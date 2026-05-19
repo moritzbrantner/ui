@@ -230,7 +230,7 @@ describe("@moritzbrantner/ui component edge cases", () => {
     );
 
     expect(container.querySelector("[data-slot='workflow-builder-edge']")?.getAttribute("d")).toBe(
-      "M 220 240 C 284 240, 284 352, 348 352",
+      "M 248 240 C 296 240, 272 352, 320 352",
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Start Source Image" }));
@@ -329,6 +329,9 @@ describe("@moritzbrantner/ui component edge cases", () => {
     );
 
     expect(screen.getByText("Assign taxonomy labels from normalized text.")).toBeTruthy();
+    expect(screen.queryByText("@platform/classification")).toBeNull();
+    expect(screen.queryByText("routing")).toBeNull();
+    expect(screen.queryByText("review")).toBeNull();
     expect(screen.getByText("required")).toBeTruthy();
     expect(screen.getByText("labels to event")).toBeTruthy();
     expect(getWorkflowNodeSize({ id: "compact", label: "Publish", variant: "compact" })).toEqual({

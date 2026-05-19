@@ -60,10 +60,10 @@ export const Default: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const expectedSize = getWorkflowNodeSize(args.node);
     await expect(canvas.getByRole("button", { name: "Classify" })).toBeVisible();
-    await expect(canvas.getByText("@moritzbrantner/text-classification")).toBeVisible();
+    await expect(canvas.queryByText("@moritzbrantner/text-classification")).not.toBeInTheDocument();
     await expect(canvas.getByText("running")).toBeVisible();
-    await expect(canvas.getByText("routing")).toBeVisible();
-    await expect(canvas.getByText("review")).toBeVisible();
+    await expect(canvas.queryByText("routing")).not.toBeInTheDocument();
+    await expect(canvas.queryByText("review")).not.toBeInTheDocument();
     await expect(canvas.getByRole("button", { name: "Classify Text" })).toBeVisible();
     await expect(canvas.getByRole("button", { name: "Classify Labels" })).toBeVisible();
     await expect(canvas.getByTestId("workflow-node-size")).toHaveTextContent(

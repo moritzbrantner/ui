@@ -75,7 +75,6 @@ function WorkflowNode({
 }: WorkflowNodeProps) {
   const compact = workflowNodeUsesCompactVariant(node);
   const size = getWorkflowNodeSize(node);
-  const tags = (node.tags ?? []).slice(0, compact ? 2 : 3);
 
   return (
     <div
@@ -84,7 +83,7 @@ function WorkflowNode({
       data-selected={selected ? "true" : undefined}
       data-status={node.status}
       className={cn(
-        "flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-colors",
+        "flex flex-col overflow-visible rounded-xl border bg-card text-card-foreground shadow-sm transition-colors",
         "data-[selected=true]:border-primary data-[selected=true]:bg-primary/5",
         compact ? "w-[224px]" : "w-[248px]",
         className,
@@ -95,7 +94,7 @@ function WorkflowNode({
       <div
         data-slot="workflow-node-header"
         className={cn(
-          "shrink-0 overflow-hidden border-b px-3 py-2",
+          "shrink-0 overflow-hidden rounded-t-xl border-b px-3 py-2",
           compact
             ? "h-[48px]"
             : node.description
@@ -121,11 +120,6 @@ function WorkflowNode({
               </div>
             ) : null}
             <div className="truncate text-sm font-semibold">{node.label}</div>
-            {node.packageLabel ? (
-              <div className="truncate text-[11px] font-medium text-muted-foreground">
-                {node.packageLabel}
-              </div>
-            ) : null}
           </button>
           <div className="mt-0.5 flex shrink-0 items-center gap-1.5">
             {node.status ? (
@@ -151,21 +145,11 @@ function WorkflowNode({
             {node.description}
           </p>
         ) : null}
-        {!compact && (tags.length > 0 || node.kind) ? (
-          <div className="mt-1 flex gap-1.5 overflow-hidden">
-            {node.kind ? <Badge variant="outline">{node.kind}</Badge> : null}
-            {tags.map((tag) => (
-              <Badge key={tag} variant="outline">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        ) : null}
       </div>
       {compact ? (
         <div
           data-slot="workflow-node-compact-ports"
-          className="grid min-h-0 flex-1 grid-cols-[auto_1fr_auto] items-center gap-2 px-3 py-2 text-xs"
+          className="relative flex min-h-0 flex-1 items-center justify-center px-8 py-2 text-xs"
         >
           <WorkflowNodePortAnchor
             direction="input"
@@ -307,12 +291,18 @@ function WorkflowNodePortAnchor({
       disabled={disabled || !onClick}
       aria-label={getAriaLabel?.(port, node) ?? `${node.label} ${port.label}`}
       className={cn(
-        "block h-full min-h-0 w-full overflow-hidden rounded-lg border px-2 py-1.5 text-left outline-none transition-colors",
+        "relative block h-full min-h-0 w-full overflow-visible rounded-lg border px-2 py-1.5 text-left outline-none transition-colors",
         "focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
         isInput
           ? "border-border/80 bg-muted/20 hover:bg-muted/40"
           : "border-border/80 bg-background hover:bg-muted/30",
-        compact && "size-6 rounded-full p-1.5",
+        compact &&
+          cn(
+            "absolute top-1/2 size-6 rounded-full p-1.5",
+            isInput
+              ? "left-0 -translate-x-1/2 -translate-y-1/2"
+              : "right-0 translate-x-1/2 -translate-y-1/2",
+          ),
       )}
       onClick={(event) => {
         event.stopPropagation();
@@ -328,12 +318,19 @@ function WorkflowNodePortAnchor({
       >
         <CircleIcon
           data-slot="workflow-node-port-dot"
-          className={cn("size-3 shrink-0 fill-current", !compact && "mt-0.5")}
+          className={cn(
+            "size-3 shrink-0 fill-current",
+            !compact &&
+              cn(
+                "absolute top-1/2 -translate-y-1/2",
+                isInput ? "-left-3.5" : "-right-3.5",
+              ),
+          )}
           aria-hidden="true"
         />
         <div
           className={cn(
-            "min-w-0 flex-1",
+            "min-w-0 flex-1 overflow-hidden",
             compact && "sr-only",
             !isInput && !compact && "items-end",
           )}

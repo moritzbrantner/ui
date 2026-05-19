@@ -679,17 +679,7 @@ function getWorkflowNodePortDotXOffset(
 ) {
   const size = getWorkflowNodeSize(node);
 
-  if (node.variant !== "compact") {
-    return direction === "input"
-      ? workflowNodePortDotInset()
-      : size.width - workflowNodePortDotInset();
-  }
-
-  if (direction === "input") {
-    return workflowNodePortDotInset();
-  }
-
-  return size.width - workflowNodePortDotInset();
+  return direction === "input" ? 0 : size.width;
 }
 
 function measureWorkflowBuilderPortPoints(
@@ -800,10 +790,6 @@ function workflowNodeSizeFallback() {
     width: 248,
     height: 124,
   };
-}
-
-function workflowNodePortDotInset() {
-  return 28;
 }
 
 export {
