@@ -607,6 +607,8 @@ function ChartDonutGraph({
     );
   const total = segments.reduce((sum, item) => sum + item.value, 0);
   const hasData = total > 0;
+  const hasInteractiveSegments = segments.some((segment) => segment.children.length > 0);
+  const isInteractiveDonut = hasInteractiveSegments || canGoUp;
   const center = size / 2;
   const radiusOuter = Math.min(outerRadius, center - 2);
   const radiusInner = Math.min(innerRadius, radiusOuter - 8);
@@ -638,7 +640,7 @@ function ChartDonutGraph({
       {hasData ? (
         <>
           <svg
-            role="img"
+            role={isInteractiveDonut ? "group" : "img"}
             aria-label={ariaLabel}
             viewBox={`0 0 ${size} ${size}`}
             className="mx-auto h-auto w-full max-w-56 overflow-visible"
@@ -650,14 +652,15 @@ function ChartDonutGraph({
                 const startAngle = currentAngle + gap / 2;
                 const endAngle = currentAngle + angle - gap / 2;
                 currentAngle += angle;
+                const isInteractiveSegment = segment.children.length > 0;
 
                 return (
                   <path
                     key={segment.index}
                     data-slot="chart-donut-graph-segment"
-                    role={segment.children.length ? "button" : "graphics-symbol"}
+                    role={isInteractiveSegment ? "button" : "graphics-symbol"}
                     aria-label={`${segment.label}: ${formatValue(segment.value)}${
-                      segment.children.length ? ". Enter folder" : ""
+                      isInteractiveSegment ? ". Enter folder" : ""
                     }`}
                     d={getDonutSegmentPath(
                       center,
@@ -670,11 +673,15 @@ function ChartDonutGraph({
                     fill={segment.color}
                     className={cn(
                       "outline-none transition-opacity hover:opacity-80 focus:opacity-80",
-                      segment.children.length && "cursor-pointer",
+                      isInteractiveSegment && "cursor-pointer",
                     )}
-                    onClick={() => handleSegmentClick(segment)}
-                    onKeyDown={(event) => handleSegmentKeyDown(event, segment)}
-                    tabIndex={0}
+                    onClick={isInteractiveSegment ? () => handleSegmentClick(segment) : undefined}
+                    onKeyDown={
+                      isInteractiveSegment
+                        ? (event) => handleSegmentKeyDown(event, segment)
+                        : undefined
+                    }
+                    tabIndex={isInteractiveSegment ? 0 : undefined}
                   />
                 );
               })}

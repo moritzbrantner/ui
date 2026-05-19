@@ -254,6 +254,66 @@ describe("@moritzbrantner/ui component edge cases", () => {
     ]);
   });
 
+  test("workflow builder minimizes nodes without losing edge routing", () => {
+    const onNodesChange = vi.fn();
+    const nodes = [
+      {
+        id: "source",
+        label: "Source",
+        x: 0,
+        y: 0,
+        outputs: [
+          { id: "image", label: "Image", kind: "image" },
+          { id: "text", label: "Text", kind: "text" },
+        ],
+      },
+      {
+        id: "merge",
+        label: "Merge",
+        x: 320,
+        y: 0,
+        minimized: true,
+        inputs: [
+          { id: "image", label: "Image", kind: "image" },
+          { id: "text", label: "Text", kind: "text" },
+        ],
+      },
+    ];
+
+    const { container } = render(
+      <WorkflowBuilder
+        nodes={nodes}
+        edges={[
+          {
+            id: "source-text-merge-text",
+            sourceNodeId: "source",
+            sourcePortId: "text",
+            targetNodeId: "merge",
+            targetPortId: "text",
+          },
+        ]}
+        onNodesChange={onNodesChange}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Expand Merge" }).getAttribute("aria-pressed"),
+    ).toBe("true");
+    expect(container.querySelector("[data-slot='workflow-builder-edge']")?.getAttribute("d")).toBe(
+      "M 248 240 C 296 240, 272 26, 320 26",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Minimize Source" }));
+
+    expect(onNodesChange).toHaveBeenCalledWith([
+      {
+        ...nodes[0],
+        minimized: true,
+      },
+      nodes[1],
+    ]);
+  });
+
   test("annotation and workflow surfaces preserve read-only and empty-state contracts", () => {
     const onAnnotationsChange = vi.fn();
     const onNodesChange = vi.fn();
@@ -325,6 +385,17 @@ describe("@moritzbrantner/ui component edge cases", () => {
             outputs: [{ id: "event", label: "Webhook", kind: "event" }],
           }}
         />
+        <WorkflowNode
+          node={{
+            id: "minimized",
+            label: "Review",
+            minimized: true,
+            description: "Hidden while minimized.",
+            inputs: [{ id: "task", label: "Task", kind: "task" }],
+            outputs: [{ id: "done", label: "Done", kind: "event" }],
+          }}
+          onMinimizedChange={vi.fn()}
+        />
       </>,
     );
 
@@ -334,9 +405,15 @@ describe("@moritzbrantner/ui component edge cases", () => {
     expect(screen.queryByText("review")).toBeNull();
     expect(screen.getByText("required")).toBeTruthy();
     expect(screen.getByText("labels to event")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Expand Review" })).toBeTruthy();
+    expect(screen.queryByText("Hidden while minimized.")).toBeNull();
     expect(getWorkflowNodeSize({ id: "compact", label: "Publish", variant: "compact" })).toEqual({
       width: 224,
       height: 84,
+    });
+    expect(getWorkflowNodeSize({ id: "minimized", label: "Review", minimized: true })).toEqual({
+      width: 192,
+      height: 52,
     });
   });
 });

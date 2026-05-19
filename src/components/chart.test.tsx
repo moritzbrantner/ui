@@ -152,6 +152,9 @@ describe("chart graph components", () => {
     expect(container.querySelectorAll('[data-slot="chart-donut-graph-segment"]')).toHaveLength(
       2,
     );
+    expect(
+      container.querySelector('[data-slot="chart-donut-graph-segment"]')?.getAttribute("tabindex"),
+    ).toBeNull();
     expect(screen.getByText("70")).toBeTruthy();
     expect(screen.getByText("Sessions")).toBeTruthy();
     expect(screen.getByText("Organic")).toBeTruthy();
@@ -184,6 +187,8 @@ describe("chart graph components", () => {
     expect(screen.getByText("Design")).toBeTruthy();
     expect(screen.getByText("Code")).toBeTruthy();
     expect(screen.getByText("20")).toBeTruthy();
+    expect(screen.getByRole("group", { name: "Folder sizes" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Design: 10. Enter folder" })).toBeTruthy();
 
     const [designSegment] = container.querySelectorAll(
       '[data-slot="chart-donut-graph-segment"]',

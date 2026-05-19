@@ -127,7 +127,7 @@ export const Default: Story = {
       canvas.getByRole("img", { name: "Activation and retention area" }),
     ).toBeVisible();
     await expect(canvas.getByRole("img", { name: "Weekly activation sparkline" })).toBeVisible();
-    await expect(canvas.getByRole("img", { name: "Acquisition channel split" })).toBeVisible();
+    await expect(canvas.getByRole("group", { name: "Acquisition channel split" })).toBeVisible();
     await expect(canvas.getByText("Target corridor")).toBeInTheDocument();
   },
 };

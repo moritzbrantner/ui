@@ -73,6 +73,7 @@ type WorkflowBuilderNodeProps = Omit<React.ComponentProps<"div">, "onSelect"> & 
   readOnly?: boolean;
   pendingConnection?: PendingConnection | null;
   onNodeSelect?: (node: WorkflowBuilderNodeData) => void;
+  onNodeMinimizedChange?: (nodeId: string, minimized: boolean) => void;
   onStartConnection?: (nodeId: string, portId: string) => void;
   onCompleteConnection?: (nodeId: string, portId: string) => void;
   onNodePointerDown?: (
@@ -263,6 +264,12 @@ function WorkflowBuilder({
     setPendingConnection(null);
   };
 
+  const changeNodeMinimized = (nodeId: string, minimized: boolean) => {
+    onNodesChange?.(
+      nodes.map((node) => (node.id === nodeId ? { ...node, minimized } : node)),
+    );
+  };
+
   const fitView = () => {
     commitZoom(1);
   };
@@ -288,6 +295,9 @@ function WorkflowBuilder({
     const measuredPortPoints = measureWorkflowBuilderPortPoints(viewport, currentZoom);
 
     if (Object.keys(measuredPortPoints).length === 0) {
+      setPortPoints((currentPortPoints) =>
+        Object.keys(currentPortPoints).length === 0 ? currentPortPoints : {},
+      );
       return;
     }
 
@@ -379,6 +389,7 @@ function WorkflowBuilder({
               readOnly={readOnly}
               pendingConnection={pendingConnection}
               onNodeSelect={selectNode}
+              onNodeMinimizedChange={onNodesChange ? changeNodeMinimized : undefined}
               onStartConnection={(sourceNodeId, sourcePortId) =>
                 setPendingConnection({ sourceNodeId, sourcePortId })
               }
@@ -404,6 +415,7 @@ function WorkflowBuilderNode({
   readOnly,
   pendingConnection,
   onNodeSelect,
+  onNodeMinimizedChange,
   onStartConnection,
   onCompleteConnection,
   onNodePointerDown,
@@ -431,6 +443,7 @@ function WorkflowBuilderNode({
         inputDisabled={readOnly || !pendingConnection}
         outputDisabled={readOnly}
         onNodeSelect={() => onNodeSelect?.(node)}
+        onMinimizedChange={(_, minimized) => onNodeMinimizedChange?.(node.id, minimized)}
         onInputClick={(port) => onCompleteConnection?.(node.id, port.id)}
         onOutputClick={(port) => onStartConnection?.(node.id, port.id)}
         getInputAriaLabel={(port) => `Connect to ${node.label} ${port.label}`}
@@ -619,6 +632,7 @@ function getWorkflowNodePortPoint(
 ): WorkflowBuilderPoint {
   const size = getWorkflowNodeSize(node);
   const compact = node.variant === "compact";
+  const minimized = node.minimized === true;
   const measuredPoint = portPoints[getWorkflowBuilderPortPointKey(node.id, direction, portId)];
 
   if (measuredPoint) {
@@ -627,7 +641,7 @@ function getWorkflowNodePortPoint(
 
   const x = node.x + getWorkflowNodePortDotXOffset(node, direction);
 
-  if (compact) {
+  if (compact || minimized) {
     return {
       x,
       y: node.y + size.height / 2,
