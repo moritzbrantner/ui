@@ -19,6 +19,18 @@ import {
 } from "./description-list";
 import { Stat, StatDelta, StatGroup, StatLabel, StatValue } from "./stat";
 import {
+  Terminal,
+  TerminalActions,
+  TerminalCommand,
+  TerminalContent,
+  TerminalControls,
+  TerminalHeader,
+  TerminalLine,
+  TerminalOutput,
+  TerminalPrompt,
+  TerminalTitle,
+} from "./terminal";
+import {
   Timeline,
   TimelineConnector,
   TimelineContent,
@@ -73,6 +85,32 @@ function DisplayPreview() {
         </CodeBlockContent>
       </CodeBlock>
 
+      <Terminal aria-label="Install command output">
+        <TerminalHeader>
+          <div className="flex min-w-0 items-center gap-3">
+            <TerminalControls />
+            <TerminalTitle>~/workspace/ui</TerminalTitle>
+          </div>
+          <TerminalActions>
+            <Badge variant="outline" className="border-zinc-700 text-zinc-300">
+              bash
+            </Badge>
+          </TerminalActions>
+        </TerminalHeader>
+        <TerminalContent>
+          <TerminalLine>
+            <TerminalPrompt />
+            <TerminalCommand>bun install</TerminalCommand>
+          </TerminalLine>
+          <TerminalLine variant="muted">
+            <TerminalOutput>Resolved, downloaded and extracted [214]</TerminalOutput>
+          </TerminalLine>
+          <TerminalLine variant="success">
+            <TerminalOutput>Saved lockfile</TerminalOutput>
+          </TerminalLine>
+        </TerminalContent>
+      </Terminal>
+
       <Timeline>
         <TimelineItem>
           <div>
@@ -116,6 +154,7 @@ export const Default: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByText("24.8k")).toBeVisible();
     await expect(canvas.getByText("package.ts")).toBeVisible();
+    await expect(canvas.getByText("bun install")).toBeVisible();
     await expect(canvas.getByText("Components added")).toBeVisible();
   },
 };

@@ -92,6 +92,7 @@ export * from "./components/stepper";
 export * from "./components/switch";
 export * from "./components/table";
 export * from "./components/tabs";
+export * from "./components/terminal";
 export * from "./components/textarea";
 export * from "./components/theme-mode-switch";
 export * from "./components/timeline";
