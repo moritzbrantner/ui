@@ -422,21 +422,39 @@ function evaluateQueryBuilderExpression(
   row: Record<string, unknown>,
   fields: QueryBuilderField[] = [],
 ): boolean {
-  const evaluations = expression.rules.map((rule) =>
-    isQueryBuilderGroup(rule)
-      ? evaluateQueryBuilderExpression(rule, row, fields)
-      : evaluateQueryBuilderRule(
-          rule,
-          row,
-          fields.find((field) => field.id === rule.fieldId),
-        ),
-  );
-
   if (expression.combinator === "or") {
-    return evaluations.some(Boolean);
+    for (const rule of expression.rules) {
+      if (evaluateQueryBuilderNode(rule, row, fields)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
-  return evaluations.every(Boolean);
+  for (const rule of expression.rules) {
+    if (!evaluateQueryBuilderNode(rule, row, fields)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function evaluateQueryBuilderNode(
+  rule: QueryBuilderRuleData | QueryBuilderGroupData,
+  row: Record<string, unknown>,
+  fields: QueryBuilderField[],
+): boolean {
+  if (isQueryBuilderGroup(rule)) {
+    return evaluateQueryBuilderExpression(rule, row, fields);
+  }
+
+  return evaluateQueryBuilderRule(
+    rule,
+    row,
+    fields.find((field) => field.id === rule.fieldId),
+  );
 }
 
 function serializeQueryBuilderExpression(expression: QueryBuilderExpression): string {
@@ -452,15 +470,10 @@ function evaluateQueryBuilderRule(
   const expected = rule.value;
 
   if (rule.operator === "empty") {
-    return (
-      actual === undefined ||
-      actual === null ||
-      actual === "" ||
-      (Array.isArray(actual) && actual.length === 0)
-    );
+    return isEmptyQueryBuilderValue(actual);
   }
   if (rule.operator === "not_empty") {
-    return !evaluateQueryBuilderRule({ ...rule, operator: "empty" }, row, field);
+    return !isEmptyQueryBuilderValue(actual);
   }
 
   if (field?.type === "number") {
@@ -502,19 +515,27 @@ function evaluateQueryBuilderRule(
     return Array.isArray(actual) && actual.map(String).includes(String(expected));
   }
   if (rule.operator === "not_includes") {
-    return !evaluateQueryBuilderRule({ ...rule, operator: "includes" }, row, field);
+    return !(Array.isArray(actual) && actual.map(String).includes(String(expected)));
   }
   if (rule.operator === "contains_all") {
     const expectedValues = Array.isArray(expected) ? expected.map(String) : [String(expected)];
-    return (
-      Array.isArray(actual) && expectedValues.every((value) => actual.map(String).includes(value))
-    );
+    const actualValues = Array.isArray(actual) ? actual.map(String) : [];
+    return expectedValues.every((value) => actualValues.includes(value));
   }
   if (rule.operator === "not_equals") {
     return String(actual) !== String(expected);
   }
 
   return String(actual) === String(expected);
+}
+
+function isEmptyQueryBuilderValue(value: unknown): boolean {
+  return (
+    value === undefined ||
+    value === null ||
+    value === "" ||
+    (Array.isArray(value) && value.length === 0)
+  );
 }
 
 function getQueryBuilderOperators(field: QueryBuilderField) {
