@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect } from "storybook/test";
+import { expect, userEvent } from "storybook/test";
 
 import {
   CitationExcerpt,
@@ -26,6 +26,8 @@ const citations = [
     locator: "section 3",
     url: "https://arxiv.org/abs/1706.03762",
     excerpt: "The Transformer allows for significantly more parallelization.",
+    context:
+      "The surrounding section explains that self-attention connects all token positions directly, reducing the number of sequential operations needed during training.",
     status: "supporting",
   },
   {
@@ -94,5 +96,7 @@ export const Default: Story = {
     await expect(canvas.getByText("Research synthesis handbook")).toBeVisible();
     await expect(canvas.getByText("Custom citation layout")).toBeVisible();
     await expect(canvas.getByText("Disputed")).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Show context" }));
+    await expect(canvas.getByText(/self-attention connects all token positions/)).toBeVisible();
   },
 };

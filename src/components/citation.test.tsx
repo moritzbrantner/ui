@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
 import {
@@ -25,6 +25,8 @@ const citations = [
     locator: "section 3",
     url: "https://arxiv.org/abs/1706.03762",
     excerpt: "The Transformer allows for significantly more parallelization.",
+    context:
+      "The surrounding discussion compares the architecture against recurrent and convolutional models.",
     status: "supporting",
   },
   {
@@ -54,6 +56,25 @@ describe("Citation", () => {
       screen.getByText("The Transformer allows for significantly more parallelization."),
     ).toBeTruthy();
     expect(screen.getByText("Supporting")).toBeTruthy();
+  });
+
+  test("expands citation excerpts to reveal context", () => {
+    render(<CitationList citations={citations.slice(0, 1)} />);
+
+    const trigger = screen.getByRole("button", { name: /show context/i });
+    const context = document.querySelector('[data-slot="citation-context"]');
+
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    expect(context?.textContent).toContain(
+      "The surrounding discussion compares the architecture against recurrent and convolutional models.",
+    );
+    expect(context?.hasAttribute("hidden")).toBe(true);
+
+    fireEvent.click(trigger);
+
+    expect(screen.getByRole("button", { name: /hide context/i })).toBeTruthy();
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    expect(context?.hasAttribute("hidden")).toBe(false);
   });
 
   test("renders linked titles and inline citation references", () => {

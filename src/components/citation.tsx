@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   AlertTriangleIcon,
   CheckCircle2Icon,
+  ChevronDownIcon,
   ExternalLinkIcon,
   FileTextIcon,
   InfoIcon,
@@ -26,6 +27,7 @@ type CitationData = {
   locator?: React.ReactNode;
   url?: string;
   excerpt?: React.ReactNode;
+  context?: React.ReactNode;
   note?: React.ReactNode;
   status?: CitationStatus;
 };
@@ -47,6 +49,13 @@ type CitationReferenceProps = React.ComponentProps<"sup"> & {
 
 type CitationStatusBadgeProps = React.ComponentProps<"span"> & {
   status: CitationStatus;
+};
+
+type CitationExcerptProps = React.ComponentProps<"blockquote"> & {
+  context?: React.ReactNode;
+  defaultContextOpen?: boolean;
+  contextLabel?: React.ReactNode;
+  collapseContextLabel?: React.ReactNode;
 };
 
 const statusLabels: Record<CitationStatus, string> = {
@@ -123,7 +132,9 @@ function CitationItem({
               </div>
               {citation.status ? <CitationStatusBadge status={citation.status} /> : null}
             </CitationHeader>
-            {citation.excerpt ? <CitationExcerpt>{citation.excerpt}</CitationExcerpt> : null}
+            {citation.excerpt || citation.context ? (
+              <CitationExcerpt context={citation.context}>{citation.excerpt}</CitationExcerpt>
+            ) : null}
             {citation.note ? <CitationNote>{citation.note}</CitationNote> : null}
           </>
         ) : null)}
@@ -235,7 +246,19 @@ function CitationMetaItem({ className, ...props }: React.ComponentProps<"span">)
   );
 }
 
-function CitationExcerpt({ className, ...props }: React.ComponentProps<"blockquote">) {
+function CitationExcerpt({
+  className,
+  children,
+  context,
+  defaultContextOpen = false,
+  contextLabel = "Show context",
+  collapseContextLabel = "Hide context",
+  ...props
+}: CitationExcerptProps) {
+  const contextId = React.useId();
+  const [contextOpen, setContextOpen] = React.useState(defaultContextOpen);
+  const hasContext = context !== undefined && context !== null && context !== false;
+
   return (
     <blockquote
       data-slot="citation-excerpt"
@@ -243,6 +266,38 @@ function CitationExcerpt({ className, ...props }: React.ComponentProps<"blockquo
         "border-l-2 border-border pl-3 text-sm leading-6 text-muted-foreground",
         className,
       )}
+      {...props}
+    >
+      {children}
+      {hasContext ? (
+        <>
+          <button
+            type="button"
+            aria-controls={contextId}
+            aria-expanded={contextOpen}
+            className="mt-2 flex h-7 w-fit items-center gap-1 rounded-md px-1.5 text-xs font-medium text-primary outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50"
+            onClick={() => setContextOpen((open) => !open)}
+          >
+            {contextOpen ? collapseContextLabel : contextLabel}
+            <ChevronDownIcon
+              className={cn("size-3.5 transition-transform", contextOpen && "rotate-180")}
+              aria-hidden="true"
+            />
+          </button>
+          <CitationContext id={contextId} hidden={!contextOpen}>
+            {context}
+          </CitationContext>
+        </>
+      ) : null}
+    </blockquote>
+  );
+}
+
+function CitationContext({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="citation-context"
+      className={cn("mt-2 rounded-md bg-muted/60 px-3 py-2 text-xs leading-5", className)}
       {...props}
     />
   );
@@ -336,6 +391,7 @@ function formatCitationAuthors(authors: readonly React.ReactNode[]) {
 
 export {
   CitationExcerpt,
+  CitationContext,
   CitationHeader,
   CitationItem,
   CitationList,
@@ -347,6 +403,7 @@ export {
   CitationStatusBadge,
   CitationTitle,
   type CitationData,
+  type CitationExcerptProps,
   type CitationItemProps,
   type CitationListProps,
   type CitationReferenceProps,
