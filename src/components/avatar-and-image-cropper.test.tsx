@@ -6,6 +6,7 @@ import {
   Avatar,
   AvatarCollection,
   ImageCropper,
+  avatarCollectionVariants,
   getAvatarInitials,
   getImageCropArea,
   type ImageCropperCrop,
@@ -26,6 +27,14 @@ describe("avatar", () => {
           ]}
           maxVisible={1}
           overflowShape="hexagonal"
+        />
+        <AvatarCollection
+          data-testid="loose-avatar-collection"
+          users={[
+            { name: "Community Team", size: "sm" },
+            { name: "Support Team", size: "sm" },
+          ]}
+          spacing="loose"
         />
       </>,
     );
@@ -50,9 +59,14 @@ describe("avatar", () => {
     expect(roundAvatar.style.borderRadius).toBe("9999px");
     expect(hexagonalAvatar.style.clipPath).toContain("polygon(50% 0");
     expect(overflowCount.style.clipPath).toContain("polygon(50% 0");
-    expect(container.querySelector('[data-slot="avatar-collection"]')?.className).toContain(
+    const avatarCollection = container.querySelector('[data-slot="avatar-collection"]');
+    expect(avatarCollection?.className).toContain("-space-x-3");
+    expect(avatarCollection?.getAttribute("data-spacing")).toBe("tight");
+    expect(avatarCollection?.className).toContain(
       "*:data-[shape=hexagonal]:ring-0",
     );
+    expect(screen.getByTestId("loose-avatar-collection").className).toContain("-space-x-1");
+    expect(avatarCollectionVariants({ spacing: "normal" })).toContain("-space-x-2");
     expect(
       screen
         .getByText("+4")

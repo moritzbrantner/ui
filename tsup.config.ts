@@ -38,6 +38,7 @@ export default defineConfig({
     ...componentEntries,
   },
   format: ["esm"],
+  minify: true,
   outDir: "dist",
   target: "es2022",
 });
