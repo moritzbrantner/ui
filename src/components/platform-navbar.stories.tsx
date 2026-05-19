@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, screen, waitFor } from "storybook/test";
+import { expect, screen, within } from "storybook/test";
 import {
   BookOpenIcon,
   DatabaseIcon,
@@ -155,20 +155,11 @@ export const Web: Story = {
     await userEvent.click(trigger);
 
     const profileItems = await screen.findAllByRole("menuitem", { name: "Profile" });
+    const menu = await screen.findByRole("menu");
 
     await expect(profileItems.length).toBeGreaterThan(0);
-    await waitFor(() => {
-      const visibleEmail = screen.getAllByText("mira@example.com").find((element) => {
-        try {
-          expect(element).toBeVisible();
-          return true;
-        } catch {
-          return false;
-        }
-      });
-
-      expect(visibleEmail).toBeDefined();
-    });
+    await expect(menu).toBeVisible();
+    await expect(within(menu).getByText("mira@example.com")).toBeVisible();
   },
 };
 
