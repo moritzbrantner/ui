@@ -185,7 +185,7 @@ const initialEdges: WorkflowBuilderEdge[] = [
 ];
 
 const meta = {
-  title: "Components/WorkflowBuilder",
+  title: "Components/Editors/Workflow Builder",
   component: WorkflowBuilder,
   tags: ["autodocs", "test"],
   args: {

@@ -7,7 +7,7 @@ const demoImage =
   "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1200&q=80";
 
 const meta = {
-  title: "Components/ImageCropper",
+  title: "Components/Editors/Image Cropper",
   component: ImageCropper,
   tags: ["autodocs", "test"],
   args: {

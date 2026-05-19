@@ -13,7 +13,7 @@ import {
 } from "./state-view";
 
 const meta = {
-  title: "Components/StateView",
+  title: "Components/Data Display/State View",
   component: EmptyState,
   tags: ["autodocs", "test"],
 } satisfies Meta<typeof EmptyState>;

@@ -38,7 +38,7 @@ function DropzoneDemo({ disabled = false, onChange }: DropzoneDemoProps) {
 }
 
 const meta = {
-  title: "Components/Dropzone",
+  title: "Components/Forms & Inputs/Dropzone",
   component: DropzoneDemo,
   tags: ["autodocs", "test"],
   args: {

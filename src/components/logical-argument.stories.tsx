@@ -83,7 +83,7 @@ function LogicalArgumentPreview() {
 }
 
 const meta = {
-  title: "Components/Logical Argument",
+  title: "Components/Data Display/Logical Argument",
   component: LogicalArgumentPreview,
   tags: ["autodocs", "test"],
 } satisfies Meta<typeof LogicalArgumentPreview>;

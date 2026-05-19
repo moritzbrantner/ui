@@ -60,7 +60,7 @@ function CommandPaletteDemo({ loading = false }: { loading?: boolean }) {
 }
 
 const meta = {
-  title: "Components/CommandPalette",
+  title: "Components/Navigation/Command Palette",
   component: CommandPaletteDemo,
   tags: ["autodocs", "test"],
 } satisfies Meta<typeof CommandPaletteDemo>;

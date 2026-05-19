@@ -136,7 +136,7 @@ function DashboardDemo({ onRefresh = () => undefined }: DashboardDemoProps) {
 }
 
 const meta = {
-  title: "Layouts/App Shell",
+  title: "Components/Layout/App Shell",
   component: DashboardDemo,
   tags: ["autodocs", "test"],
   args: {

@@ -42,7 +42,7 @@ const sections: InspectorPanelSectionData[] = [
 ];
 
 const meta = {
-  title: "Components/InspectorPanel",
+  title: "Components/Editors/Inspector Panel",
   component: InspectorPanel,
   tags: ["autodocs", "test"],
   args: {

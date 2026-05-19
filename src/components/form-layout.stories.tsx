@@ -57,7 +57,7 @@ function FormLayoutDemo() {
 }
 
 const meta = {
-  title: "Components/FormLayout",
+  title: "Components/Forms & Inputs/Form Layout",
   component: FormLayoutDemo,
   tags: ["autodocs", "test"],
 } satisfies Meta<typeof FormLayoutDemo>;

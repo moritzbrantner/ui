@@ -42,7 +42,7 @@ const projectFolders: TreeViewNode[] = [
 ];
 
 const meta = {
-  title: "Components/TreeView",
+  title: "Components/Data Display/Tree View",
   component: TreeView,
   tags: ["autodocs", "test"],
   args: {

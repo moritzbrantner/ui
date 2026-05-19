@@ -32,7 +32,7 @@ const items = [
 ] satisfies UploadQueueFile[];
 
 const meta = {
-  title: "Components/UploadQueue",
+  title: "Components/Feedback/Upload Queue",
   component: UploadQueue,
   tags: ["autodocs", "test"],
   args: {

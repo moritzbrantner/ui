@@ -1305,7 +1305,7 @@ function CatalogPreview({ designSystem = defaultUiThemeName }: CatalogPreviewPro
 }
 
 const meta = {
-  title: "Reference/Shadcn catalog",
+  title: "Reference/Shadcn Catalog",
   component: CatalogPreview,
   tags: ["autodocs", "test"],
   args: {

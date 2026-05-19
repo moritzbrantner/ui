@@ -84,7 +84,7 @@ const keyboardRows = [
 ] as const;
 
 const meta = {
-  title: "Components/Keyboard",
+  title: "Components/Forms & Inputs/Keyboard",
   component: Keyboard,
   tags: ["autodocs", "test"],
   args: {

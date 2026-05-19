@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { LanguageSwitcher } from "./language-switcher";
 
 const meta = {
-  title: "Components/Language switcher",
+  title: "Components/Forms & Inputs/Language Switcher",
   component: LanguageSwitcher,
   tags: ["autodocs", "test"],
   args: {

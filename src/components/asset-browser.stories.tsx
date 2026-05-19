@@ -35,7 +35,7 @@ const assets: AssetBrowserItem[] = [
 ];
 
 const meta = {
-  title: "Components/AssetBrowser",
+  title: "Components/Editors/Asset Browser",
   component: AssetBrowser,
   tags: ["autodocs", "test"],
   args: {

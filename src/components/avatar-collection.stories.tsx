@@ -12,7 +12,7 @@ const users = [
 ] satisfies AvatarCollectionItem[];
 
 const meta = {
-  title: "Components/AvatarCollection",
+  title: "Components/Data Display/Avatar Collection",
   component: AvatarCollection,
   tags: ["autodocs", "test"],
   argTypes: {

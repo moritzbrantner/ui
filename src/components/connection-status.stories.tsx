@@ -4,7 +4,7 @@ import { expect, fn } from "storybook/test";
 import { ConnectionStatus } from "./connection-status";
 
 const meta = {
-  title: "Components/ConnectionStatus",
+  title: "Components/Feedback/Connection Status",
   component: ConnectionStatus,
   tags: ["autodocs", "test"],
   args: {

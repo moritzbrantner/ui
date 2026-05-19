@@ -32,7 +32,7 @@ const notifications = [
 ] satisfies ComponentProps<typeof NotificationMenu>["items"];
 
 const meta = {
-  title: "Components/NotificationMenu",
+  title: "Components/Feedback/Notification Menu",
   component: NotificationMenu,
   tags: ["autodocs", "test"],
   parameters: {

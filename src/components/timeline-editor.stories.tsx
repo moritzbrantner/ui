@@ -67,7 +67,7 @@ function TimelineEditorDemo({
 }
 
 const meta = {
-  title: "Components/TimelineEditor",
+  title: "Components/Editors/Timeline Editor",
   component: TimelineEditorDemo,
   tags: ["autodocs", "test"],
   args: {

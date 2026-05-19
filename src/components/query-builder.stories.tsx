@@ -29,7 +29,7 @@ const expression: QueryBuilderExpression = {
 };
 
 const meta = {
-  title: "Components/QueryBuilder",
+  title: "Components/Forms & Inputs/Query Builder",
   component: QueryBuilder,
   tags: ["autodocs", "test"],
   args: {

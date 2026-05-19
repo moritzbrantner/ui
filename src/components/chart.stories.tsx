@@ -64,7 +64,7 @@ function ChartPreview() {
 }
 
 const meta = {
-  title: "Components/Chart",
+  title: "Components/Data Display/Chart",
   component: ChartPreview,
   tags: ["autodocs", "test"],
 } satisfies Meta<typeof ChartPreview>;

@@ -141,7 +141,7 @@ function DisplayPreview() {
 }
 
 const meta = {
-  title: "Components/Display",
+  title: "Components/Data Display/Display",
   component: DisplayPreview,
   tags: ["autodocs", "test"],
 } satisfies Meta<typeof DisplayPreview>;

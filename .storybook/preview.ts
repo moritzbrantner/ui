@@ -220,6 +220,27 @@ const preview: Preview = {
   ],
   parameters: {
     layout: "centered",
+    options: {
+      storySort: {
+        order: [
+          "Design System",
+          "Components",
+          [
+            "Actions",
+            "Forms & Inputs",
+            "Navigation",
+            "Overlays",
+            "Layout",
+            "Data Display",
+            "Feedback",
+            "Editors",
+            "Social",
+          ],
+          "Patterns",
+          "Reference",
+        ],
+      },
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,

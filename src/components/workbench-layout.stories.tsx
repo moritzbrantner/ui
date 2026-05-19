@@ -43,7 +43,7 @@ function WorkbenchLayoutDemo() {
 }
 
 const meta = {
-  title: "Components/WorkbenchLayout",
+  title: "Components/Layout/Workbench Layout",
   component: WorkbenchLayoutDemo,
   tags: ["autodocs", "test"],
 } satisfies Meta<typeof WorkbenchLayoutDemo>;

@@ -20,7 +20,7 @@ function ControlledAngleInputDemo() {
 }
 
 const meta = {
-  title: "Components/AngleInput",
+  title: "Components/Forms & Inputs/Angle Input",
   component: AngleInput,
   tags: ["autodocs", "test"],
   args: {

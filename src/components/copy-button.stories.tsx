@@ -4,7 +4,7 @@ import { expect, fn } from "storybook/test";
 import { CopyButton } from "./copy-button";
 
 const meta = {
-  title: "Components/CopyButton",
+  title: "Components/Actions/Copy Button",
   component: CopyButton,
   tags: ["autodocs", "test"],
   args: {

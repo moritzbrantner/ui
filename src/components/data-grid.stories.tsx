@@ -66,7 +66,7 @@ function DataGridDemo({
 }
 
 const meta = {
-  title: "Components/DataGrid",
+  title: "Components/Data Display/Data Grid",
   component: DataGridDemo,
   tags: ["autodocs", "test"],
   args: {

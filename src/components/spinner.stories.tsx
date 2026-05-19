@@ -15,7 +15,7 @@ const spinnerSizes = ["xs", "sm", "default", "lg", "xl"] as const;
 const spinnerVariants = ["default", "muted", "primary", "secondary", "destructive"] as const;
 
 const meta = {
-  title: "Components/Spinner",
+  title: "Components/Feedback/Spinner",
   component: Spinner,
   tags: ["autodocs", "test"],
   args: {

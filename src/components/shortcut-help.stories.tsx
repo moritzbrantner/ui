@@ -22,7 +22,7 @@ const groups = [
 ] satisfies ShortcutHelpGroup[];
 
 const meta = {
-  title: "Components/ShortcutHelp",
+  title: "Components/Navigation/Shortcut Help",
   component: ShortcutList,
   tags: ["autodocs", "test"],
 } satisfies Meta<typeof ShortcutList>;

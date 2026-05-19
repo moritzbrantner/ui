@@ -43,7 +43,7 @@ const compactPublishNode: WorkflowNodeData = {
 };
 
 const meta = {
-  title: "Components/WorkflowNode",
+  title: "Components/Editors/Workflow Node",
   component: WorkflowNode,
   tags: ["autodocs", "test"],
   args: {

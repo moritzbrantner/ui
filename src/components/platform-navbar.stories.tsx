@@ -67,7 +67,7 @@ const navigationGroups = [
 ] as const satisfies PlatformNavbarGroup[];
 
 const meta = {
-  title: "Components/PlatformNavbar",
+  title: "Components/Navigation/Platform Navbar",
   component: PlatformNavbar,
   tags: ["autodocs", "test"],
   parameters: {

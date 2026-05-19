@@ -4,7 +4,7 @@ import { expect, fn } from "storybook/test";
 import { SearchField } from "./search-field";
 
 const meta = {
-  title: "Components/SearchField",
+  title: "Components/Forms & Inputs/Search Field",
   component: SearchField,
   tags: ["autodocs", "test"],
   args: {

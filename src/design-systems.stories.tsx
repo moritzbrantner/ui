@@ -100,7 +100,7 @@ const systems = [
 ] as const satisfies readonly SystemProfile[];
 
 const meta = {
-  title: "Design Systems/Overview",
+  title: "Design System/Theme Catalog",
   tags: ["autodocs", "test"],
   parameters: {
     layout: "fullscreen",

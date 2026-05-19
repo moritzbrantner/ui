@@ -4,7 +4,7 @@ import { expect } from "storybook/test";
 import { ThemeModeSwitch } from "./theme-mode-switch";
 
 const meta = {
-  title: "Components/Theme mode switch",
+  title: "Components/Forms & Inputs/Theme Mode Switch",
   component: ThemeModeSwitch,
   tags: ["autodocs", "test"],
   args: {

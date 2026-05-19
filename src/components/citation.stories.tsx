@@ -79,7 +79,7 @@ function CitationPreview() {
 }
 
 const meta = {
-  title: "Components/Citation",
+  title: "Components/Data Display/Citation",
   component: CitationPreview,
   tags: ["autodocs", "test"],
 } satisfies Meta<typeof CitationPreview>;

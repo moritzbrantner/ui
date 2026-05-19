@@ -299,7 +299,7 @@ function SocialComponentsPreview() {
 }
 
 const meta = {
-  title: "Components/Social",
+  title: "Components/Social/Overview",
   component: SocialComponentsPreview,
   tags: ["autodocs", "test"],
 } satisfies Meta<typeof SocialComponentsPreview>;

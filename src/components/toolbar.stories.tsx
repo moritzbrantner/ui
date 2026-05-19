@@ -51,7 +51,7 @@ function ToolbarDemo({ onSave = () => undefined, density = "default" }: ToolbarD
 }
 
 const meta = {
-  title: "Components/Toolbar",
+  title: "Components/Actions/Toolbar",
   component: ToolbarDemo,
   tags: ["autodocs", "test"],
   args: {

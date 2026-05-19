@@ -54,7 +54,7 @@ const calendarIcsData = [
 ] as const satisfies CalendarIcsData;
 
 const meta = {
-  title: "Components/Calendar",
+  title: "Components/Forms & Inputs/Calendar",
   component: Calendar,
   tags: ["autodocs", "test"],
   args: {

@@ -6,7 +6,7 @@ import { Button } from "./button";
 import { SelectionToolbar } from "./selection-toolbar";
 
 const meta = {
-  title: "Components/SelectionToolbar",
+  title: "Components/Actions/Selection Toolbar",
   component: SelectionToolbar,
   tags: ["autodocs", "test"],
   args: {

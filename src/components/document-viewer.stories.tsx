@@ -42,7 +42,7 @@ const highlights: DocumentViewerHighlight[] = [
 ];
 
 const meta = {
-  title: "Components/DocumentViewer",
+  title: "Components/Data Display/Document Viewer",
   component: DocumentViewer,
   tags: ["autodocs", "test"],
   args: {

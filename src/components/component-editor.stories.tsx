@@ -45,7 +45,7 @@ const buttonDefinition = {
 } satisfies EditableComponentDefinition;
 
 const meta = {
-  title: "Components/ComponentEditor",
+  title: "Components/Editors/Component Editor",
   component: ComponentEditorPanel,
   tags: ["autodocs", "test"],
   parameters: {

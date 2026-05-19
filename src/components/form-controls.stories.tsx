@@ -49,7 +49,7 @@ function FormControlsDemo({ disabled = false }: FormControlsDemoProps) {
 }
 
 const meta = {
-  title: "Components/Form controls",
+  title: "Components/Forms & Inputs/Form Controls",
   component: FormControlsDemo,
   tags: ["autodocs", "test"],
   args: {

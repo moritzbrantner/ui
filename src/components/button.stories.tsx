@@ -9,7 +9,7 @@ const buttonVariants = ["default", "secondary", "outline", "ghost", "link", "des
 const buttonSizes = ["xs", "sm", "default", "lg", "icon", "icon-sm"] as const;
 
 const meta = {
-  title: "Components/Button",
+  title: "Components/Actions/Button",
   component: Button,
   tags: ["autodocs", "test"],
   args: {

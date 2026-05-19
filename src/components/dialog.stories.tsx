@@ -42,7 +42,7 @@ function DialogDemo({ defaultOpen = false }: DialogDemoProps) {
 }
 
 const meta = {
-  title: "Components/Dialog",
+  title: "Components/Overlays/Dialog",
   component: DialogDemo,
   tags: ["autodocs", "test"],
   args: {

@@ -56,7 +56,7 @@ function AnnotationCanvasDemo({
 }
 
 const meta = {
-  title: "Components/AnnotationCanvas",
+  title: "Components/Editors/Annotation Canvas",
   component: AnnotationCanvasDemo,
   tags: ["autodocs", "test"],
   args: {

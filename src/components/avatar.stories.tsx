@@ -6,7 +6,7 @@ import { Avatar, type AvatarShape } from "./avatar";
 const avatarShapes: AvatarShape[] = ["round", "square", "hexagonal", "octagonal"];
 
 const meta = {
-  title: "Components/Avatar",
+  title: "Components/Data Display/Avatar",
   component: Avatar,
   tags: ["autodocs", "test"],
   args: {

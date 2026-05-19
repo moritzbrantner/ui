@@ -24,7 +24,7 @@ const defaultItems = [
 ] satisfies ComponentProps<typeof AccountMenu>["items"];
 
 const meta = {
-  title: "Components/AccountMenu",
+  title: "Components/Navigation/Account Menu",
   component: AccountMenu,
   tags: ["autodocs", "test"],
   parameters: {

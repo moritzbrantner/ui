@@ -47,7 +47,7 @@ function StepperDemo({ orientation = "horizontal" }: { orientation?: "horizontal
 }
 
 const meta = {
-  title: "Components/Stepper",
+  title: "Components/Forms & Inputs/Stepper",
   component: StepperDemo,
   tags: ["autodocs", "test"],
   args: {
