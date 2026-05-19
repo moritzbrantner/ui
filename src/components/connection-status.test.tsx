@@ -4,24 +4,23 @@ import { describe, expect, test, vi } from "vitest";
 import { ConnectionStatus } from "..";
 
 describe("connection status", () => {
-  test("renders connected, synced, disconnected, and out-of-sync states", () => {
+  test("renders syncing, synced, and disconnected states", () => {
     render(
       <div>
-        <ConnectionStatus status="connected" onSync={() => undefined} />
+        <ConnectionStatus status="syncing" onSync={() => undefined} />
         <ConnectionStatus status="synced" onSync={() => undefined} />
         <ConnectionStatus status="disconnected" onReconnect={() => undefined} />
-        <ConnectionStatus status="out-of-sync" onSync={() => undefined} />
       </div>,
     );
 
-    expect(screen.getByText("Connected").closest("button")).toBeTruthy();
-    expect(screen.getByText("Connected and synced").closest("button")).toBeTruthy();
+    expect(screen.getByText("Syncing").closest("button")).toBeTruthy();
+    expect(
+      screen.getByText("Connected and synced").closest("button"),
+    ).toBeTruthy();
     expect(screen.getByText("Disconnected").closest("button")).toBeTruthy();
-    expect(screen.getByText("Out of sync").closest("button")).toBeTruthy();
-    expect(screen.getByText("Sync now")).toBeTruthy();
+    expect(screen.getByText("Syncing...")).toBeTruthy();
     expect(screen.getByText("Synced up")).toBeTruthy();
     expect(screen.getByText("Reconnect")).toBeTruthy();
-    expect(screen.getByText("Sync up")).toBeTruthy();
   });
 
   test("clicking a disconnected status tries to reconnect and shows pending feedback", async () => {
@@ -33,7 +32,9 @@ describe("connection status", () => {
         }),
     );
 
-    render(<ConnectionStatus status="disconnected" onReconnect={onReconnect} />);
+    render(
+      <ConnectionStatus status="disconnected" onReconnect={onReconnect} />,
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /Disconnected/i }));
 
@@ -47,24 +48,44 @@ describe("connection status", () => {
     });
   });
 
-  test("clicking connected, synced, and out-of-sync states routes to sync", async () => {
+  test("clicking synced routes to sync", async () => {
+    const onSync = vi.fn();
+
+    render(<ConnectionStatus status="synced" onSync={onSync} />);
+
+    fireEvent.click(
+      screen.getByText("Connected and synced").closest("button")!,
+    );
+
+    await waitFor(() => {
+      expect(onSync).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  test("syncing and legacy sync-needed states render as disabled in-progress feedback", () => {
     const onSync = vi.fn();
 
     render(
       <div>
+        <ConnectionStatus status="syncing" onSync={onSync} />
         <ConnectionStatus status="connected" onSync={onSync} />
-        <ConnectionStatus status="synced" onSync={onSync} />
         <ConnectionStatus status="out-of-sync" onSync={onSync} />
       </div>,
     );
 
-    fireEvent.click(screen.getByText("Connected").closest("button")!);
-    fireEvent.click(screen.getByText("Connected and synced").closest("button")!);
-    fireEvent.click(screen.getByText("Out of sync").closest("button")!);
+    const buttons = screen.getAllByRole("button");
 
-    await waitFor(() => {
-      expect(onSync).toHaveBeenCalledTimes(3);
-    });
+    expect(screen.getAllByText("Syncing")).toHaveLength(3);
+    expect(screen.getAllByText("Syncing...")).toHaveLength(3);
+
+    for (const button of buttons) {
+      expect(button.getAttribute("disabled")).toBe("");
+      expect(button.getAttribute("data-status")).toBe("syncing");
+      expect(button.className).toContain("border-blue-500/30");
+      fireEvent.click(button);
+    }
+
+    expect(onSync).not.toHaveBeenCalled();
   });
 
   test("renders action labels with hover and active light-up states", () => {
@@ -72,13 +93,22 @@ describe("connection status", () => {
 
     const action = screen.getByText("Synced up");
 
-    expect(action.className).toContain("group-hover/connection-status:bg-emerald-500/22");
-    expect(action.className).toContain("group-active/connection-status:bg-emerald-500/30");
+    expect(action.className).toContain(
+      "group-hover/connection-status:bg-emerald-500/22",
+    );
+    expect(action.className).toContain(
+      "group-active/connection-status:bg-emerald-500/30",
+    );
   });
 
   test("disables the control when no reconnect or sync handler is available", () => {
-    render(<ConnectionStatus status="out-of-sync" />);
+    render(<ConnectionStatus status="synced" />);
 
-    expect(screen.getByText("Out of sync").closest("button")?.getAttribute("disabled")).toBe("");
+    expect(
+      screen
+        .getByText("Connected and synced")
+        .closest("button")
+        ?.getAttribute("disabled"),
+    ).toBe("");
   });
 });

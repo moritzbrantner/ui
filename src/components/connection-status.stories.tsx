@@ -8,13 +8,13 @@ const meta = {
   component: ConnectionStatus,
   tags: ["autodocs", "test"],
   args: {
-    status: "out-of-sync",
+    status: "syncing",
     onSync: fn(),
   },
   argTypes: {
     status: {
       control: "select",
-      options: ["connected", "synced", "disconnected", "out-of-sync"],
+      options: ["syncing", "synced", "disconnected"],
     },
   },
 } satisfies Meta<typeof ConnectionStatus>;
@@ -27,11 +27,10 @@ export const Playground: Story = {};
 
 export const States: Story = {
   render: () => (
-    <div className="grid max-w-4xl gap-3 md:grid-cols-4">
-      <ConnectionStatus status="connected" onSync={fn()} />
+    <div className="grid max-w-3xl gap-3 md:grid-cols-3">
+      <ConnectionStatus status="syncing" onSync={fn()} />
       <ConnectionStatus status="synced" onSync={fn()} />
       <ConnectionStatus status="disconnected" onReconnect={fn()} />
-      <ConnectionStatus status="out-of-sync" onSync={fn()} />
     </div>
   ),
 };
@@ -42,7 +41,9 @@ export const Reconnects: Story = {
     onReconnect: fn(),
   },
   play: async ({ args, canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: /Disconnected/i }));
+    await userEvent.click(
+      canvas.getByRole("button", { name: /Disconnected/i }),
+    );
 
     await expect(args.onReconnect).toHaveBeenCalledTimes(1);
   },
