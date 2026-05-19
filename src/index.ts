@@ -106,6 +106,7 @@ export * from "./components/toolbar";
 export * from "./components/tooltip";
 export * from "./components/tree-view";
 export * from "./components/typography";
+export * from "./components/uml-diagram";
 export * from "./components/upload-queue";
 export * from "./components/workbench-layout";
 export * from "./components/workflow-builder";
