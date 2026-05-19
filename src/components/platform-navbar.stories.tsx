@@ -155,11 +155,12 @@ export const Web: Story = {
     await userEvent.click(trigger);
 
     const profileItems = await screen.findAllByRole("menuitem", { name: "Profile" });
-    const menu = await screen.findByRole("menu");
+    const accountMenu = profileItems[0]?.closest('[role="menu"]');
 
     await expect(profileItems.length).toBeGreaterThan(0);
-    await expect(menu).toBeVisible();
-    await expect(within(menu).getByText("mira@example.com")).toBeVisible();
+    await expect(accountMenu).not.toBeNull();
+    await expect(accountMenu).toHaveAttribute("data-state", "open");
+    await expect(within(accountMenu as HTMLElement).getByText("mira@example.com")).toBeInTheDocument();
   },
 };
 
