@@ -169,6 +169,12 @@ import { uiTheme as paperTheme } from "@moritzbrantner/ui/paper";
 
 Storybook uses the same theme registry for its design-system toolbar and for the per-style component catalog stories.
 
+## Storybook Pages
+
+Storybook is deployed to GitHub Pages from `.github/workflows/pages.yml` on every push to `main`, and can also be deployed manually with the `workflow_dispatch` trigger.
+
+In the repository settings, set **Pages > Build and deployment > Source** to **GitHub Actions**. The workflow builds `storybook-static` with `bun run build-storybook` and publishes that directory as the Pages artifact.
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) and [../../docs/design-system.md](../../docs/design-system.md) for package boundaries, component requirements, and release checks.

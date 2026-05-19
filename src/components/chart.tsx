@@ -380,11 +380,22 @@ function ChartPretextText({
   );
 }
 
-function ChartLineGraph({
+function ChartLineGraph(props: ChartGraphProps) {
+  return <ChartGraph graph="line" xScale="point" ariaLabel="Line chart" {...props} />;
+}
+
+function ChartBarGraph(props: ChartGraphProps) {
+  return <ChartGraph graph="bar" xScale="band" includeZero ariaLabel="Bar chart" {...props} />;
+}
+
+function ChartGraph({
+  graph,
+  includeZero = false,
+  xScale,
   data,
   series,
   xKey = "label",
-  ariaLabel = "Line chart",
+  ariaLabel,
   caption,
   emptyMessage = "No chart data.",
   height = GRAPH_VIEWBOX.height,
@@ -400,14 +411,19 @@ function ChartLineGraph({
   pretext,
   className,
   ...props
-}: ChartGraphProps) {
+}: ChartGraphProps & {
+  graph: "bar" | "line";
+  includeZero?: boolean;
+  xScale: "band" | "point";
+}) {
   const layout = getChartLayout({ width, height });
-  const domain = getValueDomain(data, series, yDomain, false);
+  const domain = getValueDomain(data, series, yDomain, includeZero);
   const yTicks = getTicks(domain, yTickCount);
+  const slot = `chart-${graph}-graph`;
   const hasData = data.length > 0 && series.length > 0;
 
   return (
-    <figure data-slot="chart-line-graph" className={cn("grid gap-2", className)} {...props}>
+    <figure data-slot={slot} className={cn("grid gap-2", className)} {...props}>
       {hasData ? (
         <>
           <svg
@@ -427,65 +443,13 @@ function ChartLineGraph({
               showYAxis={showYAxis}
               ticks={yTicks}
               xKey={xKey}
-              xScale="point"
+              xScale={xScale}
             />
-            <ChartPretext>
-              {pretext?.map((item, index) => (
-                <ChartPretextText
-                  key={item.id ?? index}
-                  x={item.x}
-                  y={item.y}
-                  className={item.className}
-                  textAnchor={item.textAnchor}
-                  dominantBaseline={item.dominantBaseline}
-                >
-                  {item.children}
-                </ChartPretextText>
-              ))}
-            </ChartPretext>
-            <g data-slot="chart-line-graph-series">
-              {series.map((item, index) => {
-                const color = getSeriesColor(item, index);
-                const points = data
-                  .map((datum, datumIndex) => {
-                    const value = getNumericValue(datum[item.key]);
-
-                    if (value == null) {
-                      return null;
-                    }
-
-                    return {
-                      x: getPointX(layout, data.length, datumIndex),
-                      y: scaleY(layout, domain, value),
-                    };
-                  })
-                  .filter((point): point is { x: number; y: number } => point !== null);
-
-                return (
-                  <g key={item.key} data-slot="chart-line-graph-line">
-                    <path
-                      d={getLinePath(points)}
-                      fill="none"
-                      stroke={color}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      className={item.className}
-                    />
-                    {points.map((point, pointIndex) => (
-                      <circle
-                        key={pointIndex}
-                        cx={point.x}
-                        cy={point.y}
-                        r={3}
-                        fill="var(--background)"
-                        stroke={color}
-                        strokeWidth={1.5}
-                      />
-                    ))}
-                  </g>
-                );
-              })}
+            <ChartGraphPretext pretext={pretext} />
+            <g data-slot={`${slot}-series`}>
+              {graph === "line"
+                ? renderLineGraphSeries(data, series, layout, domain)
+                : renderBarGraphSeries(data, series, layout, domain)}
             </g>
           </svg>
           {showLegend ? <ChartGraphLegend series={series} /> : null}
@@ -506,114 +470,107 @@ function ChartLineGraph({
   );
 }
 
-function ChartBarGraph({
-  data,
-  series,
-  xKey = "label",
-  ariaLabel = "Bar chart",
-  caption,
-  emptyMessage = "No chart data.",
-  height = GRAPH_VIEWBOX.height,
-  width = GRAPH_VIEWBOX.width,
-  yDomain,
-  yTickCount = 5,
-  showGrid = true,
-  showXAxis = true,
-  showYAxis = true,
-  showLegend = true,
-  formatLabel = defaultFormatLabel,
-  formatValue = defaultFormatValue,
-  pretext,
-  className,
-  ...props
-}: ChartGraphProps) {
-  const layout = getChartLayout({ width, height });
-  const domain = getValueDomain(data, series, yDomain, true);
-  const yTicks = getTicks(domain, yTickCount);
-  const hasData = data.length > 0 && series.length > 0;
-
+function ChartGraphPretext({ pretext }: { pretext?: ChartPretextItem[] }) {
   return (
-    <figure data-slot="chart-bar-graph" className={cn("grid gap-2", className)} {...props}>
-      {hasData ? (
-        <>
-          <svg
-            role="img"
-            aria-label={ariaLabel}
-            viewBox={`0 0 ${width} ${height}`}
-            className="h-auto w-full overflow-visible"
-          >
-            {showGrid ? <ChartGridLines layout={layout} ticks={yTicks} domain={domain} /> : null}
-            <ChartAxes
-              data={data}
-              domain={domain}
-              formatLabel={formatLabel}
-              formatValue={formatValue}
-              layout={layout}
-              showXAxis={showXAxis}
-              showYAxis={showYAxis}
-              ticks={yTicks}
-              xKey={xKey}
-              xScale="band"
-            />
-            <ChartPretext>
-              {pretext?.map((item, index) => (
-                <ChartPretextText
-                  key={item.id ?? index}
-                  x={item.x}
-                  y={item.y}
-                  className={item.className}
-                  textAnchor={item.textAnchor}
-                  dominantBaseline={item.dominantBaseline}
-                >
-                  {item.children}
-                </ChartPretextText>
-              ))}
-            </ChartPretext>
-            <g data-slot="chart-bar-graph-series">
-              {data.map((datum, datumIndex) => {
-                const bandWidth = layout.plotWidth / data.length;
-                const groupWidth = bandWidth * 0.68;
-                const barWidth = groupWidth / Math.max(series.length, 1);
-                const groupX = layout.left + bandWidth * datumIndex + (bandWidth - groupWidth) / 2;
-
-                return series.map((item, seriesIndex) => {
-                  const value = getNumericValue(datum[item.key]) ?? 0;
-                  const y = scaleY(layout, domain, value);
-                  const zeroY = scaleY(layout, domain, 0);
-                  const barHeight = Math.abs(zeroY - y);
-
-                  return (
-                    <rect
-                      key={`${datumIndex}-${item.key}`}
-                      data-slot="chart-bar-graph-bar"
-                      x={groupX + barWidth * seriesIndex}
-                      y={Math.min(y, zeroY)}
-                      width={Math.max(barWidth - 3, 1)}
-                      height={barHeight}
-                      fill={getSeriesColor(item, seriesIndex)}
-                      className={item.className}
-                    />
-                  );
-                });
-              })}
-            </g>
-          </svg>
-          {showLegend ? <ChartGraphLegend series={series} /> : null}
-        </>
-      ) : (
-        <div
-          role="img"
-          aria-label={ariaLabel}
-          className="flex min-h-40 items-center justify-center border border-dashed text-sm text-muted-foreground"
+    <ChartPretext>
+      {pretext?.map((item, index) => (
+        <ChartPretextText
+          key={item.id ?? index}
+          x={item.x}
+          y={item.y}
+          className={item.className}
+          textAnchor={item.textAnchor}
+          dominantBaseline={item.dominantBaseline}
         >
-          {emptyMessage}
-        </div>
-      )}
-      {caption ? (
-        <figcaption className="text-sm text-muted-foreground">{caption}</figcaption>
-      ) : null}
-    </figure>
+          {item.children}
+        </ChartPretextText>
+      ))}
+    </ChartPretext>
   );
+}
+
+function renderLineGraphSeries(
+  data: ChartDatum[],
+  series: ChartSeries[],
+  layout: ChartLayout,
+  domain: [number, number],
+) {
+  return series.map((item, index) => {
+    const color = getSeriesColor(item, index);
+    const points = data
+      .map((datum, datumIndex) => {
+        const value = getNumericValue(datum[item.key]);
+
+        if (value == null) {
+          return null;
+        }
+
+        return {
+          x: getPointX(layout, data.length, datumIndex),
+          y: scaleY(layout, domain, value),
+        };
+      })
+      .filter((point): point is { x: number; y: number } => point !== null);
+
+    return (
+      <g key={item.key} data-slot="chart-line-graph-line">
+        <path
+          d={getLinePath(points)}
+          fill="none"
+          stroke={color}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          className={item.className}
+        />
+        {points.map((point, pointIndex) => (
+          <circle
+            key={pointIndex}
+            cx={point.x}
+            cy={point.y}
+            r={3}
+            fill="var(--background)"
+            stroke={color}
+            strokeWidth={1.5}
+          />
+        ))}
+      </g>
+    );
+  });
+}
+
+function renderBarGraphSeries(
+  data: ChartDatum[],
+  series: ChartSeries[],
+  layout: ChartLayout,
+  domain: [number, number],
+) {
+  const bandWidth = layout.plotWidth / data.length;
+  const groupWidth = bandWidth * 0.68;
+  const barWidth = groupWidth / Math.max(series.length, 1);
+
+  return data.map((datum, datumIndex) => {
+    const groupX = layout.left + bandWidth * datumIndex + (bandWidth - groupWidth) / 2;
+
+    return series.map((item, seriesIndex) => {
+      const value = getNumericValue(datum[item.key]) ?? 0;
+      const y = scaleY(layout, domain, value);
+      const zeroY = scaleY(layout, domain, 0);
+
+      return (
+        <rect
+          key={`${datumIndex}-${item.key}`}
+          data-slot="chart-bar-graph-bar"
+          x={groupX + barWidth * seriesIndex}
+          y={Math.min(y, zeroY)}
+          width={Math.max(barWidth - 3, 1)}
+          height={Math.abs(zeroY - y)}
+          fill={getSeriesColor(item, seriesIndex)}
+          className={item.className}
+        />
+      );
+    });
+  });
 }
 
 type ChartLayout = {
