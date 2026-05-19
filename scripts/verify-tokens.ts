@@ -43,7 +43,7 @@ const tokenBackedComponents = [
   ["src/components/app-layout.tsx", "--ui-radius-surface"],
   ["src/components/toolbar.tsx", "--ui-toolbar-min-height"],
 ];
-const errors = [];
+const errors: string[] = [];
 const baseTokens = readTokens(path.join(packageRoot, "styles.css"));
 const requiredTokens = intersection(baseTokens.root, baseTokens.dark);
 
@@ -111,7 +111,7 @@ if (errors.length > 0) {
 
 console.log(`@moritzbrantner/ui token contract verified (${requiredTokens.length} shared tokens)`);
 
-function readTokens(filePath) {
+function readTokens(filePath: string): { root: Set<string>; dark: Set<string> } {
   const source = readFileSync(filePath, "utf8");
 
   return {
@@ -120,7 +120,7 @@ function readTokens(filePath) {
   };
 }
 
-function extractBlock(source, selector) {
+function extractBlock(source: string, selector: string): string {
   const selectorMatch = new RegExp(`(^|\\n)\\s*${escapeRegExp(selector)}\\s*\\{`, "m").exec(source);
 
   if (!selectorMatch || selectorMatch.index === undefined) {
@@ -153,14 +153,14 @@ function extractBlock(source, selector) {
   return "";
 }
 
-function extractCustomProperties(block) {
+function extractCustomProperties(block: string): Set<string> {
   return new Set([...block.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((match) => match[1]));
 }
 
-function intersection(left, right) {
+function intersection(left: Set<string>, right: Set<string>): string[] {
   return [...left].filter((value) => right.has(value)).sort((a, b) => a.localeCompare(b));
 }
 
-function escapeRegExp(value) {
+function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

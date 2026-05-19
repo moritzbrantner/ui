@@ -11,7 +11,7 @@ run("bun", ["run", "build"], consumerRoot);
 
 console.log("@moritzbrantner/ui consumer example verified");
 
-function run(command, args, cwd) {
+function run(command: string, args: string[], cwd: string): void {
   const result = spawnSync(command, args, {
     cwd,
     shell: false,

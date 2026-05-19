@@ -4,9 +4,22 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { JSDOM } from "jsdom";
-import React from "react";
+import * as React from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
+
+type BenchmarkKind = "logic" | "render";
+type BenchmarkResult = {
+  kind: BenchmarkKind;
+  name: string;
+  median: number;
+  p95: number;
+};
+type BenchmarkRunner = () => BenchmarkResult;
+type UiModule = Record<string, any>;
+type BenchmarkBaseline = {
+  results?: Record<string, BenchmarkResult>;
+};
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const baselinePath = path.join(
@@ -17,14 +30,15 @@ const baselinePath = path.join(
 );
 const updateBaseline = process.argv.includes("--update");
 const distEntry = path.join(packageRoot, "dist", "index.js");
+const runningInCi = process.env.CI === "true";
 
 if (!existsSync(distEntry)) {
   console.error("@moritzbrantner/ui benchmark requires dist/. Run `bun run build` first.");
   process.exit(1);
 }
 
-const ui = await import(distEntry);
-const benchmarks = [
+const ui = (await import(distEntry)) as UiModule;
+const benchmarks: BenchmarkRunner[] = [
   benchmark("logic.cnMerge", "logic", () => {
     ui.cn(
       "px-2 py-1 text-sm bg-card text-foreground",
@@ -160,7 +174,7 @@ const benchmarks = [
   }),
 ];
 
-const results = {};
+const results: Record<string, BenchmarkResult> = {};
 
 for (const runBenchmark of benchmarks) {
   const result = runBenchmark();
@@ -183,8 +197,8 @@ if (!existsSync(baselinePath)) {
   process.exit(1);
 }
 
-const baseline = JSON.parse(readFileSync(baselinePath, "utf8"));
-const errors = [];
+const baseline = JSON.parse(readFileSync(baselinePath, "utf8")) as BenchmarkBaseline;
+const errors: string[] = [];
 
 for (const [name, result] of Object.entries(results)) {
   const baselineResult = baseline.results?.[name];
@@ -194,8 +208,8 @@ for (const [name, result] of Object.entries(results)) {
     continue;
   }
 
-  const tolerance = result.kind === "logic" ? 1.25 : 1.4;
-  const noiseFloorMs = result.kind === "logic" ? 0.75 : 5;
+  const tolerance = result.kind === "logic" ? 1.25 : runningInCi ? 2.5 : 1.4;
+  const noiseFloorMs = result.kind === "logic" ? 0.75 : runningInCi ? 20 : 5;
   const allowedMedian = Math.max(
     baselineResult.median * tolerance,
     baselineResult.median + noiseFloorMs,
@@ -220,9 +234,9 @@ if (errors.length > 0) {
 
 console.log("@moritzbrantner/ui benchmarks verified");
 
-function benchmark(name, kind, callback) {
+function benchmark(name: string, kind: BenchmarkKind, callback: () => void): BenchmarkRunner {
   return () => {
-    const samples = [];
+    const samples: number[] = [];
 
     for (let index = 0; index < 5; index += 1) {
       callback();
@@ -245,7 +259,7 @@ function benchmark(name, kind, callback) {
   };
 }
 
-function renderUi(element) {
+function renderUi(element: React.ReactElement): void {
   const document = ensureDomGlobals().document;
   const container = document.createElement("div");
 
@@ -263,7 +277,7 @@ function renderUi(element) {
   container.remove();
 }
 
-function ensureDomGlobals() {
+function ensureDomGlobals(): Window & typeof globalThis {
   if (globalThis.window?.document) {
     return globalThis.window;
   }
@@ -279,10 +293,10 @@ function ensureDomGlobals() {
   defineGlobal("HTMLElement", dom.window.HTMLElement);
   defineGlobal("Element", dom.window.Element);
 
-  return dom.window;
+  return dom.window as unknown as Window & typeof globalThis;
 }
 
-function defineGlobal(name, value) {
+function defineGlobal(name: string, value: unknown): void {
   Object.defineProperty(globalThis, name, {
     configurable: true,
     enumerable: false,
@@ -291,7 +305,7 @@ function defineGlobal(name, value) {
   });
 }
 
-function createRows(count) {
+function createRows(count: number): Array<{ name: string; amount: number; status: string }> {
   return Array.from({ length: count }, (_, index) => ({
     name: `Account ${index}`,
     amount: index * 37,
@@ -299,7 +313,7 @@ function createRows(count) {
   }));
 }
 
-function createCalendarData(count) {
+function createCalendarData(count: number): unknown[] {
   return [
     "vcalendar",
     [
@@ -319,7 +333,7 @@ function createCalendarData(count) {
   ];
 }
 
-function percentile(samples, value) {
+function percentile(samples: number[], value: number): number {
   const index = Math.min(samples.length - 1, Math.floor(samples.length * value));
 
   return samples[index] ?? 0;

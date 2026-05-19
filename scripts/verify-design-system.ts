@@ -7,7 +7,7 @@ const componentsDir = path.join(packageRoot, "src", "components");
 const srcDir = path.join(packageRoot, "src");
 const packageJsonPath = path.join(packageRoot, "package.json");
 const indexPath = path.join(packageRoot, "src", "index.ts");
-const errors = [];
+const errors: string[] = [];
 const interactiveStoryComponents = [
   "annotation-canvas",
   "asset-browser",
@@ -30,7 +30,7 @@ const clientComponentPatterns = [
   /\b(window|document|navigator)\b/,
 ];
 
-const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8")) as Record<string, any>;
 const indexSource = readFileSync(indexPath, "utf8");
 const componentNames = readdirSync(componentsDir)
   .filter(
@@ -250,7 +250,7 @@ function verifyConsumerExample() {
   }
 }
 
-function expectExport(exportPath, importPath, typesPath) {
+function expectExport(exportPath: string, importPath: string, typesPath: string): void {
   expectEqual(
     packageJson.exports?.[exportPath]?.import,
     importPath,
@@ -263,29 +263,30 @@ function expectExport(exportPath, importPath, typesPath) {
   );
 }
 
-function expectArrayIncludes(value, expected, message) {
+function expectArrayIncludes(value: unknown, expected: string, message: string): void {
   if (!Array.isArray(value) || !value.includes(expected)) {
     errors.push(message);
   }
 }
 
-function expectEqual(actual, expected, message) {
+function expectEqual(actual: unknown, expected: unknown, message: string): void {
   if (actual !== expected) {
     errors.push(message);
   }
 }
 
-function expectObject(value, message) {
+function expectObject(value: unknown, message: string): void {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     errors.push(message);
   }
 }
 
-function expectObjectPath(source, keys, message) {
-  let current = source;
+function expectObjectPath(source: Record<string, any>, keys: string[], message: string): void {
+  let current: unknown = source;
 
   for (const key of keys) {
-    current = current?.[key];
+    current =
+      current && typeof current === "object" ? (current as Record<string, any>)[key] : undefined;
   }
 
   if (!current) {
@@ -293,7 +294,7 @@ function expectObjectPath(source, keys, message) {
   }
 }
 
-function listFiles(directory) {
+function listFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const filePath = path.join(directory, entry.name);
 

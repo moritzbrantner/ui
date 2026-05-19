@@ -4,14 +4,14 @@ import path from "node:path";
 const [, , targetDir, ...forbiddenPatterns] = process.argv;
 
 if (!targetDir) {
-  console.error("Usage: node scripts/verify-package-imports.mjs <dir> <pattern>...");
+  console.error("Usage: bun scripts/verify-package-imports.ts <dir> <pattern>...");
   process.exit(1);
 }
 
 const patterns = forbiddenPatterns.length > 0 ? forbiddenPatterns : ["@/", "next/"];
 const exts = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs"]);
 
-function visit(filePath) {
+function visit(filePath: string): void {
   const stats = statSync(filePath);
   if (stats.isDirectory()) {
     for (const entry of readdirSync(filePath)) {

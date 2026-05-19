@@ -8,7 +8,7 @@ const maxTotalBytes = 850 * 1024;
 const maxEntryBytes = 35 * 1024;
 const maxChunkBytes = 40 * 1024;
 const publicEntries = ["index", "bobba", "zleek", "atlas", "studio", "paper", "themes"];
-const errors = [];
+const errors: string[] = [];
 
 if (!existsSync(distDir)) {
   console.error(
@@ -65,7 +65,7 @@ if (errors.length > 0) {
 
 console.log(`@moritzbrantner/ui build-size verified (${formatBytes(totalBytes)} raw JS)`);
 
-function listFiles(directory) {
+function listFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const filePath = path.join(directory, entry.name);
 
@@ -77,6 +77,6 @@ function listFiles(directory) {
   });
 }
 
-function formatBytes(bytes) {
+function formatBytes(bytes: number): string {
   return `${(bytes / 1024).toFixed(1)} KB`;
 }

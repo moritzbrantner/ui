@@ -16,7 +16,7 @@ const packageDirs =
         .map((entry) => path.join(packagesDir, entry))
         .filter((entry) => existsSync(path.join(entry, "package.json")));
 
-const errors = [];
+const errors: string[] = [];
 
 for (const packageDir of packageDirs) {
   const packageJsonPath = path.join(packageDir, "package.json");
@@ -26,7 +26,7 @@ for (const packageDir of packageDirs) {
     continue;
   }
 
-  const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8")) as Record<string, any>;
   const packageName = packageJson.name ?? path.relative(rootDir, packageDir) ?? packageDir;
   const stylesPath = path.join(packageDir, "styles.css");
   const files = Array.isArray(packageJson.files) ? packageJson.files : [];
@@ -80,7 +80,7 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-function resolvePackageDir(packageArg) {
+function resolvePackageDir(packageArg: string): string {
   const candidate = path.resolve(process.cwd(), packageArg);
 
   if (existsSync(path.join(candidate, "package.json"))) {
