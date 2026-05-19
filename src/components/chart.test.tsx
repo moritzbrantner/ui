@@ -1,7 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import { ChartBarGraph, ChartLineGraph, ChartPretext, ChartPretextText } from "./chart";
+import {
+  ChartAreaGraph,
+  ChartBarGraph,
+  ChartLineGraph,
+  ChartPretext,
+  ChartPretextText,
+} from "./chart";
 
 const data = [
   { label: "Q1", actual: 24, target: 30 },
@@ -43,6 +49,48 @@ describe("chart graph components", () => {
     expect(screen.getByRole("img", { name: "Quarterly bars" })).toBeTruthy();
     expect(screen.getAllByText("Actual")).toHaveLength(1);
     expect(screen.getAllByText("Target")).toHaveLength(1);
+  });
+
+  test("renders area charts with the shared graph primitives", () => {
+    const { container } = render(
+      <ChartAreaGraph ariaLabel="Quarterly area" data={data} series={series} />,
+    );
+
+    expect(screen.getByRole("img", { name: "Quarterly area" })).toBeTruthy();
+    expect(container.querySelector('[data-slot="chart-area-graph-area"]')).not.toBeNull();
+  });
+
+  test("shows an interactive tooltip and crosshair on hover", () => {
+    const { container } = render(
+      <ChartLineGraph ariaLabel="Quarterly trend" data={data} series={series} xKey="label" />,
+    );
+    const hitAreas = container.querySelectorAll('[data-slot="chart-hit-area"]');
+
+    fireEvent.pointerEnter(hitAreas[1]);
+
+    const tooltip = container.querySelector('[data-slot="chart-graph-tooltip"]');
+
+    expect(tooltip).not.toBeNull();
+    expect(container.querySelector('[data-slot="chart-crosshair"]')).not.toBeNull();
+    expect(within(tooltip as HTMLElement).getByText("Q2")).toBeTruthy();
+    expect(within(tooltip as HTMLElement).getByText("36")).toBeTruthy();
+    expect(within(tooltip as HTMLElement).getByText("34")).toBeTruthy();
+  });
+
+  test("adds a horizontal scroll surface for dense data", () => {
+    const denseData = Array.from({ length: 18 }, (_, index) => ({
+      label: `W${index + 1}`,
+      actual: index + 10,
+      target: index + 12,
+    }));
+    const { container } = render(
+      <ChartBarGraph ariaLabel="Weekly bars" data={denseData} series={series} />,
+    );
+    const scrollContent = container.querySelector(
+      '[data-slot="chart-scroll-content"]',
+    ) as HTMLElement;
+
+    expect(scrollContent.style.minWidth).toBe("936px");
   });
 
   test("exposes standalone pretext primitives", () => {
