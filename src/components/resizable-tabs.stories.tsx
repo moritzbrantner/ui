@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ChartNoAxesColumnIcon, CodeIcon, FileTextIcon } from "lucide-react";
 
-import { SwapyTabs, type SwapyTabsItem } from "./swapy-tabs";
+import { ResizableTabs, type ResizableTabsItem } from "./resizable-tabs";
 
-const items: SwapyTabsItem[] = [
+const items: ResizableTabsItem[] = [
   {
     value: "preview",
     label: "Preview",
@@ -41,25 +41,25 @@ const items: SwapyTabsItem[] = [
   },
 ];
 
-function SwapyTabsDemo() {
-  return <SwapyTabs items={items} defaultValue="preview" className="max-w-3xl" />;
+function ResizableTabsDemo() {
+  return <ResizableTabs items={items} defaultValue="preview" className="max-w-3xl" />;
 }
 
 const meta = {
-  title: "Components/Navigation/Swapy Tabs",
-  component: SwapyTabsDemo,
+  title: "Components/Navigation/Resizable Tabs",
+  component: ResizableTabsDemo,
   tags: ["autodocs", "test"],
-} satisfies Meta<typeof SwapyTabsDemo>;
+} satisfies Meta<typeof ResizableTabsDemo>;
 
 export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const ResizableAndMovable: Story = {};
+export const Default: Story = {};
 
 export const LineVariant: Story = {
   render: () => (
-    <SwapyTabs
+    <ResizableTabs
       items={items}
       defaultValue="preview"
       listVariant="line"

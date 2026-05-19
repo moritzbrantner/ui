@@ -90,7 +90,7 @@ export * from "./components/stat";
 export * from "./components/state-view";
 export * from "./components/stepper";
 export * from "./components/switch";
-export * from "./components/swapy-tabs";
+export * from "./components/resizable-tabs";
 export * from "./components/table";
 export * from "./components/tabs";
 export * from "./components/terminal";

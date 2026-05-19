@@ -1,21 +1,12 @@
 "use client";
 
 import * as React from "react";
-import {
-  createSwapy,
-  type BeforeSwapEvent,
-  type BeforeSwapHandler,
-  type Config as SwapyConfig,
-  type SwapEndEvent,
-  type SwapEvent,
-  type SwapStartEvent,
-} from "swapy";
 
 import { cn } from "../lib/cn";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "./resizable";
 import { tabsListVariants } from "./tabs";
 
-type SwapyTabsItem = {
+type ResizableTabsItem = {
   value: string;
   label: React.ReactNode;
   content: React.ReactNode;
@@ -28,23 +19,17 @@ type SwapyTabsItem = {
   maxSize?: number;
 };
 
-type SwapyTabsProps = Omit<
+type ResizableTabsProps = Omit<
   React.ComponentProps<"div">,
   "children" | "defaultValue" | "onChange"
 > & {
-  items: SwapyTabsItem[];
+  items: ResizableTabsItem[];
   orientation?: "horizontal" | "vertical";
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
   order?: string[];
   defaultOrder?: string[];
-  onOrderChange?: (order: string[]) => void;
-  onBeforeSwap?: BeforeSwapHandler;
-  onSwapStart?: (event: SwapStartEvent) => void;
-  onSwap?: (event: SwapEvent) => void;
-  onSwapEnd?: (event: SwapEndEvent) => void;
-  swapyConfig?: Partial<SwapyConfig> | false;
   resizable?: boolean;
   listVariant?: "default" | "line";
   listClassName?: string;
@@ -58,9 +43,7 @@ type SwapyTabsProps = Omit<
   triggerMaxSize?: number;
 };
 
-const swapySlotPrefix = "tab-slot-";
-
-function normalizeOrder(order: string[] | undefined, items: SwapyTabsItem[]) {
+function normalizeOrder(order: string[] | undefined, items: ResizableTabsItem[]) {
   const values = items.map((item) => item.value);
   const valueSet = new Set(values);
   const nextOrder = (order ?? []).filter((value, index, source) => {
@@ -76,30 +59,10 @@ function normalizeOrder(order: string[] | undefined, items: SwapyTabsItem[]) {
   return nextOrder;
 }
 
-function slotIndex(slot: string) {
-  const index = Number.parseInt(slot.replace(swapySlotPrefix, ""), 10);
-  return Number.isFinite(index) ? index : Number.MAX_SAFE_INTEGER;
-}
-
-function orderFromSwapEvent(event: SwapEndEvent, fallbackOrder: string[]) {
-  const nextOrder = event.slotItemMap.asArray
-    .filter(({ slot, item }) => slot.startsWith(swapySlotPrefix) && item)
-    .sort((left, right) => slotIndex(left.slot) - slotIndex(right.slot))
-    .map(({ item }) => item);
-
-  return nextOrder.length > 0 ? nextOrder : fallbackOrder;
-}
-
-function SwapyTabs({
+function ResizableTabs({
   items,
   order: orderProp,
   defaultOrder,
-  onOrderChange,
-  onBeforeSwap,
-  onSwapStart,
-  onSwap,
-  onSwapEnd,
-  swapyConfig,
   resizable = true,
   orientation = "horizontal",
   defaultValue,
@@ -117,76 +80,19 @@ function SwapyTabs({
   triggerMaxSize,
   className,
   ...props
-}: SwapyTabsProps) {
+}: ResizableTabsProps) {
   const tabsId = React.useId();
-  const listRef = React.useRef<HTMLDivElement>(null);
   const triggerRefs = React.useRef(new Map<string, HTMLButtonElement>());
-  const [uncontrolledOrder, setUncontrolledOrder] = React.useState(() =>
-    normalizeOrder(defaultOrder, items),
-  );
   const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue);
 
-  const isControlledOrder = orderProp !== undefined;
   const order = React.useMemo(
-    () => normalizeOrder(isControlledOrder ? orderProp : uncontrolledOrder, items),
-    [isControlledOrder, items, orderProp, uncontrolledOrder],
+    () => normalizeOrder(orderProp ?? defaultOrder, items),
+    [defaultOrder, items, orderProp],
   );
   const orderedItems = React.useMemo(() => {
     const itemMap = new Map(items.map((item) => [item.value, item]));
-    return order.map((itemValue) => itemMap.get(itemValue)).filter(Boolean) as SwapyTabsItem[];
+    return order.map((itemValue) => itemMap.get(itemValue)).filter(Boolean) as ResizableTabsItem[];
   }, [items, order]);
-
-  const applyOrder = React.useCallback(
-    (nextOrder: string[]) => {
-      const normalizedOrder = normalizeOrder(nextOrder, items);
-      if (!isControlledOrder) {
-        setUncontrolledOrder(normalizedOrder);
-      }
-      onOrderChange?.(normalizedOrder);
-    },
-    [isControlledOrder, items, onOrderChange],
-  );
-
-  React.useEffect(() => {
-    if (swapyConfig === false || !listRef.current) return;
-
-    const swapy = createSwapy(listRef.current, {
-      animation: "dynamic",
-      dragAxis: orientation === "vertical" ? "y" : "x",
-      manualSwap: true,
-      swapMode: "drop",
-      ...swapyConfig,
-    });
-
-    swapy.onBeforeSwap((event: BeforeSwapEvent) => {
-      return onBeforeSwap ? onBeforeSwap(event) : true;
-    });
-    swapy.onSwapStart((event) => {
-      onSwapStart?.(event);
-    });
-    swapy.onSwap((event) => {
-      onSwap?.(event);
-    });
-    swapy.onSwapEnd((event) => {
-      if (event.hasChanged) {
-        applyOrder(orderFromSwapEvent(event, order));
-      }
-      onSwapEnd?.(event);
-    });
-
-    return () => {
-      swapy.destroy();
-    };
-  }, [
-    applyOrder,
-    onBeforeSwap,
-    onSwap,
-    onSwapEnd,
-    onSwapStart,
-    order,
-    orientation,
-    swapyConfig,
-  ]);
 
   const firstValue = orderedItems[0]?.value;
   const activeValue = value ?? uncontrolledValue ?? firstValue;
@@ -237,16 +143,15 @@ function SwapyTabs({
 
   return (
     <div
-      data-slot="swapy-tabs"
+      data-slot="resizable-tabs"
       data-orientation={orientation}
       className={cn("group/tabs flex min-w-0 gap-2 data-horizontal:flex-col", className)}
       {...props}
     >
       <div
-        ref={listRef}
         role="tablist"
         aria-orientation={orientation}
-        data-slot="swapy-tabs-list"
+        data-slot="resizable-tabs-list"
         data-variant={listVariant}
         className={cn(
           "group/tabs-list",
@@ -271,24 +176,22 @@ function SwapyTabs({
                   maxSize={item.maxSize ?? triggerMaxSize}
                   className={cn("min-w-0", panelClassName)}
                 >
-                  <SwapyTabsSlot index={index}>
-                    <SwapyTabsTrigger
-                      tabsId={tabsId}
-                      item={item}
-                      active={item.value === activeValue}
-                      setTriggerRef={(element) => {
-                        if (element) {
-                          triggerRefs.current.set(item.value, element);
-                        } else {
-                          triggerRefs.current.delete(item.value);
-                        }
-                      }}
-                      onSelect={selectValue}
-                      onMoveFocus={moveFocus}
-                      triggerClassName={triggerClassName}
-                      orientation={orientation}
-                    />
-                  </SwapyTabsSlot>
+                  <ResizableTabsTrigger
+                    tabsId={tabsId}
+                    item={item}
+                    active={item.value === activeValue}
+                    setTriggerRef={(element) => {
+                      if (element) {
+                        triggerRefs.current.set(item.value, element);
+                      } else {
+                        triggerRefs.current.delete(item.value);
+                      }
+                    }}
+                    onSelect={selectValue}
+                    onMoveFocus={moveFocus}
+                    triggerClassName={triggerClassName}
+                    orientation={orientation}
+                  />
                 </ResizablePanel>
                 {index < orderedItems.length - 1 ? (
                   <ResizableHandle
@@ -300,25 +203,24 @@ function SwapyTabs({
             ))}
           </ResizablePanelGroup>
         ) : (
-          orderedItems.map((item, index) => (
-            <SwapyTabsSlot key={item.value} index={index}>
-              <SwapyTabsTrigger
-                tabsId={tabsId}
-                item={item}
-                active={item.value === activeValue}
-                setTriggerRef={(element) => {
-                  if (element) {
-                    triggerRefs.current.set(item.value, element);
-                  } else {
-                    triggerRefs.current.delete(item.value);
-                  }
-                }}
-                onSelect={selectValue}
-                onMoveFocus={moveFocus}
-                triggerClassName={triggerClassName}
-                orientation={orientation}
-              />
-            </SwapyTabsSlot>
+          orderedItems.map((item) => (
+            <ResizableTabsTrigger
+              key={item.value}
+              tabsId={tabsId}
+              item={item}
+              active={item.value === activeValue}
+              setTriggerRef={(element) => {
+                if (element) {
+                  triggerRefs.current.set(item.value, element);
+                } else {
+                  triggerRefs.current.delete(item.value);
+                }
+              }}
+              onSelect={selectValue}
+              onMoveFocus={moveFocus}
+              triggerClassName={triggerClassName}
+              orientation={orientation}
+            />
           ))
         )}
       </div>
@@ -328,7 +230,7 @@ function SwapyTabs({
         role="tabpanel"
         tabIndex={0}
         aria-labelledby={activeTriggerId}
-        data-slot="swapy-tabs-content"
+        data-slot="resizable-tabs-content"
         className={cn(
           "flex-1 text-sm outline-none",
           contentClassName,
@@ -341,24 +243,7 @@ function SwapyTabs({
   );
 }
 
-function SwapyTabsSlot({
-  index,
-  className,
-  ...props
-}: React.ComponentProps<"div"> & {
-  index: number;
-}) {
-  return (
-    <div
-      data-slot="swapy-tabs-slot"
-      data-swapy-slot={`${swapySlotPrefix}${index}`}
-      className={cn("h-full min-w-0", className)}
-      {...props}
-    />
-  );
-}
-
-function SwapyTabsTrigger({
+function ResizableTabsTrigger({
   tabsId,
   item,
   active,
@@ -369,13 +254,13 @@ function SwapyTabsTrigger({
   orientation,
 }: {
   tabsId: string;
-  item: SwapyTabsItem;
+  item: ResizableTabsItem;
   active: boolean;
   setTriggerRef: (element: HTMLButtonElement | null) => void;
   onSelect: (value: string) => void;
   onMoveFocus: (value: string, direction: 1 | -1 | "first" | "last") => void;
   triggerClassName?: string;
-  orientation: SwapyTabsProps["orientation"];
+  orientation: ResizableTabsProps["orientation"];
 }) {
   const triggerId = `${tabsId}-trigger-${item.value}`;
   const contentId = `${tabsId}-content-${item.value}`;
@@ -389,10 +274,8 @@ function SwapyTabsTrigger({
       aria-selected={active}
       aria-controls={contentId}
       tabIndex={active ? 0 : -1}
-      data-slot="swapy-tabs-trigger"
+      data-slot="resizable-tabs-trigger"
       data-active={active ? "" : undefined}
-      data-swapy-item={item.value}
-      data-swapy-handle
       disabled={item.disabled}
       className={cn(
         "relative inline-flex h-full min-w-0 flex-1 items-center justify-center gap-[var(--ui-control-gap)] overflow-hidden rounded-[var(--ui-tabs-radius,var(--ui-radius-control))] border border-transparent px-2 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 dark:text-muted-foreground dark:hover:text-foreground group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -431,8 +314,4 @@ function SwapyTabsTrigger({
   );
 }
 
-export {
-  SwapyTabs,
-  type SwapyTabsItem,
-  type SwapyTabsProps,
-};
+export { ResizableTabs, type ResizableTabsItem, type ResizableTabsProps };

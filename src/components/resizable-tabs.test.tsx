@@ -2,9 +2,9 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { beforeAll, describe, expect, test, vi } from "vitest";
 
-import { SwapyTabs, type SwapyTabsItem } from "./swapy-tabs";
+import { ResizableTabs, type ResizableTabsItem } from "./resizable-tabs";
 
-const items: SwapyTabsItem[] = [
+const items: ResizableTabsItem[] = [
   { value: "alpha", label: "Alpha", content: "Alpha panel" },
   { value: "beta", label: "Beta", content: "Beta panel" },
   { value: "gamma", label: "Gamma", content: "Gamma panel" },
@@ -18,26 +18,18 @@ beforeAll(() => {
   };
 });
 
-describe("SwapyTabs", () => {
-  test("renders ordered tabs with swapy slots and resizable handles", () => {
-    render(
-      <SwapyTabs
-        items={items}
-        defaultValue="alpha"
-        defaultOrder={["gamma", "alpha"]}
-        swapyConfig={false}
-      />,
-    );
+describe("ResizableTabs", () => {
+  test("renders ordered tabs with resizable handles", () => {
+    render(<ResizableTabs items={items} defaultValue="alpha" defaultOrder={["gamma", "alpha"]} />);
 
     expect(screen.getAllByRole("tab").map((tab) => tab.textContent)).toEqual([
       "Gamma",
       "Alpha",
       "Beta",
     ]);
-    expect(screen.getByRole("tab", { name: "Gamma" }).getAttribute("data-swapy-item")).toBe(
-      "gamma",
+    expect(screen.getByRole("tab", { name: "Gamma" }).getAttribute("data-slot")).toBe(
+      "resizable-tabs-trigger",
     );
-    expect(document.querySelectorAll("[data-swapy-slot]")).toHaveLength(3);
     expect(document.querySelectorAll("[data-slot='resizable-handle']")).toHaveLength(2);
   });
 
@@ -48,14 +40,13 @@ describe("SwapyTabs", () => {
       const [value, setValue] = React.useState("alpha");
 
       return (
-        <SwapyTabs
+        <ResizableTabs
           items={items}
           value={value}
           onValueChange={(nextValue) => {
             setValue(nextValue);
             onValueChange(nextValue);
           }}
-          swapyConfig={false}
           resizable={false}
         />
       );
