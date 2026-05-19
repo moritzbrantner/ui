@@ -30,9 +30,27 @@ const weeklyData = Array.from({ length: 20 }, (_, index) => ({
 }));
 
 const channelData = [
-  { channel: "Organic", value: 42 },
-  { channel: "Referral", value: 28 },
-  { channel: "Paid", value: 18 },
+  {
+    channel: "Organic",
+    children: [
+      { channel: "Search", value: 28 },
+      { channel: "Content", value: 14 },
+    ],
+  },
+  {
+    channel: "Referral",
+    children: [
+      { channel: "Partner sites", value: 18 },
+      { channel: "Communities", value: 10 },
+    ],
+  },
+  {
+    channel: "Paid",
+    children: [
+      { channel: "Search ads", value: 11 },
+      { channel: "Social ads", value: 7 },
+    ],
+  },
   { channel: "Partner", value: 12 },
 ];
 
@@ -85,7 +103,7 @@ function ChartPreview() {
           data={channelData}
           labelKey="channel"
           centerLabel="Sessions"
-          caption="Share of sessions by acquisition channel."
+          caption="Click a channel segment to inspect its sources; click the center to go back."
         />
       </div>
     </div>

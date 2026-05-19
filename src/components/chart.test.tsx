@@ -158,6 +158,50 @@ describe("chart graph components", () => {
     expect(screen.getByText("42")).toBeTruthy();
   });
 
+  test("navigates donut tree data through segments and center click", () => {
+    const { container } = render(
+      <ChartDonutGraph
+        ariaLabel="Folder sizes"
+        data={[
+          {
+            label: "Design",
+            children: [
+              { label: "Icons", value: 8 },
+              { label: "Illustrations", value: 2 },
+            ],
+          },
+          {
+            label: "Code",
+            children: [
+              { label: "Components", value: 4 },
+              { label: "Tokens", value: 6 },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Design")).toBeTruthy();
+    expect(screen.getByText("Code")).toBeTruthy();
+    expect(screen.getByText("20")).toBeTruthy();
+
+    const [designSegment] = container.querySelectorAll(
+      '[data-slot="chart-donut-graph-segment"]',
+    );
+    fireEvent.click(designSegment);
+
+    expect(screen.getByText("Icons")).toBeTruthy();
+    expect(screen.getByText("Illustrations")).toBeTruthy();
+    expect(screen.queryByText("Code")).toBeNull();
+    expect(screen.getByText("10")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Go one folder up" }));
+
+    expect(screen.getByText("Design")).toBeTruthy();
+    expect(screen.getByText("Code")).toBeTruthy();
+    expect(screen.queryByText("Icons")).toBeNull();
+  });
+
   test("shows donut empty state when values are not positive", () => {
     render(
       <ChartDonutGraph

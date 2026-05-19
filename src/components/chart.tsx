@@ -21,7 +21,9 @@ const DONUT_VIEWBOX = 220;
 type TooltipNameType = number | string;
 type ChartDatumValue = number | string | null | undefined;
 
-type ChartDatum = Record<string, ChartDatumValue>;
+type ChartDatum = {
+  [key: string]: ChartDatumValue | ChartDatum[];
+};
 
 type ChartSeries = {
   key: string;
@@ -90,6 +92,7 @@ type ChartDonutGraphProps = Omit<React.ComponentProps<"figure">, "children"> & {
   showLegend?: boolean;
   showTotal?: boolean;
   centerLabel?: React.ReactNode | ((total: number) => React.ReactNode);
+  childrenKey?: string;
   formatLabel?: (value: ChartDatumValue, datum: ChartDatum, index: number) => React.ReactNode;
   formatValue?: (value: number) => React.ReactNode;
 };
@@ -451,7 +454,7 @@ function ChartSparkline({
 }: ChartSparklineProps) {
   const values = data
     .map((datum, index) => {
-      const value = getNumericValue(datum[series.key]);
+      const value = getNumericValue(getChartDatumScalar(datum, series.key));
 
       if (value == null) {
         return null;
@@ -545,31 +548,56 @@ function ChartDonutGraph({
   showLegend = true,
   showTotal = true,
   centerLabel,
+  childrenKey = "children",
   formatLabel = defaultFormatLabel,
   formatValue = defaultFormatValue,
   className,
   ...props
 }: ChartDonutGraphProps) {
-  const segments = data
+  const [activePath, setActivePath] = React.useState<number[]>([]);
+  const safeActivePath = getValidDonutPath(data, activePath, childrenKey);
+  const activeNode = getDonutNodeAtPath(data, safeActivePath, childrenKey);
+  const activeData = activeNode ? getChartDatumChildren(activeNode, childrenKey) : data;
+  const canGoUp = safeActivePath.length > 0;
+  const goUp = React.useCallback(() => {
+    setActivePath((path) => path.slice(0, -1));
+  }, []);
+  const handleGoUpKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<SVGCircleElement>) => {
+      if (!isActivationKey(event)) {
+        return;
+      }
+
+      event.preventDefault();
+      goUp();
+    },
+    [goUp],
+  );
+  const segments = activeData
     .map((datum, index) => {
-      const value = getNumericValue(datum[valueKey]);
+      const value = getDonutDatumValue(datum, valueKey, childrenKey);
 
       if (value == null || value <= 0) {
         return null;
       }
 
+      const children = getChartDatumChildren(datum, childrenKey);
+      const color = getChartDatumScalar(datum, "color");
+
       return {
+        children,
         datum,
         index,
-        label: formatLabel(datum[labelKey], datum, index),
+        label: formatLabel(getChartDatumScalar(datum, labelKey), datum, index),
         value,
-        color: datum.color ? String(datum.color) : `var(--chart-${(index % 5) + 1})`,
+        color: typeof color === "string" ? color : `var(--chart-${(index % 5) + 1})`,
       };
     })
     .filter(
       (
         item,
       ): item is {
+        children: ChartDatum[];
         datum: ChartDatum;
         index: number;
         label: React.ReactNode;
@@ -583,6 +611,27 @@ function ChartDonutGraph({
   const radiusOuter = Math.min(outerRadius, center - 2);
   const radiusInner = Math.min(innerRadius, radiusOuter - 8);
   let currentAngle = 0;
+  const handleSegmentClick = React.useCallback(
+    (segment: (typeof segments)[number]) => {
+      if (!segment.children.length) {
+        return;
+      }
+
+      setActivePath([...safeActivePath, segment.index]);
+    },
+    [safeActivePath, segments],
+  );
+  const handleSegmentKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<SVGPathElement>, segment: (typeof segments)[number]) => {
+      if (!segment.children.length || !isActivationKey(event)) {
+        return;
+      }
+
+      event.preventDefault();
+      setActivePath([...safeActivePath, segment.index]);
+    },
+    [safeActivePath, segments],
+  );
 
   return (
     <figure data-slot="chart-donut-graph" className={cn("grid gap-3", className)} {...props}>
@@ -606,8 +655,10 @@ function ChartDonutGraph({
                   <path
                     key={segment.index}
                     data-slot="chart-donut-graph-segment"
-                    role="graphics-symbol"
-                    aria-label={`${segment.label}: ${formatValue(segment.value)}`}
+                    role={segment.children.length ? "button" : "graphics-symbol"}
+                    aria-label={`${segment.label}: ${formatValue(segment.value)}${
+                      segment.children.length ? ". Enter folder" : ""
+                    }`}
                     d={getDonutSegmentPath(
                       center,
                       center,
@@ -617,12 +668,34 @@ function ChartDonutGraph({
                       endAngle,
                     )}
                     fill={segment.color}
-                    className="outline-none transition-opacity hover:opacity-80 focus:opacity-80"
+                    className={cn(
+                      "outline-none transition-opacity hover:opacity-80 focus:opacity-80",
+                      segment.children.length && "cursor-pointer",
+                    )}
+                    onClick={() => handleSegmentClick(segment)}
+                    onKeyDown={(event) => handleSegmentKeyDown(event, segment)}
                     tabIndex={0}
                   />
                 );
               })}
             </g>
+            {canGoUp ? (
+              <circle
+                data-slot="chart-donut-graph-up"
+                role="button"
+                aria-label="Go one folder up"
+                cx={center}
+                cy={center}
+                r={Math.max(radiusInner - 4, 1)}
+                fill="transparent"
+                className="cursor-pointer outline-none transition-colors focus:stroke-ring focus:stroke-2"
+                onClick={goUp}
+                onKeyDown={handleGoUpKeyDown}
+                tabIndex={0}
+              >
+                <title>Go one folder up</title>
+              </circle>
+            ) : null}
             {showTotal ? (
               <ChartPretext className="fill-foreground text-center">
                 <ChartPretextText
@@ -715,7 +788,7 @@ function ChartGraph({
   const activeValues =
     activeDatum && activeIndex != null
       ? series.map((item, index) => {
-          const value = getNumericValue(activeDatum[item.key]);
+          const value = getNumericValue(getChartDatumScalar(activeDatum, item.key));
 
           return {
             key: item.key,
@@ -840,7 +913,7 @@ function renderLineGraphSeries(
     const color = getSeriesColor(item, index);
     const points = data
       .map((datum, datumIndex) => {
-        const value = getNumericValue(datum[item.key]);
+        const value = getNumericValue(getChartDatumScalar(datum, item.key));
 
         if (value == null) {
           return null;
@@ -895,7 +968,7 @@ function renderAreaGraphSeries(
     const color = getSeriesColor(item, index);
     const points = data
       .map((datum, datumIndex) => {
-        const value = getNumericValue(datum[item.key]);
+        const value = getNumericValue(getChartDatumScalar(datum, item.key));
 
         if (value == null) {
           return null;
@@ -957,7 +1030,7 @@ function renderBarGraphSeries(
     const groupX = layout.left + bandWidth * datumIndex + (bandWidth - groupWidth) / 2;
 
     return series.map((item, seriesIndex) => {
-      const value = getNumericValue(datum[item.key]) ?? 0;
+      const value = getNumericValue(getChartDatumScalar(datum, item.key)) ?? 0;
       const y = scaleY(layout, domain, value);
       const zeroY = scaleY(layout, domain, 0);
 
@@ -1014,14 +1087,14 @@ function ChartInteractionLayer({
   const activeDatum = activeIndex == null ? null : data[activeIndex];
   const activeLabel =
     activeDatum && activeIndex != null
-      ? formatLabel(activeDatum[xKey], activeDatum, activeIndex)
+      ? formatLabel(getChartDatumScalar(activeDatum, xKey), activeDatum, activeIndex)
       : null;
   const activeY =
     activeDatum == null
       ? null
       : Math.min(
           ...series.flatMap((item) => {
-            const value = getNumericValue(activeDatum[item.key]);
+            const value = getNumericValue(getChartDatumScalar(activeDatum, item.key));
 
             return value == null ? [] : [scaleY(layout, domain, value)];
           }),
@@ -1042,7 +1115,7 @@ function ChartInteractionLayer({
       ) : null}
       {data.map((datum, index) => {
         const hitArea = getDatumHitArea(layout, data.length, index, xScale);
-        const label = formatLabel(datum[xKey], datum, index);
+        const label = formatLabel(getChartDatumScalar(datum, xKey), datum, index);
 
         return (
           <rect
@@ -1252,7 +1325,7 @@ function ChartAxes({
                 y={layout.bottom + 22}
                 dominantBaseline="hanging"
               >
-                {formatLabel(datum[xKey], datum, index)}
+                {formatLabel(getChartDatumScalar(datum, xKey), datum, index)}
               </ChartPretextText>
             );
           })
@@ -1315,6 +1388,92 @@ function ChartDonutLegend({
   );
 }
 
+function getChartDatumScalar(datum: ChartDatum, key: string): ChartDatumValue {
+  const value = datum[key];
+
+  return Array.isArray(value) ? undefined : value;
+}
+
+function getChartDatumChildren(datum: ChartDatum, childrenKey: string): ChartDatum[] {
+  const children = datum[childrenKey];
+
+  return Array.isArray(children) ? children : [];
+}
+
+function getDonutDatumValue(
+  datum: ChartDatum,
+  valueKey: string,
+  childrenKey: string,
+): number | null {
+  const value = getNumericValue(getChartDatumScalar(datum, valueKey));
+
+  if (value != null) {
+    return value;
+  }
+
+  const childTotal = getChartDatumChildren(datum, childrenKey).reduce((sum, child) => {
+    const childValue = getDonutDatumValue(child, valueKey, childrenKey);
+
+    return sum + (childValue ?? 0);
+  }, 0);
+
+  return childTotal > 0 ? childTotal : null;
+}
+
+function getValidDonutPath(
+  data: ChartDatum[],
+  path: number[],
+  childrenKey: string,
+): number[] {
+  let currentData = data;
+  const validPath: number[] = [];
+
+  for (const index of path) {
+    const node = currentData[index];
+
+    if (!node) {
+      break;
+    }
+
+    const children = getChartDatumChildren(node, childrenKey);
+
+    if (!children.length) {
+      break;
+    }
+
+    validPath.push(index);
+    currentData = children;
+  }
+
+  return validPath;
+}
+
+function getDonutNodeAtPath(
+  data: ChartDatum[],
+  path: number[],
+  childrenKey: string,
+): ChartDatum | null {
+  let currentData = data;
+  let currentNode: ChartDatum | null = null;
+
+  for (const index of path) {
+    const node = currentData[index];
+
+    if (!node) {
+      return null;
+    }
+
+    currentNode = node;
+    currentData = getChartDatumChildren(node, childrenKey);
+  }
+
+  return currentNode;
+}
+
+function isActivationKey(event: React.KeyboardEvent): boolean {
+  return event.key === "Enter" || event.key === " ";
+}
+
 function getNumericValue(value: ChartDatumValue): number | null {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     return null;
@@ -1335,7 +1494,7 @@ function getValueDomain(
 
   const values = data.flatMap((datum) =>
     series.flatMap((item) => {
-      const value = getNumericValue(datum[item.key]);
+      const value = getNumericValue(getChartDatumScalar(datum, item.key));
 
       return value == null ? [] : [value];
     }),
