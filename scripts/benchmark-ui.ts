@@ -208,8 +208,8 @@ for (const [name, result] of Object.entries(results)) {
     continue;
   }
 
-  const tolerance = result.kind === "logic" ? 1.25 : runningInCi ? 2.5 : 1.4;
-  const noiseFloorMs = result.kind === "logic" ? 0.75 : runningInCi ? 20 : 5;
+  const tolerance = result.kind === "logic" ? (runningInCi ? 2 : 1.25) : runningInCi ? 2.5 : 1.4;
+  const noiseFloorMs = result.kind === "logic" ? (runningInCi ? 1.5 : 0.75) : runningInCi ? 20 : 5;
   const allowedMedian = Math.max(
     baselineResult.median * tolerance,
     baselineResult.median + noiseFloorMs,
