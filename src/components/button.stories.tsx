@@ -1,12 +1,50 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { expect, fn } from "storybook/test";
-import { ArrowRightIcon, CheckIcon, SaveIcon } from "lucide-react";
+import { ArrowRightIcon, CheckIcon, Loader2Icon, RotateCcwIcon, SaveIcon } from "lucide-react";
 
 import { Button } from "./button";
 
 const buttonVariants = ["default", "secondary", "outline", "ghost", "link", "destructive"] as const;
 
 const buttonSizes = ["xs", "sm", "default", "lg", "icon", "icon-sm"] as const;
+
+type ButtonInteractionDemoProps = {
+  onSave?: () => void;
+};
+
+function ButtonInteractionDemo({ onSave = () => undefined }: ButtonInteractionDemoProps) {
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
+  const label =
+    saveState === "saving" ? "Saving changes" : saveState === "saved" ? "Saved" : "Save changes";
+  const Icon = saveState === "saving" ? Loader2Icon : saveState === "saved" ? CheckIcon : SaveIcon;
+
+  function save() {
+    setSaveState("saving");
+    onSave();
+  }
+
+  return (
+    <div className="flex w-[440px] max-w-[calc(100vw-2rem)] flex-wrap items-center gap-3 rounded-md border border-border/60 bg-card/70 p-4">
+      <Button disabled={saveState === "saving"} aria-live="polite" onClick={save}>
+        <Icon className={saveState === "saving" ? "animate-spin" : undefined} />
+        {label}
+      </Button>
+      <Button
+        variant="outline"
+        disabled={saveState !== "saving"}
+        onClick={() => setSaveState("saved")}
+      >
+        <CheckIcon />
+        Complete save
+      </Button>
+      <Button variant="ghost" onClick={() => setSaveState("idle")}>
+        <RotateCcwIcon />
+        Reset
+      </Button>
+    </div>
+  );
+}
 
 const meta = {
   title: "Components/Actions/Button",
@@ -88,5 +126,24 @@ export const Clickable: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Save changes" }));
 
     await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const InteractionStates: StoryObj<typeof ButtonInteractionDemo> = {
+  render: (args) => <ButtonInteractionDemo {...args} />,
+  args: {
+    onSave: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Save changes" }));
+    await expect(args.onSave).toHaveBeenCalledTimes(1);
+    await expect(canvas.getByRole("button", { name: "Saving changes" })).toBeDisabled();
+    await expect(canvas.getByRole("button", { name: "Complete save" })).toBeEnabled();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Complete save" }));
+    await expect(canvas.getByRole("button", { name: "Saved" })).toBeEnabled();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Reset" }));
+    await expect(canvas.getByRole("button", { name: "Save changes" })).toBeEnabled();
   },
 };

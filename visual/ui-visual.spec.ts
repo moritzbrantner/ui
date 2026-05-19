@@ -6,31 +6,31 @@ const viewports = [
   { name: "desktop", width: 1440, height: 900 },
 ];
 const storyIds = [
-  "components-button--variants",
-  "components-form-controls--basic",
+  "components-actions-button--variants",
+  "components-forms-inputs-form-controls--basic",
   "reference-shadcn-catalog--full-catalog",
-  "components-datagrid--default",
-  "components-platformnavbar--web",
-  "components-calendar--card-days",
-  "components-documentviewer--ocr-report-viewer",
-  "components-timelineeditor--default",
-  "components-annotationcanvas--default",
-  "components-workflowbuilder--ai-workflow-graph",
+  "components-data-display-data-grid--default",
+  "components-navigation-platform-navbar--web",
+  "components-data-display-calendar-card-days--default",
+  "components-data-display-document-viewer--ocr-report-viewer",
+  "components-editors-timeline-editor--default",
+  "components-editors-annotation-canvas--default",
+  "components-editors-workflow-builder--ai-workflow-graph",
 ];
 const uiThemes = ["bobba", "zleek", "atlas", "studio", "paper"] as const;
 const colorSchemes = ["light", "dark"] as const;
 const horizontallyScrollableStories = new Set([
   "reference-shadcn-catalog--full-catalog",
-  "components-datagrid--default",
-  "components-platformnavbar--web",
-  "components-calendar--card-days",
-  "components-timelineeditor--default",
-  "components-workflowbuilder--ai-workflow-graph",
+  "components-data-display-data-grid--default",
+  "components-navigation-platform-navbar--web",
+  "components-data-display-calendar-card-days--default",
+  "components-editors-timeline-editor--default",
+  "components-editors-workflow-builder--ai-workflow-graph",
 ]);
 const denseControlStories = new Set([
-  "components-calendar--card-days",
+  "components-data-display-calendar-card-days--default",
   "reference-shadcn-catalog--full-catalog",
-  "components-workflowbuilder--ai-workflow-graph",
+  "components-editors-workflow-builder--ai-workflow-graph",
 ]);
 
 for (const viewport of viewports) {
