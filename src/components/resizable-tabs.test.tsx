@@ -30,7 +30,11 @@ describe("ResizableTabs", () => {
     expect(screen.getByRole("tab", { name: "Gamma" }).getAttribute("data-slot")).toBe(
       "resizable-tabs-trigger",
     );
-    expect(document.querySelectorAll("[data-slot='resizable-handle']")).toHaveLength(2);
+    const handles = document.querySelectorAll("[data-slot='resizable-handle']");
+
+    expect(handles).toHaveLength(2);
+    expect(handles[0]?.getAttribute("aria-hidden")).toBe("true");
+    expect(handles[0]?.getAttribute("role")).toBeNull();
   });
 
   test("supports controlled tab value changes", () => {

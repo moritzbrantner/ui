@@ -195,6 +195,7 @@ function ResizableTabs({
                 </ResizablePanel>
                 {index < orderedItems.length - 1 ? (
                   <ResizableHandle
+                    decorative
                     withHandle={withResizeHandles}
                     className={cn("bg-border/70", resizeHandleClassName)}
                   />
