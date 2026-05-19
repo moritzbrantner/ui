@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import {
+  CheckIcon,
   FileArchiveIcon,
   FileAudioIcon,
   FileIcon,
@@ -19,9 +20,11 @@ import { Badge } from "./badge";
 import { Button } from "./button";
 import { Input } from "./input";
 import { ScrollArea } from "./scroll-area";
+import { SelectionToolbar } from "./selection-toolbar";
 
 type AssetBrowserView = "grid" | "list";
 type AssetBrowserSelectionMode = "none" | "single" | "multiple";
+type AssetBrowserLayout = "default" | "mobile";
 type AssetBrowserItemType =
   | "folder"
   | "image"
@@ -58,17 +61,20 @@ type AssetBrowserProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   uploadLabel?: string;
   searchPlaceholder?: string;
   emptyMessage?: React.ReactNode;
+  layout?: AssetBrowserLayout;
   showPreview?: boolean;
 };
 
 type AssetBrowserItemCardProps = React.ComponentProps<"button"> & {
   item: AssetBrowserItem;
   selected?: boolean;
+  selectionMode?: AssetBrowserSelectionMode;
 };
 
 type AssetBrowserItemRowProps = React.ComponentProps<"button"> & {
   item: AssetBrowserItem;
   selected?: boolean;
+  selectionMode?: AssetBrowserSelectionMode;
 };
 
 type AssetBrowserPreviewProps = React.ComponentProps<"aside"> & {
@@ -89,7 +95,8 @@ function AssetBrowser({
   uploadLabel = "Upload files",
   searchPlaceholder = "Search assets...",
   emptyMessage = "No assets found.",
-  showPreview = true,
+  layout = "default",
+  showPreview,
   className,
   ...props
 }: AssetBrowserProps) {
@@ -101,6 +108,8 @@ function AssetBrowser({
   const currentSelection = selectedItemIds ?? internalSelection;
   const selectedItems = items.filter((item) => currentSelection.includes(item.id));
   const previewItem = selectedItems.at(-1);
+  const isMultipleSelection = selectionMode === "multiple";
+  const shouldShowPreview = showPreview ?? layout !== "mobile";
   const normalizedQuery = query.trim().toLowerCase();
   const visibleItems = normalizedQuery
     ? items.filter((item) =>
@@ -121,6 +130,16 @@ function AssetBrowser({
       nextSelection,
       items.filter((item) => nextSelection.includes(item.id)),
     );
+  };
+
+  const selectVisibleItems = () => {
+    commitSelection(
+      Array.from(new Set([...currentSelection, ...visibleItems.map((item) => item.id)])),
+    );
+  };
+
+  const clearSelection = () => {
+    commitSelection([]);
   };
 
   const toggleItem = (item: AssetBrowserItem) => {
@@ -152,22 +171,36 @@ function AssetBrowser({
     <div
       data-slot="asset-browser"
       data-view={currentView}
-      className={cn("grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]", className)}
+      data-layout={layout}
+      className={cn(
+        "grid gap-4",
+        layout === "default" && shouldShowPreview && "lg:grid-cols-[minmax(0,1fr)_18rem]",
+        layout === "mobile" && "gap-3",
+        className,
+      )}
       {...props}
     >
       <div className="min-w-0 space-y-4">
         <div
           data-slot="asset-browser-toolbar"
-          className="flex flex-wrap items-center justify-between gap-2"
+          className={cn(
+            "flex flex-wrap items-center justify-between gap-2",
+            layout === "mobile" && "items-stretch",
+          )}
         >
           <Input
             aria-label="Search assets"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={searchPlaceholder}
-            className="max-w-sm"
+            className={cn("w-full sm:max-w-sm", layout === "mobile" && "sm:max-w-none")}
           />
-          <div className="flex items-center gap-2">
+          <div
+            className={cn(
+              "flex items-center gap-2",
+              layout === "mobile" && "w-full flex-wrap justify-between",
+            )}
+          >
             <Button
               type="button"
               variant={currentView === "grid" ? "secondary" : "outline"}
@@ -188,6 +221,18 @@ function AssetBrowser({
             >
               <ListIcon />
             </Button>
+            {isMultipleSelection ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                aria-label="Select all assets"
+                onClick={selectVisibleItems}
+              >
+                <CheckIcon />
+                Select all
+              </Button>
+            ) : null}
             {onUpload ? (
               <Button asChild type="button" variant="outline" size="sm">
                 <label>
@@ -205,7 +250,16 @@ function AssetBrowser({
             ) : null}
           </div>
         </div>
-        <ScrollArea className="h-[28rem] rounded-md border">
+        {isMultipleSelection ? (
+          <SelectionToolbar
+            selectedCount={selectedItems.length}
+            totalCount={items.length}
+            onClearSelection={clearSelection}
+          />
+        ) : null}
+        <ScrollArea
+          className={cn("h-[28rem] rounded-md border", layout === "mobile" && "h-[34rem]")}
+        >
           {visibleItems.length === 0 ? (
             <div className="grid h-40 place-items-center text-sm text-muted-foreground">
               {emptyMessage}
@@ -215,13 +269,17 @@ function AssetBrowser({
               role="listbox"
               aria-label="Assets"
               aria-multiselectable={selectionMode === "multiple" ? true : undefined}
-              className="grid gap-3 p-3 sm:grid-cols-2 xl:grid-cols-3"
+              className={cn(
+                "grid gap-3 p-3 sm:grid-cols-2 xl:grid-cols-3",
+                layout === "mobile" && "grid-cols-1 sm:grid-cols-1 xl:grid-cols-1",
+              )}
             >
               {visibleItems.map((item) => (
                 <AssetBrowserItemCard
                   key={item.id}
                   item={item}
                   selected={currentSelection.includes(item.id)}
+                  selectionMode={selectionMode}
                   role="option"
                   aria-selected={currentSelection.includes(item.id)}
                   onClick={() => toggleItem(item)}
@@ -241,6 +299,7 @@ function AssetBrowser({
                   key={item.id}
                   item={item}
                   selected={currentSelection.includes(item.id)}
+                  selectionMode={selectionMode}
                   role="option"
                   aria-selected={currentSelection.includes(item.id)}
                   onClick={() => toggleItem(item)}
@@ -251,23 +310,30 @@ function AssetBrowser({
           )}
         </ScrollArea>
       </div>
-      {showPreview ? <AssetBrowserPreview item={previewItem} /> : null}
+      {shouldShowPreview ? <AssetBrowserPreview item={previewItem} /> : null}
     </div>
   );
 }
 
-function AssetBrowserItemCard({ item, selected, className, ...props }: AssetBrowserItemCardProps) {
+function AssetBrowserItemCard({
+  item,
+  selected,
+  selectionMode = "single",
+  className,
+  ...props
+}: AssetBrowserItemCardProps) {
   return (
     <button
       type="button"
       data-slot="asset-browser-item-card"
       data-selected={selected ? "true" : undefined}
       className={cn(
-        "group grid min-h-40 gap-3 rounded-md border bg-card p-3 text-left text-card-foreground outline-none transition-colors hover:bg-muted/40 focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[selected=true]:border-primary data-[selected=true]:bg-primary/10",
+        "group relative grid min-h-40 gap-3 rounded-md border bg-card p-3 text-left text-card-foreground outline-none transition-colors hover:bg-muted/40 focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[selected=true]:border-primary data-[selected=true]:bg-primary/10",
         className,
       )}
       {...props}
     >
+      {selectionMode === "multiple" ? <AssetBrowserSelectionMark selected={selected} /> : null}
       <AssetBrowserThumbnail item={item} className="h-24" />
       <div className="min-w-0">
         <div className="truncate text-sm font-medium">{item.name}</div>
@@ -280,8 +346,15 @@ function AssetBrowserItemCard({ item, selected, className, ...props }: AssetBrow
   );
 }
 
-function AssetBrowserItemRow({ item, selected, className, ...props }: AssetBrowserItemRowProps) {
+function AssetBrowserItemRow({
+  item,
+  selected,
+  selectionMode = "single",
+  className,
+  ...props
+}: AssetBrowserItemRowProps) {
   const Icon = getAssetIcon(item.type);
+  const isMultipleSelection = selectionMode === "multiple";
 
   return (
     <button
@@ -289,11 +362,17 @@ function AssetBrowserItemRow({ item, selected, className, ...props }: AssetBrows
       data-slot="asset-browser-item-row"
       data-selected={selected ? "true" : undefined}
       className={cn(
-        "grid w-full grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-3 px-3 py-2 text-left outline-none transition-colors hover:bg-muted/40 focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[selected=true]:bg-primary/10",
+        "grid w-full items-center gap-3 px-3 py-2 text-left outline-none transition-colors hover:bg-muted/40 focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[selected=true]:bg-primary/10",
+        isMultipleSelection
+          ? "grid-cols-[1.5rem_2.25rem_minmax(0,1fr)_auto]"
+          : "grid-cols-[2.25rem_minmax(0,1fr)_auto]",
         className,
       )}
       {...props}
     >
+      {isMultipleSelection ? (
+        <AssetBrowserSelectionMark selected={selected} className="static" />
+      ) : null}
       <span className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
         <Icon aria-hidden="true" className="size-4" />
       </span>
@@ -307,6 +386,28 @@ function AssetBrowserItemRow({ item, selected, className, ...props }: AssetBrows
         {item.size ? formatAssetSize(item.size) : ""}
       </span>
     </button>
+  );
+}
+
+function AssetBrowserSelectionMark({
+  selected,
+  className,
+}: {
+  selected?: boolean;
+  className?: string;
+}) {
+  return (
+    <span
+      aria-hidden="true"
+      data-slot="asset-browser-selection-mark"
+      data-selected={selected ? "true" : undefined}
+      className={cn(
+        "absolute top-2 right-2 flex size-5 items-center justify-center rounded-[4px] border border-input bg-background text-transparent shadow-sm transition-colors group-data-[selected=true]:border-primary group-data-[selected=true]:bg-primary group-data-[selected=true]:text-primary-foreground",
+        className,
+      )}
+    >
+      <CheckIcon className="size-3.5" />
+    </span>
   );
 }
 
@@ -424,4 +525,10 @@ function formatAssetDate(value: string | Date) {
 }
 
 export { AssetBrowser, AssetBrowserItemCard, AssetBrowserItemRow, AssetBrowserPreview };
-export type { AssetBrowserItem, AssetBrowserProps, AssetBrowserSelectionMode, AssetBrowserView };
+export type {
+  AssetBrowserItem,
+  AssetBrowserLayout,
+  AssetBrowserProps,
+  AssetBrowserSelectionMode,
+  AssetBrowserView,
+};

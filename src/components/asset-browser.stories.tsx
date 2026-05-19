@@ -65,3 +65,33 @@ export const List: Story = {
     selectionMode: "multiple",
   },
 };
+
+export const MultipleSelection: Story = {
+  args: {
+    selectionMode: "multiple",
+    defaultSelectedItemIds: ["folder-brand"],
+  },
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByText("1 of 4 selected")).toBeInTheDocument();
+    await userEvent.click(canvas.getByText("hero-image.jpg"));
+    await expect(canvas.getByText("2 of 4 selected")).toBeInTheDocument();
+  },
+};
+
+export const Mobile: Story = {
+  args: {
+    layout: "mobile",
+    defaultView: "list",
+    selectionMode: "multiple",
+    defaultSelectedItemIds: ["hero"],
+  },
+  render: (args) => (
+    <div className="w-[360px]">
+      <AssetBrowser {...args} />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("1 of 4 selected")).toBeInTheDocument();
+    await expect(canvas.queryByText("No asset selected.")).not.toBeInTheDocument();
+  },
+};
