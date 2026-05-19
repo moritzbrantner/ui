@@ -784,6 +784,7 @@ function ChartInteractionLayer({
           <rect
             key={index}
             data-slot="chart-hit-area"
+            role="graphics-symbol"
             aria-label={`${ariaLabel ?? "Chart"} ${label}`}
             tabIndex={0}
             x={hitArea.x}

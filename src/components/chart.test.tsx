@@ -77,6 +77,16 @@ describe("chart graph components", () => {
     expect(within(tooltip as HTMLElement).getByText("34")).toBeTruthy();
   });
 
+  test("uses a valid graphics role for labeled svg hit areas", () => {
+    const { container } = render(
+      <ChartBarGraph ariaLabel="Quarterly bars" data={data} series={series} xKey="label" />,
+    );
+    const hitArea = container.querySelector('[data-slot="chart-hit-area"]');
+
+    expect(hitArea?.getAttribute("role")).toBe("graphics-symbol");
+    expect(hitArea?.getAttribute("aria-label")).toBe("Quarterly bars Q1");
+  });
+
   test("adds a horizontal scroll surface for dense data", () => {
     const denseData = Array.from({ length: 18 }, (_, index) => ({
       label: `W${index + 1}`,
