@@ -230,7 +230,7 @@ describe("@moritzbrantner/ui component edge cases", () => {
     );
 
     expect(container.querySelector("[data-slot='workflow-builder-edge']")?.getAttribute("d")).toBe(
-      "M 220 150 C 284 150, 284 202, 348 202",
+      "M 220 240 C 284 240, 284 352, 348 352",
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Start Source Image" }));

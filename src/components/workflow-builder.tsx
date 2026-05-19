@@ -689,21 +689,7 @@ function getWorkflowNodePortDotXOffset(
     return workflowNodePortDotInset();
   }
 
-  const compactPortColumnWidth =
-    (size.width -
-      workflowNodeCompactPortPadding() * 2 -
-      workflowNodeCompactPortGap() * 2 -
-      workflowNodeCompactPortArrowWidth()) /
-    2;
-
-  return (
-    workflowNodeCompactPortPadding() +
-    compactPortColumnWidth +
-    workflowNodeCompactPortGap() +
-    workflowNodeCompactPortArrowWidth() +
-    workflowNodeCompactPortGap() +
-    workflowNodePortDotInset()
-  );
+  return size.width - workflowNodePortDotInset();
 }
 
 function measureWorkflowBuilderPortPoints(
@@ -818,18 +804,6 @@ function workflowNodeSizeFallback() {
 
 function workflowNodePortDotInset() {
   return 28;
-}
-
-function workflowNodeCompactPortPadding() {
-  return 12;
-}
-
-function workflowNodeCompactPortGap() {
-  return 8;
-}
-
-function workflowNodeCompactPortArrowWidth() {
-  return 16;
 }
 
 export {

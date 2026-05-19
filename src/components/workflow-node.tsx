@@ -56,7 +56,7 @@ const workflowNodeDefaultWidth = 248;
 const workflowNodeCompactHeight = 84;
 const workflowNodeHeaderHeight = 72;
 const workflowNodeDescriptionHeight = 28;
-const workflowNodePortRowHeight = 52;
+const workflowNodePortRowHeight = 112;
 
 function WorkflowNode({
   node,
@@ -84,18 +84,23 @@ function WorkflowNode({
       data-selected={selected ? "true" : undefined}
       data-status={node.status}
       className={cn(
-        "overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-colors",
+        "flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-colors",
         "data-[selected=true]:border-primary data-[selected=true]:bg-primary/5",
         compact ? "w-[224px]" : "w-[248px]",
         className,
       )}
-      style={{ width: size.width, ...style }}
+      style={{ width: size.width, height: size.height, ...style }}
       {...props}
     >
       <div
         data-slot="workflow-node-header"
         className={cn(
-          "border-b px-3 py-3",
+          "shrink-0 overflow-hidden border-b px-3 py-2",
+          compact
+            ? "h-[48px]"
+            : node.description
+              ? "h-[100px]"
+              : "h-[72px]",
           getWorkflowNodeToneClasses(node.tone ?? getWorkflowNodeToneFromStatus(node.status)),
         )}
       >
@@ -117,7 +122,7 @@ function WorkflowNode({
             ) : null}
             <div className="truncate text-sm font-semibold">{node.label}</div>
             {node.packageLabel ? (
-              <div className="mt-0.5 truncate text-[11px] font-medium text-muted-foreground">
+              <div className="truncate text-[11px] font-medium text-muted-foreground">
                 {node.packageLabel}
               </div>
             ) : null}
@@ -137,31 +142,17 @@ function WorkflowNode({
             />
           </div>
         </div>
-        {node.description ? (
+        {node.description && !compact ? (
           <p
             className={cn(
-              "mt-2 text-xs leading-5 text-muted-foreground",
-              compact && "line-clamp-1",
+              "mt-1 line-clamp-1 text-xs leading-5 text-muted-foreground",
             )}
           >
             {node.description}
           </p>
         ) : null}
-        {compact ? (
-          <div
-            data-slot="workflow-node-summary"
-            className="mt-2 flex items-center gap-2 text-[11px] text-muted-foreground"
-          >
-            <span>{workflowNodeCompactPortSummary(node)}</span>
-            {tags[0] ? (
-              <>
-                <span aria-hidden="true">•</span>
-                <span className="truncate">{tags[0]}</span>
-              </>
-            ) : null}
-          </div>
-        ) : tags.length > 0 || node.kind ? (
-          <div className="mt-2 flex flex-wrap gap-1.5">
+        {!compact && (tags.length > 0 || node.kind) ? (
+          <div className="mt-1 flex gap-1.5 overflow-hidden">
             {node.kind ? <Badge variant="outline">{node.kind}</Badge> : null}
             {tags.map((tag) => (
               <Badge key={tag} variant="outline">
@@ -174,7 +165,7 @@ function WorkflowNode({
       {compact ? (
         <div
           data-slot="workflow-node-compact-ports"
-          className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 py-3 text-xs"
+          className="grid min-h-0 flex-1 grid-cols-[auto_1fr_auto] items-center gap-2 px-3 py-2 text-xs"
         >
           <WorkflowNodePortAnchor
             direction="input"
@@ -185,7 +176,13 @@ function WorkflowNode({
             getAriaLabel={getInputAriaLabel}
             compact
           />
-          <ArrowRightIcon className="size-4 text-muted-foreground" aria-hidden="true" />
+          <div
+            data-slot="workflow-node-summary"
+            className="flex min-w-0 items-center justify-center gap-1.5 text-[11px] text-muted-foreground"
+          >
+            <span className="truncate">{workflowNodeCompactPortSummary(node)}</span>
+            <ArrowRightIcon className="size-3 shrink-0" aria-hidden="true" />
+          </div>
           <WorkflowNodePortAnchor
             direction="output"
             node={node}
@@ -197,7 +194,7 @@ function WorkflowNode({
           />
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 p-3 text-xs">
+        <div className="grid min-h-0 flex-1 grid-cols-2 gap-2 p-2 text-xs">
           <WorkflowNodePortColumn
             title="Inputs"
             direction="input"
@@ -240,14 +237,16 @@ function WorkflowNodePortColumn({
   getAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
 }) {
   return (
-    <div>
-      <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+    <div className="flex min-h-0 flex-col">
+      <div className="mb-1 shrink-0 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
         {title}
       </div>
       {ports.length === 0 ? (
-        <div className="rounded-lg border border-dashed px-2 py-2 text-muted-foreground">none</div>
+        <div className="flex min-h-0 flex-1 items-center rounded-lg border border-dashed px-2 py-1.5 text-muted-foreground">
+          none
+        </div>
       ) : (
-        <div className="space-y-2">
+        <div className="grid min-h-0 flex-1 gap-1">
           {ports.map((port) => (
             <WorkflowNodePortAnchor
               key={`${direction}-${port.id}`}
@@ -290,8 +289,8 @@ function WorkflowNodePortAnchor({
         data-slot="workflow-node-port"
         data-port-direction={direction}
         className={cn(
-          "rounded-lg border border-dashed px-2 py-2 text-muted-foreground",
-          compact && "min-h-11 text-center",
+          "flex min-h-0 items-center rounded-lg border border-dashed px-2 py-1.5 text-muted-foreground",
+          compact && "h-full justify-center text-center",
         )}
       >
         none
@@ -308,12 +307,12 @@ function WorkflowNodePortAnchor({
       disabled={disabled || !onClick}
       aria-label={getAriaLabel?.(port, node) ?? `${node.label} ${port.label}`}
       className={cn(
-        "block w-full rounded-lg border px-2.5 py-2 text-left outline-none transition-colors",
+        "block h-full min-h-0 w-full overflow-hidden rounded-lg border px-2 py-1.5 text-left outline-none transition-colors",
         "focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
         isInput
           ? "border-border/80 bg-muted/20 hover:bg-muted/40"
           : "border-border/80 bg-background hover:bg-muted/30",
-        compact && "min-h-11",
+        compact && "size-6 rounded-full p-1.5",
       )}
       onClick={(event) => {
         event.stopPropagation();
@@ -322,19 +321,20 @@ function WorkflowNodePortAnchor({
     >
       <div
         className={cn(
-          "flex items-start gap-2",
+          "flex h-full min-h-0 items-start gap-2",
           !isInput && !compact && "flex-row-reverse text-right",
+          compact && "items-center justify-center",
         )}
       >
         <CircleIcon
           data-slot="workflow-node-port-dot"
-          className="mt-0.5 size-3 shrink-0 fill-current"
+          className={cn("size-3 shrink-0 fill-current", !compact && "mt-0.5")}
           aria-hidden="true"
         />
         <div
           className={cn(
             "min-w-0 flex-1",
-            compact && "text-center",
+            compact && "sr-only",
             !isInput && !compact && "items-end",
           )}
         >
@@ -347,7 +347,7 @@ function WorkflowNodePortAnchor({
             </div>
           )}
           {port.description && !compact ? (
-            <div className="mt-1 line-clamp-2 text-[11px] leading-4 text-muted-foreground">
+            <div className="sr-only">
               {port.description}
             </div>
           ) : null}
