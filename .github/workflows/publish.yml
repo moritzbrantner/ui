@@ -23,8 +23,6 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "24"
-          registry-url: "https://npm.pkg.github.com"
-          scope: "@moritzbrantner"
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -40,4 +38,4 @@ jobs:
       - name: Publish package
         run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
