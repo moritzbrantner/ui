@@ -273,13 +273,22 @@ function ensureDomGlobals() {
     url: "http://127.0.0.1/",
   });
 
-  globalThis.window = dom.window;
-  globalThis.document = dom.window.document;
-  globalThis.navigator = dom.window.navigator;
-  globalThis.HTMLElement = dom.window.HTMLElement;
-  globalThis.Element = dom.window.Element;
+  defineGlobal("window", dom.window);
+  defineGlobal("document", dom.window.document);
+  defineGlobal("navigator", dom.window.navigator);
+  defineGlobal("HTMLElement", dom.window.HTMLElement);
+  defineGlobal("Element", dom.window.Element);
 
   return dom.window;
+}
+
+function defineGlobal(name, value) {
+  Object.defineProperty(globalThis, name, {
+    configurable: true,
+    enumerable: false,
+    value,
+    writable: true,
+  });
 }
 
 function createRows(count) {
