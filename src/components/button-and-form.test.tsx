@@ -64,6 +64,7 @@ import {
   DocumentViewer,
   type DocumentViewerHighlight,
   type DocumentViewerPageData,
+  BlocksSpinner,
   DotsSpinner,
   Dropzone,
   DropzoneContent,
@@ -106,6 +107,8 @@ import {
   type QueryBuilderField,
   SectionGrid,
   Spinner,
+  OrbitSpinner,
+  PolygonSpinner,
   PulseSpinner,
   Stat,
   StatDelta,
@@ -562,6 +565,9 @@ describe("@moritzbrantner/ui button-and-form", () => {
         <Spinner size="lg" />
         <DotsSpinner label="Syncing package" />
         <PulseSpinner decorative />
+        <OrbitSpinner label="Syncing workspace" />
+        <BlocksSpinner label="Packing release" />
+        <PolygonSpinner decorative />
         <LoadingBar value={42} label="Upload progress" showValue />
         <LoadingBar indeterminate label="Fetching package" />
       </div>,
@@ -569,10 +575,19 @@ describe("@moritzbrantner/ui button-and-form", () => {
 
     expect(screen.getByRole("status", { name: "Loading" })).toBeTruthy();
     expect(screen.getByRole("status", { name: "Syncing package" })).toBeTruthy();
+    expect(screen.getByRole("status", { name: "Syncing workspace" })).toBeTruthy();
+    expect(screen.getByRole("status", { name: "Packing release" })).toBeTruthy();
     expect(
       container.querySelector("[data-slot='pulse-spinner']")?.getAttribute("aria-hidden"),
     ).toBe("true");
+    expect(
+      container.querySelector("[data-slot='polygon-spinner']")?.getAttribute("aria-hidden"),
+    ).toBe("true");
     expect(container.querySelectorAll("[data-slot='spinner-loop'] animate")).toHaveLength(3);
+    expect(
+      container.querySelector("[data-slot='orbit-spinner-dots'] animateTransform"),
+    ).toBeTruthy();
+    expect(container.querySelectorAll("[data-slot='blocks-spinner-block']")).toHaveLength(4);
 
     const upload = screen.getByRole("progressbar", { name: "Upload progress" });
     const fetching = screen.getByRole("progressbar", { name: "Fetching package" });

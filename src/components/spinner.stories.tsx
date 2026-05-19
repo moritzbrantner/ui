@@ -2,7 +2,14 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 
 import { Button } from "./button";
-import { DotsSpinner, PulseSpinner, Spinner } from "./spinner";
+import {
+  BlocksSpinner,
+  DotsSpinner,
+  OrbitSpinner,
+  PolygonSpinner,
+  PulseSpinner,
+  Spinner,
+} from "./spinner";
 
 const spinnerSizes = ["xs", "sm", "default", "lg", "xl"] as const;
 const spinnerVariants = ["default", "muted", "primary", "secondary", "destructive"] as const;
@@ -53,6 +60,18 @@ export const Families: Story = {
         <PulseSpinner label="Pulse spinner" />
         <span className="text-sm text-muted-foreground">Pulse</span>
       </div>
+      <div className="flex min-w-36 items-center gap-3">
+        <OrbitSpinner label="Syncing orbit" />
+        <span className="text-sm text-muted-foreground">Orbit</span>
+      </div>
+      <div className="flex min-w-36 items-center gap-3">
+        <BlocksSpinner label="Processing blocks" />
+        <span className="text-sm text-muted-foreground">Blocks</span>
+      </div>
+      <div className="flex min-w-36 items-center gap-3">
+        <PolygonSpinner label="Transforming polygon" />
+        <span className="text-sm text-muted-foreground">Polygon</span>
+      </div>
     </div>
   ),
 };
@@ -93,6 +112,14 @@ export const InContext: Story = {
       <div className="flex items-center gap-3 rounded-md border border-border/70 px-4 py-3">
         <DotsSpinner label="Publishing package" variant="primary" />
         <span className="text-sm">Publishing package</span>
+      </div>
+      <div className="flex items-center gap-3 rounded-md border border-border/70 px-4 py-3">
+        <OrbitSpinner label="Syncing workspace" variant="primary" />
+        <span className="text-sm">Syncing workspace</span>
+      </div>
+      <div className="flex items-center gap-3 rounded-md border border-border/70 px-4 py-3">
+        <BlocksSpinner label="Packing release" variant="muted" />
+        <span className="text-sm">Packing release</span>
       </div>
     </div>
   ),

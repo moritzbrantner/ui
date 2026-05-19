@@ -115,6 +115,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  BlocksSpinner,
   DotsSpinner,
   DirectionProvider,
   Drawer,
@@ -259,6 +260,8 @@ import {
   Skeleton,
   Slider,
   Spinner,
+  OrbitSpinner,
+  PolygonSpinner,
   PulseSpinner,
   Switch,
   Table,
@@ -1161,6 +1164,9 @@ function CatalogPreview({ designSystem = defaultUiThemeName }: CatalogPreviewPro
               </span>
               <DotsSpinner label="Syncing package" variant="primary" />
               <PulseSpinner label="Live package check" variant="muted" />
+              <OrbitSpinner label="Syncing workspace" variant="primary" />
+              <BlocksSpinner label="Packing release" variant="muted" />
+              <PolygonSpinner label="Transforming package" variant="secondary" />
             </div>
           </CatalogSection>
 
