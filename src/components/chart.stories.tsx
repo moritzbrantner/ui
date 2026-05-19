@@ -1,7 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 
-import { ChartAreaGraph, ChartBarGraph, ChartLineGraph } from "./chart";
+import {
+  ChartAreaGraph,
+  ChartBarGraph,
+  ChartDonutGraph,
+  ChartLineGraph,
+  ChartSparkline,
+} from "./chart";
 
 const revenueData = [
   { month: "Jan", revenue: 42, forecast: 36 },
@@ -22,6 +28,13 @@ const weeklyData = Array.from({ length: 20 }, (_, index) => ({
   activation: 38 + Math.round(Math.sin(index / 2) * 12 + index * 1.6),
   retention: 32 + Math.round(Math.cos(index / 2.8) * 8 + index * 1.2),
 }));
+
+const channelData = [
+  { channel: "Organic", value: 42 },
+  { channel: "Referral", value: 28 },
+  { channel: "Paid", value: 18 },
+  { channel: "Partner", value: 12 },
+];
 
 function ChartPreview() {
   return (
@@ -59,6 +72,22 @@ function ChartPreview() {
         xKey="month"
         caption="Grouped monthly totals, in thousands."
       />
+      <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)]">
+        <ChartSparkline
+          ariaLabel="Weekly activation sparkline"
+          data={weeklyData}
+          series={{ key: "activation", label: "Activation", color: "var(--chart-3)" }}
+          caption="Compact trend summary for dashboard cards."
+          showPoints
+        />
+        <ChartDonutGraph
+          ariaLabel="Acquisition channel split"
+          data={channelData}
+          labelKey="channel"
+          centerLabel="Sessions"
+          caption="Share of sessions by acquisition channel."
+        />
+      </div>
     </div>
   );
 }
@@ -79,6 +108,8 @@ export const Default: Story = {
     await expect(
       canvas.getByRole("img", { name: "Activation and retention area" }),
     ).toBeVisible();
+    await expect(canvas.getByRole("img", { name: "Weekly activation sparkline" })).toBeVisible();
+    await expect(canvas.getByRole("img", { name: "Acquisition channel split" })).toBeVisible();
     await expect(canvas.getByText("Target corridor")).toBeInTheDocument();
   },
 };

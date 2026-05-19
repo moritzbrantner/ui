@@ -4,9 +4,11 @@ import { describe, expect, test } from "vitest";
 import {
   ChartAreaGraph,
   ChartBarGraph,
+  ChartDonutGraph,
   ChartLineGraph,
   ChartPretext,
   ChartPretextText,
+  ChartSparkline,
 } from "./chart";
 
 const data = [
@@ -115,5 +117,58 @@ describe("chart graph components", () => {
     );
 
     expect(screen.getByText("Annotation").getAttribute("data-slot")).toBe("chart-pretext-text");
+  });
+
+  test("renders compact sparkline trend paths", () => {
+    const { container } = render(
+      <ChartSparkline
+        ariaLabel="Quarterly sparkline"
+        data={data}
+        series={{ key: "actual", label: "Actual", color: "var(--chart-3)" }}
+        showPoints
+      />,
+    );
+
+    expect(screen.getByRole("img", { name: "Quarterly sparkline" })).toBeTruthy();
+    expect(container.querySelector('[data-slot="chart-sparkline-line"]')).not.toBeNull();
+    expect(container.querySelector('[data-slot="chart-sparkline-area"]')).not.toBeNull();
+    expect(container.querySelectorAll('[data-slot="chart-sparkline-point"]')).toHaveLength(3);
+  });
+
+  test("renders donut segments, center total, and legend values", () => {
+    const { container } = render(
+      <ChartDonutGraph
+        ariaLabel="Channel split"
+        data={[
+          { channel: "Organic", value: 42 },
+          { channel: "Referral", value: 28 },
+        ]}
+        labelKey="channel"
+        centerLabel="Sessions"
+      />,
+    );
+
+    expect(screen.getByRole("img", { name: "Channel split" })).toBeTruthy();
+    expect(container.querySelectorAll('[data-slot="chart-donut-graph-segment"]')).toHaveLength(
+      2,
+    );
+    expect(screen.getByText("70")).toBeTruthy();
+    expect(screen.getByText("Sessions")).toBeTruthy();
+    expect(screen.getByText("Organic")).toBeTruthy();
+    expect(screen.getByText("42")).toBeTruthy();
+  });
+
+  test("shows donut empty state when values are not positive", () => {
+    render(
+      <ChartDonutGraph
+        ariaLabel="Empty split"
+        data={[{ channel: "Organic", value: 0 }]}
+        labelKey="channel"
+      />,
+    );
+
+    expect(screen.getByRole("img", { name: "Empty split" }).textContent).toBe(
+      "No chart data.",
+    );
   });
 });

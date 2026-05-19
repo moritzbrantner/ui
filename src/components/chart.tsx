@@ -15,6 +15,9 @@ const GRAPH_PADDING = { top: 20, right: 24, bottom: 44, left: 48 } as const;
 const GRAPH_SCROLL_POINT_WIDTH = 48;
 const GRAPH_TOOLTIP_WIDTH = 184;
 const GRAPH_TOOLTIP_ROW_HEIGHT = 22;
+const SPARKLINE_VIEWBOX = { width: 240, height: 72 } as const;
+const SPARKLINE_PADDING = 6;
+const DONUT_VIEWBOX = 220;
 type TooltipNameType = number | string;
 type ChartDatumValue = number | string | null | undefined;
 
@@ -58,6 +61,37 @@ type ChartGraphProps = Omit<React.ComponentProps<"figure">, "children"> & {
   formatLabel?: (value: ChartDatumValue, datum: ChartDatum, index: number) => React.ReactNode;
   formatValue?: (value: number) => React.ReactNode;
   pretext?: ChartPretextItem[];
+};
+
+type ChartSparklineProps = Omit<React.ComponentProps<"figure">, "children"> & {
+  data: ChartDatum[];
+  series: ChartSeries;
+  ariaLabel?: string;
+  caption?: React.ReactNode;
+  emptyMessage?: React.ReactNode;
+  height?: number;
+  width?: number;
+  yDomain?: [number, number];
+  showArea?: boolean;
+  showPoints?: boolean;
+  formatValue?: (value: number) => React.ReactNode;
+};
+
+type ChartDonutGraphProps = Omit<React.ComponentProps<"figure">, "children"> & {
+  data: ChartDatum[];
+  valueKey?: string;
+  labelKey?: string;
+  ariaLabel?: string;
+  caption?: React.ReactNode;
+  emptyMessage?: React.ReactNode;
+  size?: number;
+  innerRadius?: number;
+  outerRadius?: number;
+  showLegend?: boolean;
+  showTotal?: boolean;
+  centerLabel?: React.ReactNode | ((total: number) => React.ReactNode);
+  formatLabel?: (value: ChartDatumValue, datum: ChartDatum, index: number) => React.ReactNode;
+  formatValue?: (value: number) => React.ReactNode;
 };
 
 export type ChartConfig = Record<
@@ -398,6 +432,236 @@ function ChartAreaGraph(props: ChartGraphProps) {
 
 function ChartBarGraph(props: ChartGraphProps) {
   return <ChartGraph graph="bar" xScale="band" includeZero ariaLabel="Bar chart" {...props} />;
+}
+
+function ChartSparkline({
+  data,
+  series,
+  ariaLabel = "Sparkline chart",
+  caption,
+  emptyMessage = "No sparkline data.",
+  height = SPARKLINE_VIEWBOX.height,
+  width = SPARKLINE_VIEWBOX.width,
+  yDomain,
+  showArea = true,
+  showPoints = false,
+  formatValue = defaultFormatValue,
+  className,
+  ...props
+}: ChartSparklineProps) {
+  const values = data
+    .map((datum, index) => {
+      const value = getNumericValue(datum[series.key]);
+
+      if (value == null) {
+        return null;
+      }
+
+      return { index, value };
+    })
+    .filter((item): item is { index: number; value: number } => item !== null);
+  const hasData = values.length > 0;
+  const domain = yDomain ? normalizeDomain(yDomain) : normalizeDomain(getNumericDomain(values));
+  const color = getSeriesColor(series, 0);
+  const points = values.map((item) => ({
+    index: item.index,
+    value: item.value,
+    x: getSparklineX(width, data.length, item.index),
+    y: scaleSparklineY(height, domain, item.value),
+  }));
+
+  return (
+    <figure data-slot="chart-sparkline" className={cn("grid gap-1.5", className)} {...props}>
+      {hasData ? (
+        <svg
+          role="img"
+          aria-label={ariaLabel}
+          viewBox={`0 0 ${width} ${height}`}
+          className="h-auto w-full overflow-visible"
+        >
+          {showArea ? (
+            <path
+              data-slot="chart-sparkline-area"
+              d={getSparklineAreaPath(points, height)}
+              fill={color}
+              fillOpacity={0.16}
+            />
+          ) : null}
+          <path
+            data-slot="chart-sparkline-line"
+            d={getLinePath(points)}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            className={series.className}
+          />
+          {showPoints
+            ? points.map((point) => (
+                <circle
+                  key={point.index}
+                  data-slot="chart-sparkline-point"
+                  cx={point.x}
+                  cy={point.y}
+                  r={2.5}
+                  fill="var(--background)"
+                  stroke={color}
+                  strokeWidth={1.5}
+                >
+                  <title>
+                    {series.label ?? series.key}: {formatValue(point.value)}
+                  </title>
+                </circle>
+              ))
+            : null}
+        </svg>
+      ) : (
+        <div
+          role="img"
+          aria-label={ariaLabel}
+          className="flex min-h-14 items-center justify-center border border-dashed text-xs text-muted-foreground"
+        >
+          {emptyMessage}
+        </div>
+      )}
+      {caption ? (
+        <figcaption className="text-xs text-muted-foreground">{caption}</figcaption>
+      ) : null}
+    </figure>
+  );
+}
+
+function ChartDonutGraph({
+  data,
+  valueKey = "value",
+  labelKey = "label",
+  ariaLabel = "Donut chart",
+  caption,
+  emptyMessage = "No chart data.",
+  size = DONUT_VIEWBOX,
+  innerRadius = 58,
+  outerRadius = 96,
+  showLegend = true,
+  showTotal = true,
+  centerLabel,
+  formatLabel = defaultFormatLabel,
+  formatValue = defaultFormatValue,
+  className,
+  ...props
+}: ChartDonutGraphProps) {
+  const segments = data
+    .map((datum, index) => {
+      const value = getNumericValue(datum[valueKey]);
+
+      if (value == null || value <= 0) {
+        return null;
+      }
+
+      return {
+        datum,
+        index,
+        label: formatLabel(datum[labelKey], datum, index),
+        value,
+        color: datum.color ? String(datum.color) : `var(--chart-${(index % 5) + 1})`,
+      };
+    })
+    .filter(
+      (
+        item,
+      ): item is {
+        datum: ChartDatum;
+        index: number;
+        label: React.ReactNode;
+        value: number;
+        color: string;
+      } => item !== null,
+    );
+  const total = segments.reduce((sum, item) => sum + item.value, 0);
+  const hasData = total > 0;
+  const center = size / 2;
+  const radiusOuter = Math.min(outerRadius, center - 2);
+  const radiusInner = Math.min(innerRadius, radiusOuter - 8);
+  let currentAngle = 0;
+
+  return (
+    <figure data-slot="chart-donut-graph" className={cn("grid gap-3", className)} {...props}>
+      {hasData ? (
+        <>
+          <svg
+            role="img"
+            aria-label={ariaLabel}
+            viewBox={`0 0 ${size} ${size}`}
+            className="mx-auto h-auto w-full max-w-56 overflow-visible"
+          >
+            <g data-slot="chart-donut-graph-segments">
+              {segments.map((segment) => {
+                const angle = (segment.value / total) * 360;
+                const gap = segments.length > 1 ? Math.min(1.5, angle / 4) : 0;
+                const startAngle = currentAngle + gap / 2;
+                const endAngle = currentAngle + angle - gap / 2;
+                currentAngle += angle;
+
+                return (
+                  <path
+                    key={segment.index}
+                    data-slot="chart-donut-graph-segment"
+                    role="graphics-symbol"
+                    aria-label={`${segment.label}: ${formatValue(segment.value)}`}
+                    d={getDonutSegmentPath(
+                      center,
+                      center,
+                      radiusInner,
+                      radiusOuter,
+                      startAngle,
+                      endAngle,
+                    )}
+                    fill={segment.color}
+                    className="outline-none transition-opacity hover:opacity-80 focus:opacity-80"
+                    tabIndex={0}
+                  />
+                );
+              })}
+            </g>
+            {showTotal ? (
+              <ChartPretext className="fill-foreground text-center">
+                <ChartPretextText
+                  x={center}
+                  y={center - 5}
+                  className="fill-foreground text-lg font-semibold"
+                >
+                  {formatValue(total)}
+                </ChartPretextText>
+                {centerLabel ? (
+                  <ChartPretextText
+                    x={center}
+                    y={center + 18}
+                    className="fill-muted-foreground text-[10px]"
+                  >
+                    {typeof centerLabel === "function" ? centerLabel(total) : centerLabel}
+                  </ChartPretextText>
+                ) : null}
+              </ChartPretext>
+            ) : null}
+          </svg>
+          {showLegend ? (
+            <ChartDonutLegend segments={segments} formatValue={formatValue} />
+          ) : null}
+        </>
+      ) : (
+        <div
+          role="img"
+          aria-label={ariaLabel}
+          className="flex min-h-40 items-center justify-center border border-dashed text-sm text-muted-foreground"
+        >
+          {emptyMessage}
+        </div>
+      )}
+      {caption ? (
+        <figcaption className="text-sm text-muted-foreground">{caption}</figcaption>
+      ) : null}
+    </figure>
+  );
 }
 
 function ChartGraph({
@@ -1018,6 +1282,39 @@ function ChartGraphLegend({ series }: { series: ChartSeries[] }) {
   );
 }
 
+function ChartDonutLegend({
+  segments,
+  formatValue,
+}: {
+  segments: Array<{
+    index: number;
+    label: React.ReactNode;
+    value: number;
+    color: string;
+  }>;
+  formatValue: (value: number) => React.ReactNode;
+}) {
+  return (
+    <div data-slot="chart-donut-graph-legend" className="grid gap-2 text-sm">
+      {segments.map((item) => (
+        <div key={item.index} className="flex items-center justify-between gap-3">
+          <span className="flex min-w-0 items-center gap-2 text-muted-foreground">
+            <span
+              aria-hidden="true"
+              className="size-2.5 shrink-0 rounded-[2px]"
+              style={{ backgroundColor: item.color }}
+            />
+            <span className="truncate">{item.label}</span>
+          </span>
+          <span className="font-mono font-medium text-foreground tabular-nums">
+            {formatValue(item.value)}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function getNumericValue(value: ChartDatumValue): number | null {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     return null;
@@ -1053,6 +1350,16 @@ function getValueDomain(
   }
 
   return normalizeDomain([Math.min(...values), Math.max(...values)]);
+}
+
+function getNumericDomain(values: Array<{ value: number }>): [number, number] {
+  if (!values.length) {
+    return [0, 1];
+  }
+
+  const numericValues = values.map((item) => item.value);
+
+  return [Math.min(...numericValues), Math.max(...numericValues)];
 }
 
 function normalizeDomain([min, max]: [number, number]): [number, number] {
@@ -1108,6 +1415,67 @@ function getAreaPath(points: Array<{ x: number; y: number }>, baseline: number):
   const last = points[points.length - 1];
 
   return `${linePath} L ${last.x} ${baseline} L ${first.x} ${baseline} Z`;
+}
+
+function getSparklineAreaPath(points: Array<{ x: number; y: number }>, height: number): string {
+  if (!points.length) {
+    return "";
+  }
+
+  const baseline = height - SPARKLINE_PADDING;
+  const first = points[0];
+  const last = points[points.length - 1];
+
+  return `${getLinePath(points)} L ${last.x} ${baseline} L ${first.x} ${baseline} Z`;
+}
+
+function getSparklineX(width: number, dataLength: number, index: number): number {
+  if (dataLength <= 1) {
+    return width / 2;
+  }
+
+  const plotWidth = width - SPARKLINE_PADDING * 2;
+
+  return SPARKLINE_PADDING + (plotWidth / (dataLength - 1)) * index;
+}
+
+function scaleSparklineY(height: number, [min, max]: [number, number], value: number): number {
+  const plotHeight = height - SPARKLINE_PADDING * 2;
+
+  return height - SPARKLINE_PADDING - ((value - min) / (max - min)) * plotHeight;
+}
+
+function getDonutSegmentPath(
+  cx: number,
+  cy: number,
+  innerRadius: number,
+  outerRadius: number,
+  startAngle: number,
+  endAngle: number,
+): string {
+  const normalizedEnd = endAngle - startAngle >= 360 ? startAngle + 359.99 : endAngle;
+  const startOuter = getPolarPoint(cx, cy, outerRadius, startAngle);
+  const endOuter = getPolarPoint(cx, cy, outerRadius, normalizedEnd);
+  const startInner = getPolarPoint(cx, cy, innerRadius, normalizedEnd);
+  const endInner = getPolarPoint(cx, cy, innerRadius, startAngle);
+  const largeArcFlag = normalizedEnd - startAngle > 180 ? 1 : 0;
+
+  return [
+    `M ${startOuter.x} ${startOuter.y}`,
+    `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${endOuter.x} ${endOuter.y}`,
+    `L ${startInner.x} ${startInner.y}`,
+    `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${endInner.x} ${endInner.y}`,
+    "Z",
+  ].join(" ");
+}
+
+function getPolarPoint(cx: number, cy: number, radius: number, angle: number) {
+  const radians = ((angle - 90) * Math.PI) / 180;
+
+  return {
+    x: cx + radius * Math.cos(radians),
+    y: cy + radius * Math.sin(radians),
+  };
 }
 
 function getDatumHitArea(
@@ -1185,13 +1553,23 @@ export {
   ChartAreaGraph,
   ChartBarGraph,
   ChartContainer,
+  ChartDonutGraph,
   ChartLineGraph,
   ChartLegend,
   ChartLegendContent,
   ChartPretext,
   ChartPretextText,
+  ChartSparkline,
   ChartStyle,
   ChartTooltip,
   ChartTooltipContent,
 };
-export type { ChartDatum, ChartDatumValue, ChartGraphProps, ChartPretextItem, ChartSeries };
+export type {
+  ChartDatum,
+  ChartDatumValue,
+  ChartDonutGraphProps,
+  ChartGraphProps,
+  ChartPretextItem,
+  ChartSeries,
+  ChartSparklineProps,
+};
