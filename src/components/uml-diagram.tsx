@@ -53,10 +53,11 @@ type UmlDiagramEdge = {
   className?: string;
 };
 
-type PositionedUmlDiagramNode = UmlDiagramNode & Required<Pick<UmlDiagramNode, "x" | "y">> & {
-  width: number;
-  height: number;
-};
+type PositionedUmlDiagramNode = UmlDiagramNode &
+  Required<Pick<UmlDiagramNode, "x" | "y">> & {
+    width: number;
+    height: number;
+  };
 
 type UmlDiagramBounds = {
   x: number;
@@ -316,11 +317,7 @@ function UmlDiagramMarkers({ ids }: { ids: UmlDiagramMarkerIds }) {
         refY="5"
         viewBox="0 0 10 10"
       >
-        <path
-          d="M 1 1 L 9 5 L 1 9 Z"
-          className="fill-card stroke-current"
-          strokeWidth="1.25"
-        />
+        <path d="M 1 1 L 9 5 L 1 9 Z" className="fill-card stroke-current" strokeWidth="1.25" />
       </marker>
       <marker
         id={ids.diamond}
@@ -808,14 +805,20 @@ function getUmlDiagramEdgeRoute(
 
   if (sourceNode.id === targetNode.id) {
     const offset = 28 + (edgeIndex % 3) * 16;
-    const start = { x: sourceNode.x + sourceNode.width, y: sourceNode.y + sourceNode.height * 0.35 };
+    const start = {
+      x: sourceNode.x + sourceNode.width,
+      y: sourceNode.y + sourceNode.height * 0.35,
+    };
     const end = { x: sourceNode.x + sourceNode.width, y: sourceNode.y + sourceNode.height * 0.68 };
     const c1 = { x: start.x + offset, y: start.y - offset };
     const c2 = { x: end.x + offset, y: end.y + offset };
 
     return {
       path: `M ${start.x} ${start.y} C ${c1.x} ${c1.y} ${c2.x} ${c2.y} ${end.x} ${end.y}`,
-      labelPoint: { x: sourceNode.x + sourceNode.width + offset + 12, y: sourceNode.y + sourceNode.height / 2 },
+      labelPoint: {
+        x: sourceNode.x + sourceNode.width + offset + 12,
+        y: sourceNode.y + sourceNode.height / 2,
+      },
       sourceLabelPoint: { x: start.x + 8, y: start.y - 8 },
       targetLabelPoint: { x: end.x + 8, y: end.y + 8 },
     };

@@ -296,9 +296,9 @@ describe("@moritzbrantner/ui component edge cases", () => {
       />,
     );
 
-    expect(
-      screen.getByRole("button", { name: "Expand Merge" }).getAttribute("aria-pressed"),
-    ).toBe("true");
+    expect(screen.getByRole("button", { name: "Expand Merge" }).getAttribute("aria-pressed")).toBe(
+      "true",
+    );
     expect(container.querySelector("[data-slot='workflow-builder-edge']")?.getAttribute("d")).toBe(
       "M 248 240 C 296 240, 272 26, 320 26",
     );

@@ -199,9 +199,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("img", { name: "Order domain class diagram" })).toBeVisible();
-    await expect(
-      canvas.getByRole("img", { name: "Order lifecycle state diagram" }),
-    ).toBeVisible();
+    await expect(canvas.getByRole("img", { name: "Order lifecycle state diagram" })).toBeVisible();
     await expect(canvas.getByRole("img", { name: "Service dependency diagram" })).toBeVisible();
     await expect(canvas.getByText("Order")).toBeVisible();
     await expect(canvas.getByText("Fulfilled")).toBeVisible();

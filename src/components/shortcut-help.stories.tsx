@@ -66,7 +66,9 @@ export const OpensFromButton: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Keyboard shortcuts" }));
 
-    await expect(await screen.findByRole("dialog", { name: "Keyboard shortcuts" })).toBeInTheDocument();
+    await expect(
+      await screen.findByRole("dialog", { name: "Keyboard shortcuts" }),
+    ).toBeInTheDocument();
     await expect(await screen.findByText("Open command palette")).toBeInTheDocument();
 
     await userEvent.keyboard("{Escape}");

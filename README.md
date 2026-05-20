@@ -18,6 +18,55 @@ bun add @moritzbrantner/ui
 
 The package is published to GitHub Packages for the `@moritzbrantner` scope, so consumers need registry access configured for that scope.
 
+## Development Workflow
+
+This repository uses Bun as the package manager and task runner. CI currently installs Bun `1.3.12` and Node `24`.
+
+Set up the package from a clean checkout:
+
+```sh
+bun install --frozen-lockfile
+```
+
+For daily component work, run Storybook:
+
+```sh
+bun run dev
+```
+
+Fast local tests:
+
+```sh
+bun run test
+```
+
+Format and static checks:
+
+```sh
+bun run format:check
+bun run lint
+```
+
+Production build:
+
+```sh
+bun run build
+```
+
+Full local confidence check:
+
+```sh
+bun run verify
+```
+
+`bun run verify` reports repository hygiene first, then runs the release verification contract. The heavy checks include Storybook tests, coverage, Playwright visual tests, the consumer example build, benchmarks, build-size checks, and an npm pack dry run. Install the local Playwright browser before running visual tests for the first time:
+
+```sh
+bunx playwright install chromium
+```
+
+If installation or CI cannot read GitHub Packages, make sure `GH_PACKAGES_TOKEN` is available for the `@moritzbrantner` scope configured in `.npmrc`.
+
 ## Styles
 
 Import exactly one UI stylesheet for the app. Theme tokens are global CSS custom properties, so different UI themes are not intended to coexist on the same page.
@@ -181,14 +230,16 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) and [../../docs/design-system.md](../..
 
 ## Release Checks
 
-Before publishing, run:
+Publishing is handled by `.github/workflows/publish.yml` on `v*` tags or manual workflow dispatch. There is no local `release` script because publishing requires GitHub Packages credentials and should go through the workflow.
+
+Before tagging or dispatching a publish, run:
 
 ```sh
-bun run check-types
-bun run lint
-bun run test
-bun run build
-bun run test:storybook
-bun run test:package
-npm pack --dry-run --ignore-scripts --json
+bun run verify:release
+```
+
+To inspect the package contents without publishing:
+
+```sh
+bun run pack:dry
 ```

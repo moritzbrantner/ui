@@ -463,9 +463,7 @@ function ChartLineGraph(props: ChartGraphProps) {
 }
 
 function ChartAreaGraph(props: ChartGraphProps) {
-  return (
-    <ChartGraph graph="area" xScale="point" includeZero ariaLabel="Area chart" {...props} />
-  );
+  return <ChartGraph graph="area" xScale="point" includeZero ariaLabel="Area chart" {...props} />;
 }
 
 function ChartBarGraph(props: ChartGraphProps) {
@@ -512,9 +510,7 @@ function ChartHistogramGraph({
       )
     : width;
   const layout = getChartLayout({ width: chartWidth, height });
-  const histogramXDomain = xDomain
-    ? normalizeDomain(xDomain)
-    : getHistogramXDomain(histogramBins);
+  const histogramXDomain = xDomain ? normalizeDomain(xDomain) : getHistogramXDomain(histogramBins);
   const histogramYDomain = yDomain
     ? normalizeDomain(yDomain)
     : normalizeDomain([0, Math.max(...histogramBins.map((bin) => bin.count), 0)]);
@@ -523,11 +519,8 @@ function ChartHistogramGraph({
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
   const activeBin = activeIndex == null ? null : histogramBins[activeIndex];
   const activeX =
-    activeBin == null
-      ? null
-      : getHistogramBinCenterX(layout, histogramXDomain, activeBin);
-  const activeY =
-    activeBin == null ? null : scaleY(layout, histogramYDomain, activeBin.count);
+    activeBin == null ? null : getHistogramBinCenterX(layout, histogramXDomain, activeBin);
+  const activeY = activeBin == null ? null : scaleY(layout, histogramYDomain, activeBin.count);
   const activeValues =
     activeBin == null
       ? []
@@ -565,11 +558,7 @@ function ChartHistogramGraph({
                 onPointerLeave={() => setActiveIndex(null)}
               >
                 {showGrid ? (
-                  <ChartGridLines
-                    layout={layout}
-                    ticks={yTicks}
-                    domain={histogramYDomain}
-                  />
+                  <ChartGridLines layout={layout} ticks={yTicks} domain={histogramYDomain} />
                 ) : null}
                 <ChartHistogramAxes
                   domain={histogramYDomain}
@@ -918,9 +907,7 @@ function ChartDonutGraph({
               </ChartPretext>
             ) : null}
           </svg>
-          {showLegend ? (
-            <ChartDonutLegend segments={segments} formatValue={formatValue} />
-          ) : null}
+          {showLegend ? <ChartDonutLegend segments={segments} formatValue={formatValue} /> : null}
         </>
       ) : (
         <div
@@ -1377,8 +1364,7 @@ function ChartHistogramInteractionLayer({
   onActiveIndexChange: (index: number | null) => void;
   xDomain: [number, number];
 }) {
-  const activeLabel =
-    activeBin && activeIndex != null ? formatBin(activeBin, activeIndex) : null;
+  const activeLabel = activeBin && activeIndex != null ? formatBin(activeBin, activeIndex) : null;
 
   return (
     <g data-slot="chart-interaction-layer">
@@ -1635,14 +1621,7 @@ function ChartGridLines({
         const y = scaleY(layout, domain, tick);
 
         return (
-          <line
-            key={tick}
-            x1={layout.left}
-            x2={layout.right}
-            y1={y}
-            y2={y}
-            strokeDasharray="3 4"
-          />
+          <line key={tick} x1={layout.left} x2={layout.right} y1={y} y2={y} strokeDasharray="3 4" />
         );
       })}
     </g>
@@ -1800,11 +1779,7 @@ function getDonutDatumValue(
   return childTotal > 0 ? childTotal : null;
 }
 
-function getValidDonutPath(
-  data: ChartDatum[],
-  path: number[],
-  childrenKey: string,
-): number[] {
+function getValidDonutPath(data: ChartDatum[], path: number[], childrenKey: string): number[] {
   let currentData = data;
   const validPath: number[] = [];
 
@@ -2057,9 +2032,7 @@ function getBandCenterX(layout: ChartLayout, dataLength: number, index: number):
 }
 
 function getLinePath(points: Array<{ x: number; y: number }>): string {
-  return points
-    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
-    .join(" ");
+  return points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
 }
 
 function getAreaPath(points: Array<{ x: number; y: number }>, baseline: number): string {
@@ -2154,8 +2127,7 @@ function getDatumHitArea(
   const previous = index === 0 ? layout.left : getPointX(layout, dataLength, index - 1);
   const next = index === dataLength - 1 ? layout.right : getPointX(layout, dataLength, index + 1);
   const x = index === 0 ? layout.left : previous + (current - previous) / 2;
-  const width =
-    index === dataLength - 1 ? layout.right - x : next - (next - current) / 2 - x;
+  const width = index === dataLength - 1 ? layout.right - x : next - (next - current) / 2 - x;
 
   return {
     x,

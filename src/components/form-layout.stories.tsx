@@ -130,7 +130,9 @@ function ValidatedFormDemo({ onSave = () => undefined }: ValidatedFormDemoProps)
                 placeholder="owner@example.com"
               />
               <FieldError>
-                {errors.includes("Owner email must include @.") ? "Owner email must include @." : null}
+                {errors.includes("Owner email must include @.")
+                  ? "Owner email must include @."
+                  : null}
               </FieldError>
             </Field>
           </FieldGrid>

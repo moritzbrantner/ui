@@ -41,9 +41,7 @@ export const Reconnects: Story = {
     onReconnect: fn(),
   },
   play: async ({ args, canvas, userEvent }) => {
-    await userEvent.click(
-      canvas.getByRole("button", { name: /Disconnected/i }),
-    );
+    await userEvent.click(canvas.getByRole("button", { name: /Disconnected/i }));
 
     await expect(args.onReconnect).toHaveBeenCalledTimes(1);
   },

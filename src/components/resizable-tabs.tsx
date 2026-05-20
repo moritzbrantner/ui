@@ -130,8 +130,7 @@ function ResizableTabs({
           : direction === "last"
             ? enabledItems[enabledItems.length - 1]
             : enabledItems[
-                (Math.max(currentIndex, 0) + direction + enabledItems.length) %
-                  enabledItems.length
+                (Math.max(currentIndex, 0) + direction + enabledItems.length) % enabledItems.length
               ];
 
       if (!nextItem) return;

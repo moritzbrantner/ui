@@ -90,12 +90,7 @@ function ToolbarInteractionDemo({
       </ToolbarGroup>
       <ToolbarSeparator />
       <ToolbarGroup aria-label="View">
-        <Toggle
-          size="sm"
-          aria-label="Preview mode"
-          pressed={preview}
-          onPressedChange={setPreview}
-        >
+        <Toggle size="sm" aria-label="Preview mode" pressed={preview} onPressedChange={setPreview}>
           {preview ? "Preview on" : "Preview"}
         </Toggle>
       </ToolbarGroup>

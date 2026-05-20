@@ -43,9 +43,9 @@ describe("Terminal", () => {
     expect(screen.getByText("Build completed")).toBeTruthy();
     expect(container.querySelector("[data-slot='terminal']")).toBeTruthy();
     expect(container.querySelector("[data-slot='terminal-controls']")).toBeTruthy();
-    expect(container.querySelector("[data-slot='terminal-line']")?.getAttribute("data-variant")).toBe(
-      "default",
-    );
+    expect(
+      container.querySelector("[data-slot='terminal-line']")?.getAttribute("data-variant"),
+    ).toBe("default");
     expect(
       screen
         .getByText("Build completed")

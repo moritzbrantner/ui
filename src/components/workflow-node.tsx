@@ -102,21 +102,12 @@ function WorkflowNode({
         className={cn(
           "shrink-0 overflow-hidden px-3 py-2",
           minimized ? "rounded-xl border-b-0" : "rounded-t-xl border-b",
-          minimized
-            ? "h-full"
-            : compact
-            ? "h-[48px]"
-            : node.description
-              ? "h-[100px]"
-              : "h-[72px]",
+          minimized ? "h-full" : compact ? "h-[48px]" : node.description ? "h-[100px]" : "h-[72px]",
           getWorkflowNodeToneClasses(node.tone ?? getWorkflowNodeToneFromStatus(node.status)),
         )}
       >
         <div
-          className={cn(
-            "flex justify-between gap-3",
-            minimized ? "items-center" : "items-start",
-          )}
+          className={cn("flex justify-between gap-3", minimized ? "items-center" : "items-start")}
         >
           <button
             type="button"
@@ -172,11 +163,7 @@ function WorkflowNode({
           </div>
         </div>
         {node.description && !compact && !minimized ? (
-          <p
-            className={cn(
-              "mt-1 line-clamp-1 text-xs leading-5 text-muted-foreground",
-            )}
-          >
+          <p className={cn("mt-1 line-clamp-1 text-xs leading-5 text-muted-foreground")}>
             {node.description}
           </p>
         ) : null}
@@ -391,10 +378,7 @@ function WorkflowNodePortAnchor({
           className={cn(
             "size-3 shrink-0 fill-current",
             !compact &&
-              cn(
-                "absolute top-1/2 -translate-y-1/2",
-                isInput ? "-left-3.5" : "-right-3.5",
-              ),
+              cn("absolute top-1/2 -translate-y-1/2", isInput ? "-left-3.5" : "-right-3.5"),
           )}
           aria-hidden="true"
         />
@@ -413,11 +397,7 @@ function WorkflowNodePortAnchor({
               {port.required ? <Badge variant="outline">required</Badge> : null}
             </div>
           )}
-          {port.description && !compact ? (
-            <div className="sr-only">
-              {port.description}
-            </div>
-          ) : null}
+          {port.description && !compact ? <div className="sr-only">{port.description}</div> : null}
         </div>
       </div>
     </button>

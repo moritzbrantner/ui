@@ -440,9 +440,4 @@ export {
   pulseSpinnerVariants,
   spinnerVariants,
 };
-export type {
-  DotsSpinnerProps,
-  GeometricSpinnerProps,
-  PulseSpinnerProps,
-  SpinnerProps,
-};
+export type { DotsSpinnerProps, GeometricSpinnerProps, PulseSpinnerProps, SpinnerProps };

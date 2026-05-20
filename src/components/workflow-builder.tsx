@@ -265,9 +265,7 @@ function WorkflowBuilder({
   };
 
   const changeNodeMinimized = (nodeId: string, minimized: boolean) => {
-    onNodesChange?.(
-      nodes.map((node) => (node.id === nodeId ? { ...node, minimized } : node)),
-    );
+    onNodesChange?.(nodes.map((node) => (node.id === nodeId ? { ...node, minimized } : node)));
   };
 
   const fitView = () => {

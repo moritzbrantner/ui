@@ -81,10 +81,10 @@ const scaleColumnWidth: Record<GanttScale, number> = {
 };
 
 const statusColors: Record<GanttTaskStatus, string> = {
-  pending: "var(--muted-foreground)",
-  active: "var(--chart-1)",
-  done: "var(--chart-2)",
-  blocked: "var(--destructive)",
+  pending: "#374151",
+  active: "#7c2d12",
+  done: "#134e4a",
+  blocked: "#7f1d1d",
 };
 
 function Gantt({
@@ -164,10 +164,7 @@ function Gantt({
             >
               {ticks.map((tick) => {
                 const tickLeft = getGanttDayDiff(range.start, tick.start) * dayWidth;
-                const tickWidth = Math.max(
-                  getGanttDayDiff(tick.start, tick.end) * dayWidth,
-                  1,
-                );
+                const tickWidth = Math.max(getGanttDayDiff(tick.start, tick.end) * dayWidth, 1);
 
                 return (
                   <div
@@ -213,8 +210,7 @@ function Gantt({
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0"
                 style={{
-                  backgroundImage:
-                    "linear-gradient(to right, var(--border) 1px, transparent 1px)",
+                  backgroundImage: "linear-gradient(to right, var(--border) 1px, transparent 1px)",
                   backgroundSize: `${resolvedColumnWidth}px 100%`,
                 }}
               />

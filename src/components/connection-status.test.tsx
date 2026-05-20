@@ -14,9 +14,7 @@ describe("connection status", () => {
     );
 
     expect(screen.getByText("Syncing").closest("button")).toBeTruthy();
-    expect(
-      screen.getByText("Connected and synced").closest("button"),
-    ).toBeTruthy();
+    expect(screen.getByText("Connected and synced").closest("button")).toBeTruthy();
     expect(screen.getByText("Disconnected").closest("button")).toBeTruthy();
     expect(screen.getByText("Syncing...")).toBeTruthy();
     expect(screen.getByText("Synced up")).toBeTruthy();
@@ -32,9 +30,7 @@ describe("connection status", () => {
         }),
     );
 
-    render(
-      <ConnectionStatus status="disconnected" onReconnect={onReconnect} />,
-    );
+    render(<ConnectionStatus status="disconnected" onReconnect={onReconnect} />);
 
     fireEvent.click(screen.getByRole("button", { name: /Disconnected/i }));
 
@@ -53,9 +49,7 @@ describe("connection status", () => {
 
     render(<ConnectionStatus status="synced" onSync={onSync} />);
 
-    fireEvent.click(
-      screen.getByText("Connected and synced").closest("button")!,
-    );
+    fireEvent.click(screen.getByText("Connected and synced").closest("button")!);
 
     await waitFor(() => {
       expect(onSync).toHaveBeenCalledTimes(1);
@@ -93,22 +87,15 @@ describe("connection status", () => {
 
     const action = screen.getByText("Synced up");
 
-    expect(action.className).toContain(
-      "group-hover/connection-status:bg-emerald-500/22",
-    );
-    expect(action.className).toContain(
-      "group-active/connection-status:bg-emerald-500/30",
-    );
+    expect(action.className).toContain("group-hover/connection-status:bg-emerald-500/22");
+    expect(action.className).toContain("group-active/connection-status:bg-emerald-500/30");
   });
 
   test("disables the control when no reconnect or sync handler is available", () => {
     render(<ConnectionStatus status="synced" />);
 
     expect(
-      screen
-        .getByText("Connected and synced")
-        .closest("button")
-        ?.getAttribute("disabled"),
+      screen.getByText("Connected and synced").closest("button")?.getAttribute("disabled"),
     ).toBe("");
   });
 });

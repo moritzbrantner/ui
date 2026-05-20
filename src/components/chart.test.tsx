@@ -65,9 +65,7 @@ describe("chart graph components", () => {
     );
 
     expect(screen.getByRole("img", { name: "Latency distribution" })).toBeTruthy();
-    expect(container.querySelectorAll('[data-slot="chart-histogram-graph-bar"]')).toHaveLength(
-      2,
-    );
+    expect(container.querySelectorAll('[data-slot="chart-histogram-graph-bar"]')).toHaveLength(2);
     expect(
       container.querySelector('[data-slot="chart-histogram-graph-bar"]')?.textContent,
     ).toContain("1 - 3: 3");
@@ -196,9 +194,7 @@ describe("chart graph components", () => {
     );
 
     expect(screen.getByRole("img", { name: "Channel split" })).toBeTruthy();
-    expect(container.querySelectorAll('[data-slot="chart-donut-graph-segment"]')).toHaveLength(
-      2,
-    );
+    expect(container.querySelectorAll('[data-slot="chart-donut-graph-segment"]')).toHaveLength(2);
     expect(
       container.querySelector('[data-slot="chart-donut-graph-segment"]')?.getAttribute("tabindex"),
     ).toBeNull();
@@ -237,9 +233,7 @@ describe("chart graph components", () => {
     expect(screen.getByRole("group", { name: "Folder sizes" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Design: 10. Enter folder" })).toBeTruthy();
 
-    const [designSegment] = container.querySelectorAll(
-      '[data-slot="chart-donut-graph-segment"]',
-    );
+    const [designSegment] = container.querySelectorAll('[data-slot="chart-donut-graph-segment"]');
     fireEvent.click(designSegment);
 
     expect(screen.getByText("Icons")).toBeTruthy();
@@ -263,8 +257,6 @@ describe("chart graph components", () => {
       />,
     );
 
-    expect(screen.getByRole("img", { name: "Empty split" }).textContent).toBe(
-      "No chart data.",
-    );
+    expect(screen.getByRole("img", { name: "Empty split" }).textContent).toBe("No chart data.");
   });
 });

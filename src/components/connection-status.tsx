@@ -14,10 +14,7 @@ export type ConnectionStatusState =
   | "out-of-sync";
 type ResolvedConnectionStatusState = "synced" | "syncing" | "disconnected";
 
-type ConnectionStatusProps = Omit<
-  React.ComponentPropsWithoutRef<"button">,
-  "children"
-> & {
+type ConnectionStatusProps = Omit<React.ComponentPropsWithoutRef<"button">, "children"> & {
   status: ConnectionStatusState;
   label?: React.ReactNode;
   detail?: React.ReactNode;
@@ -35,8 +32,7 @@ const connectionStatusVariants = cva(
   {
     variants: {
       status: {
-        synced:
-          "border-emerald-500/30 bg-emerald-500/10 text-foreground hover:bg-emerald-500/14",
+        synced: "border-emerald-500/30 bg-emerald-500/10 text-foreground hover:bg-emerald-500/14",
         syncing: "border-blue-500/30 bg-blue-500/10 text-foreground",
         disconnected:
           "border-destructive/25 bg-destructive/8 text-foreground hover:bg-destructive/12",
@@ -45,18 +41,15 @@ const connectionStatusVariants = cva(
   },
 );
 
-const iconToneVariants = cva(
-  "flex size-8 shrink-0 items-center justify-center rounded-full",
-  {
-    variants: {
-      status: {
-        synced: "bg-emerald-500/16 text-emerald-700 dark:text-emerald-300",
-        syncing: "bg-blue-500/14 text-blue-700 dark:text-blue-300",
-        disconnected: "bg-destructive/14 text-destructive",
-      },
+const iconToneVariants = cva("flex size-8 shrink-0 items-center justify-center rounded-full", {
+  variants: {
+    status: {
+      synced: "bg-emerald-500/16 text-emerald-700 dark:text-emerald-300",
+      syncing: "bg-blue-500/14 text-blue-700 dark:text-blue-300",
+      disconnected: "bg-destructive/14 text-destructive",
     },
   },
-);
+});
 
 const actionToneVariants = cva(
   "inline-flex shrink-0 items-center rounded-md px-2 py-1 text-xs font-medium transition-[background-color,box-shadow,color,transform] group-hover/connection-status:-translate-y-px group-active/connection-status:translate-y-0",
@@ -106,9 +99,7 @@ const statusConfig = {
   }
 >;
 
-function resolveConnectionStatus(
-  status: ConnectionStatusState,
-): ResolvedConnectionStatusState {
+function resolveConnectionStatus(status: ConnectionStatusState): ResolvedConnectionStatusState {
   if (status === "connected" || status === "out-of-sync") {
     return "syncing";
   }
@@ -144,8 +135,7 @@ function ConnectionStatus({
         ? undefined
         : onSync;
   const busy = resolvedStatus === "syncing" || pending || isPending;
-  const isDisabled =
-    disabled || resolvedStatus === "syncing" || (!action && !onClick);
+  const isDisabled = disabled || resolvedStatus === "syncing" || (!action && !onClick);
   const resolvedLabel = label ?? config.label;
   const resolvedDetail = detail ?? config.detail;
   const idleActionLabel =
@@ -180,10 +170,7 @@ function ConnectionStatus({
       data-pending={busy ? "true" : "false"}
       type={type}
       disabled={isDisabled}
-      className={cn(
-        connectionStatusVariants({ status: resolvedStatus }),
-        className,
-      )}
+      className={cn(connectionStatusVariants({ status: resolvedStatus }), className)}
       onClick={handleClick}
       {...props}
     >
@@ -191,17 +178,10 @@ function ConnectionStatus({
         data-slot="connection-status-icon"
         className={cn(iconToneVariants({ status: resolvedStatus }))}
       >
-        {busy ? (
-          <RefreshCwIcon className="size-4 animate-spin" />
-        ) : (
-          <Icon className="size-4" />
-        )}
+        {busy ? <RefreshCwIcon className="size-4 animate-spin" /> : <Icon className="size-4" />}
       </span>
       <span className="grid min-w-0 flex-1 gap-0.5">
-        <span
-          data-slot="connection-status-label"
-          className="truncate text-sm font-medium"
-        >
+        <span data-slot="connection-status-label" className="truncate text-sm font-medium">
           {resolvedLabel}
         </span>
         <span

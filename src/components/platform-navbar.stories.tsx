@@ -160,7 +160,9 @@ export const Web: Story = {
     await expect(profileItems.length).toBeGreaterThan(0);
     await expect(accountMenu).not.toBeNull();
     await expect(accountMenu).toHaveAttribute("data-state", "open");
-    await expect(within(accountMenu as HTMLElement).getByText("mira@example.com")).toBeInTheDocument();
+    await expect(
+      within(accountMenu as HTMLElement).getByText("mira@example.com"),
+    ).toBeInTheDocument();
   },
 };
 

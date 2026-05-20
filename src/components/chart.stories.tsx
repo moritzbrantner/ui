@@ -56,8 +56,8 @@ const channelData = [
 ];
 
 const latencySamples = [
-  82, 88, 91, 94, 96, 97, 101, 104, 108, 111, 113, 118, 124, 128, 132, 137, 141, 145,
-  149, 153, 158, 162, 168, 173, 181, 188, 196, 208, 224, 247,
+  82, 88, 91, 94, 96, 97, 101, 104, 108, 111, 113, 118, 124, 128, 132, 137, 141, 145, 149, 153, 158,
+  162, 168, 173, 181, 188, 196, 208, 224, 247,
 ];
 
 function ChartPreview() {
@@ -138,9 +138,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("img", { name: "Revenue and forecast trend" })).toBeVisible();
-    await expect(
-      canvas.getByRole("img", { name: "Activation and retention area" }),
-    ).toBeVisible();
+    await expect(canvas.getByRole("img", { name: "Activation and retention area" })).toBeVisible();
     await expect(canvas.getByRole("img", { name: "API latency distribution" })).toBeVisible();
     await expect(canvas.getByRole("img", { name: "Weekly activation sparkline" })).toBeVisible();
     await expect(canvas.getByRole("group", { name: "Acquisition channel split" })).toBeVisible();

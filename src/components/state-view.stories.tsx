@@ -26,7 +26,9 @@ function RetryStateDemo({ onRetry = () => undefined }: RetryStateDemoProps) {
     return (
       <LoadingState label="Retrying package metadata">
         <StateViewTitle>Retrying package metadata</StateViewTitle>
-        <StateViewDescription>Checking the registry again with the current filters.</StateViewDescription>
+        <StateViewDescription>
+          Checking the registry again with the current filters.
+        </StateViewDescription>
         <StateViewActions>
           <Button size="sm" onClick={() => setState("success")}>
             Complete retry
@@ -40,7 +42,9 @@ function RetryStateDemo({ onRetry = () => undefined }: RetryStateDemoProps) {
     return (
       <SuccessState>
         <StateViewTitle>Packages loaded</StateViewTitle>
-        <StateViewDescription>The registry returned the latest package metadata.</StateViewDescription>
+        <StateViewDescription>
+          The registry returned the latest package metadata.
+        </StateViewDescription>
         <StateViewActions>
           <Button variant="outline" size="sm" onClick={() => setState("error")}>
             Show error
@@ -53,7 +57,9 @@ function RetryStateDemo({ onRetry = () => undefined }: RetryStateDemoProps) {
   return (
     <ErrorState>
       <StateViewTitle>Could not load packages</StateViewTitle>
-      <StateViewDescription>The package registry returned an unavailable response.</StateViewDescription>
+      <StateViewDescription>
+        The package registry returned an unavailable response.
+      </StateViewDescription>
       <StateViewActions>
         <Button
           variant="destructive"

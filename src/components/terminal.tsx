@@ -161,7 +161,10 @@ function TerminalCursor({
   return (
     <span
       data-slot="terminal-cursor"
-      className={cn("ml-1 inline-block h-4 w-2 animate-pulse bg-zinc-50 align-[-0.125em]", className)}
+      className={cn(
+        "ml-1 inline-block h-4 w-2 animate-pulse bg-zinc-50 align-[-0.125em]",
+        className,
+      )}
       aria-hidden={ariaHidden}
       {...props}
     >

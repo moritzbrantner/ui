@@ -43,10 +43,7 @@ describe("AssetBrowser", () => {
     fireEvent.click(screen.getByRole("option", { name: /creative-brief.pdf/ }));
 
     expect(screen.getByText("2 of 3 selected")).toBeTruthy();
-    expect(onSelectionChange).toHaveBeenLastCalledWith(
-      ["hero", "brief"],
-      [assets[1], assets[2]],
-    );
+    expect(onSelectionChange).toHaveBeenLastCalledWith(["hero", "brief"], [assets[1], assets[2]]);
     expect(listbox.querySelectorAll("[data-slot='asset-browser-selection-mark']").length).toBe(3);
   });
 
@@ -55,9 +52,9 @@ describe("AssetBrowser", () => {
       <AssetBrowser items={assets} layout="mobile" selectionMode="multiple" defaultView="list" />,
     );
 
-    expect(container.querySelector("[data-slot='asset-browser']")?.getAttribute("data-layout")).toBe(
-      "mobile",
-    );
+    expect(
+      container.querySelector("[data-slot='asset-browser']")?.getAttribute("data-layout"),
+    ).toBe("mobile");
     expect(container.querySelector("[data-slot='asset-browser-preview']")).toBeNull();
   });
 });

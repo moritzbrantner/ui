@@ -62,9 +62,7 @@ describe("avatar", () => {
     const avatarCollection = container.querySelector('[data-slot="avatar-collection"]');
     expect(avatarCollection?.className).toContain("-space-x-3");
     expect(avatarCollection?.getAttribute("data-spacing")).toBe("tight");
-    expect(avatarCollection?.className).toContain(
-      "*:data-[shape=hexagonal]:ring-0",
-    );
+    expect(avatarCollection?.className).toContain("*:data-[shape=hexagonal]:ring-0");
     expect(screen.getByTestId("loose-avatar-collection").className).toContain("-space-x-1");
     expect(avatarCollectionVariants({ spacing: "normal" })).toContain("-space-x-2");
     expect(

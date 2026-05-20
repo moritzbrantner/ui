@@ -17,7 +17,10 @@ try {
   const rootPackageJson = JSON.parse(readFileSync(path.join(packageRoot, "package.json"), "utf8"));
 
   mkdirSync(tempConsumerRoot, { recursive: true });
-  cpSync(path.join(packageRoot, "tsconfig.base.json"), path.join(tempWorkspace, "tsconfig.base.json"));
+  cpSync(
+    path.join(packageRoot, "tsconfig.base.json"),
+    path.join(tempWorkspace, "tsconfig.base.json"),
+  );
   cpSync(path.join(consumerRoot, "src"), path.join(tempConsumerRoot, "src"), { recursive: true });
   cpSync(path.join(consumerRoot, "index.html"), path.join(tempConsumerRoot, "index.html"));
   cpSync(path.join(consumerRoot, "tsconfig.json"), path.join(tempConsumerRoot, "tsconfig.json"));
@@ -26,7 +29,8 @@ try {
   const packageJson = JSON.parse(readFileSync(path.join(consumerRoot, "package.json"), "utf8"));
   packageJson.dependencies["@moritzbrantner/ui"] = `file:${tarballPath}`;
   packageJson.devDependencies["@types/react"] ??= rootPackageJson.devDependencies["@types/react"];
-  packageJson.devDependencies["@types/react-dom"] ??= rootPackageJson.devDependencies["@types/react-dom"];
+  packageJson.devDependencies["@types/react-dom"] ??=
+    rootPackageJson.devDependencies["@types/react-dom"];
   writeFileSync(
     path.join(tempConsumerRoot, "package.json"),
     `${JSON.stringify(packageJson, null, 2)}\n`,
@@ -42,11 +46,15 @@ try {
 console.log("@moritzbrantner/ui consumer example verified");
 
 function packPackage(destination: string): string {
-  const result = spawnSync("npm", ["pack", "--ignore-scripts", "--pack-destination", destination, "--json"], {
-    cwd: packageRoot,
-    shell: false,
-    encoding: "utf8",
-  });
+  const result = spawnSync(
+    "npm",
+    ["pack", "--ignore-scripts", "--pack-destination", destination, "--json"],
+    {
+      cwd: packageRoot,
+      shell: false,
+      encoding: "utf8",
+    },
+  );
 
   if (result.error) {
     console.error(result.error.message);
