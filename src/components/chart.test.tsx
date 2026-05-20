@@ -5,6 +5,7 @@ import {
   ChartAreaGraph,
   ChartBarGraph,
   ChartDonutGraph,
+  ChartHistogramGraph,
   ChartLineGraph,
   ChartPretext,
   ChartPretextText,
@@ -51,6 +52,52 @@ describe("chart graph components", () => {
     expect(screen.getByRole("img", { name: "Quarterly bars" })).toBeTruthy();
     expect(screen.getAllByText("Actual")).toHaveLength(1);
     expect(screen.getAllByText("Target")).toHaveLength(1);
+  });
+
+  test("renders histogram bins from raw values", () => {
+    const { container } = render(
+      <ChartHistogramGraph
+        ariaLabel="Latency distribution"
+        values={[1, 2, 2.2, 3.9, 5]}
+        bins={2}
+        xDomain={[1, 5]}
+      />,
+    );
+
+    expect(screen.getByRole("img", { name: "Latency distribution" })).toBeTruthy();
+    expect(container.querySelectorAll('[data-slot="chart-histogram-graph-bar"]')).toHaveLength(
+      2,
+    );
+    expect(
+      container.querySelector('[data-slot="chart-histogram-graph-bar"]')?.textContent,
+    ).toContain("1 - 3: 3");
+  });
+
+  test("supports pre-binned histogram data and hover inspection", () => {
+    const { container } = render(
+      <ChartHistogramGraph
+        ariaLabel="Score distribution"
+        data={[
+          { min: 0, max: 10, count: 4, label: "Low" },
+          { min: 10, max: 20, count: 7, label: "High", color: "var(--chart-2)" },
+        ]}
+        countLabel="Responses"
+      />,
+    );
+    const hitAreas = container.querySelectorAll('[data-slot="chart-hit-area"]');
+
+    expect(hitAreas).toHaveLength(2);
+    expect(hitAreas[1]?.getAttribute("aria-label")).toBe("Score distribution High");
+
+    fireEvent.pointerEnter(hitAreas[1] as Element);
+
+    const tooltip = container.querySelector('[data-slot="chart-graph-tooltip"]');
+
+    expect(tooltip).not.toBeNull();
+    expect(container.querySelector('[data-slot="chart-crosshair"]')).not.toBeNull();
+    expect(within(tooltip as HTMLElement).getByText("High")).toBeTruthy();
+    expect(within(tooltip as HTMLElement).getByText("Responses")).toBeTruthy();
+    expect(within(tooltip as HTMLElement).getByText("7")).toBeTruthy();
   });
 
   test("renders area charts with the shared graph primitives", () => {

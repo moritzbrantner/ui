@@ -5,6 +5,7 @@ import {
   ChartAreaGraph,
   ChartBarGraph,
   ChartDonutGraph,
+  ChartHistogramGraph,
   ChartLineGraph,
   ChartSparkline,
 } from "./chart";
@@ -54,6 +55,11 @@ const channelData = [
   { channel: "Partner", value: 12 },
 ];
 
+const latencySamples = [
+  82, 88, 91, 94, 96, 97, 101, 104, 108, 111, 113, 118, 124, 128, 132, 137, 141, 145,
+  149, 153, 158, 162, 168, 173, 181, 188, 196, 208, 224, 247,
+];
+
 function ChartPreview() {
   return (
     <div className="grid max-w-4xl gap-8">
@@ -89,6 +95,15 @@ function ChartPreview() {
         series={series}
         xKey="month"
         caption="Grouped monthly totals, in thousands."
+      />
+      <ChartHistogramGraph
+        ariaLabel="API latency distribution"
+        values={latencySamples}
+        bins={[100, 140, 180, 220]}
+        xDomain={[80, 260]}
+        caption="Request latency samples binned into millisecond ranges."
+        countLabel="Requests"
+        formatValue={(value) => `${value}ms`}
       />
       <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)]">
         <ChartSparkline
@@ -126,6 +141,7 @@ export const Default: Story = {
     await expect(
       canvas.getByRole("img", { name: "Activation and retention area" }),
     ).toBeVisible();
+    await expect(canvas.getByRole("img", { name: "API latency distribution" })).toBeVisible();
     await expect(canvas.getByRole("img", { name: "Weekly activation sparkline" })).toBeVisible();
     await expect(canvas.getByRole("group", { name: "Acquisition channel split" })).toBeVisible();
     await expect(canvas.getByText("Target corridor")).toBeInTheDocument();

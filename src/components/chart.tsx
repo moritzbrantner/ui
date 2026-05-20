@@ -32,6 +32,15 @@ type ChartSeries = {
   className?: string;
 };
 
+type ChartHistogramBin = {
+  min: number;
+  max: number;
+  count: number;
+  label?: React.ReactNode;
+  color?: string;
+  className?: string;
+};
+
 type ChartPretextItem = {
   id?: string;
   x: number | string;
@@ -63,6 +72,32 @@ type ChartGraphProps = Omit<React.ComponentProps<"figure">, "children"> & {
   formatLabel?: (value: ChartDatumValue, datum: ChartDatum, index: number) => React.ReactNode;
   formatValue?: (value: number) => React.ReactNode;
   pretext?: ChartPretextItem[];
+};
+
+type ChartHistogramGraphProps = Omit<React.ComponentProps<"figure">, "children"> & {
+  data?: ChartHistogramBin[];
+  values?: number[];
+  bins?: number | number[];
+  ariaLabel?: string;
+  caption?: React.ReactNode;
+  emptyMessage?: React.ReactNode;
+  height?: number;
+  width?: number;
+  xDomain?: [number, number];
+  yDomain?: [number, number];
+  yTickCount?: number;
+  xTickCount?: number;
+  showGrid?: boolean;
+  showXAxis?: boolean;
+  showYAxis?: boolean;
+  interactive?: boolean;
+  scrollable?: boolean;
+  scrollBinWidth?: number;
+  color?: string;
+  countLabel?: React.ReactNode;
+  formatBin?: (bin: ChartHistogramBin, index: number) => React.ReactNode;
+  formatCount?: (value: number) => React.ReactNode;
+  formatValue?: (value: number) => React.ReactNode;
 };
 
 type ChartSparklineProps = Omit<React.ComponentProps<"figure">, "children"> & {
@@ -435,6 +470,165 @@ function ChartAreaGraph(props: ChartGraphProps) {
 
 function ChartBarGraph(props: ChartGraphProps) {
   return <ChartGraph graph="bar" xScale="band" includeZero ariaLabel="Bar chart" {...props} />;
+}
+
+function ChartHistogramGraph({
+  data,
+  values,
+  bins = 10,
+  ariaLabel = "Histogram chart",
+  caption,
+  emptyMessage = "No histogram data.",
+  height = GRAPH_VIEWBOX.height,
+  width = GRAPH_VIEWBOX.width,
+  xDomain,
+  yDomain,
+  yTickCount = 5,
+  xTickCount = 6,
+  showGrid = true,
+  showXAxis = true,
+  showYAxis = true,
+  interactive = true,
+  scrollable,
+  scrollBinWidth = GRAPH_SCROLL_POINT_WIDTH,
+  color = "var(--chart-1)",
+  countLabel = "Count",
+  formatBin = defaultFormatHistogramBin,
+  formatCount = defaultFormatValue,
+  formatValue = defaultFormatValue,
+  className,
+  ...props
+}: ChartHistogramGraphProps) {
+  const histogramBins = React.useMemo(
+    () => getHistogramBins({ data, values, bins, xDomain }),
+    [data, values, bins, xDomain],
+  );
+  const hasData = histogramBins.length > 0;
+  const shouldScroll = scrollable ?? histogramBins.length > 16;
+  const chartWidth = shouldScroll
+    ? Math.max(
+        width,
+        GRAPH_PADDING.left + GRAPH_PADDING.right + histogramBins.length * scrollBinWidth,
+      )
+    : width;
+  const layout = getChartLayout({ width: chartWidth, height });
+  const histogramXDomain = xDomain
+    ? normalizeDomain(xDomain)
+    : getHistogramXDomain(histogramBins);
+  const histogramYDomain = yDomain
+    ? normalizeDomain(yDomain)
+    : normalizeDomain([0, Math.max(...histogramBins.map((bin) => bin.count), 0)]);
+  const yTicks = getTicks(histogramYDomain, yTickCount);
+  const xTicks = getTicks(histogramXDomain, xTickCount);
+  const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
+  const activeBin = activeIndex == null ? null : histogramBins[activeIndex];
+  const activeX =
+    activeBin == null
+      ? null
+      : getHistogramBinCenterX(layout, histogramXDomain, activeBin);
+  const activeY =
+    activeBin == null ? null : scaleY(layout, histogramYDomain, activeBin.count);
+  const activeValues =
+    activeBin == null
+      ? []
+      : [
+          {
+            key: "count",
+            label: countLabel,
+            color: activeBin.color ?? color,
+            value: activeBin.count,
+            displayValue: formatCount(activeBin.count),
+          },
+        ];
+
+  return (
+    <figure data-slot="chart-histogram-graph" className={cn("grid gap-2", className)} {...props}>
+      {hasData ? (
+        <>
+          <div
+            data-slot="chart-scroll-area"
+            className={cn(
+              "overflow-x-auto overflow-y-visible",
+              shouldScroll && "pb-2 [scrollbar-width:thin]",
+            )}
+          >
+            <div
+              data-slot="chart-scroll-content"
+              className="relative"
+              style={{ minWidth: shouldScroll ? chartWidth : undefined }}
+            >
+              <svg
+                role="img"
+                aria-label={ariaLabel}
+                viewBox={`0 0 ${chartWidth} ${height}`}
+                className="h-auto w-full overflow-visible"
+                onPointerLeave={() => setActiveIndex(null)}
+              >
+                {showGrid ? (
+                  <ChartGridLines
+                    layout={layout}
+                    ticks={yTicks}
+                    domain={histogramYDomain}
+                  />
+                ) : null}
+                <ChartHistogramAxes
+                  domain={histogramYDomain}
+                  formatCount={formatCount}
+                  formatValue={formatValue}
+                  layout={layout}
+                  showXAxis={showXAxis}
+                  showYAxis={showYAxis}
+                  xDomain={histogramXDomain}
+                  xTicks={xTicks}
+                  yTicks={yTicks}
+                />
+                <g data-slot="chart-histogram-graph-series">
+                  {histogramBins.map((bin, index) => (
+                    <HistogramBar
+                      key={`${bin.min}-${bin.max}-${index}`}
+                      bin={bin}
+                      color={color}
+                      domain={histogramXDomain}
+                      index={index}
+                      isActive={activeIndex == null || activeIndex === index}
+                      layout={layout}
+                      yDomain={histogramYDomain}
+                    />
+                  ))}
+                </g>
+                {interactive ? (
+                  <ChartHistogramInteractionLayer
+                    activeBin={activeBin}
+                    activeIndex={activeIndex}
+                    activeValues={activeValues}
+                    activeX={activeX}
+                    activeY={activeY}
+                    ariaLabel={ariaLabel}
+                    bins={histogramBins}
+                    formatBin={formatBin}
+                    layout={layout}
+                    onActiveIndexChange={setActiveIndex}
+                    xDomain={histogramXDomain}
+                  />
+                ) : null}
+              </svg>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div
+          role="img"
+          aria-label={ariaLabel}
+          className="flex min-h-40 items-center justify-center border border-dashed text-sm text-muted-foreground"
+        >
+          {emptyMessage}
+        </div>
+      )}
+      {caption ? (
+        <figcaption className="text-sm text-muted-foreground">{caption}</figcaption>
+      ) : null}
+    </figure>
+  );
 }
 
 function ChartSparkline({
@@ -1058,6 +1252,185 @@ function renderBarGraphSeries(
   });
 }
 
+function HistogramBar({
+  bin,
+  color,
+  domain,
+  index,
+  isActive,
+  layout,
+  yDomain,
+}: {
+  bin: ChartHistogramBin;
+  color: string;
+  domain: [number, number];
+  index: number;
+  isActive: boolean;
+  layout: ChartLayout;
+  yDomain: [number, number];
+}) {
+  const x0 = scaleX(layout, domain, bin.min);
+  const x1 = scaleX(layout, domain, bin.max);
+  const gap = Math.min(4, Math.max(1, (x1 - x0) * 0.08));
+  const x = x0 + gap / 2;
+  const barWidth = Math.max(x1 - x0 - gap, 1);
+  const y = scaleY(layout, yDomain, bin.count);
+  const zeroY = scaleY(layout, yDomain, 0);
+
+  return (
+    <rect
+      data-slot="chart-histogram-graph-bar"
+      x={x}
+      y={Math.min(y, zeroY)}
+      width={barWidth}
+      height={Math.abs(zeroY - y)}
+      fill={bin.color ?? color}
+      className={bin.className}
+      opacity={isActive ? undefined : 0.35}
+    >
+      <title>
+        {bin.label ?? defaultFormatHistogramBin(bin)}: {defaultFormatValue(bin.count)}
+      </title>
+    </rect>
+  );
+}
+
+function ChartHistogramAxes({
+  domain,
+  formatCount,
+  formatValue,
+  layout,
+  showXAxis,
+  showYAxis,
+  xDomain,
+  xTicks,
+  yTicks,
+}: {
+  domain: [number, number];
+  formatCount: (value: number) => React.ReactNode;
+  formatValue: (value: number) => React.ReactNode;
+  layout: ChartLayout;
+  showXAxis: boolean;
+  showYAxis: boolean;
+  xDomain: [number, number];
+  xTicks: number[];
+  yTicks: number[];
+}) {
+  return (
+    <ChartPretext data-slot="chart-axes" className="fill-muted-foreground">
+      {showYAxis
+        ? yTicks.map((tick) => (
+            <ChartPretextText
+              key={tick}
+              x={layout.left - 10}
+              y={scaleY(layout, domain, tick)}
+              textAnchor="end"
+            >
+              {formatCount(tick)}
+            </ChartPretextText>
+          ))
+        : null}
+      {showXAxis
+        ? xTicks.map((tick) => (
+            <ChartPretextText
+              key={tick}
+              x={scaleX(layout, xDomain, tick)}
+              y={layout.bottom + 22}
+              dominantBaseline="hanging"
+            >
+              {formatValue(tick)}
+            </ChartPretextText>
+          ))
+        : null}
+    </ChartPretext>
+  );
+}
+
+function ChartHistogramInteractionLayer({
+  activeBin,
+  activeIndex,
+  activeValues,
+  activeX,
+  activeY,
+  ariaLabel,
+  bins,
+  formatBin,
+  layout,
+  onActiveIndexChange,
+  xDomain,
+}: {
+  activeBin: ChartHistogramBin | null;
+  activeIndex: number | null;
+  activeValues: Array<{
+    key: string;
+    label: React.ReactNode;
+    color: string;
+    value: number | null;
+    displayValue: React.ReactNode;
+  }>;
+  activeX: number | null;
+  activeY: number | null;
+  ariaLabel?: string;
+  bins: ChartHistogramBin[];
+  formatBin: (bin: ChartHistogramBin, index: number) => React.ReactNode;
+  layout: ChartLayout;
+  onActiveIndexChange: (index: number | null) => void;
+  xDomain: [number, number];
+}) {
+  const activeLabel =
+    activeBin && activeIndex != null ? formatBin(activeBin, activeIndex) : null;
+
+  return (
+    <g data-slot="chart-interaction-layer">
+      {activeIndex != null && activeX != null ? (
+        <line
+          data-slot="chart-crosshair"
+          x1={activeX}
+          x2={activeX}
+          y1={layout.top}
+          y2={layout.bottom}
+          className="stroke-border"
+          strokeDasharray="4 4"
+        />
+      ) : null}
+      {bins.map((bin, index) => {
+        const x0 = scaleX(layout, xDomain, bin.min);
+        const x1 = scaleX(layout, xDomain, bin.max);
+        const label = formatBin(bin, index);
+
+        return (
+          <rect
+            key={`${bin.min}-${bin.max}-${index}`}
+            data-slot="chart-hit-area"
+            role="graphics-symbol"
+            aria-label={`${ariaLabel ?? "Histogram"} ${label}`}
+            tabIndex={0}
+            x={x0}
+            y={layout.top}
+            width={Math.max(x1 - x0, 1)}
+            height={layout.plotHeight}
+            fill="transparent"
+            className="cursor-crosshair outline-none"
+            onFocus={() => onActiveIndexChange(index)}
+            onBlur={() => onActiveIndexChange(null)}
+            onPointerEnter={() => onActiveIndexChange(index)}
+            onPointerMove={() => onActiveIndexChange(index)}
+          />
+        );
+      })}
+      {activeIndex != null && activeX != null && activeBin ? (
+        <ChartGraphTooltip
+          label={activeLabel}
+          layout={layout}
+          values={activeValues}
+          x={activeX}
+          y={activeY}
+        />
+      ) : null}
+    </g>
+  );
+}
+
 function ChartInteractionLayer({
   activeIndex,
   activeValues,
@@ -1518,6 +1891,112 @@ function getValueDomain(
   return normalizeDomain([Math.min(...values), Math.max(...values)]);
 }
 
+function getHistogramBins({
+  data,
+  values,
+  bins,
+  xDomain,
+}: {
+  data?: ChartHistogramBin[];
+  values?: number[];
+  bins: number | number[];
+  xDomain?: [number, number];
+}): ChartHistogramBin[] {
+  if (data?.length) {
+    return data.filter(
+      (bin) =>
+        Number.isFinite(bin.min) &&
+        Number.isFinite(bin.max) &&
+        Number.isFinite(bin.count) &&
+        bin.max > bin.min &&
+        bin.count >= 0,
+    );
+  }
+
+  const numericValues = (values ?? []).filter(
+    (value): value is number => typeof value === "number" && Number.isFinite(value),
+  );
+
+  if (!numericValues.length) {
+    return [];
+  }
+
+  const valueDomain = xDomain
+    ? normalizeDomain(xDomain)
+    : normalizeDomain([Math.min(...numericValues), Math.max(...numericValues)]);
+  const edges = getHistogramEdges(valueDomain, bins);
+
+  if (edges.length < 2) {
+    return [];
+  }
+
+  const histogramBins = edges.slice(0, -1).map((min, index) => ({
+    min,
+    max: edges[index + 1] as number,
+    count: 0,
+  }));
+
+  for (const value of numericValues) {
+    const binIndex = getHistogramBinIndex(edges, value);
+
+    if (binIndex != null && histogramBins[binIndex]) {
+      histogramBins[binIndex].count += 1;
+    }
+  }
+
+  return histogramBins;
+}
+
+function getHistogramEdges(domain: [number, number], bins: number | number[]): number[] {
+  const [min, max] = domain;
+
+  if (Array.isArray(bins)) {
+    const thresholds = bins.filter((value) => value > min && value < max);
+
+    return [min, ...thresholds, max]
+      .filter((value) => Number.isFinite(value))
+      .sort((a, b) => a - b)
+      .filter((value, index, edges) => index === 0 || value !== edges[index - 1]);
+  }
+
+  const count = Math.max(1, Math.floor(bins));
+  const step = (max - min) / count;
+
+  return Array.from({ length: count + 1 }, (_, index) => min + step * index);
+}
+
+function getHistogramBinIndex(edges: number[], value: number): number | null {
+  const first = edges[0];
+  const last = edges[edges.length - 1];
+
+  if (value < first || value > last) {
+    return null;
+  }
+
+  if (value === last) {
+    return edges.length - 2;
+  }
+
+  const index = edges.findIndex((edge, edgeIndex) => {
+    const next = edges[edgeIndex + 1];
+
+    return next != null && value >= edge && value < next;
+  });
+
+  return index === -1 ? null : index;
+}
+
+function getHistogramXDomain(bins: ChartHistogramBin[]): [number, number] {
+  if (!bins.length) {
+    return [0, 1];
+  }
+
+  return normalizeDomain([
+    Math.min(...bins.map((bin) => bin.min)),
+    Math.max(...bins.map((bin) => bin.max)),
+  ]);
+}
+
 function getNumericDomain(values: Array<{ value: number }>): [number, number] {
   if (!values.length) {
     return [0, 1];
@@ -1547,6 +2026,18 @@ function getTicks([min, max]: [number, number], tickCount: number): number[] {
 
 function scaleY(layout: ChartLayout, [min, max]: [number, number], value: number): number {
   return layout.bottom - ((value - min) / (max - min)) * layout.plotHeight;
+}
+
+function scaleX(layout: ChartLayout, [min, max]: [number, number], value: number): number {
+  return layout.left + ((value - min) / (max - min)) * layout.plotWidth;
+}
+
+function getHistogramBinCenterX(
+  layout: ChartLayout,
+  domain: [number, number],
+  bin: ChartHistogramBin,
+): number {
+  return scaleX(layout, domain, bin.min + (bin.max - bin.min) / 2);
 }
 
 function getPointX(layout: ChartLayout, dataLength: number, index: number): number {
@@ -1690,6 +2181,10 @@ function defaultFormatValue(value: number): React.ReactNode {
     : value.toLocaleString(undefined, { maximumFractionDigits: 1 });
 }
 
+function defaultFormatHistogramBin(bin: ChartHistogramBin): React.ReactNode {
+  return bin.label ?? `${defaultFormatValue(bin.min)} - ${defaultFormatValue(bin.max)}`;
+}
+
 function getPayloadConfigFromPayload(config: ChartConfig, payload: unknown, key: string) {
   if (typeof payload !== "object" || payload === null) {
     return undefined;
@@ -1720,6 +2215,7 @@ export {
   ChartBarGraph,
   ChartContainer,
   ChartDonutGraph,
+  ChartHistogramGraph,
   ChartLineGraph,
   ChartLegend,
   ChartLegendContent,
@@ -1735,6 +2231,8 @@ export type {
   ChartDatumValue,
   ChartDonutGraphProps,
   ChartGraphProps,
+  ChartHistogramBin,
+  ChartHistogramGraphProps,
   ChartPretextItem,
   ChartSeries,
   ChartSparklineProps,
