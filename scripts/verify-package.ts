@@ -110,6 +110,20 @@ assert.equal(typeof dataGrid.DataGrid, "function", "data-grid subpath should exp
 const dialog = await importPackage("@moritzbrantner/ui/components/dialog");
 assert.equal(typeof dialog.Dialog, "function", "dialog subpath should expose Dialog");
 
+const avatarShapes = await importPackage("@moritzbrantner/ui/components/avatar-shapes");
+assert.equal(
+  typeof avatarShapes.avatarShapeStyles,
+  "object",
+  "avatar-shapes helper subpath should expose avatarShapeStyles",
+);
+
+const hotkeyVisibility = await importPackage("@moritzbrantner/ui/components/hotkey-visibility");
+assert.equal(
+  typeof hotkeyVisibility.useHotkeyShortcut,
+  "function",
+  "hotkey-visibility helper subpath should expose useHotkeyShortcut",
+);
+
 const cn = await importPackage("@moritzbrantner/ui/lib/cn");
 assert.equal(typeof cn.cn, "function", "cn subpath should expose cn");
 
@@ -151,10 +165,14 @@ const requiredPackageFiles = [
   "dist/paper/server.d.ts",
   "dist/components/button.js",
   "dist/components/button.d.ts",
+  "dist/components/avatar-shapes.js",
+  "dist/components/avatar-shapes.d.ts",
   "dist/components/data-grid.js",
   "dist/components/data-grid.d.ts",
   "dist/components/dialog.js",
   "dist/components/dialog.d.ts",
+  "dist/components/hotkey-visibility.js",
+  "dist/components/hotkey-visibility.d.ts",
   "dist/lib/cn.js",
   "dist/themes.js",
   "styles.css",

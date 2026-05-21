@@ -1,5 +1,14 @@
 # @moritzbrantner/ui
 
+## 0.5.4
+
+### Patch Changes
+
+- Add explicit client/server package entrypoints plus server-only theme entrypoints for metadata-safe consumption.
+- Expand package, consumer bundle, Storybook, visual, build-size, benchmark, and release verification guardrails.
+- Add and refine Gantt, UML diagram, chart, terminal, resizable-tabs, spinner, typography, and workflow component coverage.
+- Add GitHub Pages deployment support and tighten CI/publish release checks.
+
 ## 0.5.2
 
 ### Patch Changes

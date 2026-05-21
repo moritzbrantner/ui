@@ -32,6 +32,16 @@ const interactiveStoryComponents = [
   "timeline-editor",
   "workflow-builder",
 ];
+const componentHelperAllowlist = new Map([
+  [
+    "avatar-shapes",
+    "Internal avatar styling helper published through the component subpath wildcard.",
+  ],
+  [
+    "hotkey-visibility",
+    "Internal shortcut visibility helper used by command, menu, and keyboard components.",
+  ],
+]);
 const clientComponentPatterns = [
   /\bReact\.use[A-Z]/,
   /\buse(State|Effect|LayoutEffect|Memo|Callback|Ref|Id|Reducer)\b/,
@@ -52,9 +62,19 @@ const componentNames = readdirSync(componentsDir)
   )
   .map((fileName) => fileName.replace(/\.tsx$/, ""))
   .sort((left, right) => left.localeCompare(right));
+const componentHelperNames = readdirSync(componentsDir)
+  .filter(
+    (fileName) =>
+      fileName.endsWith(".ts") &&
+      !fileName.endsWith(".stories.ts") &&
+      !fileName.endsWith(".test.ts"),
+  )
+  .map((fileName) => fileName.replace(/\.ts$/, ""))
+  .sort((left, right) => left.localeCompare(right));
 
 verifyPackageMetadata();
 verifyComponentExports();
+verifyComponentHelperExports();
 verifyEntrypointBoundaries();
 verifyComponentContracts();
 verifyStoryCoverage();
@@ -298,6 +318,32 @@ function verifyComponentExports() {
   }
 }
 
+function verifyComponentHelperExports() {
+  for (const helperName of componentHelperNames) {
+    const exportLine = `export * from "./components/${helperName}";`;
+    const isAllowlisted = componentHelperAllowlist.has(helperName);
+    const isRootExported = indexSource.includes(exportLine);
+
+    if (!isAllowlisted && !isRootExported) {
+      errors.push(
+        `${helperName}: component helper subpaths must be root-exported or explicitly allowlisted as internal helpers`,
+      );
+    }
+
+    if (isAllowlisted && isRootExported) {
+      errors.push(
+        `${helperName}: internal component helper is allowlisted and must not be exported from src/index.ts`,
+      );
+    }
+  }
+
+  for (const helperName of componentHelperAllowlist.keys()) {
+    if (!componentHelperNames.includes(helperName)) {
+      errors.push(`${helperName}: component helper allowlist entry does not match a source file`);
+    }
+  }
+}
+
 function verifyStoryCoverage() {
   const storyFiles = readdirSync(componentsDir).filter((fileName) =>
     fileName.endsWith(".stories.tsx"),
@@ -378,6 +424,40 @@ function verifyClientDirectives() {
       );
     }
   }
+
+  for (const helperName of componentHelperNames) {
+    const helperPath = path.join(componentsDir, `${helperName}.ts`);
+    const helperSource = readFileSync(helperPath, "utf8");
+
+    if (!clientComponentPatterns.some((pattern) => pattern.test(helperSource))) {
+      continue;
+    }
+
+    if (helperSource.startsWith('"use client";')) {
+      continue;
+    }
+
+    if (!componentHelperAllowlist.has(helperName)) {
+      errors.push(
+        `${helperName}: browser or hook-based component helpers must start with "use client";`,
+      );
+      continue;
+    }
+
+    const nonClientImporters = getComponentHelperImporters(helperName).filter((importerPath) => {
+      const importerSource = readFileSync(importerPath, "utf8");
+
+      return !importerSource.startsWith('"use client";');
+    });
+
+    if (nonClientImporters.length > 0) {
+      errors.push(
+        `${helperName}: internal browser or hook helper must be imported only by client files; found ${nonClientImporters
+          .map((filePath) => path.relative(packageRoot, filePath))
+          .join(", ")}`,
+      );
+    }
+  }
 }
 
 function verifyConsumerExample() {
@@ -453,4 +533,25 @@ function listFiles(directory: string): string[] {
 
     return filePath;
   });
+}
+
+function getComponentHelperImporters(helperName: string): string[] {
+  const importPatterns = [
+    new RegExp(`from\\s+["']\\./${escapeRegExp(helperName)}["']`),
+    new RegExp(`from\\s+["']\\./components/${escapeRegExp(helperName)}["']`),
+  ];
+
+  return listFiles(srcDir).filter((filePath) => {
+    if (!/\.(ts|tsx)$/.test(filePath) || filePath.endsWith(`${helperName}.ts`)) {
+      return false;
+    }
+
+    const source = readFileSync(filePath, "utf8");
+
+    return importPatterns.some((pattern) => pattern.test(source));
+  });
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
