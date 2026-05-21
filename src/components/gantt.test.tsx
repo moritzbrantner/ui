@@ -5,8 +5,10 @@ import {
   Gantt,
   getGanttDateRange,
   getGanttDayDiff,
+  getGanttParentTaskIds,
   getGanttTaskMetrics,
   getGanttTicks,
+  getVisibleGanttTasks,
   normalizeGanttTasks,
   parseGanttDate,
   type GanttTask,
@@ -35,6 +37,47 @@ const tasks: GanttTask[] = [
     start: "2026-04-27",
     milestone: true,
     status: "blocked",
+  },
+];
+
+const nestedTasks: GanttTask[] = [
+  {
+    id: "discovery",
+    label: "Discovery",
+    start: "2026-04-06",
+    end: "2026-04-24",
+    progress: 70,
+    children: [
+      {
+        id: "research",
+        label: "Research",
+        start: "2026-04-06",
+        end: "2026-04-17",
+        progress: 90,
+      },
+      {
+        id: "synthesis",
+        label: "Synthesis",
+        start: "2026-04-20",
+        end: "2026-04-24",
+        progress: 30,
+        dependencies: ["research"],
+      },
+    ],
+  },
+  {
+    id: "delivery",
+    label: "Delivery",
+    start: "2026-04-27",
+    end: "2026-05-08",
+    children: [
+      {
+        id: "prototype",
+        label: "Prototype",
+        start: "2026-04-27",
+        end: "2026-05-08",
+      },
+    ],
   },
 ];
 
@@ -69,6 +112,42 @@ describe("@moritzbrantner/ui gantt", () => {
     expect(onTaskSelect).toHaveBeenCalledWith(expect.objectContaining({ id: "build" }));
   });
 
+  test("renders nested tasks expanded by default and collapses descendants", () => {
+    render(<Gantt tasks={nestedTasks} />);
+
+    expect(screen.getByRole("button", { name: "Collapse Discovery" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Research/ })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Collapse Discovery" }));
+
+    expect(screen.getByRole("button", { name: "Expand Discovery" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Research/ })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Expand Discovery" }));
+
+    expect(screen.getByRole("button", { name: /Research/ })).toBeTruthy();
+  });
+
+  test("supports controlled expanded task state", () => {
+    const onExpandedTaskIdsChange = vi.fn();
+
+    render(
+      <Gantt
+        tasks={nestedTasks}
+        expandedTaskIds={["discovery"]}
+        onExpandedTaskIdsChange={onExpandedTaskIdsChange}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: /Research/ })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Prototype/ })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Collapse Discovery" }));
+
+    expect(onExpandedTaskIdsChange).toHaveBeenCalledWith([]);
+    expect(screen.getByRole("button", { name: /Research/ })).toBeTruthy();
+  });
+
   test("normalizes date-only strings and clamps invalid task end dates", () => {
     const parsed = parseGanttDate("2026-04-06");
     expect(parsed.getFullYear()).toBe(2026);
@@ -80,6 +159,27 @@ describe("@moritzbrantner/ui gantt", () => {
     ]);
 
     expect(getGanttDayDiff(normalized[0].startDate, normalized[0].endDate)).toBe(0);
+  });
+
+  test("normalizes nested tasks with hierarchy metadata", () => {
+    const normalized = normalizeGanttTasks(nestedTasks);
+
+    expect(normalized.map((task) => task.id)).toEqual([
+      "discovery",
+      "research",
+      "synthesis",
+      "delivery",
+      "prototype",
+    ]);
+    expect(normalized.find((task) => task.id === "research")).toEqual(
+      expect.objectContaining({ depth: 1, parentId: "discovery", hasChildren: false }),
+    );
+    expect(getGanttParentTaskIds(normalized)).toEqual(["discovery", "delivery"]);
+    expect(getVisibleGanttTasks(normalized, new Set(["delivery"])).map((task) => task.id)).toEqual([
+      "discovery",
+      "delivery",
+      "prototype",
+    ]);
   });
 
   test("creates week ticks over the visible range", () => {

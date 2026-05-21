@@ -6,52 +6,70 @@ import { Gantt, type GanttMarker, type GanttTask } from "./gantt";
 
 const tasks: GanttTask[] = [
   {
-    id: "brief",
-    label: "Project brief",
+    id: "discovery",
+    label: "Discovery phase",
     start: "2026-04-06",
-    end: "2026-04-10",
-    progress: 100,
-    status: "done",
-    group: "Discovery",
-  },
-  {
-    id: "research",
-    label: "Customer research",
-    start: "2026-04-13",
     end: "2026-04-24",
-    progress: 80,
+    progress: 88,
     status: "active",
     group: "Discovery",
-    dependencies: ["brief"],
+    children: [
+      {
+        id: "brief",
+        label: "Project brief",
+        start: "2026-04-06",
+        end: "2026-04-10",
+        progress: 100,
+        status: "done",
+      },
+      {
+        id: "research",
+        label: "Customer research",
+        start: "2026-04-13",
+        end: "2026-04-24",
+        progress: 80,
+        status: "active",
+        dependencies: ["brief"],
+      },
+    ],
   },
   {
-    id: "prototype",
-    label: "Prototype",
+    id: "delivery",
+    label: "Delivery phase",
     start: "2026-04-27",
-    end: "2026-05-08",
-    progress: 45,
+    end: "2026-05-22",
+    progress: 34,
     status: "active",
     group: "Delivery",
     dependencies: ["research"],
-  },
-  {
-    id: "review",
-    label: "Stakeholder review",
-    start: "2026-05-11",
-    milestone: true,
-    status: "blocked",
-    group: "Delivery",
-    dependencies: ["prototype"],
-  },
-  {
-    id: "handoff",
-    label: "Engineering handoff",
-    start: "2026-05-12",
-    end: "2026-05-22",
-    progress: 20,
-    color: "#0f766e",
-    group: "Delivery",
-    dependencies: ["review"],
+    children: [
+      {
+        id: "prototype",
+        label: "Prototype",
+        start: "2026-04-27",
+        end: "2026-05-08",
+        progress: 45,
+        status: "active",
+        dependencies: ["research"],
+      },
+      {
+        id: "review",
+        label: "Stakeholder review",
+        start: "2026-05-11",
+        milestone: true,
+        status: "blocked",
+        dependencies: ["prototype"],
+      },
+      {
+        id: "handoff",
+        label: "Engineering handoff",
+        start: "2026-05-12",
+        end: "2026-05-22",
+        progress: 20,
+        color: "#0f766e",
+        dependencies: ["review"],
+      },
+    ],
   },
 ];
 
@@ -101,5 +119,9 @@ export const Default: Story = {
     await expect(args.onTaskSelect).toHaveBeenCalledWith(
       expect.objectContaining({ id: "research" }),
     );
+    await userEvent.click(canvas.getByRole("button", { name: "Collapse Discovery phase" }));
+    await expect(
+      canvas.queryByRole("button", { name: /Customer research/ }),
+    ).not.toBeInTheDocument();
   },
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { ChevronRight } from "lucide-react";
 
 import { cn } from "../lib/cn";
 
@@ -21,6 +22,7 @@ type GanttTask = {
   group?: string;
   groupLabel?: string;
   dependencies?: string[];
+  children?: GanttTask[];
   milestone?: boolean;
   disabled?: boolean;
   metadata?: Record<string, unknown>;
@@ -44,6 +46,9 @@ type GanttProps = Omit<React.ComponentProps<"div">, "onSelect"> & {
   labelWidth?: number;
   selectedTaskId?: string | null;
   onTaskSelect?: (task: GanttTask) => void;
+  expandedTaskIds?: string[];
+  defaultExpandedTaskIds?: string[];
+  onExpandedTaskIdsChange?: (taskIds: string[]) => void;
   showToday?: boolean;
   today?: GanttDateInput;
   emptyLabel?: string;
@@ -53,6 +58,9 @@ type GanttProps = Omit<React.ComponentProps<"div">, "onSelect"> & {
 type NormalizedGanttTask = GanttTask & {
   startDate: Date;
   endDate: Date;
+  depth: number;
+  parentId?: string;
+  hasChildren: boolean;
 };
 
 type GanttDateRange = {
@@ -98,6 +106,9 @@ function Gantt({
   labelWidth = 220,
   selectedTaskId,
   onTaskSelect,
+  expandedTaskIds,
+  defaultExpandedTaskIds,
+  onExpandedTaskIdsChange,
   showToday = true,
   today = new Date(),
   emptyLabel = "No tasks",
@@ -105,7 +116,23 @@ function Gantt({
   className,
   ...props
 }: GanttProps) {
-  const normalizedTasks = normalizeGanttTasks(tasks);
+  const normalizedTasks = React.useMemo(() => normalizeGanttTasks(tasks), [tasks]);
+  const parentTaskIds = React.useMemo(
+    () => getGanttParentTaskIds(normalizedTasks),
+    [normalizedTasks],
+  );
+  const [internalExpandedTaskIds, setInternalExpandedTaskIds] = React.useState<string[]>(
+    () => defaultExpandedTaskIds ?? parentTaskIds,
+  );
+  const resolvedExpandedTaskIds = expandedTaskIds ?? internalExpandedTaskIds;
+  const expandedTaskIdSet = React.useMemo(
+    () => new Set(resolvedExpandedTaskIds),
+    [resolvedExpandedTaskIds],
+  );
+  const visibleTasks = React.useMemo(
+    () => getVisibleGanttTasks(normalizedTasks, expandedTaskIdSet),
+    [expandedTaskIdSet, normalizedTasks],
+  );
   const normalizedMarkers = markers.map((marker) => ({
     ...marker,
     dateValue: parseGanttDate(marker.date),
@@ -120,14 +147,30 @@ function Gantt({
   const dayWidth = resolvedColumnWidth / getScaleDaySpan(scale);
   const totalDays = getGanttDayDiff(range.start, addGanttDays(range.end, 1));
   const timelineWidth = Math.max(totalDays * dayWidth, 320);
-  const timelineHeight = normalizedTasks.length * rowHeight;
+  const timelineHeight = visibleTasks.length * rowHeight;
   const metricsByTaskId = new Map<string, GanttTaskMetrics>();
 
-  for (const task of normalizedTasks) {
+  for (const task of visibleTasks) {
     if (isGanttTaskVisible(task, range)) {
       metricsByTaskId.set(task.id, getGanttTaskMetrics(task, range, dayWidth));
     }
   }
+
+  const commitExpandedTaskIds = (nextTaskIds: string[]) => {
+    if (!expandedTaskIds) {
+      setInternalExpandedTaskIds(nextTaskIds);
+    }
+
+    onExpandedTaskIdsChange?.(nextTaskIds);
+  };
+
+  const toggleTaskExpanded = (taskId: string) => {
+    const nextTaskIds = expandedTaskIdSet.has(taskId)
+      ? resolvedExpandedTaskIds.filter((expandedTaskId) => expandedTaskId !== taskId)
+      : [...resolvedExpandedTaskIds, taskId];
+
+    commitExpandedTaskIds(nextTaskIds);
+  };
 
   return (
     <div
@@ -183,20 +226,41 @@ function Gantt({
             </div>
 
             <div data-slot="gantt-labels" className="sticky left-0 z-20 border-r bg-card">
-              {normalizedTasks.map((task) => {
+              {visibleTasks.map((task) => {
                 const groupLabel = task.groupLabel ?? task.group;
+                const expanded = expandedTaskIdSet.has(task.id);
 
                 return (
                   <div
                     key={task.id}
                     data-slot="gantt-row-label"
-                    className="grid content-center border-b px-3"
-                    style={{ height: rowHeight }}
+                    data-parent={task.hasChildren ? "true" : undefined}
+                    className="flex items-center gap-2 border-b pr-3 data-[parent=true]:bg-muted/20"
+                    style={{ height: rowHeight, paddingLeft: 12 + task.depth * 18 }}
                   >
-                    <div className="truncate text-sm font-medium">{task.label}</div>
-                    {groupLabel ? (
-                      <div className="truncate text-xs text-muted-foreground">{groupLabel}</div>
-                    ) : null}
+                    {task.hasChildren ? (
+                      <button
+                        type="button"
+                        data-slot="gantt-disclosure"
+                        aria-label={`${expanded ? "Collapse" : "Expand"} ${task.label}`}
+                        aria-expanded={expanded}
+                        className="inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground outline-none transition hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                        onClick={() => toggleTaskExpanded(task.id)}
+                      >
+                        <ChevronRight
+                          aria-hidden="true"
+                          className={cn("size-4 transition-transform", expanded && "rotate-90")}
+                        />
+                      </button>
+                    ) : (
+                      <span aria-hidden="true" className="size-6 shrink-0" />
+                    )}
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium">{task.label}</div>
+                      {groupLabel ? (
+                        <div className="truncate text-xs text-muted-foreground">{groupLabel}</div>
+                      ) : null}
+                    </div>
                   </div>
                 );
               })}
@@ -214,17 +278,18 @@ function Gantt({
                   backgroundSize: `${resolvedColumnWidth}px 100%`,
                 }}
               />
-              {normalizedTasks.map((task, index) => (
+              {visibleTasks.map((task, index) => (
                 <div
                   key={task.id}
                   aria-hidden="true"
                   data-slot="gantt-row"
-                  className="absolute left-0 right-0 border-b"
+                  data-parent={task.hasChildren ? "true" : undefined}
+                  className="absolute left-0 right-0 border-b data-[parent=true]:bg-muted/20"
                   style={{ top: index * rowHeight, height: rowHeight }}
                 />
               ))}
               <GanttOverlay
-                tasks={normalizedTasks}
+                tasks={visibleTasks}
                 markers={normalizedMarkers}
                 metricsByTaskId={metricsByTaskId}
                 range={range}
@@ -234,7 +299,7 @@ function Gantt({
                 showToday={showToday}
                 today={today}
               />
-              {normalizedTasks.map((task, index) => {
+              {visibleTasks.map((task, index) => {
                 const metrics = metricsByTaskId.get(task.id);
 
                 if (!metrics) {
@@ -431,29 +496,63 @@ function GanttOverlay({
 }
 
 function normalizeGanttTasks(tasks: GanttTask[]): NormalizedGanttTask[] {
-  return tasks
-    .map((task) => {
-      const start = parseGanttDate(task.start);
-      const end = task.end ? parseGanttDate(task.end) : start;
-      const endDate = getGanttDayDiff(start, end) < 0 ? start : end;
+  const normalizedTasks: NormalizedGanttTask[] = [];
 
-      return {
-        ...task,
-        startDate: start,
-        endDate,
-      };
-    })
-    .sort((left, right) => {
-      const groupSort = (left.groupLabel ?? left.group ?? "").localeCompare(
-        right.groupLabel ?? right.group ?? "",
-      );
+  const visitTask = (task: GanttTask, depth: number, parentId?: string) => {
+    const start = parseGanttDate(task.start);
+    const end = task.end ? parseGanttDate(task.end) : start;
+    const endDate = getGanttDayDiff(start, end) < 0 ? start : end;
+    const children = task.children ?? [];
 
-      if (groupSort !== 0) {
-        return groupSort;
+    normalizedTasks.push({
+      ...task,
+      startDate: start,
+      endDate,
+      depth,
+      parentId,
+      hasChildren: children.length > 0,
+    });
+
+    for (const child of children) {
+      visitTask(child, depth + 1, task.id);
+    }
+  };
+
+  for (const task of tasks) {
+    visitTask(task, 0);
+  }
+
+  return normalizedTasks;
+}
+
+function getGanttParentTaskIds(tasks: NormalizedGanttTask[]) {
+  return tasks.filter((task) => task.hasChildren).map((task) => task.id);
+}
+
+function getVisibleGanttTasks(
+  tasks: NormalizedGanttTask[],
+  expandedTaskIds: ReadonlySet<string>,
+) {
+  const visibleTasks: NormalizedGanttTask[] = [];
+  let collapsedDepth: number | undefined;
+
+  for (const task of tasks) {
+    if (collapsedDepth !== undefined) {
+      if (task.depth > collapsedDepth) {
+        continue;
       }
 
-      return getGanttDayDiff(right.startDate, left.startDate);
-    });
+      collapsedDepth = undefined;
+    }
+
+    visibleTasks.push(task);
+
+    if (task.hasChildren && !expandedTaskIds.has(task.id)) {
+      collapsedDepth = task.depth;
+    }
+  }
+
+  return visibleTasks;
 }
 
 function parseGanttDate(input: GanttDateInput): Date {
@@ -674,8 +773,10 @@ export {
   formatGanttDate,
   getGanttDateRange,
   getGanttDayDiff,
+  getGanttParentTaskIds,
   getGanttTaskMetrics,
   getGanttTicks,
+  getVisibleGanttTasks,
   normalizeGanttTasks,
   parseGanttDate,
 };
