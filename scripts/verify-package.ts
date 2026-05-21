@@ -14,6 +14,20 @@ assert.equal(typeof root.Button, "function", "root export should include Button"
 assert.equal(typeof root.cn, "function", "root export should include cn");
 assert.equal(typeof root.UiTheme, "function", "root export should include UiTheme");
 
+const server = await importPackage("@moritzbrantner/ui/server");
+assert.equal(typeof server.cn, "function", "server export should include cn");
+assert.equal(server.themeConfig.bobba.name, "bobba", "server export should expose theme metadata");
+assert.equal(
+  Object.hasOwn(server, "Button"),
+  false,
+  "server export should not expose client components",
+);
+
+const client = await importPackage("@moritzbrantner/ui/client");
+assert.equal(typeof client.Button, "function", "client export should include Button");
+assert.equal(typeof client.DataGrid, "function", "client export should include DataGrid");
+assert.equal(typeof client.Dialog, "function", "client export should include Dialog");
+
 const zleek = await importPackage("@moritzbrantner/ui/zleek");
 assert.equal(zleek.uiTheme.name, "zleek", "zleek entry should expose zleek uiTheme");
 assert.equal(typeof zleek.ZleekTheme, "function", "zleek entry should expose ZleekTheme");
@@ -36,6 +50,12 @@ assert.equal(typeof paper.PaperTheme, "function", "paper entry should expose Pap
 
 const button = await importPackage("@moritzbrantner/ui/components/button");
 assert.equal(typeof button.Button, "function", "button subpath should expose Button");
+
+const dataGrid = await importPackage("@moritzbrantner/ui/components/data-grid");
+assert.equal(typeof dataGrid.DataGrid, "function", "data-grid subpath should expose DataGrid");
+
+const dialog = await importPackage("@moritzbrantner/ui/components/dialog");
+assert.equal(typeof dialog.Dialog, "function", "dialog subpath should expose Dialog");
 
 const cn = await importPackage("@moritzbrantner/ui/lib/cn");
 assert.equal(typeof cn.cn, "function", "cn subpath should expose cn");
@@ -62,8 +82,16 @@ const packageFiles = new Set(packageMetadata.files.map((file) => file.path));
 const requiredPackageFiles = [
   "dist/index.js",
   "dist/index.d.ts",
+  "dist/server.js",
+  "dist/server.d.ts",
+  "dist/client.js",
+  "dist/client.d.ts",
   "dist/components/button.js",
   "dist/components/button.d.ts",
+  "dist/components/data-grid.js",
+  "dist/components/data-grid.d.ts",
+  "dist/components/dialog.js",
+  "dist/components/dialog.d.ts",
   "dist/lib/cn.js",
   "dist/themes.js",
   "styles.css",

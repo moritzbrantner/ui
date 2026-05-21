@@ -125,6 +125,49 @@ import { Button } from "@moritzbrantner/ui/components/button";
 import { cn } from "@moritzbrantner/ui/lib/cn";
 ```
 
+## Comprehensive App Usage
+
+Use the root import for compatibility and ordinary client-side app code:
+
+```tsx
+import { Button, PageShell, DataGrid } from "@moritzbrantner/ui";
+```
+
+Use the explicit client entrypoint for interactive components in mixed server/client rendering:
+
+```tsx
+import { Button, CommandPalette, Dialog } from "@moritzbrantner/ui/client";
+```
+
+Use the server entrypoint for server-safe helpers and theme metadata:
+
+```ts
+import { cn, themeConfig } from "@moritzbrantner/ui/server";
+```
+
+Every app should import one stylesheet, usually `@moritzbrantner/ui/styles.css`. Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css` replace that default when a product surface needs a different visual system. `UiTheme` and `themeConfig` provide metadata classes and attributes; they do not fetch data or switch global CSS by themselves.
+
+## Do Not Put Here
+
+Keep app-specific behavior in consuming packages:
+
+- Auth and session flows.
+- Route-aware menus.
+- Settings, admin, account, and profile pages.
+- Upload execution and transport logic.
+- Data fetching, cache policy, and API contracts.
+- Product-specific onboarding, empty-state copy, or workflow decisions.
+
+## Recipes
+
+- App shell: combine `PlatformNavbar`, `PageShell`, `PageHeader`, `PageContent`, `Surface`, `CommandPalette`, `NotificationMenu`, `AccountMenu`, `LanguageSwitcher`, and `ThemeModeSwitch`.
+- Data page: use `SearchField`, `DataGrid`, `StateView`, and app-owned server state for sorting, filtering, pagination, loading, empty, and error states.
+- Validated form: use `FormSection`, `Field`, `FieldError`, `ValidationSummary`, and `FormActions`; keep validation rules and submit side effects in the app.
+- Upload queue: use `Dropzone` and `UploadQueue`; keep file storage, retries, cancellation, and transport in the app.
+- Command palette: pass app-owned actions to `CommandPalette`; keep routing and permissions outside this package.
+- Theme switching: wire `ThemeModeSwitch` to the app theme provider and import exactly one UI stylesheet.
+- Non-happy paths: compose `EmptyState`, `LoadingState`, `ErrorState`, and `OfflineState` with app-owned messages and retry callbacks.
+
 ## Component Contract
 
 Public components should accept `className`, forward standard DOM props, expose stable `data-slot` hooks, and use variants for intentional design choices. Avoid arbitrary visual props such as `color`, `rounded`, `shadow`, or custom spacing knobs; those decisions should come from design tokens and named variants.
@@ -189,6 +232,8 @@ The package also includes reusable state-light patterns for common application s
 
 These components render UI state and slots only. Keep fetching, routing, upload execution, auth/session state, and product-specific workflows in consuming packages.
 
+`DataTable` remains available as a legacy/simple table helper. Prefer `DataGrid` for app data pages that need controlled server state, manual sorting/filtering/pagination, row selection, and loading/error/empty states.
+
 ## Theme Metadata
 
 `UiTheme`, `BobbaTheme`, `ZleekTheme`, `AtlasTheme`, `StudioTheme`, and `PaperTheme` add theme metadata classes and `data-ui-theme` attributes around a subtree. They do not scope CSS tokens by themselves; the active visual theme still comes from the single stylesheet imported by the app.
@@ -226,7 +271,7 @@ In the repository settings, set **Pages > Build and deployment > Source** to **G
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) and [../../docs/design-system.md](../../docs/design-system.md) for package boundaries, component requirements, and release checks.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) and [docs/design-system.md](./docs/design-system.md) for package boundaries, component requirements, and release checks.
 
 ## Release Checks
 

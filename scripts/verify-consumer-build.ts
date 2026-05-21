@@ -39,6 +39,7 @@ try {
   run("bun", ["install"], tempConsumerRoot);
   run("bun", ["run", "check-types"], tempConsumerRoot);
   run("bun", ["run", "build"], tempConsumerRoot);
+  verifyConsumerSource(tempConsumerRoot);
 } finally {
   rmSync(tempWorkspace, { recursive: true, force: true });
 }
@@ -86,5 +87,35 @@ function run(command: string, args: string[], cwd: string): void {
 
   if (result.status !== 0) {
     process.exit(result.status ?? 1);
+  }
+}
+
+function verifyConsumerSource(root: string): void {
+  const appSource = readFileSync(path.join(root, "src", "App.tsx"), "utf8");
+  const subpathSource = readFileSync(path.join(root, "src", "SubpathApp.tsx"), "utf8");
+  const serverSource = readFileSync(path.join(root, "src", "server-entry.ts"), "utf8");
+
+  for (const expected of [
+    'from "@moritzbrantner/ui"',
+    "PlatformNavbar",
+    "PageShell",
+    "DataGrid",
+    "CommandPalette",
+    "Toaster",
+  ]) {
+    if (!appSource.includes(expected)) {
+      throw new Error(`consumer App.tsx must exercise ${expected}`);
+    }
+  }
+
+  for (const expected of [
+    'from "@moritzbrantner/ui/components/button"',
+    'from "@moritzbrantner/ui/components/data-grid"',
+    'from "@moritzbrantner/ui/client"',
+    'from "@moritzbrantner/ui/server"',
+  ]) {
+    if (!subpathSource.includes(expected) && !serverSource.includes(expected)) {
+      throw new Error(`consumer fixtures must exercise ${expected}`);
+    }
   }
 }

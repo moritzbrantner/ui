@@ -90,6 +90,7 @@ function CopyButton({
   return (
     <Button
       type="button"
+      data-slot="copy-button"
       variant={variant}
       size={size}
       className={cn("min-w-20", className)}
@@ -104,3 +105,4 @@ function CopyButton({
 }
 
 export { CopyButton, copyText };
+export type { CopyButtonProps };

@@ -171,7 +171,16 @@ import {
 } from ".";
 import { AtlasTheme, atlasTheme, uiTheme as atlasUiTheme } from "./atlas";
 import { BobbaTheme, Button as BobbaButton, bobbaTheme, uiTheme as bobbaUiTheme } from "./bobba";
+import {
+  Button as ClientButton,
+  DataGrid as ClientDataGrid,
+  Dialog as ClientDialog,
+} from "./client";
+import { Button as SubpathButton } from "./components/button";
+import { DataGrid as SubpathDataGrid } from "./components/data-grid";
+import { Dialog as SubpathDialog } from "./components/dialog";
 import { PaperTheme, paperTheme, uiTheme as paperUiTheme } from "./paper";
+import { cn as serverCn, themeConfig as serverThemeConfig } from "./server";
 import { StudioTheme, studioTheme, uiTheme as studioUiTheme } from "./studio";
 import { Button as ZleekButton, ZleekTheme, uiTheme as zleekUiTheme, zleekTheme } from "./zleek";
 
@@ -383,6 +392,10 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./atlas"].import).toBe("./dist/atlas.js");
     expect(packageJson.exports["./studio"].import).toBe("./dist/studio.js");
     expect(packageJson.exports["./paper"].import).toBe("./dist/paper.js");
+    expect(packageJson.exports["./server"].import).toBe("./dist/server.js");
+    expect(packageJson.exports["./server"].types).toBe("./dist/server.d.ts");
+    expect(packageJson.exports["./client"].import).toBe("./dist/client.js");
+    expect(packageJson.exports["./client"].types).toBe("./dist/client.d.ts");
     expect(packageJson.exports["./atlas/styles.css"]).toBe("./atlas/styles.css");
     expect(packageJson.exports["./studio/styles.css"]).toBe("./studio/styles.css");
     expect(packageJson.exports["./paper/styles.css"]).toBe("./paper/styles.css");
@@ -403,5 +416,16 @@ describe("@moritzbrantner/ui package-contract", () => {
 
   test("merges class names", () => {
     expect(cn("px-4", "px-2", "font-semibold")).toBe("px-2 font-semibold");
+  });
+
+  test("exposes explicit server, client, and representative subpath APIs", () => {
+    expect(serverCn("px-4", "px-2")).toBe("px-2");
+    expect(serverThemeConfig.bobba.name).toBe("bobba");
+    expect(ClientButton).toBe(Button);
+    expect(ClientDataGrid).toBe(DataGrid);
+    expect(ClientDialog).toBe(Dialog);
+    expect(SubpathButton).toBe(Button);
+    expect(SubpathDataGrid).toBe(DataGrid);
+    expect(SubpathDialog).toBe(Dialog);
   });
 });

@@ -27,6 +27,8 @@ export type NotificationMenuItem = {
   onMarkRead?: (itemId: string, item: NotificationMenuItem) => void;
 };
 
+type DataAttributes = Record<`data-${string}`, string | number | boolean | undefined>;
+
 export type NotificationMenuProps = {
   label?: string;
   titleHref?: string;
@@ -43,6 +45,8 @@ export type NotificationMenuProps = {
   sideOffset?: number;
   maxItems?: number;
   className?: string;
+  triggerProps?: Omit<React.ComponentProps<typeof Button>, "children"> & DataAttributes;
+  contentProps?: React.ComponentProps<typeof DropdownMenuContent> & DataAttributes;
 };
 
 function NotificationMenu({
@@ -61,6 +65,8 @@ function NotificationMenu({
   sideOffset = 8,
   maxItems,
   className,
+  triggerProps,
+  contentProps,
 }: NotificationMenuProps): React.ReactElement {
   const [readItemIds, setReadItemIds] = React.useState<ReadonlySet<string>>(() => new Set());
   const [localUnreadAdjustment, setLocalUnreadAdjustment] = React.useState(0);
@@ -86,6 +92,8 @@ function NotificationMenu({
   const countLabel = formatNotificationMenuCount(effectiveUnreadCount, maxCount);
   const accessibleLabel =
     effectiveUnreadCount > 0 ? `${label}, ${effectiveUnreadCount} unread` : label;
+  const { className: triggerClassName, ...restTriggerProps } = triggerProps ?? {};
+  const { className: contentClassName, ...restContentProps } = contentProps ?? {};
 
   React.useEffect(() => {
     setReadItemIds((currentReadItemIds) => {
@@ -113,11 +121,13 @@ function NotificationMenu({
       <DropdownMenuTrigger asChild>
         <Button
           type="button"
+          data-slot="notification-menu-trigger"
           variant="outline"
           size="icon"
           aria-label={accessibleLabel}
           title={accessibleLabel}
-          className={cn("relative", className)}
+          className={cn("relative", className, triggerClassName)}
+          {...restTriggerProps}
         >
           <BellIcon />
           {effectiveUnreadCount > 0 ? (
@@ -127,7 +137,13 @@ function NotificationMenu({
           ) : null}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align={align} sideOffset={sideOffset} className="w-80">
+      <DropdownMenuContent
+        data-slot="notification-menu"
+        align={align}
+        sideOffset={sideOffset}
+        className={cn("w-80", contentClassName)}
+        {...restContentProps}
+      >
         <DropdownMenuLabel className="flex items-center justify-between gap-3 px-2 py-2">
           {titleHref ? (
             <a

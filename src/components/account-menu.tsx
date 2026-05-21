@@ -30,7 +30,9 @@ export type AccountMenuItem = {
   onSelect?: () => void;
 };
 
-export type AccountMenuProps = {
+type DataAttributes = Record<`data-${string}`, string | number | boolean | undefined>;
+
+export type AccountMenuProps = Omit<React.ComponentPropsWithoutRef<"button">, "children"> & {
   user: AccountMenuUser | null;
   label?: string;
   guestLabel?: React.ReactNode;
@@ -38,7 +40,8 @@ export type AccountMenuProps = {
   triggerVariant?: "icon" | "inline";
   align?: "start" | "center" | "end";
   sideOffset?: number;
-  className?: string;
+  triggerProps?: Omit<React.ComponentPropsWithoutRef<"button">, "children"> & DataAttributes;
+  contentProps?: React.ComponentProps<typeof DropdownMenuContent> & DataAttributes;
 };
 
 function AccountMenu({
@@ -50,24 +53,33 @@ function AccountMenu({
   align = "end",
   sideOffset = 8,
   className,
+  triggerProps,
+  contentProps,
+  ...buttonProps
 }: AccountMenuProps): React.ReactElement {
   const fallbackName = getAccountMenuText(user?.name) ?? getAccountMenuText(guestLabel) ?? label;
   const secondaryText = user?.meta ?? user?.email;
   const inlineUser = triggerVariant === "inline" ? user : null;
   const iconTrigger = inlineUser === null;
+  const { className: triggerClassName, ...restTriggerProps } = triggerProps ?? {};
+  const { className: contentClassName, ...restContentProps } = contentProps ?? {};
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
           type="button"
+          data-slot="account-menu-trigger"
           aria-label={label}
           title={label}
+          {...buttonProps}
+          {...restTriggerProps}
           className={cn(
             inlineUser
               ? "inline-flex h-10 max-w-56 shrink-0 items-center gap-2 rounded-full border border-border/60 bg-background/45 px-2.5 pr-3 text-left shadow-[var(--glass-shadow)] outline-none transition-[box-shadow,transform,background-color,border-color] hover:-translate-y-[1px] hover:border-border hover:bg-accent/45 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
               : "group/account-menu inline-flex shrink-0 rounded-full outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
             className,
+            triggerClassName,
           )}
         >
           <Avatar
@@ -93,7 +105,13 @@ function AccountMenu({
           ) : null}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align={align} sideOffset={sideOffset} className="w-72">
+      <DropdownMenuContent
+        data-slot="account-menu"
+        align={align}
+        sideOffset={sideOffset}
+        className={cn("w-72", contentClassName)}
+        {...restContentProps}
+      >
         <DropdownMenuLabel className="grid gap-0.5 px-2 py-2">
           <span className="truncate text-sm font-medium text-popover-foreground">
             {user?.name ?? guestLabel}

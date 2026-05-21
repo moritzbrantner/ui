@@ -68,6 +68,25 @@ describe("account menu", () => {
     expect(screen.getByText("AL")).toBeTruthy();
   });
 
+  test("forwards account trigger and content props", async () => {
+    render(
+      <AccountMenu
+        user={{ name: "Ada Lovelace", initials: "AL" }}
+        data-testid="account-trigger"
+        triggerProps={{ "data-ui": "trigger" }}
+        contentProps={{ "data-testid": "account-content" }}
+      />,
+    );
+
+    const trigger = screen.getByTestId("account-trigger");
+    expect(trigger.getAttribute("data-slot")).toBe("account-menu-trigger");
+    expect(trigger.getAttribute("data-ui")).toBe("trigger");
+
+    openMenu(trigger);
+
+    expect(await screen.findByTestId("account-content")).toBeTruthy();
+  });
+
   test("applies destructive item variant without owning logout behavior", async () => {
     const onSelect = vi.fn();
 
@@ -128,6 +147,22 @@ describe("notification menu", () => {
     const link = await screen.findByRole("link", { name: "Notifications" });
     expect(link.getAttribute("href")).toBe("/notifications");
     expect(link.getAttribute("target")).toBe("_self");
+  });
+
+  test("forwards notification trigger and content props", async () => {
+    render(
+      <NotificationMenu
+        triggerProps={{ "data-testid": "notification-trigger" }}
+        contentProps={{ "data-testid": "notification-content" }}
+      />,
+    );
+
+    const trigger = screen.getByTestId("notification-trigger");
+    expect(trigger.getAttribute("data-slot")).toBe("notification-menu-trigger");
+
+    openMenu(trigger);
+
+    expect(await screen.findByTestId("notification-content")).toBeTruthy();
   });
 
   test("marks an individual notification as read without selecting it", async () => {

@@ -30,6 +30,14 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js"
+    },
     "./zleek": {
       "types": "./dist/zleek.d.ts",
       "import": "./dist/zleek.js"
@@ -84,7 +92,7 @@
     "dev": "bun run storybook",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
-    "lint": "bun ./scripts/verify-design-system.ts && bun ./scripts/verify-tokens.ts && bun ./scripts/verify-package-imports.ts ./src @/ next/ && bun ./scripts/verify-package-styles.ts .",
+    "lint": "bun ./scripts/verify-design-system.ts && bun ./scripts/verify-tokens.ts && bun ./scripts/verify-package-imports.ts ./src @/ next/ && bun ./scripts/verify-package-styles.ts . && bun ./scripts/verify-docs-links.ts",
     "pack:dry": "npm pack --dry-run --ignore-scripts --json",
     "prepack": "bun run build",
     "storybook": "storybook dev -p 6006 --no-open",

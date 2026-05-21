@@ -18,10 +18,9 @@ import { Input } from "./input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table";
 import { cn } from "../lib/cn";
 
-type DataTableProps<TData, TValue> = {
+type DataTableProps<TData, TValue> = Omit<React.ComponentPropsWithoutRef<"div">, "children"> & {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  className?: string;
   emptyMessage?: string;
   searchColumn?: string;
   searchPlaceholder?: string;
@@ -34,6 +33,7 @@ function DataTable<TData, TValue>({
   emptyMessage = "No results.",
   searchColumn,
   searchPlaceholder = "Filter results...",
+  ...props
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -56,7 +56,7 @@ function DataTable<TData, TValue>({
   const filterColumn = searchColumn ? table.getColumn(searchColumn) : undefined;
 
   return (
-    <div className={cn("space-y-4", className)}>
+    <div data-slot="data-table" className={cn("space-y-4", className)} {...props}>
       {filterColumn ? (
         <div className="flex items-center gap-2">
           <Input

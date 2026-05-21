@@ -4,10 +4,20 @@ import { fileURLToPath } from "node:url";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const distDir = path.join(packageRoot, "dist");
-const maxTotalBytes = 860 * 1024;
+const maxTotalBytes = 880 * 1024;
 const maxEntryBytes = 35 * 1024;
 const maxChunkBytes = 40 * 1024;
-const publicEntries = ["index", "bobba", "zleek", "atlas", "studio", "paper", "themes"];
+const publicEntries = [
+  "index",
+  "server",
+  "client",
+  "bobba",
+  "zleek",
+  "atlas",
+  "studio",
+  "paper",
+  "themes",
+];
 const errors: string[] = [];
 
 if (!existsSync(distDir)) {

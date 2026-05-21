@@ -7,6 +7,8 @@ const componentsDir = path.join(packageRoot, "src", "components");
 const srcDir = path.join(packageRoot, "src");
 const packageJsonPath = path.join(packageRoot, "package.json");
 const indexPath = path.join(packageRoot, "src", "index.ts");
+const serverPath = path.join(packageRoot, "src", "server.ts");
+const clientPath = path.join(packageRoot, "src", "client.ts");
 const errors: string[] = [];
 const interactiveStoryComponents = [
   "annotation-canvas",
@@ -32,6 +34,8 @@ const clientComponentPatterns = [
 
 const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8")) as Record<string, any>;
 const indexSource = readFileSync(indexPath, "utf8");
+const serverSource = readFileSync(serverPath, "utf8");
+const clientSource = readFileSync(clientPath, "utf8");
 const componentNames = readdirSync(componentsDir)
   .filter(
     (fileName) =>
@@ -44,6 +48,8 @@ const componentNames = readdirSync(componentsDir)
 
 verifyPackageMetadata();
 verifyComponentExports();
+verifyEntrypointBoundaries();
+verifyComponentContracts();
 verifyStoryCoverage();
 verifyStoryContracts();
 verifyClientDirectives();
@@ -93,6 +99,8 @@ function verifyPackageMetadata() {
   );
 
   expectExport(".", "./dist/index.js", "./dist/index.d.ts");
+  expectExport("./server", "./dist/server.js", "./dist/server.d.ts");
+  expectExport("./client", "./dist/client.js", "./dist/client.d.ts");
   expectExport("./zleek", "./dist/zleek.js", "./dist/zleek.d.ts");
   expectExport("./bobba", "./dist/bobba.js", "./dist/bobba.d.ts");
   expectExport("./atlas", "./dist/atlas.js", "./dist/atlas.d.ts");
@@ -137,6 +145,82 @@ function verifyPackageMetadata() {
     "./paper/styles.css",
     "paper stylesheet must be exported",
   );
+}
+
+function verifyEntrypointBoundaries() {
+  if (!clientSource.startsWith('"use client";')) {
+    errors.push('src/client.ts must start with "use client";');
+  }
+
+  if (!clientSource.includes('export * from "./index";')) {
+    errors.push("src/client.ts must cover the root public client component API");
+  }
+
+  if (serverSource.includes('"use client";')) {
+    errors.push('src/server.ts must stay server-safe and must not contain "use client";');
+  }
+
+  const forbiddenServerExports = [
+    /from\s+["']\.\/index["']/,
+    /from\s+["']\.\/themes["']/,
+    /from\s+["']\.\/components\//,
+    /from\s+["'](?:@base-ui\/react|cmdk|embla-carousel-react|input-otp|motion\/react|next-themes|radix-ui|react-day-picker|react-resizable-panels|sonner|vaul)/,
+  ];
+
+  for (const pattern of forbiddenServerExports) {
+    if (pattern.test(serverSource)) {
+      errors.push(
+        "src/server.ts must export only pure helpers, theme metadata, and types; found a client-only export pattern",
+      );
+      break;
+    }
+  }
+
+  for (const expectedExport of ['from "./lib/cn"', 'from "./theme-metadata"']) {
+    if (!serverSource.includes(expectedExport)) {
+      errors.push(`src/server.ts must export server-safe API ${expectedExport}`);
+    }
+  }
+}
+
+function verifyComponentContracts() {
+  const contractAllowlist = new Map([
+    [
+      "aspect-ratio",
+      "Radix primitive wrapper: className and DOM props are carried by the wrapped primitive API.",
+    ],
+    [
+      "collapsible",
+      "Radix primitive wrapper: className and DOM props are carried by the wrapped primitive API.",
+    ],
+    [
+      "direction",
+      "Provider-only Radix wrapper: it establishes context and does not render a stylable DOM node.",
+    ],
+  ]);
+
+  for (const componentName of componentNames) {
+    const componentPath = path.join(componentsDir, `${componentName}.tsx`);
+    const componentSource = readFileSync(componentPath, "utf8");
+    const allowlistReason = contractAllowlist.get(componentName);
+
+    if (!/data-slot=/.test(componentSource)) {
+      errors.push(`${componentName}: public component files must expose at least one data-slot`);
+    }
+
+    if (!allowlistReason && !/\bclassName\b/.test(componentSource)) {
+      errors.push(`${componentName}: public DOM-rendering components must support className`);
+    }
+
+    if (
+      !allowlistReason &&
+      !/(\.\.\.props|\.\.\.\(rest as Record<string, unknown>\)|\.\.\.rest[A-Z]\w*Props|\.\.\.buttonProps)/.test(
+        componentSource,
+      )
+    ) {
+      errors.push(`${componentName}: public DOM-rendering components must forward DOM props`);
+    }
+  }
 }
 
 function verifyComponentExports() {

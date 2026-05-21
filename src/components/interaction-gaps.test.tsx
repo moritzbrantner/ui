@@ -176,10 +176,17 @@ describe("@moritzbrantner/ui primitive interaction gaps", () => {
   });
 
   test("date picker renders controlled formatted values and disabled state", () => {
-    render(<DatePicker value={new Date(2026, 3, 22)} disabled />);
+    render(
+      <DatePicker
+        value={new Date(2026, 3, 22)}
+        disabled
+        triggerProps={{ "data-testid": "date-trigger" }}
+      />,
+    );
 
     const trigger = screen.getByRole("button", { name: /April 22nd, 2026/ });
 
     expect(trigger).toHaveProperty("disabled", true);
+    expect(screen.getByTestId("date-trigger").getAttribute("data-slot")).toBe("date-picker");
   });
 });

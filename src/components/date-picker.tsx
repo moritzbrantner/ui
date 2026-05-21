@@ -10,12 +10,16 @@ import { Calendar } from "./calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { cn } from "../lib/cn";
 
+type DataAttributes = Record<`data-${string}`, string | number | boolean | undefined>;
+
 type SharedDatePickerProps = {
   className?: string;
   placeholder?: React.ReactNode;
   formatString?: string;
   align?: React.ComponentProps<typeof PopoverContent>["align"];
   disabled?: boolean;
+  triggerProps?: Omit<React.ComponentProps<typeof Button>, "children"> & DataAttributes;
+  contentProps?: React.ComponentProps<typeof PopoverContent> & DataAttributes;
 };
 
 type DatePickerProps = SharedDatePickerProps &
@@ -44,6 +48,8 @@ function DatePicker({
   formatString = "PPP",
   align = "start",
   disabled,
+  triggerProps,
+  contentProps,
   ...calendarProps
 }: DatePickerProps) {
   const [internalValue, setInternalValue] = React.useState<Date | undefined>(defaultValue);
@@ -59,24 +65,34 @@ function DatePicker({
     },
     [onChange, value],
   );
+  const { className: triggerClassName, ...restTriggerProps } = triggerProps ?? {};
+  const { className: contentClassName, ...restContentProps } = contentProps ?? {};
 
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
+          data-slot="date-picker"
           variant="outline"
           data-empty={!selected}
           disabled={disabled}
           className={cn(
             "w-[280px] justify-start text-left font-normal data-[empty=true]:text-muted-foreground",
             className,
+            triggerClassName,
           )}
+          {...restTriggerProps}
         >
           <CalendarIcon />
           {selected ? format(selected, formatString) : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align={align} className="w-auto p-0">
+      <PopoverContent
+        aria-label="Date picker"
+        align={align}
+        className={cn("w-auto p-0", contentClassName)}
+        {...restContentProps}
+      >
         <Calendar
           mode="single"
           selected={selected}
@@ -98,6 +114,8 @@ function DateRangePicker({
   formatString = "LLL dd, y",
   align = "start",
   disabled,
+  triggerProps,
+  contentProps,
   ...calendarProps
 }: DateRangePickerProps) {
   const [internalValue, setInternalValue] = React.useState<DateRange | undefined>(defaultValue);
@@ -120,24 +138,34 @@ function DateRangePicker({
       : selected?.from
         ? format(selected.from, formatString)
         : null;
+  const { className: triggerClassName, ...restTriggerProps } = triggerProps ?? {};
+  const { className: contentClassName, ...restContentProps } = contentProps ?? {};
 
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
+          data-slot="date-range-picker"
           variant="outline"
           data-empty={!label}
           disabled={disabled}
           className={cn(
             "w-[300px] justify-start text-left font-normal data-[empty=true]:text-muted-foreground",
             className,
+            triggerClassName,
           )}
+          {...restTriggerProps}
         >
           <CalendarIcon />
           {label ? <span>{label}</span> : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align={align} className="w-auto p-0">
+      <PopoverContent
+        aria-label="Date range picker"
+        align={align}
+        className={cn("w-auto p-0", contentClassName)}
+        {...restContentProps}
+      >
         <Calendar
           mode="range"
           numberOfMonths={2}

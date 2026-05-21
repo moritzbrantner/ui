@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 import {
@@ -10,13 +11,19 @@ import {
   Loader2Icon,
 } from "lucide-react";
 
-const Toaster = ({ ...props }: ToasterProps) => {
+type UiToasterProps = ToasterProps & {
+  "data-slot"?: string;
+};
+
+const Toaster = ({ theme: themeProp, className, ...props }: UiToasterProps) => {
   const { theme = "system" } = useTheme();
+  const resolvedTheme = themeProp ?? (theme as ToasterProps["theme"]);
 
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
-      className="toaster group"
+      data-slot="toaster"
+      theme={resolvedTheme}
+      className={className ? `toaster group ${className}` : "toaster group"}
       icons={{
         success: <CircleCheckIcon className="size-4" />,
         info: <InfoIcon className="size-4" />,
@@ -43,3 +50,4 @@ const Toaster = ({ ...props }: ToasterProps) => {
 };
 
 export { Toaster };
+export type { UiToasterProps as ToasterProps };

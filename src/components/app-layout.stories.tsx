@@ -20,6 +20,8 @@ import {
 } from "./app-layout";
 import { Badge } from "./badge";
 import { Button } from "./button";
+import { CommandPalette } from "./command-palette";
+import { PlatformNavbar } from "./platform-navbar";
 import { Stat, StatDelta, StatDescription, StatGroup, StatLabel, StatValue } from "./stat";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table";
 
@@ -35,7 +37,7 @@ const releaseRows = [
 
 function DashboardDemo({ onRefresh = () => undefined }: DashboardDemoProps) {
   return (
-    <PageShell background="muted" maxWidth="wide">
+    <PageShell background="muted" maxWidth="wide" className="mx-auto max-w-[calc(100vw-2rem)]">
       <PageHeader>
         <div className="grid gap-2">
           <Badge variant="outline" className="w-fit">
@@ -220,6 +222,95 @@ export const StickyActionBar: Story = {
           </ActionBar>
         </SurfaceFooter>
       </Surface>
+    </PageShell>
+  ),
+};
+
+export const ComprehensiveAppShell: Story = {
+  render: () => (
+    <PageShell background="muted" maxWidth="wide" className="mx-auto max-w-[calc(100vw-2rem)]">
+      <PlatformNavbar
+        brand="Platform"
+        variant="mobile"
+        groups={[
+          {
+            id: "workspace",
+            label: "Workspace",
+            description: "Primary operating surfaces.",
+            items: [
+              { id: "overview", label: "Overview", href: "#overview", active: true },
+              { id: "data", label: "Data", href: "#data", badge: "Live" },
+            ],
+          },
+          {
+            id: "admin",
+            label: "Admin",
+            description: "Fixture-only app controls.",
+            items: [
+              { id: "members", label: "Members", href: "#members" },
+              { id: "settings", label: "Settings", href: "#settings" },
+            ],
+          },
+        ]}
+        activeItemId="overview"
+        defaultOpenGroupId={null}
+        languageSwitcher
+        themeModeSwitch
+        notificationMenu={{
+          unreadCount: 1,
+          items: [{ id: "review", title: "Review requested", unread: true, meta: "Now" }],
+        }}
+        accountMenu={{
+          user: { name: "Ada Lovelace", email: "ada@example.com", initials: "AL" },
+          items: [{ id: "profile", label: "Profile" }],
+        }}
+      />
+      <PageHeader>
+        <div className="grid gap-2">
+          <PageTitle>Comprehensive app shell</PageTitle>
+          <PageDescription>
+            Navigation, shell layout, account controls, notifications, theme switching, and command
+            palette composition without route or auth ownership.
+          </PageDescription>
+        </div>
+        <PageActions>
+          <Button variant="outline">Review</Button>
+          <Button>Publish</Button>
+        </PageActions>
+      </PageHeader>
+      <PageContent>
+        <SectionGrid columns="sidebar-right">
+          <Surface>
+            <SurfaceHeader>
+              <SurfaceTitle>Operational surface</SurfaceTitle>
+              <SurfaceDescription>
+                Reusable shell components around app-owned state.
+              </SurfaceDescription>
+            </SurfaceHeader>
+            <SurfaceContent className="mt-4">
+              <p className="text-sm leading-6 text-muted-foreground">
+                This story provides a representative visual target for app-scale layouts.
+              </p>
+            </SurfaceContent>
+          </Surface>
+          <Surface variant="muted">
+            <SurfaceHeader>
+              <SurfaceTitle>Fixture status</SurfaceTitle>
+              <SurfaceDescription>Callbacks and data are Storybook-only.</SurfaceDescription>
+            </SurfaceHeader>
+          </Surface>
+        </SectionGrid>
+      </PageContent>
+      <CommandPalette
+        open={false}
+        groups={[
+          {
+            id: "commands",
+            label: "Commands",
+            actions: [{ id: "publish", label: "Publish release" }],
+          },
+        ]}
+      />
     </PageShell>
   ),
 };

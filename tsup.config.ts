@@ -28,6 +28,8 @@ export default defineConfig({
   dts: true,
   entry: {
     index: "src/index.ts",
+    server: "src/server.ts",
+    client: "src/client.ts",
     zleek: "src/zleek.ts",
     bobba: "src/bobba.ts",
     atlas: "src/atlas.ts",

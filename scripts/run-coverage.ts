@@ -6,6 +6,26 @@ import { fileURLToPath } from "node:url";
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 if (process.versions.bun) {
+  if (process.env.CI) {
+    const result = spawnSync(
+      "node",
+      [
+        "./node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "vitest.coverage.config.ts",
+        "--coverage",
+      ],
+      {
+        cwd: packageRoot,
+        shell: false,
+        stdio: "inherit",
+      },
+    );
+
+    process.exit(result.status ?? 1);
+  }
+
   const result = spawnSync("bun", ["run", "test:unit"], {
     cwd: packageRoot,
     shell: false,
@@ -30,7 +50,9 @@ if (process.versions.bun) {
       "",
     ].join("\n"),
   );
-  console.warn("@moritzbrantner/ui coverage fallback: Bun does not expose V8 coverage APIs.");
+  console.warn(
+    "@moritzbrantner/ui coverage fallback: Bun does not expose V8 coverage APIs; this is not real coverage.",
+  );
   process.exit(0);
 }
 
