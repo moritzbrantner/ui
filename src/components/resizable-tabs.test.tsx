@@ -35,6 +35,19 @@ describe("ResizableTabs", () => {
     expect(handles).toHaveLength(2);
     expect(handles[0]?.getAttribute("aria-hidden")).toBe("true");
     expect(handles[0]?.getAttribute("role")).toBeNull();
+    expect(handles[0]?.getAttribute("data-orientation")).toBe("vertical");
+    expect(handles[0]?.className).toContain("cursor-col-resize");
+  });
+
+  test("uses a roomier default tab size", () => {
+    render(<ResizableTabs items={items} defaultValue="alpha" />);
+
+    expect(document.querySelector("[data-slot='resizable-tabs-list']")?.className).toContain(
+      "--ui-control-height-md",
+    );
+    expect(screen.getByRole("tab", { name: "Alpha" }).className).toContain(
+      "--ui-control-padding-x-sm",
+    );
   });
 
   test("supports controlled tab value changes", () => {

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect } from "storybook/test";
+import { expect, userEvent } from "storybook/test";
 
 import {
   ChartAreaGraph,
@@ -143,5 +143,32 @@ export const Default: Story = {
     await expect(canvas.getByRole("img", { name: "Weekly activation sparkline" })).toBeVisible();
     await expect(canvas.getByRole("group", { name: "Acquisition channel split" })).toBeVisible();
     await expect(canvas.getByText("Target corridor")).toBeInTheDocument();
+  },
+};
+
+export const NestedDonutData: Story = {
+  render: () => (
+    <div className="max-w-80">
+      <ChartDonutGraph
+        ariaLabel="Acquisition channel split"
+        data={channelData}
+        labelKey="channel"
+        centerLabel="Sessions"
+        caption="Parent segments roll up child totals. Enter a segment to inspect its sources, then use the center to go back."
+      />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("group", { name: "Acquisition channel split" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Organic: 42. Enter folder" })).toBeVisible();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Organic: 42. Enter folder" }));
+
+    await expect(canvas.getByText("Search")).toBeVisible();
+    await expect(canvas.getByText("Content")).toBeVisible();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Go one folder up" }));
+
+    await expect(canvas.getByText("Referral")).toBeVisible();
   },
 };

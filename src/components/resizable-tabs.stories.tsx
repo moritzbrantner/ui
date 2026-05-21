@@ -42,13 +42,22 @@ const items: ResizableTabsItem[] = [
 ];
 
 function ResizableTabsDemo() {
-  return <ResizableTabs items={items} defaultValue="preview" className="max-w-3xl" />;
+  return (
+    <ResizableTabs
+      items={items}
+      defaultValue="preview"
+      className="w-[min(48rem,calc(100vw-2rem))]"
+    />
+  );
 }
 
 const meta = {
   title: "Components/Navigation/Resizable Tabs",
   component: ResizableTabsDemo,
   tags: ["autodocs", "test"],
+  parameters: {
+    layout: "padded",
+  },
 } satisfies Meta<typeof ResizableTabsDemo>;
 
 export default meta;
@@ -63,7 +72,7 @@ export const LineVariant: Story = {
       items={items}
       defaultValue="preview"
       listVariant="line"
-      className="max-w-3xl"
+      className="w-[min(48rem,calc(100vw-2rem))]"
       triggerMinSize={16}
     />
   ),
