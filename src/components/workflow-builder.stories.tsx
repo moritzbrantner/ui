@@ -6,6 +6,7 @@ import {
   WorkflowBuilder,
   type WorkflowBuilderEdge,
   type WorkflowBuilderNodeData,
+  type WorkflowBuilderViewport,
 } from "./workflow-builder";
 
 const initialNodes: WorkflowBuilderNodeData[] = [
@@ -222,6 +223,25 @@ function WorkflowBuilderDemo(args: React.ComponentProps<typeof WorkflowBuilder>)
   );
 }
 
+function ControlledViewportWorkflowBuilder(args: React.ComponentProps<typeof WorkflowBuilder>) {
+  const [viewport, setViewport] = React.useState<WorkflowBuilderViewport>({
+    x: 24,
+    y: 12,
+    zoom: 0.85,
+  });
+
+  return (
+    <WorkflowBuilder
+      {...args}
+      viewport={viewport}
+      onViewportChange={(nextViewport) => {
+        setViewport(nextViewport);
+        args.onViewportChange?.(nextViewport);
+      }}
+    />
+  );
+}
+
 export const AiWorkflowGraph: Story = {
   render: (args) => <WorkflowBuilderDemo {...args} />,
   play: async ({ args, canvas, userEvent }) => {
@@ -234,4 +254,19 @@ export const AiWorkflowGraph: Story = {
 
 export const ReadOnly: Story = {
   render: (args) => <WorkflowBuilderDemo {...args} readOnly />,
+};
+
+export const ControlledViewport: Story = {
+  render: (args) => <ControlledViewportWorkflowBuilder {...args} />,
+  args: {
+    onViewportChange: fn(),
+    onConnectionStart: fn(),
+    onConnectionCancel: fn(),
+    onConnectionComplete: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByText("85%")).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Zoom in" }));
+    await expect(args.onViewportChange).toHaveBeenCalled();
+  },
 };

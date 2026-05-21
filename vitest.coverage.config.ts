@@ -16,6 +16,7 @@ export default mergeConfig(baseConfig, {
         "src/components/calendar.tsx",
         "src/components/data-grid.tsx",
         "src/components/field.tsx",
+        "src/components/filter-bar.tsx",
         "src/components/form-layout.tsx",
         "src/components/hotkey-visibility.ts",
         "src/components/notification-menu.tsx",

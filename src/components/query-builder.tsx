@@ -40,6 +40,7 @@ type QueryBuilderGroupData = {
 };
 
 type QueryBuilderExpression = QueryBuilderGroupData;
+type QueryBuilderIdFactory = (kind: "group" | "rule") => string;
 
 type QueryBuilderProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   fields: QueryBuilderField[];
@@ -49,6 +50,9 @@ type QueryBuilderProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   maxDepth?: number;
   readOnly?: boolean;
   validationMessages?: Record<string, React.ReactNode>;
+  idFactory?: QueryBuilderIdFactory;
+  operatorLabels?: Partial<Record<string, React.ReactNode>>;
+  emptyMessage?: React.ReactNode;
 };
 
 type QueryBuilderGroupProps = React.ComponentProps<"div"> & {
@@ -59,6 +63,9 @@ type QueryBuilderGroupProps = React.ComponentProps<"div"> & {
   readOnly?: boolean;
   root?: boolean;
   validationMessages?: Record<string, React.ReactNode>;
+  idFactory?: QueryBuilderIdFactory;
+  operatorLabels?: Partial<Record<string, React.ReactNode>>;
+  emptyMessage?: React.ReactNode;
   onGroupChange?: (group: QueryBuilderGroupData) => void;
   onRemove?: () => void;
 };
@@ -68,11 +75,12 @@ type QueryBuilderRuleProps = React.ComponentProps<"div"> & {
   fields: QueryBuilderField[];
   readOnly?: boolean;
   validationMessage?: React.ReactNode;
+  operatorLabels?: Partial<Record<string, React.ReactNode>>;
   onRuleChange?: (rule: QueryBuilderRuleData) => void;
   onRemove?: () => void;
 };
 
-const queryBuilderOperatorLabels: Record<string, string> = {
+const queryBuilderOperatorLabels: Record<string, React.ReactNode> = {
   after: "after",
   before: "before",
   contains: "contains",
@@ -101,11 +109,14 @@ function QueryBuilder({
   maxDepth = 3,
   readOnly = false,
   validationMessages,
+  idFactory,
+  operatorLabels,
+  emptyMessage = "No rules in this group.",
   className,
   ...props
 }: QueryBuilderProps) {
   const [internalExpression, setInternalExpression] = React.useState<QueryBuilderExpression>(
-    defaultExpression ?? createQueryBuilderGroup(fields),
+    defaultExpression ?? createQueryBuilderGroup(fields, idFactory),
   );
   const currentExpression = expression ?? internalExpression;
 
@@ -138,6 +149,9 @@ function QueryBuilder({
         readOnly={readOnly}
         maxDepth={maxDepth}
         validationMessages={validationMessages}
+        idFactory={idFactory}
+        operatorLabels={operatorLabels}
+        emptyMessage={emptyMessage}
         onGroupChange={commitExpression}
       />
     </div>
@@ -152,6 +166,9 @@ function QueryBuilderGroup({
   readOnly,
   root,
   validationMessages,
+  idFactory,
+  operatorLabels,
+  emptyMessage = "No rules in this group.",
   onGroupChange,
   onRemove,
   className,
@@ -207,7 +224,7 @@ function QueryBuilderGroup({
             onClick={() =>
               onGroupChange?.({
                 ...group,
-                rules: [...group.rules, createQueryBuilderRule(fields)],
+                rules: [...group.rules, createQueryBuilderRule(fields, idFactory)],
               })
             }
           >
@@ -222,7 +239,7 @@ function QueryBuilderGroup({
             onClick={() =>
               onGroupChange?.({
                 ...group,
-                rules: [...group.rules, createQueryBuilderGroup(fields)],
+                rules: [...group.rules, createQueryBuilderGroup(fields, idFactory)],
               })
             }
           >
@@ -245,7 +262,7 @@ function QueryBuilderGroup({
       </div>
       {group.rules.length === 0 ? (
         <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-          No rules in this group.
+          {emptyMessage}
         </div>
       ) : (
         <div className="space-y-2">
@@ -259,6 +276,9 @@ function QueryBuilderGroup({
                 maxDepth={maxDepth}
                 readOnly={readOnly}
                 validationMessages={validationMessages}
+                idFactory={idFactory}
+                operatorLabels={operatorLabels}
+                emptyMessage={emptyMessage}
                 onGroupChange={(nextGroup) => updateRuleAt(index, nextGroup)}
                 onRemove={() => removeRuleAt(index)}
               />
@@ -269,6 +289,7 @@ function QueryBuilderGroup({
                 fields={fields}
                 readOnly={readOnly}
                 validationMessage={validationMessages?.[rule.id]}
+                operatorLabels={operatorLabels}
                 onRuleChange={(nextRule) => updateRuleAt(index, nextRule)}
                 onRemove={() => removeRuleAt(index)}
               />
@@ -285,6 +306,7 @@ function QueryBuilderRule({
   fields,
   readOnly,
   validationMessage,
+  operatorLabels,
   onRuleChange,
   onRemove,
   className,
@@ -293,6 +315,7 @@ function QueryBuilderRule({
   const field = fields.find((item) => item.id === rule.fieldId) ?? fields[0];
   const operators = field ? getQueryBuilderOperators(field) : [];
   const operator = operators.includes(rule.operator) ? rule.operator : (operators[0] ?? "equals");
+  const labels = { ...queryBuilderOperatorLabels, ...operatorLabels };
 
   const changeField = (fieldId: string) => {
     const nextField = fields.find((item) => item.id === fieldId) ?? fields[0];
@@ -327,7 +350,7 @@ function QueryBuilderRule({
           disabled={readOnly}
           onValueChange={(value) => onRuleChange?.({ ...rule, operator: value })}
           options={operators.map((operatorName) => ({
-            label: queryBuilderOperatorLabels[operatorName] ?? operatorName,
+            label: labels[operatorName] ?? operatorName,
             value: operatorName,
           }))}
         />
@@ -561,19 +584,25 @@ function getQueryBuilderOperators(field: QueryBuilderField) {
   return ["equals", "not_equals", "empty", "not_empty"];
 }
 
-function createQueryBuilderGroup(fields: QueryBuilderField[]): QueryBuilderGroupData {
+function createQueryBuilderGroup(
+  fields: QueryBuilderField[],
+  idFactory?: QueryBuilderIdFactory,
+): QueryBuilderGroupData {
   return {
-    id: createQueryBuilderId("group"),
+    id: createQueryBuilderId("group", idFactory),
     combinator: "and",
-    rules: fields.length > 0 ? [createQueryBuilderRule(fields)] : [],
+    rules: fields.length > 0 ? [createQueryBuilderRule(fields, idFactory)] : [],
   };
 }
 
-function createQueryBuilderRule(fields: QueryBuilderField[]): QueryBuilderRuleData {
+function createQueryBuilderRule(
+  fields: QueryBuilderField[],
+  idFactory?: QueryBuilderIdFactory,
+): QueryBuilderRuleData {
   const field = fields[0];
 
   return {
-    id: createQueryBuilderId("rule"),
+    id: createQueryBuilderId("rule", idFactory),
     fieldId: field?.id ?? "",
     operator: field ? (getQueryBuilderOperators(field)[0] ?? "equals") : "equals",
     value: getDefaultQueryBuilderValue(field),
@@ -612,15 +641,18 @@ function isQueryBuilderGroup(
   return "rules" in rule;
 }
 
-function createQueryBuilderId(prefix: string) {
-  return `${prefix}-${Date.now()}-${Math.round(Math.random() * 10000)}`;
+function createQueryBuilderId(kind: "group" | "rule", idFactory?: QueryBuilderIdFactory) {
+  return idFactory?.(kind) ?? `${kind}-${Date.now()}-${Math.round(Math.random() * 10000)}`;
 }
 
 export {
   QueryBuilder,
   QueryBuilderGroup,
   QueryBuilderRule,
+  createQueryBuilderGroup,
+  createQueryBuilderRule,
   evaluateQueryBuilderExpression,
+  getQueryBuilderOperators,
   serializeQueryBuilderExpression,
 };
 export type {
@@ -629,6 +661,7 @@ export type {
   QueryBuilderFieldOption,
   QueryBuilderFieldType,
   QueryBuilderGroupData,
+  QueryBuilderIdFactory,
   QueryBuilderProps,
   QueryBuilderRuleData,
 };

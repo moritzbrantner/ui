@@ -57,3 +57,33 @@ export const ReadOnly: Story = {
     readOnly: true,
   },
 };
+
+export const AdvancedControls: Story = {
+  args: {
+    defaultExpression: {
+      id: "advanced-root",
+      combinator: "or",
+      rules: [
+        { id: "advanced-name", fieldId: "name", operator: "contains", value: "Atlas" },
+        {
+          id: "advanced-group",
+          combinator: "and",
+          rules: [
+            { id: "advanced-status", fieldId: "status", operator: "equals", value: "review" },
+            { id: "advanced-verified", fieldId: "verified", operator: "equals", value: true },
+          ],
+        },
+      ],
+    },
+    idFactory: (kind) => `story-${kind}`,
+    operatorLabels: {
+      contains: "matches text",
+      equals: "is exactly",
+    },
+    emptyMessage: "No query rules configured.",
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("matches text")).toBeVisible();
+    await expect(canvas.getAllByText("is exactly")[0]).toBeVisible();
+  },
+};

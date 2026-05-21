@@ -81,6 +81,8 @@ import {
   EmptyTitle,
   EmptyState,
   ErrorState,
+  FilterBar,
+  FilterChip,
   InspectorPanel,
   type InspectorPanelSectionData,
   Kbd,
@@ -107,10 +109,12 @@ import {
   PageShell,
   PageTitle,
   QueryBuilder,
+  createQueryBuilderGroup,
   evaluateQueryBuilderExpression,
   serializeQueryBuilderExpression,
   type QueryBuilderExpression,
   type QueryBuilderField,
+  type QueryBuilderIdFactory,
   SectionGrid,
   SearchField,
   SelectionToolbar,
@@ -149,8 +153,10 @@ import {
   TimelineTitle,
   WorkflowBuilder,
   getWorkflowBuilderConnectionValidity,
+  type WorkflowBuilderConnection,
   type WorkflowBuilderEdge,
   type WorkflowBuilderNodeData,
+  type WorkflowBuilderViewport,
   moveTimelineEditorClip,
   resizeTimelineEditorClip,
   type TimelineEditorTrack,
@@ -181,6 +187,7 @@ import {
 import { Button as SubpathButton } from "./components/button";
 import { DataGrid as SubpathDataGrid } from "./components/data-grid";
 import { Dialog as SubpathDialog } from "./components/dialog";
+import { FilterBar as SubpathFilterBar } from "./components/filter-bar";
 import { PaperTheme, paperTheme, uiTheme as paperUiTheme } from "./paper";
 import { paperTheme as paperServerTheme, uiTheme as paperServerUiTheme } from "./paper-server";
 import { cn as serverCn, themeConfig as serverThemeConfig } from "./server";
@@ -442,6 +449,20 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(SubpathButton).toBe(Button);
     expect(SubpathDataGrid).toBe(DataGrid);
     expect(SubpathDialog).toBe(Dialog);
+    expect(SubpathFilterBar).toBe(FilterBar);
+    expect(typeof FilterChip).toBe("function");
+    const queryBuilderIdFactory: QueryBuilderIdFactory = (kind) => `contract-${kind}`;
+    const queryBuilderGroup = createQueryBuilderGroup([], queryBuilderIdFactory);
+    expect(queryBuilderGroup.id).toBe("contract-group");
+    const workflowViewport: WorkflowBuilderViewport = { x: 0, y: 0, zoom: 1 };
+    const workflowConnection: WorkflowBuilderConnection = {
+      sourceNodeId: "source",
+      sourcePortId: "out",
+      targetNodeId: "target",
+      targetPortId: "in",
+    };
+    expect(workflowViewport.zoom).toBe(1);
+    expect(workflowConnection.sourceNodeId).toBe("source");
   });
 
   test("exposes metadata-only theme server entrypoints", () => {

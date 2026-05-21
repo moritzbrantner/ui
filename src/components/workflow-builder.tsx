@@ -51,6 +51,19 @@ type WorkflowBuilderConnectionValidity = {
   reason?: "duplicate" | "kind-mismatch" | "missing-port" | "self-connection";
 };
 
+type WorkflowBuilderViewport = {
+  x: number;
+  y: number;
+  zoom: number;
+};
+
+type WorkflowBuilderConnection = {
+  sourceNodeId: string;
+  sourcePortId: string;
+  targetNodeId: string;
+  targetPortId: string;
+};
+
 type WorkflowBuilderProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   nodes: WorkflowBuilderNodeData[];
   edges: WorkflowBuilderEdge[];
@@ -63,6 +76,17 @@ type WorkflowBuilderProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   defaultZoom?: number;
   zoom?: number;
   onZoomChange?: (zoom: number) => void;
+  viewport?: WorkflowBuilderViewport;
+  defaultViewport?: WorkflowBuilderViewport;
+  onViewportChange?: (viewport: WorkflowBuilderViewport) => void;
+  isConnectionValid?: (
+    connection: WorkflowBuilderConnectionValidityInput,
+  ) => WorkflowBuilderConnectionValidity;
+  onConnectionStart?: (
+    connection: Pick<WorkflowBuilderConnection, "sourceNodeId" | "sourcePortId">,
+  ) => void;
+  onConnectionCancel?: () => void;
+  onConnectionComplete?: (connection: WorkflowBuilderConnection) => void;
   minZoom?: number;
   maxZoom?: number;
 };
@@ -133,28 +157,52 @@ function WorkflowBuilder({
   defaultZoom = 1,
   zoom,
   onZoomChange,
+  viewport,
+  defaultViewport,
+  onViewportChange,
+  isConnectionValid = getWorkflowBuilderConnectionValidity,
+  onConnectionStart,
+  onConnectionCancel,
+  onConnectionComplete,
   minZoom = 0.5,
   maxZoom = 1.75,
   className,
   ...props
 }: WorkflowBuilderProps) {
   const [internalZoom, setInternalZoom] = React.useState(defaultZoom);
+  const [internalViewport, setInternalViewport] = React.useState<WorkflowBuilderViewport>(
+    defaultViewport ?? { x: 0, y: 0, zoom: defaultZoom },
+  );
   const [internalSelectedNodeId, setInternalSelectedNodeId] = React.useState<string | null>(null);
   const [internalSelectedEdgeId, setInternalSelectedEdgeId] = React.useState<string | null>(null);
   const [pendingConnection, setPendingConnection] = React.useState<PendingConnection | null>(null);
   const [dragState, setDragState] = React.useState<DragState>(null);
   const [portPoints, setPortPoints] = React.useState<WorkflowBuilderPortPointMap>({});
   const viewportRef = React.useRef<HTMLDivElement>(null);
-  const currentZoom = zoom ?? internalZoom;
+  const currentViewport = viewport ?? {
+    ...internalViewport,
+    zoom: zoom ?? internalViewport.zoom ?? internalZoom,
+  };
+  const currentZoom = currentViewport.zoom;
   const currentSelectedNodeId = selectedNodeId ?? internalSelectedNodeId;
   const currentSelectedEdgeId = selectedEdgeId ?? internalSelectedEdgeId;
   const selectedNode = nodes.find((node) => node.id === currentSelectedNodeId);
   const selectedEdge = edges.find((edge) => edge.id === currentSelectedEdgeId);
 
+  const commitViewport = (nextViewport: WorkflowBuilderViewport) => {
+    const safeViewport = {
+      ...nextViewport,
+      zoom: clampWorkflowValue(nextViewport.zoom, minZoom, maxZoom),
+    };
+    setInternalViewport(safeViewport);
+    setInternalZoom(safeViewport.zoom);
+    onZoomChange?.(safeViewport.zoom);
+    onViewportChange?.(safeViewport);
+  };
+
   const commitZoom = (nextZoom: number) => {
     const safeZoom = clampWorkflowValue(nextZoom, minZoom, maxZoom);
-    setInternalZoom(safeZoom);
-    onZoomChange?.(safeZoom);
+    commitViewport({ ...currentViewport, zoom: safeZoom });
   };
 
   const commitSelection = (selection: WorkflowBuilderSelection) => {
@@ -239,26 +287,34 @@ function WorkflowBuilder({
       return;
     }
 
-    const validity = getWorkflowBuilderConnectionValidity({
+    const connection = {
       nodes,
       edges,
       sourceNodeId: pendingConnection.sourceNodeId,
       sourcePortId: pendingConnection.sourcePortId,
       targetNodeId,
       targetPortId,
-    });
+    };
+    const validity = isConnectionValid(connection);
 
     if (validity.valid) {
+      const nextConnection = {
+        sourceNodeId: pendingConnection.sourceNodeId,
+        sourcePortId: pendingConnection.sourcePortId,
+        targetNodeId,
+        targetPortId,
+      };
       onEdgesChange?.([
         ...edges,
         {
-          id: `edge-${pendingConnection.sourceNodeId}-${pendingConnection.sourcePortId}-${targetNodeId}-${targetPortId}`,
-          sourceNodeId: pendingConnection.sourceNodeId,
-          sourcePortId: pendingConnection.sourcePortId,
+          id: `edge-${nextConnection.sourceNodeId}-${nextConnection.sourcePortId}-${targetNodeId}-${targetPortId}`,
+          sourceNodeId: nextConnection.sourceNodeId,
+          sourcePortId: nextConnection.sourcePortId,
           targetNodeId,
           targetPortId,
         },
       ]);
+      onConnectionComplete?.(nextConnection);
     }
 
     setPendingConnection(null);
@@ -269,7 +325,7 @@ function WorkflowBuilder({
   };
 
   const fitView = () => {
-    commitZoom(1);
+    commitViewport({ x: 0, y: 0, zoom: 1 });
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -278,6 +334,9 @@ function WorkflowBuilder({
       deleteSelection();
     }
     if (event.key === "Escape") {
+      if (pendingConnection) {
+        onConnectionCancel?.();
+      }
       setPendingConnection(null);
       commitSelection(null);
     }
@@ -339,7 +398,10 @@ function WorkflowBuilder({
           ref={viewportRef}
           data-slot="workflow-builder-viewport"
           className="relative min-h-[52rem] min-w-[72rem] origin-top-left"
-          style={{ transform: `scale(${currentZoom})`, width: `${100 / currentZoom}%` }}
+          style={{
+            transform: `translate(${currentViewport.x}px, ${currentViewport.y}px) scale(${currentZoom})`,
+            width: `${100 / currentZoom}%`,
+          }}
         >
           <svg
             data-slot="workflow-builder-edges"
@@ -388,9 +450,11 @@ function WorkflowBuilder({
               pendingConnection={pendingConnection}
               onNodeSelect={selectNode}
               onNodeMinimizedChange={onNodesChange ? changeNodeMinimized : undefined}
-              onStartConnection={(sourceNodeId, sourcePortId) =>
-                setPendingConnection({ sourceNodeId, sourcePortId })
-              }
+              onStartConnection={(sourceNodeId, sourcePortId) => {
+                const nextConnection = { sourceNodeId, sourcePortId };
+                setPendingConnection(nextConnection);
+                onConnectionStart?.(nextConnection);
+              }}
               onCompleteConnection={completeConnection}
               onNodePointerDown={handleNodePointerDown}
             />
@@ -812,6 +876,7 @@ export {
   getWorkflowBuilderConnectionValidity,
 };
 export type {
+  WorkflowBuilderConnection,
   WorkflowBuilderConnectionValidity,
   WorkflowBuilderConnectionValidityInput,
   WorkflowBuilderEdge,
@@ -819,4 +884,5 @@ export type {
   WorkflowBuilderPort,
   WorkflowBuilderProps,
   WorkflowBuilderSelection,
+  WorkflowBuilderViewport,
 };

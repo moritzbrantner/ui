@@ -44,6 +44,7 @@ export * from "./components/drawer";
 export * from "./components/dropdown-menu";
 export * from "./components/empty";
 export * from "./components/field";
+export * from "./components/filter-bar";
 export * from "./components/form-layout";
 export * from "./components/gantt";
 export * from "./components/hover-card";

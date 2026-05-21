@@ -31,11 +31,15 @@ App shell: compose `PlatformNavbar`, `PageShell`, `PageHeader`, `PageContent`, `
 
 Data page: prefer `DataGrid` over legacy `DataTable` for controlled server state, manual sorting/filtering/pagination, row selection, and loading/error/empty states. Apps own fetching, cache state, URL state, and backend contracts.
 
+Filtered data page: compose `FilterBar` for search and active filter display with `DataGrid` for rows. Use `QueryBuilder` only when the app needs nested boolean filters. Apps own fetching, URL state, backend query contracts, and persistence.
+
 Validated form: compose `FormSection`, `Field`, `FieldError`, `ValidationSummary`, and `FormActions`. Apps own schema validation, submit behavior, persistence, and error mapping.
 
 Upload queue: compose `Dropzone` and `UploadQueue`. Apps own transport, file storage, retries, cancellation, and progress events.
 
 Command palette: pass app-owned command groups to `CommandPalette`. Apps own routing, permissions, and side effects.
+
+Workflow editor: use `WorkflowBuilder` for graph layout, viewport control, selection, and connection interaction. Apps own execution, persistence, permissions, run state, and backend workflow contracts.
 
 Theme switching: wire `ThemeModeSwitch` to the app theme provider or controlled state. `Toaster` accepts an optional `theme` prop and otherwise follows `next-themes`.
 

@@ -178,9 +178,11 @@ Keep app-specific behavior in consuming packages:
 
 - App shell: combine `PlatformNavbar`, `PageShell`, `PageHeader`, `PageContent`, `Surface`, `CommandPalette`, `NotificationMenu`, `AccountMenu`, `LanguageSwitcher`, and `ThemeModeSwitch`.
 - Data page: use `SearchField`, `DataGrid`, `StateView`, and app-owned server state for sorting, filtering, pagination, loading, empty, and error states.
+- Filtered data page: use `FilterBar` for search and active filter display, `DataGrid` for rows, and `QueryBuilder` only when the app needs nested boolean filters; keep fetching, URL state, and backend query contracts in the app.
 - Validated form: use `FormSection`, `Field`, `FieldError`, `ValidationSummary`, and `FormActions`; keep validation rules and submit side effects in the app.
 - Upload queue: use `Dropzone` and `UploadQueue`; keep file storage, retries, cancellation, and transport in the app.
 - Command palette: pass app-owned actions to `CommandPalette`; keep routing and permissions outside this package.
+- Workflow editor: use `WorkflowBuilder` for graph layout, selection, viewport, and connection interaction; keep execution, persistence, permissions, and run state in the app.
 - Theme switching: wire `ThemeModeSwitch` to the app theme provider and import exactly one UI stylesheet.
 - Non-happy paths: compose `EmptyState`, `LoadingState`, `ErrorState`, and `OfflineState` with app-owned messages and retry callbacks.
 
@@ -244,7 +246,9 @@ The package also includes reusable state-light patterns for common application s
 
 - `StateView`, `EmptyState`, `LoadingState`, `ErrorState`, and `OfflineState` for consistent non-happy-path panels.
 - `SearchField`, `SelectionToolbar`, `FormSection`, `FieldGrid`, `FormActions`, and `ValidationSummary` for repeated search, selection, and form structure.
+- `FilterBar` and `QueryBuilder` for app-owned search/filter composition and nested boolean filter editing.
 - `CommandPalette`, `UploadQueue`, `ShortcutList`, `ShortcutHelpDialog`, and `WorkbenchLayout` for generic tool surfaces.
+- `WorkflowBuilder` for reusable workflow graph editing surfaces without execution or persistence behavior.
 
 These components render UI state and slots only. Keep fetching, routing, upload execution, auth/session state, and product-specific workflows in consuming packages.
 

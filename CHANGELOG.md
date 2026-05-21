@@ -1,5 +1,14 @@
 # @moritzbrantner/ui
 
+## 0.6.0
+
+### Minor Changes
+
+- Add `FilterBar` composition components for app-owned search and active filter state.
+- Add deterministic QueryBuilder IDs, operator label overrides, empty-state copy, and exported query helper constructors.
+- Add WorkflowBuilder viewport control plus connection lifecycle and validation hooks.
+- Expand primitive Storybook coverage, focused tests, visual checks, docs, and package-contract assertions.
+
 ## 0.5.4
 
 ### Patch Changes
