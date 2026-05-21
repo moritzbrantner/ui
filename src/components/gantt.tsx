@@ -529,10 +529,7 @@ function getGanttParentTaskIds(tasks: NormalizedGanttTask[]) {
   return tasks.filter((task) => task.hasChildren).map((task) => task.id);
 }
 
-function getVisibleGanttTasks(
-  tasks: NormalizedGanttTask[],
-  expandedTaskIds: ReadonlySet<string>,
-) {
+function getVisibleGanttTasks(tasks: NormalizedGanttTask[], expandedTaskIds: ReadonlySet<string>) {
   const visibleTasks: NormalizedGanttTask[] = [];
   let collapsedDepth: number | undefined;
 
