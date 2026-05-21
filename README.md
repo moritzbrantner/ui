@@ -67,6 +67,10 @@ bunx playwright install chromium
 
 If installation or CI cannot read GitHub Packages, make sure `GH_PACKAGES_TOKEN` is available for the `@moritzbrantner` scope configured in `.npmrc`.
 
+`bun run test:coverage` is a local fallback when Bun's `node` shim cannot expose V8 coverage APIs. It runs the unit suite and reports that coverage was not measured. Release coverage must use `npm run test:coverage:real` with a real Node runtime, which CI gets from `actions/setup-node`.
+
+Run `bun run bench` by itself, not in parallel with Storybook, Playwright, or other browser-heavy checks. The benchmark verifier retries failed samples once to filter transient host load, but repeat failures should be treated as release signals.
+
 ## Styles
 
 Import exactly one UI stylesheet for the app. Theme tokens are global CSS custom properties, so different UI themes are not intended to coexist on the same page.

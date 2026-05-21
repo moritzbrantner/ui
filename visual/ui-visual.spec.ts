@@ -19,7 +19,24 @@ const storyIds = [
   "components-editors-timeline-editor--default",
   "components-editors-annotation-canvas--default",
   "components-editors-workflow-builder--ai-workflow-graph",
+  "patterns-release-readiness--consumer-dashboard-shell-story",
+  "patterns-release-readiness--editor-workspace-story",
+  "patterns-release-readiness--forms-settings-story",
 ];
+const releaseReadinessThemeStories = [
+  {
+    storyId: "patterns-release-readiness--consumer-dashboard-shell-story",
+    designSystem: "atlas",
+  },
+  {
+    storyId: "patterns-release-readiness--editor-workspace-story",
+    designSystem: "studio",
+  },
+  {
+    storyId: "patterns-release-readiness--forms-settings-story",
+    designSystem: "paper",
+  },
+] as const;
 const uiThemes = ["bobba", "zleek", "atlas", "studio", "paper"] as const;
 const colorSchemes = ["light", "dark"] as const;
 const horizontallyScrollableStories = new Set([
@@ -29,6 +46,8 @@ const horizontallyScrollableStories = new Set([
   "components-data-display-calendar-card-days--default",
   "components-editors-timeline-editor--default",
   "components-editors-workflow-builder--ai-workflow-graph",
+  "patterns-release-readiness--consumer-dashboard-shell-story",
+  "patterns-release-readiness--editor-workspace-story",
 ]);
 const denseControlStories = new Set([
   "components-data-display-calendar-card-days--default",
@@ -56,6 +75,13 @@ for (const viewport of viewports) {
           theme: "light",
         });
         await verifyPageLayout(page, "reference-shadcn-catalog--full-catalog");
+      });
+    }
+
+    for (const { storyId, designSystem } of releaseReadinessThemeStories) {
+      test(`${storyId} renders ${designSystem}`, async ({ page }) => {
+        await gotoStory(page, storyId, { designSystem, theme: "light" });
+        await verifyPageLayout(page, storyId);
       });
     }
   });

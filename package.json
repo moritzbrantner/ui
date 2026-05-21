@@ -118,6 +118,7 @@
     "storybook": "storybook dev -p 6006 --no-open",
     "test": "bun run test:unit",
     "test:coverage": "bun ./scripts/run-coverage.ts",
+    "test:coverage:real": "node ./scripts/run-real-coverage.mjs",
     "test:package": "bun ./scripts/verify-package.ts",
     "test:storybook": "vitest --config vitest.storybook.config.ts --project=storybook --run",
     "test:unit": "vitest run src",
@@ -125,6 +126,7 @@
     "verify:build-size": "bun ./scripts/verify-build-size.ts",
     "verify:consumer": "bun ./scripts/verify-consumer-build.ts",
     "verify": "bun run check:hygiene && bun run verify:release",
+    "verify:release:ci": "bun run check-types && bun run lint && bun run test:unit && bun run build && bun run test:package && bun run test:storybook && npm run test:coverage:real && bun run test:visual && bun run verify:consumer && bun run verify:build-size && bun run bench && bun run pack:dry",
     "verify:release": "bun run check-types && bun run lint && bun run test:unit && bun run build && bun run test:package && bun run test:storybook && bun run test:coverage && bun run test:visual && bun run verify:consumer && bun run verify:build-size && bun run bench && bun run pack:dry",
     "verify:tokens": "bun ./scripts/verify-tokens.ts"
   },

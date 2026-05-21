@@ -44,14 +44,18 @@ if (process.versions.bun) {
       "# Coverage unavailable under Bun",
       "",
       "Vitest V8 coverage requires Node inspector coverage APIs.",
-      "The Bun-provided `node` shim in this workspace does not expose those APIs, so this",
-      "script runs the UI unit suite as the local fallback. In Node-based CI, it runs",
+      "The Bun-provided `node` shim in this workspace does not expose those APIs.",
+      "",
+      "`bun run test:coverage` runs the UI unit suite as a local fallback only.",
+      "Unit tests passed, but coverage was not measured.",
+      "",
+      "Use `npm run test:coverage:real` in an environment with real Node to enforce",
       "`vitest --coverage` with `vitest.coverage.config.ts`.",
       "",
     ].join("\n"),
   );
   console.warn(
-    "@moritzbrantner/ui coverage fallback: Bun does not expose V8 coverage APIs; this is not real coverage.",
+    "@moritzbrantner/ui coverage fallback: unit tests passed, but coverage was not measured. Use `npm run test:coverage:real` with real Node for release coverage.",
   );
   process.exit(0);
 }

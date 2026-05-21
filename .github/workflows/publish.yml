@@ -33,7 +33,7 @@ jobs:
         run: bunx playwright install --with-deps chromium
 
       - name: Verify release contract
-        run: bun run verify:release
+        run: npm run verify:release:ci
 
       - name: Publish package
         run: npm publish
