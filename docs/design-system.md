@@ -4,12 +4,13 @@
 
 ## Import Boundaries
 
-Use `@moritzbrantner/ui` for compatibility and normal app code. Use `@moritzbrantner/ui/client` for interactive components in mixed server/client rendering. Use `@moritzbrantner/ui/server` for server-safe helpers and theme metadata such as `cn`, `themeConfig`, `uiThemeNames`, and `createUiTheme`. Use component subpaths when a consumer wants narrow imports.
+Use `@moritzbrantner/ui` for compatibility and examples. Use `@moritzbrantner/ui/client` as a convenience client barrel when importing from one broad client surface is acceptable. It can include the full component surface, so use component subpaths for bundle-sensitive comprehensive apps. Use `@moritzbrantner/ui/server` for server-safe helpers and theme metadata such as `cn`, `themeConfig`, `uiThemeNames`, and `createUiTheme`.
 
 ```tsx
-import { Button, DataGrid } from "@moritzbrantner/ui/client";
+import { Button } from "@moritzbrantner/ui/components/button";
+import { DataGrid } from "@moritzbrantner/ui/components/data-grid";
+import { uiTheme } from "@moritzbrantner/ui/atlas/server";
 import { cn, themeConfig } from "@moritzbrantner/ui/server";
-import { SearchField } from "@moritzbrantner/ui/components/search-field";
 ```
 
 ## Styles And Themes
@@ -21,6 +22,8 @@ import "@moritzbrantner/ui/styles.css";
 ```
 
 Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css`, `@moritzbrantner/ui/studio/styles.css`, and `@moritzbrantner/ui/paper/styles.css` replace the default stylesheet for product surfaces with different visual needs. `UiTheme` and the theme metadata exports add classes and attributes; they do not load stylesheets or own theme persistence.
+
+Existing theme subpaths such as `@moritzbrantner/ui/zleek` and `@moritzbrantner/ui/atlas` remain full client convenience entrypoints. Use metadata-only subpaths such as `@moritzbrantner/ui/zleek/server`, `@moritzbrantner/ui/bobba/server`, `@moritzbrantner/ui/atlas/server`, `@moritzbrantner/ui/studio/server`, and `@moritzbrantner/ui/paper/server` in server code.
 
 ## App Recipes
 

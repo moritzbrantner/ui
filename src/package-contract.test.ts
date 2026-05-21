@@ -170,7 +170,9 @@ import {
   type UiThemeName,
 } from ".";
 import { AtlasTheme, atlasTheme, uiTheme as atlasUiTheme } from "./atlas";
+import { atlasTheme as atlasServerTheme, uiTheme as atlasServerUiTheme } from "./atlas-server";
 import { BobbaTheme, Button as BobbaButton, bobbaTheme, uiTheme as bobbaUiTheme } from "./bobba";
+import { bobbaTheme as bobbaServerTheme, uiTheme as bobbaServerUiTheme } from "./bobba-server";
 import {
   Button as ClientButton,
   DataGrid as ClientDataGrid,
@@ -180,9 +182,12 @@ import { Button as SubpathButton } from "./components/button";
 import { DataGrid as SubpathDataGrid } from "./components/data-grid";
 import { Dialog as SubpathDialog } from "./components/dialog";
 import { PaperTheme, paperTheme, uiTheme as paperUiTheme } from "./paper";
+import { paperTheme as paperServerTheme, uiTheme as paperServerUiTheme } from "./paper-server";
 import { cn as serverCn, themeConfig as serverThemeConfig } from "./server";
 import { StudioTheme, studioTheme, uiTheme as studioUiTheme } from "./studio";
+import { studioTheme as studioServerTheme, uiTheme as studioServerUiTheme } from "./studio-server";
 import { Button as ZleekButton, ZleekTheme, uiTheme as zleekUiTheme, zleekTheme } from "./zleek";
+import { uiTheme as zleekServerUiTheme, zleekTheme as zleekServerTheme } from "./zleek-server";
 
 const shadcnBasicComponentFiles = [
   "accordion",
@@ -390,8 +395,18 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./zleek/styles.css"]).toBe("./zleek/styles.css");
     expect(packageJson.exports["./bobba/styles.css"]).toBe("./bobba/styles.css");
     expect(packageJson.exports["./atlas"].import).toBe("./dist/atlas.js");
+    expect(packageJson.exports["./atlas/server"].import).toBe("./dist/atlas/server.js");
+    expect(packageJson.exports["./atlas/server"].types).toBe("./dist/atlas/server.d.ts");
     expect(packageJson.exports["./studio"].import).toBe("./dist/studio.js");
+    expect(packageJson.exports["./studio/server"].import).toBe("./dist/studio/server.js");
+    expect(packageJson.exports["./studio/server"].types).toBe("./dist/studio/server.d.ts");
     expect(packageJson.exports["./paper"].import).toBe("./dist/paper.js");
+    expect(packageJson.exports["./paper/server"].import).toBe("./dist/paper/server.js");
+    expect(packageJson.exports["./paper/server"].types).toBe("./dist/paper/server.d.ts");
+    expect(packageJson.exports["./zleek/server"].import).toBe("./dist/zleek/server.js");
+    expect(packageJson.exports["./zleek/server"].types).toBe("./dist/zleek/server.d.ts");
+    expect(packageJson.exports["./bobba/server"].import).toBe("./dist/bobba/server.js");
+    expect(packageJson.exports["./bobba/server"].types).toBe("./dist/bobba/server.d.ts");
     expect(packageJson.exports["./server"].import).toBe("./dist/server.js");
     expect(packageJson.exports["./server"].types).toBe("./dist/server.d.ts");
     expect(packageJson.exports["./client"].import).toBe("./dist/client.js");
@@ -427,5 +442,48 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(SubpathButton).toBe(Button);
     expect(SubpathDataGrid).toBe(DataGrid);
     expect(SubpathDialog).toBe(Dialog);
+  });
+
+  test("exposes metadata-only theme server entrypoints", () => {
+    const serverThemeEntries = [
+      {
+        name: "zleek",
+        label: "Zleek",
+        uiTheme: zleekServerUiTheme,
+        theme: zleekServerTheme,
+      },
+      {
+        name: "bobba",
+        label: "Bobba",
+        uiTheme: bobbaServerUiTheme,
+        theme: bobbaServerTheme,
+      },
+      {
+        name: "atlas",
+        label: "Atlas",
+        uiTheme: atlasServerUiTheme,
+        theme: atlasServerTheme,
+      },
+      {
+        name: "studio",
+        label: "Studio",
+        uiTheme: studioServerUiTheme,
+        theme: studioServerTheme,
+      },
+      {
+        name: "paper",
+        label: "Paper",
+        uiTheme: paperServerUiTheme,
+        theme: paperServerTheme,
+      },
+    ] as const;
+
+    for (const themeEntry of serverThemeEntries) {
+      expect(themeEntry.uiTheme.name).toBe(themeEntry.name);
+      expect(themeEntry.theme.name).toBe(themeEntry.name);
+      expect(themeEntry.uiTheme).toBe(themeEntry.theme);
+      expect(themeEntry.uiTheme).toBe(serverThemeConfig[themeEntry.name]);
+      expect(uiThemeLabels[themeEntry.name]).toBe(themeEntry.label);
+    }
   });
 });

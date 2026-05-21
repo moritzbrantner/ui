@@ -42,21 +42,41 @@
       "types": "./dist/zleek.d.ts",
       "import": "./dist/zleek.js"
     },
+    "./zleek/server": {
+      "types": "./dist/zleek/server.d.ts",
+      "import": "./dist/zleek/server.js"
+    },
     "./bobba": {
       "types": "./dist/bobba.d.ts",
       "import": "./dist/bobba.js"
+    },
+    "./bobba/server": {
+      "types": "./dist/bobba/server.d.ts",
+      "import": "./dist/bobba/server.js"
     },
     "./atlas": {
       "types": "./dist/atlas.d.ts",
       "import": "./dist/atlas.js"
     },
+    "./atlas/server": {
+      "types": "./dist/atlas/server.d.ts",
+      "import": "./dist/atlas/server.js"
+    },
     "./studio": {
       "types": "./dist/studio.d.ts",
       "import": "./dist/studio.js"
     },
+    "./studio/server": {
+      "types": "./dist/studio/server.d.ts",
+      "import": "./dist/studio/server.js"
+    },
     "./paper": {
       "types": "./dist/paper.d.ts",
       "import": "./dist/paper.js"
+    },
+    "./paper/server": {
+      "types": "./dist/paper/server.d.ts",
+      "import": "./dist/paper/server.js"
     },
     "./themes": {
       "types": "./dist/themes.d.ts",

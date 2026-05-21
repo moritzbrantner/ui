@@ -10,4 +10,4 @@ bun install
 bun run build
 ```
 
-The example intentionally imports from the public package entrypoint and imports exactly one global stylesheet.
+The example includes a root-import compatibility fixture and a bundle-sensitive subpath fixture. `bun run verify:consumer` builds both and enforces JS bundle budgets for the subpath fixture.

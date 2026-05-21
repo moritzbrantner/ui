@@ -48,6 +48,59 @@ const paper = await importPackage("@moritzbrantner/ui/paper");
 assert.equal(paper.uiTheme.name, "paper", "paper entry should expose paper uiTheme");
 assert.equal(typeof paper.PaperTheme, "function", "paper entry should expose PaperTheme");
 
+const serverThemeEntries = [
+  {
+    specifier: "@moritzbrantner/ui/zleek/server",
+    exportName: "zleekTheme",
+    expectedName: "zleek",
+  },
+  {
+    specifier: "@moritzbrantner/ui/bobba/server",
+    exportName: "bobbaTheme",
+    expectedName: "bobba",
+  },
+  {
+    specifier: "@moritzbrantner/ui/atlas/server",
+    exportName: "atlasTheme",
+    expectedName: "atlas",
+  },
+  {
+    specifier: "@moritzbrantner/ui/studio/server",
+    exportName: "studioTheme",
+    expectedName: "studio",
+  },
+  {
+    specifier: "@moritzbrantner/ui/paper/server",
+    exportName: "paperTheme",
+    expectedName: "paper",
+  },
+] as const;
+
+for (const themeEntry of serverThemeEntries) {
+  const themeServer = await importPackage(themeEntry.specifier);
+
+  assert.equal(
+    themeServer.uiTheme.name,
+    themeEntry.expectedName,
+    `${themeEntry.specifier} should expose the matching uiTheme`,
+  );
+  assert.equal(
+    themeServer[themeEntry.exportName].name,
+    themeEntry.expectedName,
+    `${themeEntry.specifier} should expose ${themeEntry.exportName}`,
+  );
+  assert.equal(
+    Object.hasOwn(themeServer, "Button"),
+    false,
+    `${themeEntry.specifier} should not expose client components`,
+  );
+  assert.equal(
+    Object.hasOwn(themeServer, `${capitalize(themeEntry.expectedName)}Theme`),
+    false,
+    `${themeEntry.specifier} should not expose client theme providers`,
+  );
+}
+
 const button = await importPackage("@moritzbrantner/ui/components/button");
 assert.equal(typeof button.Button, "function", "button subpath should expose Button");
 
@@ -86,6 +139,16 @@ const requiredPackageFiles = [
   "dist/server.d.ts",
   "dist/client.js",
   "dist/client.d.ts",
+  "dist/zleek/server.js",
+  "dist/zleek/server.d.ts",
+  "dist/bobba/server.js",
+  "dist/bobba/server.d.ts",
+  "dist/atlas/server.js",
+  "dist/atlas/server.d.ts",
+  "dist/studio/server.js",
+  "dist/studio/server.d.ts",
+  "dist/paper/server.js",
+  "dist/paper/server.d.ts",
   "dist/components/button.js",
   "dist/components/button.d.ts",
   "dist/components/data-grid.js",
@@ -124,4 +187,8 @@ console.log("@moritzbrantner/ui package exports and npm package contents verifie
 
 function importPackage(specifier: string): Promise<PackageModule> {
   return import(specifier) as Promise<PackageModule>;
+}
+
+function capitalize(value: string): string {
+  return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
 }

@@ -10,6 +10,13 @@ const indexPath = path.join(packageRoot, "src", "index.ts");
 const serverPath = path.join(packageRoot, "src", "server.ts");
 const clientPath = path.join(packageRoot, "src", "client.ts");
 const errors: string[] = [];
+const themeEntrypoints = [
+  { name: "zleek", sourceFile: "zleek.ts", serverSourceFile: "zleek-server.ts" },
+  { name: "bobba", sourceFile: "bobba.ts", serverSourceFile: "bobba-server.ts" },
+  { name: "atlas", sourceFile: "atlas.ts", serverSourceFile: "atlas-server.ts" },
+  { name: "studio", sourceFile: "studio.ts", serverSourceFile: "studio-server.ts" },
+  { name: "paper", sourceFile: "paper.ts", serverSourceFile: "paper-server.ts" },
+] as const;
 const interactiveStoryComponents = [
   "annotation-canvas",
   "asset-browser",
@@ -102,10 +109,15 @@ function verifyPackageMetadata() {
   expectExport("./server", "./dist/server.js", "./dist/server.d.ts");
   expectExport("./client", "./dist/client.js", "./dist/client.d.ts");
   expectExport("./zleek", "./dist/zleek.js", "./dist/zleek.d.ts");
+  expectExport("./zleek/server", "./dist/zleek/server.js", "./dist/zleek/server.d.ts");
   expectExport("./bobba", "./dist/bobba.js", "./dist/bobba.d.ts");
+  expectExport("./bobba/server", "./dist/bobba/server.js", "./dist/bobba/server.d.ts");
   expectExport("./atlas", "./dist/atlas.js", "./dist/atlas.d.ts");
+  expectExport("./atlas/server", "./dist/atlas/server.js", "./dist/atlas/server.d.ts");
   expectExport("./studio", "./dist/studio.js", "./dist/studio.d.ts");
+  expectExport("./studio/server", "./dist/studio/server.js", "./dist/studio/server.d.ts");
   expectExport("./paper", "./dist/paper.js", "./dist/paper.d.ts");
+  expectExport("./paper/server", "./dist/paper/server.js", "./dist/paper/server.d.ts");
   expectExport("./themes", "./dist/themes.js", "./dist/themes.d.ts");
   expectExport("./lib/cn", "./dist/lib/cn.js", "./dist/lib/cn.d.ts");
   expectExport("./components/*", "./dist/components/*.js", "./dist/components/*.d.ts");
@@ -179,6 +191,59 @@ function verifyEntrypointBoundaries() {
   for (const expectedExport of ['from "./lib/cn"', 'from "./theme-metadata"']) {
     if (!serverSource.includes(expectedExport)) {
       errors.push(`src/server.ts must export server-safe API ${expectedExport}`);
+    }
+  }
+
+  const forbiddenThemeServerFragments = [
+    '"use client"',
+    'from "./index"',
+    'from "./themes"',
+    'from "./components/',
+    'from "react"',
+    'from "@base-ui/react',
+    'from "cmdk',
+    'from "embla-carousel-react',
+    'from "input-otp',
+    'from "motion',
+    'from "next-themes',
+    'from "radix-ui',
+    'from "react-day-picker',
+    'from "react-resizable-panels',
+    'from "sonner',
+    'from "vaul',
+  ];
+
+  for (const themeEntrypoint of themeEntrypoints) {
+    const clientThemePath = path.join(srcDir, themeEntrypoint.sourceFile);
+    const serverThemePath = path.join(srcDir, themeEntrypoint.serverSourceFile);
+
+    if (!existsSync(clientThemePath)) {
+      errors.push(`missing src/${themeEntrypoint.sourceFile}`);
+      continue;
+    }
+
+    if (!existsSync(serverThemePath)) {
+      errors.push(`missing src/${themeEntrypoint.serverSourceFile}`);
+      continue;
+    }
+
+    const clientThemeSource = readFileSync(clientThemePath, "utf8");
+    const serverThemeSource = readFileSync(serverThemePath, "utf8");
+
+    if (!clientThemeSource.startsWith('"use client";')) {
+      errors.push(`src/${themeEntrypoint.sourceFile} must start with "use client";`);
+    }
+
+    for (const forbiddenFragment of forbiddenThemeServerFragments) {
+      if (serverThemeSource.includes(forbiddenFragment)) {
+        errors.push(
+          `src/${themeEntrypoint.serverSourceFile} must stay metadata-only; found ${forbiddenFragment}`,
+        );
+      }
+    }
+
+    if (!serverThemeSource.includes('from "./theme-metadata"')) {
+      errors.push(`src/${themeEntrypoint.serverSourceFile} must import only theme metadata`);
     }
   }
 }

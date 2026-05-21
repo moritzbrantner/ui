@@ -99,7 +99,7 @@ Use `atlas` for dense dashboards and analytics, `studio` for creative tooling, a
 
 ## Components
 
-Root imports are the stable default for application code:
+Root imports are best for compatibility and examples:
 
 ```tsx
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@moritzbrantner/ui";
@@ -118,31 +118,43 @@ export function Example() {
 }
 ```
 
-Component subpaths are available for package consumers that prefer narrower imports:
+Component subpaths are preferred for bundle-sensitive comprehensive apps:
 
 ```tsx
 import { Button } from "@moritzbrantner/ui/components/button";
-import { cn } from "@moritzbrantner/ui/lib/cn";
+import { DataGrid } from "@moritzbrantner/ui/components/data-grid";
+import { cn } from "@moritzbrantner/ui/server";
 ```
 
 ## Comprehensive App Usage
 
-Use the root import for compatibility and ordinary client-side app code:
+Use the root import for compatibility and examples:
 
 ```tsx
 import { Button, PageShell, DataGrid } from "@moritzbrantner/ui";
 ```
 
-Use the explicit client entrypoint for interactive components in mixed server/client rendering:
+Use the explicit client entrypoint as a convenience client barrel. It can include the full component surface, so prefer component subpaths when bundle size matters:
 
 ```tsx
 import { Button, CommandPalette, Dialog } from "@moritzbrantner/ui/client";
 ```
 
-Use the server entrypoint for server-safe helpers and theme metadata:
+Use component subpaths for bundle-sensitive app surfaces:
+
+```tsx
+import "@moritzbrantner/ui/atlas/styles.css";
+
+import { Button } from "@moritzbrantner/ui/components/button";
+import { DataGrid } from "@moritzbrantner/ui/components/data-grid";
+import { uiTheme } from "@moritzbrantner/ui/atlas/server";
+import { cn } from "@moritzbrantner/ui/server";
+```
+
+Use the server entrypoint for `cn`, `themeConfig`, `createUiTheme`, and theme metadata in server code:
 
 ```ts
-import { cn, themeConfig } from "@moritzbrantner/ui/server";
+import { cn, createUiTheme, themeConfig } from "@moritzbrantner/ui/server";
 ```
 
 Every app should import one stylesheet, usually `@moritzbrantner/ui/styles.css`. Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css` replace that default when a product surface needs a different visual system. `UiTheme` and `themeConfig` provide metadata classes and attributes; they do not fetch data or switch global CSS by themselves.
@@ -250,7 +262,7 @@ export function Shell({ theme }: { theme: UiThemeName }) {
 }
 ```
 
-Theme metadata is also available from subpaths:
+Theme metadata is also available from subpaths. The full theme subpaths are client/full-package convenience entrypoints:
 
 ```ts
 import { themeConfig, uiThemeNames } from "@moritzbrantner/ui/themes";
@@ -259,6 +271,16 @@ import { uiTheme as bobbaTheme } from "@moritzbrantner/ui/bobba";
 import { uiTheme as atlasTheme } from "@moritzbrantner/ui/atlas";
 import { uiTheme as studioTheme } from "@moritzbrantner/ui/studio";
 import { uiTheme as paperTheme } from "@moritzbrantner/ui/paper";
+```
+
+Use metadata-only theme server subpaths for server code and bundle-sensitive theme metadata:
+
+```ts
+import { uiTheme as zleekTheme } from "@moritzbrantner/ui/zleek/server";
+import { uiTheme as bobbaTheme } from "@moritzbrantner/ui/bobba/server";
+import { uiTheme as atlasTheme } from "@moritzbrantner/ui/atlas/server";
+import { uiTheme as studioTheme } from "@moritzbrantner/ui/studio/server";
+import { uiTheme as paperTheme } from "@moritzbrantner/ui/paper/server";
 ```
 
 Storybook uses the same theme registry for its design-system toolbar and for the per-style component catalog stories.
