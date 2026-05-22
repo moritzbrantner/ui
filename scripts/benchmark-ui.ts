@@ -38,6 +38,7 @@ const baselinePath = path.join(
 );
 const updateBaseline = process.argv.includes("--update");
 const distEntry = path.join(packageRoot, "dist", "index.js");
+const labsEntry = path.join(packageRoot, "dist", "labs.js");
 const runningInCi = process.env.CI === "true";
 
 if (!existsSync(distEntry)) {
@@ -46,6 +47,7 @@ if (!existsSync(distEntry)) {
 }
 
 const ui = (await import(distEntry)) as UiModule;
+const labs = (await import(labsEntry)) as UiModule;
 const benchmarks: BenchmarkRunner[] = [
   benchmark("logic.cnMerge", "logic", () => {
     ui.cn(
@@ -84,7 +86,7 @@ const benchmarks: BenchmarkRunner[] = [
     }));
 
     for (const row of rows) {
-      ui.evaluateQueryBuilderExpression(expression, row, fields);
+      labs.evaluateQueryBuilderExpression(expression, row, fields);
     }
   }),
   benchmark("logic.workflowConnectionValidation", "logic", () => {
@@ -104,7 +106,7 @@ const benchmarks: BenchmarkRunner[] = [
       targetPortId: "in",
     }));
 
-    ui.getWorkflowBuilderConnectionValidity({
+    labs.getWorkflowBuilderConnectionValidity({
       nodes,
       edges,
       sourceNodeId: "node-10",
@@ -127,8 +129,8 @@ const benchmarks: BenchmarkRunner[] = [
       },
     ];
 
-    ui.moveTimelineEditorClip(tracks, "clip-250", 375, { duration: 2000, snapInterval: 0.25 });
-    ui.resizeTimelineEditorClip(tracks, "clip-500", "end", 630, {
+    labs.moveTimelineEditorClip(tracks, "clip-250", 375, { duration: 2000, snapInterval: 0.25 });
+    labs.resizeTimelineEditorClip(tracks, "clip-500", "end", 630, {
       duration: 2000,
       snapInterval: 0.25,
     });
@@ -169,7 +171,7 @@ const benchmarks: BenchmarkRunner[] = [
   }),
   benchmark("render.documentViewer100Pages", "render", () => {
     renderUi(
-      React.createElement(ui.DocumentViewer, {
+      React.createElement(labs.DocumentViewer, {
         pages: Array.from({ length: 100 }, (_, index) => ({
           id: `page-${index + 1}`,
           pageNumber: index + 1,

@@ -1,5 +1,15 @@
 # @moritzbrantner/ui
 
+## 0.8.0
+
+### Minor Changes
+
+- Breaking: component subpaths are now tiered under `components/stable`, `components/patterns`, `components/labs`, and `components/legacy`.
+- Breaking: `labs` and `legacy` components are no longer root-exported; root and client exports contain only stable and pattern components plus shared helpers and theme client APIs.
+- Migration: replace flat component subpaths with tiered paths, such as `@moritzbrantner/ui/components/stable/button` and `@moritzbrantner/ui/components/patterns/data-grid`.
+- Legacy: `DataTable` is deprecated for app data pages and remains available only from legacy paths; use `DataGrid` for new data-page work.
+- Add a typed component registry, tier barrels, tier-aware package checks, token metadata centralization, and migration documentation.
+
 ## 0.7.0
 
 ### Minor Changes

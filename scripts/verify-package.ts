@@ -11,8 +11,15 @@ type PackageMetadata = {
 
 const root = await importPackage("@moritzbrantner/ui");
 assert.equal(typeof root.Button, "function", "root export should include Button");
+assert.equal(typeof root.DataGrid, "function", "root export should include DataGrid");
 assert.equal(typeof root.cn, "function", "root export should include cn");
 assert.equal(typeof root.UiTheme, "function", "root export should include UiTheme");
+assert.equal(Object.hasOwn(root, "DataTable"), false, "root export should not include DataTable");
+assert.equal(
+  Object.hasOwn(root, "WorkflowBuilder"),
+  false,
+  "root export should not include labs components",
+);
 
 const server = await importPackage("@moritzbrantner/ui/server");
 assert.equal(typeof server.cn, "function", "server export should include cn");
@@ -27,6 +34,25 @@ const client = await importPackage("@moritzbrantner/ui/client");
 assert.equal(typeof client.Button, "function", "client export should include Button");
 assert.equal(typeof client.DataGrid, "function", "client export should include DataGrid");
 assert.equal(typeof client.Dialog, "function", "client export should include Dialog");
+assert.equal(
+  Object.hasOwn(client, "DataTable"),
+  false,
+  "client export should not expose legacy components",
+);
+
+const stable = await importPackage("@moritzbrantner/ui/stable");
+assert.equal(typeof stable.Button, "function", "stable entry should expose Button");
+assert.equal(typeof stable.Dialog, "function", "stable entry should expose Dialog");
+
+const patterns = await importPackage("@moritzbrantner/ui/patterns");
+assert.equal(typeof patterns.DataGrid, "function", "patterns entry should expose DataGrid");
+assert.equal(typeof patterns.ActionMenu, "function", "patterns entry should expose ActionMenu");
+
+const labs = await importPackage("@moritzbrantner/ui/labs");
+assert.equal(typeof labs.WorkflowBuilder, "function", "labs entry should expose WorkflowBuilder");
+
+const legacy = await importPackage("@moritzbrantner/ui/legacy");
+assert.equal(typeof legacy.DataTable, "function", "legacy entry should expose DataTable");
 
 const zleek = await importPackage("@moritzbrantner/ui/zleek");
 assert.equal(zleek.uiTheme.name, "zleek", "zleek entry should expose zleek uiTheme");
@@ -101,27 +127,32 @@ for (const themeEntry of serverThemeEntries) {
   );
 }
 
-const button = await importPackage("@moritzbrantner/ui/components/button");
-assert.equal(typeof button.Button, "function", "button subpath should expose Button");
-
-const dataGrid = await importPackage("@moritzbrantner/ui/components/data-grid");
-assert.equal(typeof dataGrid.DataGrid, "function", "data-grid subpath should expose DataGrid");
-
-const dialog = await importPackage("@moritzbrantner/ui/components/dialog");
-assert.equal(typeof dialog.Dialog, "function", "dialog subpath should expose Dialog");
-
-const avatarShapes = await importPackage("@moritzbrantner/ui/components/avatar-shapes");
-assert.equal(
-  typeof avatarShapes.avatarShapeStyles,
-  "object",
-  "avatar-shapes helper subpath should expose avatarShapeStyles",
+await assert.rejects(
+  () => importPackage("@moritzbrantner/ui/components/button"),
+  "old flat component subpaths should not be importable",
 );
 
-const hotkeyVisibility = await importPackage("@moritzbrantner/ui/components/hotkey-visibility");
+const button = await importPackage("@moritzbrantner/ui/components/stable/button");
+assert.equal(typeof button.Button, "function", "button subpath should expose Button");
+
+const dataGrid = await importPackage("@moritzbrantner/ui/components/patterns/data-grid");
+assert.equal(typeof dataGrid.DataGrid, "function", "data-grid subpath should expose DataGrid");
+
+const dialog = await importPackage("@moritzbrantner/ui/components/stable/dialog");
+assert.equal(typeof dialog.Dialog, "function", "dialog subpath should expose Dialog");
+
+const workflowBuilder = await importPackage("@moritzbrantner/ui/components/labs/workflow-builder");
 assert.equal(
-  typeof hotkeyVisibility.useHotkeyShortcut,
+  typeof workflowBuilder.WorkflowBuilder,
   "function",
-  "hotkey-visibility helper subpath should expose useHotkeyShortcut",
+  "labs workflow-builder subpath should expose WorkflowBuilder",
+);
+
+const dataTable = await importPackage("@moritzbrantner/ui/components/legacy/data-table");
+assert.equal(
+  typeof dataTable.DataTable,
+  "function",
+  "legacy data-table subpath should expose DataTable",
 );
 
 const cn = await importPackage("@moritzbrantner/ui/lib/cn");
@@ -153,6 +184,14 @@ const requiredPackageFiles = [
   "dist/server.d.ts",
   "dist/client.js",
   "dist/client.d.ts",
+  "dist/stable.js",
+  "dist/stable.d.ts",
+  "dist/patterns.js",
+  "dist/patterns.d.ts",
+  "dist/labs.js",
+  "dist/labs.d.ts",
+  "dist/legacy.js",
+  "dist/legacy.d.ts",
   "dist/zleek/server.js",
   "dist/zleek/server.d.ts",
   "dist/bobba/server.js",
@@ -163,16 +202,16 @@ const requiredPackageFiles = [
   "dist/studio/server.d.ts",
   "dist/paper/server.js",
   "dist/paper/server.d.ts",
-  "dist/components/button.js",
-  "dist/components/button.d.ts",
-  "dist/components/avatar-shapes.js",
-  "dist/components/avatar-shapes.d.ts",
-  "dist/components/data-grid.js",
-  "dist/components/data-grid.d.ts",
-  "dist/components/dialog.js",
-  "dist/components/dialog.d.ts",
-  "dist/components/hotkey-visibility.js",
-  "dist/components/hotkey-visibility.d.ts",
+  "dist/components/stable/button.js",
+  "dist/components/stable/button.d.ts",
+  "dist/components/stable/dialog.js",
+  "dist/components/stable/dialog.d.ts",
+  "dist/components/patterns/data-grid.js",
+  "dist/components/patterns/data-grid.d.ts",
+  "dist/components/labs/workflow-builder.js",
+  "dist/components/labs/workflow-builder.d.ts",
+  "dist/components/legacy/data-table.js",
+  "dist/components/legacy/data-table.d.ts",
   "dist/lib/cn.js",
   "dist/themes.js",
   "styles.css",

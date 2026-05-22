@@ -6,21 +6,26 @@ import { defineConfig } from "tsup";
 
 const packageRoot = fileURLToPath(new URL("./", import.meta.url));
 const componentsDir = path.join(packageRoot, "src/components");
+const componentTiers = ["stable", "patterns", "labs", "legacy"] as const;
 const componentEntries = Object.fromEntries(
-  readdirSync(componentsDir)
-    .filter(
-      (fileName) =>
-        /\.(ts|tsx)$/.test(fileName) &&
-        !fileName.endsWith(".stories.tsx") &&
-        !fileName.endsWith(".test.ts") &&
-        !fileName.endsWith(".test.tsx"),
-    )
-    .sort((left, right) => left.localeCompare(right))
-    .map((fileName) => {
-      const entryName = fileName.replace(/\.(ts|tsx)$/, "");
+  componentTiers.flatMap((tier) => {
+    const tierDir = path.join(componentsDir, tier);
 
-      return [`components/${entryName}`, path.join(componentsDir, fileName)] as const;
-    }),
+    return readdirSync(tierDir)
+      .filter(
+        (fileName) =>
+          /\.(ts|tsx)$/.test(fileName) &&
+          !fileName.endsWith(".stories.tsx") &&
+          !fileName.endsWith(".test.ts") &&
+          !fileName.endsWith(".test.tsx"),
+      )
+      .sort((left, right) => left.localeCompare(right))
+      .map((fileName) => {
+        const entryName = fileName.replace(/\.(ts|tsx)$/, "");
+
+        return [`components/${tier}/${entryName}`, path.join(tierDir, fileName)] as const;
+      });
+  }),
 );
 
 export default defineConfig({
@@ -30,6 +35,10 @@ export default defineConfig({
     index: "src/index.ts",
     server: "src/server.ts",
     client: "src/client.ts",
+    stable: "src/stable.ts",
+    patterns: "src/patterns.ts",
+    labs: "src/labs.ts",
+    legacy: "src/legacy.ts",
     zleek: "src/zleek.ts",
     "zleek/server": "src/zleek-server.ts",
     bobba: "src/bobba.ts",

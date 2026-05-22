@@ -101,19 +101,25 @@ import "@moritzbrantner/ui/paper/styles.css";
 
 Use `atlas` for dense dashboards and analytics, `studio` for creative tooling, and `paper` for document or research-heavy interfaces.
 
+Token metadata now lives in `src/token-metadata.ts`. CSS is still manually authored in this release; see [docs/token-source-of-truth.md](./docs/token-source-of-truth.md) for the current source-of-truth status and the deferred generation plan.
+
 ## Components
 
-Root imports are best for compatibility and examples:
+Components are organized into support tiers:
+
+- `stable`: primitives and low-level controls with the strongest API expectations.
+- `patterns`: state-light composed components for common app layouts and workflows.
+- `labs`: experimental components that are public only through explicit labs paths and can change faster.
+- `legacy`: retained compatibility components that should not be used for new work.
+
+Root imports expose only `stable` and `patterns` components, plus `cn` and theme client APIs:
 
 ```tsx
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@moritzbrantner/ui";
+import { Button, Card, CardContent, DataGrid } from "@moritzbrantner/ui";
 
 export function Example() {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Package status</CardTitle>
-      </CardHeader>
       <CardContent>
         <Button>Refresh</Button>
       </CardContent>
@@ -125,10 +131,28 @@ export function Example() {
 Component subpaths are preferred for bundle-sensitive comprehensive apps:
 
 ```tsx
-import { Button } from "@moritzbrantner/ui/components/button";
-import { DataGrid } from "@moritzbrantner/ui/components/data-grid";
+import { Button } from "@moritzbrantner/ui/components/stable/button";
+import { DataGrid } from "@moritzbrantner/ui/components/patterns/data-grid";
 import { cn } from "@moritzbrantner/ui/server";
 ```
+
+Labs and legacy are not root-exported. Import them deliberately:
+
+```tsx
+import { WorkflowBuilder } from "@moritzbrantner/ui/components/labs/workflow-builder";
+import { DataTable } from "@moritzbrantner/ui/components/legacy/data-table";
+```
+
+`DataTable` is legacy as of `0.8.0`; use `DataGrid` for app data pages.
+
+Migration examples:
+
+| Old                                              | New                                                   |
+| ------------------------------------------------ | ----------------------------------------------------- |
+| `@moritzbrantner/ui/components/button`           | `@moritzbrantner/ui/components/stable/button`         |
+| `@moritzbrantner/ui/components/data-grid`        | `@moritzbrantner/ui/components/patterns/data-grid`    |
+| `@moritzbrantner/ui/components/workflow-builder` | `@moritzbrantner/ui/components/labs/workflow-builder` |
+| `@moritzbrantner/ui/components/data-table`       | `@moritzbrantner/ui/components/legacy/data-table`     |
 
 ## Menu Patterns
 
@@ -152,7 +176,7 @@ Use the root import for compatibility and examples:
 import { Button, PageShell, DataGrid } from "@moritzbrantner/ui";
 ```
 
-Use the explicit client entrypoint as a convenience client barrel. It can include the full component surface, so prefer component subpaths when bundle size matters:
+Use the explicit client entrypoint as a convenience client barrel. It mirrors the root component policy, so labs and legacy remain excluded:
 
 ```tsx
 import { Button, CommandPalette, Dialog } from "@moritzbrantner/ui/client";
@@ -163,8 +187,8 @@ Use component subpaths for bundle-sensitive app surfaces:
 ```tsx
 import "@moritzbrantner/ui/atlas/styles.css";
 
-import { Button } from "@moritzbrantner/ui/components/button";
-import { DataGrid } from "@moritzbrantner/ui/components/data-grid";
+import { Button } from "@moritzbrantner/ui/components/stable/button";
+import { DataGrid } from "@moritzbrantner/ui/components/patterns/data-grid";
 import { uiTheme } from "@moritzbrantner/ui/atlas/server";
 import { cn } from "@moritzbrantner/ui/server";
 ```

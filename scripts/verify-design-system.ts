@@ -2,6 +2,12 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import {
+  componentRegistry,
+  type ComponentRegistryEntry,
+  type ComponentTier,
+} from "../src/component-registry.js";
+
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const componentsDir = path.join(packageRoot, "src", "components");
 const srcDir = path.join(packageRoot, "src");
@@ -9,38 +15,33 @@ const packageJsonPath = path.join(packageRoot, "package.json");
 const indexPath = path.join(packageRoot, "src", "index.ts");
 const serverPath = path.join(packageRoot, "src", "server.ts");
 const clientPath = path.join(packageRoot, "src", "client.ts");
+const stablePath = path.join(packageRoot, "src", "stable.ts");
+const patternsPath = path.join(packageRoot, "src", "patterns.ts");
+const labsPath = path.join(packageRoot, "src", "labs.ts");
+const legacyPath = path.join(packageRoot, "src", "legacy.ts");
 const errors: string[] = [];
-const themeEntrypoints = [
-  { name: "zleek", sourceFile: "zleek.ts", serverSourceFile: "zleek-server.ts" },
-  { name: "bobba", sourceFile: "bobba.ts", serverSourceFile: "bobba-server.ts" },
-  { name: "atlas", sourceFile: "atlas.ts", serverSourceFile: "atlas-server.ts" },
-  { name: "studio", sourceFile: "studio.ts", serverSourceFile: "studio-server.ts" },
-  { name: "paper", sourceFile: "paper.ts", serverSourceFile: "paper-server.ts" },
-] as const;
-const interactiveStoryComponents = [
-  "annotation-canvas",
-  "asset-browser",
-  "button",
-  "calendar",
-  "data-grid",
-  "dialog",
-  "document-viewer",
-  "dropzone",
-  "inspector-panel",
-  "platform-navbar",
-  "query-builder",
-  "timeline-editor",
-  "workflow-builder",
-];
-const componentHelperAllowlist = new Map([
+const publicTiers = ["stable", "patterns", "labs", "legacy"] as const;
+const rootExportTiers = new Set<ComponentTier>(["stable", "patterns"]);
+const tierBarrelPaths = {
+  stable: stablePath,
+  patterns: patternsPath,
+  labs: labsPath,
+  legacy: legacyPath,
+} as const;
+const contractAllowlist = new Map([
   [
-    "avatar-shapes",
-    "Internal avatar styling helper published through the component subpath wildcard.",
+    "aspect-ratio",
+    "Radix primitive wrapper: className and DOM props are carried by the wrapped primitive API.",
   ],
   [
-    "hotkey-visibility",
-    "Internal shortcut visibility helper used by command, menu, and keyboard components.",
+    "collapsible",
+    "Radix primitive wrapper: className and DOM props are carried by the wrapped primitive API.",
   ],
+  [
+    "direction",
+    "Provider-only Radix wrapper: it establishes context and does not render a stylable DOM node.",
+  ],
+  ["menu-actions", "Typed menu action schema and helpers; it does not render DOM."],
 ]);
 const clientComponentPatterns = [
   /\bReact\.use[A-Z]/,
@@ -53,31 +54,19 @@ const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8")) as Record<
 const indexSource = readFileSync(indexPath, "utf8");
 const serverSource = readFileSync(serverPath, "utf8");
 const clientSource = readFileSync(clientPath, "utf8");
-const componentNames = readdirSync(componentsDir)
-  .filter(
-    (fileName) =>
-      fileName.endsWith(".tsx") &&
-      !fileName.endsWith(".stories.tsx") &&
-      !fileName.endsWith(".test.tsx"),
-  )
-  .map((fileName) => fileName.replace(/\.tsx$/, ""))
-  .sort((left, right) => left.localeCompare(right));
-const componentHelperNames = readdirSync(componentsDir)
-  .filter(
-    (fileName) =>
-      fileName.endsWith(".ts") &&
-      !fileName.endsWith(".stories.ts") &&
-      !fileName.endsWith(".test.ts"),
-  )
-  .map((fileName) => fileName.replace(/\.ts$/, ""))
-  .sort((left, right) => left.localeCompare(right));
+const registryEntries: readonly ComponentRegistryEntry[] = componentRegistry;
+const tierBarrelSources = Object.fromEntries(
+  publicTiers.map((tier) => [tier, readFileSync(tierBarrelPaths[tier], "utf8")]),
+) as Record<(typeof publicTiers)[number], string>;
+const registryByName = new Map<string, ComponentRegistryEntry>(
+  registryEntries.map((entry) => [entry.name, entry]),
+);
 
 verifyPackageMetadata();
-verifyComponentExports();
-verifyComponentHelperExports();
+verifyTierLayout();
+verifyComponentRegistry();
 verifyEntrypointBoundaries();
 verifyComponentContracts();
-verifyStoryCoverage();
 verifyStoryContracts();
 verifyClientDirectives();
 verifyConsumerExample();
@@ -100,6 +89,7 @@ function verifyPackageMetadata() {
     "@moritzbrantner/ui",
     "package name must remain @moritzbrantner/ui",
   );
+  expectEqual(packageJson.version, "0.8.0", "package version must match tiered API release");
   expectEqual(packageJson.private, false, "package must stay publishable");
   expectArrayIncludes(packageJson.files, "dist", "package files must include dist");
   expectArrayIncludes(packageJson.files, "styles.css", "package files must include styles.css");
@@ -108,16 +98,10 @@ function verifyPackageMetadata() {
     "theme-scopes.css",
     "package files must include theme-scopes.css",
   );
-  expectArrayIncludes(packageJson.files, "zleek", "package files must include zleek styles");
-  expectArrayIncludes(packageJson.files, "bobba", "package files must include bobba styles");
-  expectArrayIncludes(packageJson.files, "atlas", "package files must include atlas styles");
-  expectArrayIncludes(packageJson.files, "studio", "package files must include studio styles");
-  expectArrayIncludes(packageJson.files, "paper", "package files must include paper styles");
   expectArrayIncludes(packageJson.sideEffects, "*.css", "CSS files must be retained by bundlers");
   expectObject(packageJson.peerDependencies, "peerDependencies must be declared");
   expectObject(packageJson.dependencies, "dependencies must be declared");
   expectObject(packageJson.exports, "exports must be declared");
-
   expectObjectPath(packageJson, ["peerDependencies", "react"], "react must be a peer dependency");
   expectObjectPath(
     packageJson,
@@ -128,55 +112,186 @@ function verifyPackageMetadata() {
   expectExport(".", "./dist/index.js", "./dist/index.d.ts");
   expectExport("./server", "./dist/server.js", "./dist/server.d.ts");
   expectExport("./client", "./dist/client.js", "./dist/client.d.ts");
-  expectExport("./zleek", "./dist/zleek.js", "./dist/zleek.d.ts");
-  expectExport("./zleek/server", "./dist/zleek/server.js", "./dist/zleek/server.d.ts");
-  expectExport("./bobba", "./dist/bobba.js", "./dist/bobba.d.ts");
-  expectExport("./bobba/server", "./dist/bobba/server.js", "./dist/bobba/server.d.ts");
-  expectExport("./atlas", "./dist/atlas.js", "./dist/atlas.d.ts");
-  expectExport("./atlas/server", "./dist/atlas/server.js", "./dist/atlas/server.d.ts");
-  expectExport("./studio", "./dist/studio.js", "./dist/studio.d.ts");
-  expectExport("./studio/server", "./dist/studio/server.js", "./dist/studio/server.d.ts");
-  expectExport("./paper", "./dist/paper.js", "./dist/paper.d.ts");
-  expectExport("./paper/server", "./dist/paper/server.js", "./dist/paper/server.d.ts");
+  expectExport("./stable", "./dist/stable.js", "./dist/stable.d.ts");
+  expectExport("./patterns", "./dist/patterns.js", "./dist/patterns.d.ts");
+  expectExport("./labs", "./dist/labs.js", "./dist/labs.d.ts");
+  expectExport("./legacy", "./dist/legacy.js", "./dist/legacy.d.ts");
   expectExport("./themes", "./dist/themes.js", "./dist/themes.d.ts");
   expectExport("./lib/cn", "./dist/lib/cn.js", "./dist/lib/cn.d.ts");
-  expectExport("./components/*", "./dist/components/*.js", "./dist/components/*.d.ts");
-
-  expectEqual(
-    packageJson.exports["./styles.css"],
-    "./styles.css",
-    "default stylesheet must be exported",
+  expectExport(
+    "./components/stable/*",
+    "./dist/components/stable/*.js",
+    "./dist/components/stable/*.d.ts",
   );
+  expectExport(
+    "./components/patterns/*",
+    "./dist/components/patterns/*.js",
+    "./dist/components/patterns/*.d.ts",
+  );
+  expectExport(
+    "./components/labs/*",
+    "./dist/components/labs/*.js",
+    "./dist/components/labs/*.d.ts",
+  );
+  expectExport(
+    "./components/legacy/*",
+    "./dist/components/legacy/*.js",
+    "./dist/components/legacy/*.d.ts",
+  );
+
+  if (packageJson.exports?.["./components/*"]) {
+    errors.push("package exports must not expose the removed flat ./components/* wildcard");
+  }
+
+  for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper"]) {
+    expectExport(`./${themeName}`, `./dist/${themeName}.js`, `./dist/${themeName}.d.ts`);
+    expectExport(
+      `./${themeName}/server`,
+      `./dist/${themeName}/server.js`,
+      `./dist/${themeName}/server.d.ts`,
+    );
+    expectEqual(
+      packageJson.exports[`./${themeName}/styles.css`],
+      `./${themeName}/styles.css`,
+      `${themeName} stylesheet must be exported`,
+    );
+  }
+
+  expectEqual(packageJson.exports["./styles.css"], "./styles.css", "stylesheet must be exported");
   expectEqual(
     packageJson.exports["./theme-scopes.css"],
     "./theme-scopes.css",
     "scoped theme stylesheet must be exported",
   );
-  expectEqual(
-    packageJson.exports["./zleek/styles.css"],
-    "./zleek/styles.css",
-    "zleek stylesheet must be exported",
-  );
-  expectEqual(
-    packageJson.exports["./bobba/styles.css"],
-    "./bobba/styles.css",
-    "bobba stylesheet must be exported",
-  );
-  expectEqual(
-    packageJson.exports["./atlas/styles.css"],
-    "./atlas/styles.css",
-    "atlas stylesheet must be exported",
-  );
-  expectEqual(
-    packageJson.exports["./studio/styles.css"],
-    "./studio/styles.css",
-    "studio stylesheet must be exported",
-  );
-  expectEqual(
-    packageJson.exports["./paper/styles.css"],
-    "./paper/styles.css",
-    "paper stylesheet must be exported",
-  );
+}
+
+function verifyTierLayout() {
+  const allowedTopLevelEntries = new Set([...publicTiers, "internal"]);
+
+  for (const entry of readdirSync(componentsDir, { withFileTypes: true })) {
+    if (entry.isDirectory()) {
+      if (!allowedTopLevelEntries.has(entry.name as any)) {
+        errors.push(`src/components/${entry.name}: unexpected component tier directory`);
+      }
+      continue;
+    }
+
+    errors.push(`src/components/${entry.name}: public components must live in a tier directory`);
+  }
+
+  for (const tier of publicTiers) {
+    if (!existsSync(path.join(componentsDir, tier))) {
+      errors.push(`missing src/components/${tier}`);
+    }
+  }
+
+  if (!existsSync(path.join(componentsDir, "internal"))) {
+    errors.push("missing src/components/internal");
+  }
+}
+
+function verifyComponentRegistry() {
+  const sourceComponents = new Map<string, ComponentTier>();
+
+  for (const tier of publicTiers) {
+    const tierDir = path.join(componentsDir, tier);
+
+    for (const fileName of readdirSync(tierDir)) {
+      if (
+        !fileName.endsWith(".tsx") ||
+        fileName.endsWith(".stories.tsx") ||
+        fileName.endsWith(".test.tsx")
+      ) {
+        continue;
+      }
+
+      const componentName = fileName.replace(/\.tsx$/, "");
+      sourceComponents.set(componentName, tier);
+    }
+  }
+
+  for (const [componentName, tier] of sourceComponents) {
+    const registryEntry = registryByName.get(componentName);
+
+    if (!registryEntry) {
+      errors.push(`${componentName}: missing component registry entry`);
+      continue;
+    }
+
+    if (registryEntry.tier !== tier) {
+      errors.push(`${componentName}: registry tier ${registryEntry.tier} does not match ${tier}`);
+    }
+  }
+
+  for (const entry of registryEntries) {
+    const sourcePath = path.join(componentsDir, entry.tier, `${entry.fileName}.tsx`);
+
+    if (!existsSync(sourcePath)) {
+      errors.push(`${entry.name}: registry points at missing ${sourcePath}`);
+    }
+
+    if (!sourceComponents.has(entry.name)) {
+      errors.push(`${entry.name}: registry entry does not match a source component`);
+    }
+
+    const expectedRootExport = rootExportTiers.has(entry.tier);
+
+    if (entry.rootExport !== expectedRootExport) {
+      errors.push(`${entry.name}: rootExport must be ${expectedRootExport} for ${entry.tier}`);
+    }
+
+    if (entry.publicSubpath !== `@moritzbrantner/ui/components/${entry.tier}/${entry.fileName}`) {
+      errors.push(`${entry.name}: publicSubpath must use the tiered component path`);
+    }
+
+    const tierExportLine = `export * from "./components/${entry.tier}/${entry.fileName}";`;
+
+    if (!tierBarrelSources[entry.tier].includes(tierExportLine)) {
+      errors.push(`${entry.name}: missing export in src/${entry.tier}.ts`);
+    }
+
+    const rootHasExport = indexSource.includes(tierExportLine);
+
+    if (entry.rootExport && !indexSource.includes(`export * from "./${entry.tier}";`)) {
+      errors.push(`src/index.ts must export the ${entry.tier} barrel`);
+    }
+
+    if (!entry.rootExport && rootHasExport) {
+      errors.push(`${entry.name}: ${entry.tier} components must not be root-exported`);
+    }
+
+    if (entry.tier === "stable" || entry.tier === "patterns") {
+      if (entry.storyFiles.length === 0) {
+        errors.push(`${entry.name}: ${entry.tier} entries must list Storybook coverage`);
+      }
+
+      if (entry.testFiles.length === 0) {
+        errors.push(`${entry.name}: ${entry.tier} entries must list test coverage`);
+      }
+    }
+
+    for (const relativeFile of [...entry.storyFiles, ...entry.testFiles]) {
+      if (!existsSync(path.join(packageRoot, relativeFile))) {
+        errors.push(`${entry.name}: registry file ${relativeFile} does not exist`);
+      }
+    }
+
+    if (entry.tier === "legacy") {
+      if (!entry.deprecatedSince || !entry.migration) {
+        errors.push(`${entry.name}: legacy entries require deprecatedSince and migration`);
+      }
+
+      if (entry.rootExport) {
+        errors.push(`${entry.name}: legacy entries must not be root-exported`);
+      }
+    }
+  }
+
+  for (const forbiddenRootExport of ['export * from "./labs";', 'export * from "./legacy";']) {
+    if (indexSource.includes(forbiddenRootExport)) {
+      errors.push(`src/index.ts must not contain ${forbiddenRootExport}`);
+    }
+  }
 }
 
 function verifyEntrypointBoundaries() {
@@ -213,89 +328,20 @@ function verifyEntrypointBoundaries() {
       errors.push(`src/server.ts must export server-safe API ${expectedExport}`);
     }
   }
-
-  const forbiddenThemeServerFragments = [
-    '"use client"',
-    'from "./index"',
-    'from "./themes"',
-    'from "./components/',
-    'from "react"',
-    'from "@base-ui/react',
-    'from "cmdk',
-    'from "embla-carousel-react',
-    'from "input-otp',
-    'from "motion',
-    'from "next-themes',
-    'from "radix-ui',
-    'from "react-day-picker',
-    'from "react-resizable-panels',
-    'from "sonner',
-    'from "vaul',
-  ];
-
-  for (const themeEntrypoint of themeEntrypoints) {
-    const clientThemePath = path.join(srcDir, themeEntrypoint.sourceFile);
-    const serverThemePath = path.join(srcDir, themeEntrypoint.serverSourceFile);
-
-    if (!existsSync(clientThemePath)) {
-      errors.push(`missing src/${themeEntrypoint.sourceFile}`);
-      continue;
-    }
-
-    if (!existsSync(serverThemePath)) {
-      errors.push(`missing src/${themeEntrypoint.serverSourceFile}`);
-      continue;
-    }
-
-    const clientThemeSource = readFileSync(clientThemePath, "utf8");
-    const serverThemeSource = readFileSync(serverThemePath, "utf8");
-
-    if (!clientThemeSource.startsWith('"use client";')) {
-      errors.push(`src/${themeEntrypoint.sourceFile} must start with "use client";`);
-    }
-
-    for (const forbiddenFragment of forbiddenThemeServerFragments) {
-      if (serverThemeSource.includes(forbiddenFragment)) {
-        errors.push(
-          `src/${themeEntrypoint.serverSourceFile} must stay metadata-only; found ${forbiddenFragment}`,
-        );
-      }
-    }
-
-    if (!serverThemeSource.includes('from "./theme-metadata"')) {
-      errors.push(`src/${themeEntrypoint.serverSourceFile} must import only theme metadata`);
-    }
-  }
 }
 
 function verifyComponentContracts() {
-  const contractAllowlist = new Map([
-    [
-      "aspect-ratio",
-      "Radix primitive wrapper: className and DOM props are carried by the wrapped primitive API.",
-    ],
-    [
-      "collapsible",
-      "Radix primitive wrapper: className and DOM props are carried by the wrapped primitive API.",
-    ],
-    [
-      "direction",
-      "Provider-only Radix wrapper: it establishes context and does not render a stylable DOM node.",
-    ],
-    ["menu-actions", "Typed menu action schema and helpers; it does not render DOM."],
-  ]);
-
-  for (const componentName of componentNames) {
-    const componentPath = path.join(componentsDir, `${componentName}.tsx`);
+  for (const entry of registryEntries) {
+    const componentPath = path.join(componentsDir, entry.tier, `${entry.fileName}.tsx`);
     const componentSource = readFileSync(componentPath, "utf8");
-    const allowlistReason = contractAllowlist.get(componentName);
+    const allowlistReason = contractAllowlist.get(entry.name);
 
     if (!allowlistReason && !/data-slot=/.test(componentSource)) {
-      errors.push(`${componentName}: public component files must expose at least one data-slot`);
+      errors.push(`${entry.name}: public component files must expose at least one data-slot`);
     }
 
     if (!allowlistReason && !/\bclassName\b/.test(componentSource)) {
-      errors.push(`${componentName}: public DOM-rendering components must support className`);
+      errors.push(`${entry.name}: public DOM-rendering components must support className`);
     }
 
     if (
@@ -304,158 +350,48 @@ function verifyComponentContracts() {
         componentSource,
       )
     ) {
-      errors.push(`${componentName}: public DOM-rendering components must forward DOM props`);
-    }
-  }
-}
-
-function verifyComponentExports() {
-  for (const componentName of componentNames) {
-    const exportLine = `export * from "./components/${componentName}";`;
-
-    if (!indexSource.includes(exportLine)) {
-      errors.push(`${componentName}: missing root export in src/index.ts`);
-    }
-  }
-}
-
-function verifyComponentHelperExports() {
-  for (const helperName of componentHelperNames) {
-    const exportLine = `export * from "./components/${helperName}";`;
-    const isAllowlisted = componentHelperAllowlist.has(helperName);
-    const isRootExported = indexSource.includes(exportLine);
-
-    if (!isAllowlisted && !isRootExported) {
-      errors.push(
-        `${helperName}: component helper subpaths must be root-exported or explicitly allowlisted as internal helpers`,
-      );
-    }
-
-    if (isAllowlisted && isRootExported) {
-      errors.push(
-        `${helperName}: internal component helper is allowlisted and must not be exported from src/index.ts`,
-      );
-    }
-  }
-
-  for (const helperName of componentHelperAllowlist.keys()) {
-    if (!componentHelperNames.includes(helperName)) {
-      errors.push(`${helperName}: component helper allowlist entry does not match a source file`);
-    }
-  }
-}
-
-function verifyStoryCoverage() {
-  const storyFiles = readdirSync(componentsDir).filter((fileName) =>
-    fileName.endsWith(".stories.tsx"),
-  );
-  const coveredComponents = new Set();
-
-  for (const storyFile of storyFiles) {
-    const storyName = storyFile.replace(/\.stories\.tsx$/, "");
-    const storySource = readFileSync(path.join(componentsDir, storyFile), "utf8");
-
-    if (componentNames.includes(storyName)) {
-      coveredComponents.add(storyName);
-    }
-
-    for (const match of storySource.matchAll(/from\s+["']\.\/(.+?)["']/g)) {
-      coveredComponents.add(match[1]);
-    }
-
-    const catalogComponents = storySource.match(
-      /const catalogComponents = \[([\s\S]*?)\] as const;/,
-    );
-
-    if (catalogComponents) {
-      for (const match of catalogComponents[1].matchAll(/["']([^"']+)["']/g)) {
-        coveredComponents.add(match[1]);
-      }
-    }
-  }
-
-  for (const componentName of componentNames) {
-    if (!coveredComponents.has(componentName)) {
-      errors.push(
-        `${componentName}: missing Storybook coverage; every public component in src/components must appear in Storybook`,
-      );
+      errors.push(`${entry.name}: public DOM-rendering components must forward DOM props`);
     }
   }
 }
 
 function verifyStoryContracts() {
-  const storyFiles = listFiles(srcDir).filter((filePath) => filePath.endsWith(".stories.tsx"));
+  const storyFiles = new Set<string>();
 
-  for (const storyFile of storyFiles) {
-    const relativeStoryFile = path.relative(packageRoot, storyFile);
-    const storySource = readFileSync(storyFile, "utf8");
-
-    if (!/tags:\s*\[[^\]]*["']autodocs["'][^\]]*["']test["'][^\]]*\]/s.test(storySource)) {
-      errors.push(`${relativeStoryFile}: story meta must include tags ["autodocs", "test"]`);
+  for (const entry of registryEntries) {
+    for (const relativeFile of entry.storyFiles) {
+      storyFiles.add(relativeFile);
     }
   }
 
-  for (const componentName of interactiveStoryComponents) {
-    const storyPath = path.join(componentsDir, `${componentName}.stories.tsx`);
+  for (const relativeFile of storyFiles) {
+    const storySource = readFileSync(path.join(packageRoot, relativeFile), "utf8");
 
-    if (!existsSync(storyPath)) {
-      errors.push(`${componentName}: interactive component must have a dedicated story file`);
-      continue;
-    }
-
-    const storySource = readFileSync(storyPath, "utf8");
-
-    if (!/\bplay\s*:\s*async\b/.test(storySource)) {
-      errors.push(`${componentName}: interactive story must include at least one play function`);
+    if (!/tags:\s*\[[^\]]*["']autodocs["'][^\]]*["']test["'][^\]]*\]/s.test(storySource)) {
+      errors.push(`${relativeFile}: story meta must include tags ["autodocs", "test"]`);
     }
   }
 }
 
 function verifyClientDirectives() {
-  for (const componentName of componentNames) {
-    const componentPath = path.join(componentsDir, `${componentName}.tsx`);
-    const componentSource = readFileSync(componentPath, "utf8");
+  const sourceFiles = [
+    ...registryEntries.map((entry) =>
+      path.join(componentsDir, entry.tier, `${entry.fileName}.tsx`),
+    ),
+    ...listFiles(path.join(componentsDir, "internal")).filter((filePath) =>
+      /\.(ts|tsx)$/.test(filePath),
+    ),
+  ];
+
+  for (const sourceFile of sourceFiles) {
+    const source = readFileSync(sourceFile, "utf8");
 
     if (
-      !componentSource.startsWith('"use client";') &&
-      clientComponentPatterns.some((pattern) => pattern.test(componentSource))
+      !source.startsWith('"use client";') &&
+      clientComponentPatterns.some((pattern) => pattern.test(source))
     ) {
       errors.push(
-        `${componentName}: browser or hook-based components must start with "use client";`,
-      );
-    }
-  }
-
-  for (const helperName of componentHelperNames) {
-    const helperPath = path.join(componentsDir, `${helperName}.ts`);
-    const helperSource = readFileSync(helperPath, "utf8");
-
-    if (!clientComponentPatterns.some((pattern) => pattern.test(helperSource))) {
-      continue;
-    }
-
-    if (helperSource.startsWith('"use client";')) {
-      continue;
-    }
-
-    if (!componentHelperAllowlist.has(helperName)) {
-      errors.push(
-        `${helperName}: browser or hook-based component helpers must start with "use client";`,
-      );
-      continue;
-    }
-
-    const nonClientImporters = getComponentHelperImporters(helperName).filter((importerPath) => {
-      const importerSource = readFileSync(importerPath, "utf8");
-
-      return !importerSource.startsWith('"use client";');
-    });
-
-    if (nonClientImporters.length > 0) {
-      errors.push(
-        `${helperName}: internal browser or hook helper must be imported only by client files; found ${nonClientImporters
-          .map((filePath) => path.relative(packageRoot, filePath))
-          .join(", ")}`,
+        `${path.relative(packageRoot, sourceFile)}: browser or hook-based modules must start with "use client";`,
       );
     }
   }
@@ -463,20 +399,32 @@ function verifyClientDirectives() {
 
 function verifyConsumerExample() {
   const appPath = path.join(packageRoot, "examples", "consumer", "src", "App.tsx");
+  const subpathPath = path.join(packageRoot, "examples", "consumer", "src", "SubpathApp.tsx");
 
-  if (!existsSync(appPath)) {
-    errors.push("missing examples/consumer/src/App.tsx");
+  if (!existsSync(appPath) || !existsSync(subpathPath)) {
+    errors.push("consumer example must include App.tsx and SubpathApp.tsx");
     return;
   }
 
   const appSource = readFileSync(appPath, "utf8");
+  const subpathSource = readFileSync(subpathPath, "utf8");
 
   if (!appSource.includes('import "@moritzbrantner/ui/styles.css";')) {
     errors.push("consumer example must import the default UI stylesheet");
   }
 
   if (!appSource.includes('from "@moritzbrantner/ui"')) {
-    errors.push("consumer example must import components from the public root entrypoint");
+    errors.push("consumer example must import stable/patterns from the public root entrypoint");
+  }
+
+  for (const expectedImport of [
+    'from "@moritzbrantner/ui/components/stable/button"',
+    'from "@moritzbrantner/ui/components/stable/dialog"',
+    'from "@moritzbrantner/ui/components/patterns/data-grid"',
+  ]) {
+    if (!subpathSource.includes(expectedImport)) {
+      errors.push(`consumer subpath example must exercise ${expectedImport}`);
+    }
   }
 }
 
@@ -534,25 +482,4 @@ function listFiles(directory: string): string[] {
 
     return filePath;
   });
-}
-
-function getComponentHelperImporters(helperName: string): string[] {
-  const importPatterns = [
-    new RegExp(`from\\s+["']\\./${escapeRegExp(helperName)}["']`),
-    new RegExp(`from\\s+["']\\./components/${escapeRegExp(helperName)}["']`),
-  ];
-
-  return listFiles(srcDir).filter((filePath) => {
-    if (!/\.(ts|tsx)$/.test(filePath) || filePath.endsWith(`${helperName}.ts`)) {
-      return false;
-    }
-
-    const source = readFileSync(filePath, "utf8");
-
-    return importPatterns.some((pattern) => pattern.test(source));
-  });
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

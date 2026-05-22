@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { uiTokenMetadata } from "../src/token-metadata.js";
+
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const tokenFiles = [
   "styles.css",
@@ -11,37 +13,20 @@ const tokenFiles = [
   "studio/styles.css",
   "paper/styles.css",
 ];
-const requiredPublicUiTokens = [
-  "--ui-radius-control",
-  "--ui-radius-surface",
-  "--ui-radius-overlay",
-  "--ui-control-height-xs",
-  "--ui-control-height-sm",
-  "--ui-control-height-md",
-  "--ui-control-height-lg",
-  "--ui-control-padding-x-sm",
-  "--ui-control-padding-x-md",
-  "--ui-control-gap",
-  "--ui-surface-padding-sm",
-  "--ui-surface-padding-md",
-  "--ui-surface-gap",
-  "--ui-focus-ring-width",
-  "--ui-motion-hover-y",
-  "--ui-motion-hover-scale",
-  "--ui-shadow-surface",
-  "--ui-shadow-interactive",
-];
+const requiredPublicUiTokens = uiTokenMetadata
+  .filter((token) => token.name.startsWith("--ui-") || token.name.startsWith("--glass-"))
+  .map((token) => token.name);
 const tokenBackedComponents = [
-  ["src/components/button.tsx", "--ui-button-height-md"],
-  ["src/components/input.tsx", "--ui-input-height"],
-  ["src/components/card.tsx", "--ui-card-radius"],
-  ["src/components/select.tsx", "--ui-input-height"],
-  ["src/components/tabs.tsx", "--ui-tabs-radius"],
-  ["src/components/dialog.tsx", "--ui-overlay-radius"],
-  ["src/components/popover.tsx", "--ui-overlay-radius"],
-  ["src/components/dropdown-menu.tsx", "--ui-menu-item-radius"],
-  ["src/components/app-layout.tsx", "--ui-radius-surface"],
-  ["src/components/toolbar.tsx", "--ui-toolbar-min-height"],
+  ["src/components/stable/button.tsx", "--ui-button-height-md"],
+  ["src/components/stable/input.tsx", "--ui-input-height"],
+  ["src/components/stable/card.tsx", "--ui-card-radius"],
+  ["src/components/stable/select.tsx", "--ui-input-height"],
+  ["src/components/stable/tabs.tsx", "--ui-tabs-radius"],
+  ["src/components/stable/dialog.tsx", "--ui-overlay-radius"],
+  ["src/components/stable/popover.tsx", "--ui-overlay-radius"],
+  ["src/components/stable/dropdown-menu.tsx", "--ui-menu-item-radius"],
+  ["src/components/patterns/app-layout.tsx", "--ui-radius-surface"],
+  ["src/components/stable/toolbar.tsx", "--ui-toolbar-min-height"],
 ];
 const errors: string[] = [];
 const baseTokens = readTokens(path.join(packageRoot, "styles.css"));

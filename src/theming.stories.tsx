@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
 
-import { Button } from "./components/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./components/card";
-import { Input } from "./components/input";
+import { Button } from "./components/stable/button";
+import { Card, CardContent, CardHeader, CardTitle } from "./components/stable/card";
+import { Input } from "./components/stable/input";
 import { UiTheme, createUiTheme, type UiThemeTokens } from "./themes";
 
 const meta = {

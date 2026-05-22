@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { Button } from "../components/button";
-import { Input } from "../components/input";
+import { Button } from "../components/stable/button";
+import { Input } from "../components/stable/input";
 
 function FocusableFixture() {
   return (

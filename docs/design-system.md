@@ -4,14 +4,33 @@
 
 ## Import Boundaries
 
-Use `@moritzbrantner/ui` for compatibility and examples. Use `@moritzbrantner/ui/client` as a convenience client barrel when importing from one broad client surface is acceptable. It can include the full component surface, so use component subpaths for bundle-sensitive comprehensive apps. Use `@moritzbrantner/ui/server` for server-safe helpers and theme metadata such as `cn`, `themeConfig`, `uiThemeNames`, and `createUiTheme`.
+Use `@moritzbrantner/ui` for `stable` and `patterns` components, `cn`, and theme client APIs. Use `@moritzbrantner/ui/client` as the matching client convenience barrel. Neither root nor client exports `labs` or `legacy`.
+
+Use tiered component subpaths for bundle-sensitive comprehensive apps. Use `@moritzbrantner/ui/server` for server-safe helpers and theme metadata such as `cn`, `themeConfig`, `uiThemeNames`, and `createUiTheme`.
 
 ```tsx
-import { Button } from "@moritzbrantner/ui/components/button";
-import { DataGrid } from "@moritzbrantner/ui/components/data-grid";
+import { Button } from "@moritzbrantner/ui/components/stable/button";
+import { DataGrid } from "@moritzbrantner/ui/components/patterns/data-grid";
+import { WorkflowBuilder } from "@moritzbrantner/ui/components/labs/workflow-builder";
 import { uiTheme } from "@moritzbrantner/ui/atlas/server";
 import { cn, themeConfig } from "@moritzbrantner/ui/server";
 ```
+
+Component tiers:
+
+- `stable`: primitives and low-level controls with the strongest support and contract checks.
+- `patterns`: state-light composed UI for common app workflows.
+- `labs`: experimental public components. They are not root-exported and may change faster.
+- `legacy`: deprecated public components. They are not root-exported and require migration metadata.
+
+Migration examples:
+
+| Old                                              | New                                                   |
+| ------------------------------------------------ | ----------------------------------------------------- |
+| `@moritzbrantner/ui/components/button`           | `@moritzbrantner/ui/components/stable/button`         |
+| `@moritzbrantner/ui/components/data-grid`        | `@moritzbrantner/ui/components/patterns/data-grid`    |
+| `@moritzbrantner/ui/components/workflow-builder` | `@moritzbrantner/ui/components/labs/workflow-builder` |
+| `@moritzbrantner/ui/components/data-table`       | `@moritzbrantner/ui/components/legacy/data-table`     |
 
 ## Styles And Themes
 
@@ -29,7 +48,7 @@ Existing theme subpaths such as `@moritzbrantner/ui/zleek` and `@moritzbrantner/
 
 App shell: compose `PlatformNavbar`, `PageShell`, `PageHeader`, `PageContent`, `Surface`, `CommandPalette`, `NotificationMenu`, `AccountMenu`, `LanguageSwitcher`, and `ThemeModeSwitch`. Apps provide route state, menu item content, account data, and callbacks.
 
-Data page: prefer `DataGrid` over legacy `DataTable` for controlled server state, manual sorting/filtering/pagination, row selection, and loading/error/empty states. Apps own fetching, cache state, URL state, and backend contracts.
+Data page: prefer `DataGrid` over legacy `DataTable` for controlled server state, manual sorting/filtering/pagination, row selection, and loading/error/empty states. Apps own fetching, cache state, URL state, and backend contracts. `DataTable` is legacy as of `0.8.0` and is available only from `@moritzbrantner/ui/components/legacy/data-table` or `@moritzbrantner/ui/legacy`.
 
 Filtered data page: compose `FilterBar` for search and active filter display with `DataGrid` for rows. Use `QueryBuilder` only when the app needs nested boolean filters. Apps own fetching, URL state, backend query contracts, and persistence.
 
@@ -58,6 +77,12 @@ Non-happy paths: compose `EmptyState`, `LoadingState`, `ErrorState`, `OfflineSta
 ## Component Contract
 
 Public components should accept `className`, forward DOM props where they render DOM, expose stable `data-slot` values, use semantic tokens from the published stylesheets, and avoid arbitrary visual knobs. If a wrapper cannot satisfy a rule because it delegates to a third-party primitive or provider, the verifier allowlist must include a reason.
+
+The typed component registry in `src/component-registry.ts` records the tier, public subpath, root-export policy, Storybook files, test files, and deprecation metadata for every public component. `stable` and `patterns` entries must list story and test coverage. `labs` entries may use catalog or family coverage while the APIs settle. `legacy` entries require `deprecatedSince` and `migration`.
+
+## Token Source Status
+
+Token names and categories are centralized in `src/token-metadata.ts`. CSS remains manually authored for now. The future token pass should generate `styles.css`, theme CSS files, `theme-scopes.css`, and docs from one canonical source; generation is explicitly out of scope for `0.8.0`.
 
 ## Do Not Put Here
 

@@ -11,8 +11,8 @@ import {
   SearchIcon,
 } from "lucide-react";
 
-import { Badge } from "./components/badge";
-import { Button } from "./components/button";
+import { Badge } from "./components/stable/badge";
+import { Button } from "./components/stable/button";
 import {
   Card,
   CardContent,
@@ -20,19 +20,36 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./components/card";
-import { Checkbox } from "./components/checkbox";
-import { Input } from "./components/input";
-import { Label } from "./components/label";
-import { NativeSelect, NativeSelectOption } from "./components/native-select";
-import { Progress } from "./components/progress";
-import { RadioGroup, RadioGroupItem } from "./components/radio-group";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "./components/resizable";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/select";
-import { Separator } from "./components/separator";
-import { Slider } from "./components/slider";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/tabs";
+} from "./components/stable/card";
+import { Checkbox } from "./components/stable/checkbox";
+import { Input } from "./components/stable/input";
+import { Label } from "./components/stable/label";
+import { NativeSelect, NativeSelectOption } from "./components/stable/native-select";
+import { Progress } from "./components/stable/progress";
+import { RadioGroup, RadioGroupItem } from "./components/stable/radio-group";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "./components/stable/resizable";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./components/stable/select";
+import { Separator } from "./components/stable/separator";
+import { Slider } from "./components/stable/slider";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./components/stable/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/stable/tabs";
 import { UiTheme, type UiThemeName } from "./themes";
 
 type SystemProfile = {

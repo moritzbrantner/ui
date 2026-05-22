@@ -37,11 +37,22 @@ Before exporting a component:
 - It does not expose arbitrary visual knobs.
 - It has Storybook coverage.
 - It has focused tests for rendering and important accessibility behavior.
-- It is exported from `src/index.ts`.
+- It lives in the correct tier under `src/components/stable`, `src/components/patterns`, `src/components/labs`, or `src/components/legacy`.
+- It is listed in `src/component-registry.ts` with the correct public subpath, Storybook files, and test files.
+- It is exported from its tier barrel. Only `stable` and `patterns` components are root-exported through `src/index.ts`.
+
+Tier policy:
+
+- `stable`: primitives and low-level controls with strict contract checks.
+- `patterns`: state-light composed components for reusable app workflows.
+- `labs`: experimental public components; not root-exported.
+- `legacy`: deprecated public components; not root-exported and must include `deprecatedSince` plus `migration`.
+
+New component subpaths must be tiered, for example `@moritzbrantner/ui/components/stable/button` or `@moritzbrantner/ui/components/patterns/data-grid`. Do not add compatibility wrappers for the removed flat `@moritzbrantner/ui/components/*` paths.
 
 ## Storybook checklist
 
-Every public component must appear in Storybook.
+Every `stable` and `patterns` component must appear in Storybook through a registry-listed file.
 
 Dedicated `*.stories.tsx` files are preferred for components that should be directly discoverable in the sidebar. Aggregate catalog stories can supplement coverage, but they should not be the only place a component is demonstrated when the component stands on its own.
 
@@ -69,3 +80,7 @@ bun run test:storybook
 bun run test:package
 npm pack --dry-run --ignore-scripts --json
 ```
+
+## Token metadata
+
+Token names and categories belong in `src/token-metadata.ts`. CSS is still manually authored in `styles.css`, theme CSS entrypoints, and `theme-scopes.css`; do not introduce CSS generation until the dedicated token source-of-truth pass.

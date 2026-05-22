@@ -5,15 +5,10 @@ import * as React from "react";
 import { describe, expect, test, vi } from "vitest";
 
 import {
-  AnnotationCanvas,
-  type AnnotationCanvasAnnotation,
-  type AnnotationCanvasTool,
   ActionMenu,
   type ActionMenuProps,
   ActionSheet,
   type ActionSheetProps,
-  AssetBrowser,
-  type AssetBrowserItem,
   Button,
   ButtonGroup,
   ButtonGroupText,
@@ -69,9 +64,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DocumentViewer,
-  type DocumentViewerHighlight,
-  type DocumentViewerPageData,
   BlocksSpinner,
   DotsSpinner,
   Dropzone,
@@ -91,8 +83,6 @@ import {
   FilterChip,
   HoverPreview,
   type HoverPreviewProps,
-  InspectorPanel,
-  type InspectorPanelSectionData,
   Kbd,
   LanguageSwitcher,
   type LanguageSwitcherLanguage,
@@ -120,13 +110,6 @@ import {
   PageHeader,
   PageShell,
   PageTitle,
-  QueryBuilder,
-  createQueryBuilderGroup,
-  evaluateQueryBuilderExpression,
-  serializeQueryBuilderExpression,
-  type QueryBuilderExpression,
-  type QueryBuilderField,
-  type QueryBuilderIdFactory,
   SectionGrid,
   SearchField,
   SelectionToolbar,
@@ -158,6 +141,62 @@ import {
   Switch,
   ThemeModeSwitch,
   type ThemeMode,
+  Toggle,
+  ToggleSetting,
+  Toolbar,
+  ToolbarGroup,
+  ToolbarSpacer,
+  ToolbarTitle,
+  UploadQueue,
+  ValidationSummary,
+  WorkbenchLayout,
+  defaultUiThemeName,
+  themeConfig,
+  uiThemeLabels,
+  uiThemeNames,
+  type UiThemeName,
+} from ".";
+import * as RootExports from ".";
+import { AtlasTheme, atlasTheme, uiTheme as atlasUiTheme } from "./atlas";
+import { atlasTheme as atlasServerTheme, uiTheme as atlasServerUiTheme } from "./atlas-server";
+import { BobbaTheme, Button as BobbaButton, bobbaTheme, uiTheme as bobbaUiTheme } from "./bobba";
+import { bobbaTheme as bobbaServerTheme, uiTheme as bobbaServerUiTheme } from "./bobba-server";
+import {
+  Button as ClientButton,
+  DataGrid as ClientDataGrid,
+  Dialog as ClientDialog,
+} from "./client";
+import { Button as SubpathButton } from "./components/stable/button";
+import { ActionMenu as SubpathActionMenu } from "./components/patterns/action-menu";
+import { ActionSheet as SubpathActionSheet } from "./components/patterns/action-sheet";
+import { ContextActionMenu as SubpathContextActionMenu } from "./components/patterns/context-action-menu";
+import { DataGrid as SubpathDataGrid } from "./components/patterns/data-grid";
+import { Dialog as SubpathDialog } from "./components/stable/dialog";
+import { FilterBar as SubpathFilterBar } from "./components/patterns/filter-bar";
+import { HoverPreview as SubpathHoverPreview } from "./components/patterns/hover-preview";
+import { DataTable as LegacyDataTable } from "./components/legacy/data-table";
+import { WorkflowBuilder as SubpathWorkflowBuilder } from "./components/labs/workflow-builder";
+import { getMenuActionItemText as subpathGetMenuActionItemText } from "./components/patterns/menu-actions";
+import { ResponsiveActionMenu as SubpathResponsiveActionMenu } from "./components/patterns/responsive-action-menu";
+import { componentRegistry } from "./component-registry";
+import {
+  AnnotationCanvas,
+  type AnnotationCanvasAnnotation,
+  type AnnotationCanvasTool,
+  AssetBrowser,
+  type AssetBrowserItem,
+  DocumentViewer,
+  type DocumentViewerHighlight,
+  type DocumentViewerPageData,
+  InspectorPanel,
+  type InspectorPanelSectionData,
+  QueryBuilder,
+  createQueryBuilderGroup,
+  evaluateQueryBuilderExpression,
+  serializeQueryBuilderExpression,
+  type QueryBuilderExpression,
+  type QueryBuilderField,
+  type QueryBuilderIdFactory,
   Timeline,
   TimelineConnector,
   TimelineContent,
@@ -174,40 +213,7 @@ import {
   moveTimelineEditorClip,
   resizeTimelineEditorClip,
   type TimelineEditorTrack,
-  Toggle,
-  ToggleSetting,
-  Toolbar,
-  ToolbarGroup,
-  ToolbarSpacer,
-  ToolbarTitle,
-  UploadQueue,
-  ValidationSummary,
-  WorkbenchLayout,
-  defaultUiThemeName,
-  themeConfig,
-  uiThemeLabels,
-  uiThemeNames,
-  type UiThemeName,
-} from ".";
-import { AtlasTheme, atlasTheme, uiTheme as atlasUiTheme } from "./atlas";
-import { atlasTheme as atlasServerTheme, uiTheme as atlasServerUiTheme } from "./atlas-server";
-import { BobbaTheme, Button as BobbaButton, bobbaTheme, uiTheme as bobbaUiTheme } from "./bobba";
-import { bobbaTheme as bobbaServerTheme, uiTheme as bobbaServerUiTheme } from "./bobba-server";
-import {
-  Button as ClientButton,
-  DataGrid as ClientDataGrid,
-  Dialog as ClientDialog,
-} from "./client";
-import { Button as SubpathButton } from "./components/button";
-import { ActionMenu as SubpathActionMenu } from "./components/action-menu";
-import { ActionSheet as SubpathActionSheet } from "./components/action-sheet";
-import { ContextActionMenu as SubpathContextActionMenu } from "./components/context-action-menu";
-import { DataGrid as SubpathDataGrid } from "./components/data-grid";
-import { Dialog as SubpathDialog } from "./components/dialog";
-import { FilterBar as SubpathFilterBar } from "./components/filter-bar";
-import { HoverPreview as SubpathHoverPreview } from "./components/hover-preview";
-import { getMenuActionItemText as subpathGetMenuActionItemText } from "./components/menu-actions";
-import { ResponsiveActionMenu as SubpathResponsiveActionMenu } from "./components/responsive-action-menu";
+} from "./labs";
 import { PaperTheme, paperTheme, uiTheme as paperUiTheme } from "./paper";
 import { paperTheme as paperServerTheme, uiTheme as paperServerUiTheme } from "./paper-server";
 import { cn as serverCn, themeConfig as serverThemeConfig } from "./server";
@@ -438,22 +444,52 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./server"].types).toBe("./dist/server.d.ts");
     expect(packageJson.exports["./client"].import).toBe("./dist/client.js");
     expect(packageJson.exports["./client"].types).toBe("./dist/client.d.ts");
+    expect(packageJson.exports["./stable"].import).toBe("./dist/stable.js");
+    expect(packageJson.exports["./patterns"].import).toBe("./dist/patterns.js");
+    expect(packageJson.exports["./labs"].import).toBe("./dist/labs.js");
+    expect(packageJson.exports["./legacy"].import).toBe("./dist/legacy.js");
     expect(packageJson.exports["./atlas/styles.css"]).toBe("./atlas/styles.css");
     expect(packageJson.exports["./studio/styles.css"]).toBe("./studio/styles.css");
     expect(packageJson.exports["./paper/styles.css"]).toBe("./paper/styles.css");
-    expect(packageJson.exports["./components/*"].import).toBe("./dist/components/*.js");
+    expect(packageJson.exports["./components/*"]).toBeUndefined();
+    expect(packageJson.exports["./components/stable/*"].import).toBe(
+      "./dist/components/stable/*.js",
+    );
+    expect(packageJson.exports["./components/patterns/*"].import).toBe(
+      "./dist/components/patterns/*.js",
+    );
+    expect(packageJson.exports["./components/labs/*"].import).toBe("./dist/components/labs/*.js");
+    expect(packageJson.exports["./components/legacy/*"].import).toBe(
+      "./dist/components/legacy/*.js",
+    );
     expect(packageJson.exports["./lib/cn"].import).toBe("./dist/lib/cn.js");
     expect(consumerExample).toContain('import "@moritzbrantner/ui/styles.css";');
     expect(consumerExample).toContain('from "@moritzbrantner/ui"');
   });
 
-  test("ships the full shadcn basic component catalog", () => {
+  test("ships tiered component source and root barrels by governance policy", () => {
     const indexSource = readFileSync("src/index.ts", "utf8");
+    const stableSource = readFileSync("src/stable.ts", "utf8");
+    const patternsSource = readFileSync("src/patterns.ts", "utf8");
 
     for (const componentFile of shadcnBasicComponentFiles) {
-      expect(existsSync(`src/components/${componentFile}.tsx`)).toBe(true);
-      expect(indexSource).toContain(`export * from "./components/${componentFile}";`);
+      const entry = componentRegistry.find((component) => component.fileName === componentFile);
+      expect(entry, `${componentFile} must be registered`).toBeTruthy();
+      expect(existsSync(`src/components/${entry?.tier}/${componentFile}.tsx`)).toBe(true);
+      if (entry?.tier === "stable") {
+        expect(stableSource).toContain(`export * from "./components/stable/${componentFile}";`);
+      }
+      if (entry?.tier === "patterns") {
+        expect(patternsSource).toContain(`export * from "./components/patterns/${componentFile}";`);
+      }
     }
+
+    expect(indexSource).toContain('export * from "./stable";');
+    expect(indexSource).toContain('export * from "./patterns";');
+    expect(indexSource).not.toContain('export * from "./labs";');
+    expect(indexSource).not.toContain('export * from "./legacy";');
+    expect(Object.hasOwn(RootExports, "DataTable")).toBe(false);
+    expect(Object.hasOwn(RootExports, "WorkflowBuilder")).toBe(false);
   });
 
   test("merges class names", () => {
@@ -475,6 +511,8 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(SubpathFilterBar).toBe(FilterBar);
     expect(SubpathHoverPreview).toBe(HoverPreview);
     expect(SubpathResponsiveActionMenu).toBe(ResponsiveActionMenu);
+    expect(SubpathWorkflowBuilder).toBe(WorkflowBuilder);
+    expect(typeof LegacyDataTable).toBe("function");
     expect(subpathGetMenuActionItemText({ id: "contract", label: "Contract" })).toBe("Contract");
     expect(typeof FilterChip).toBe("function");
     expect(typeof ActionMenu).toBe("function");

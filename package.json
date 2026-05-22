@@ -1,6 +1,6 @@
 {
   "name": "@moritzbrantner/ui",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": false,
   "description": "Shared Tailwind 4 React UI primitives, themes, and layout components for platform packages.",
   "license": "UNLICENSED",
@@ -37,6 +37,22 @@
     "./client": {
       "types": "./dist/client.d.ts",
       "import": "./dist/client.js"
+    },
+    "./stable": {
+      "types": "./dist/stable.d.ts",
+      "import": "./dist/stable.js"
+    },
+    "./patterns": {
+      "types": "./dist/patterns.d.ts",
+      "import": "./dist/patterns.js"
+    },
+    "./labs": {
+      "types": "./dist/labs.d.ts",
+      "import": "./dist/labs.js"
+    },
+    "./legacy": {
+      "types": "./dist/legacy.d.ts",
+      "import": "./dist/legacy.js"
     },
     "./zleek": {
       "types": "./dist/zleek.d.ts",
@@ -86,9 +102,21 @@
       "types": "./dist/lib/cn.d.ts",
       "import": "./dist/lib/cn.js"
     },
-    "./components/*": {
-      "types": "./dist/components/*.d.ts",
-      "import": "./dist/components/*.js"
+    "./components/stable/*": {
+      "types": "./dist/components/stable/*.d.ts",
+      "import": "./dist/components/stable/*.js"
+    },
+    "./components/patterns/*": {
+      "types": "./dist/components/patterns/*.d.ts",
+      "import": "./dist/components/patterns/*.js"
+    },
+    "./components/labs/*": {
+      "types": "./dist/components/labs/*.d.ts",
+      "import": "./dist/components/labs/*.js"
+    },
+    "./components/legacy/*": {
+      "types": "./dist/components/legacy/*.d.ts",
+      "import": "./dist/components/legacy/*.js"
     },
     "./styles.css": "./styles.css",
     "./theme-scopes.css": "./theme-scopes.css",
