@@ -10,7 +10,9 @@ import {
   DocumentViewer,
   type TimelineEditorTrack,
   WorkflowBuilder,
+  WorkflowInputOnlyNode,
   WorkflowNode,
+  WorkflowOutputOnlyNode,
   getWorkflowBuilderConnectionValidity,
   getWorkflowNodeSize,
   moveTimelineEditorClip,
@@ -167,6 +169,25 @@ describe("@moritzbrantner/ui component edge cases", () => {
         targetPortId: "text",
       }),
     ).toEqual({ valid: false, reason: "kind-mismatch" });
+    expect(
+      getWorkflowBuilderConnectionValidity({
+        nodes: [
+          {
+            ...nodes[0],
+            outputs: [{ id: "payload", label: "Payload", type: "DocumentInput" }],
+          },
+          {
+            ...nodes[1],
+            inputs: [{ id: "payload", label: "Payload", type: "ReportPayload" }],
+          },
+        ],
+        edges: [],
+        sourceNodeId: "source",
+        sourcePortId: "payload",
+        targetNodeId: "ocr",
+        targetPortId: "payload",
+      }),
+    ).toEqual({ valid: false, reason: "type-mismatch" });
     expect(
       getWorkflowBuilderConnectionValidity({
         nodes: [
@@ -433,5 +454,50 @@ describe("@moritzbrantner/ui component edge cases", () => {
       width: 230,
       height: 94,
     });
+  });
+
+  test("workflow boundary nodes render one side and surface TypeScript port types", () => {
+    render(
+      <>
+        <WorkflowOutputOnlyNode
+          node={{
+            id: "workflow-input",
+            label: "Workflow input",
+            outputs: [
+              {
+                id: "documents",
+                label: "Documents",
+                type: "readonly DocumentInput[]",
+                required: true,
+              },
+            ],
+          }}
+        />
+        <WorkflowInputOnlyNode
+          node={{
+            id: "workflow-output",
+            label: "Workflow output",
+            inputs: [
+              {
+                id: "report",
+                label: "Report",
+                type: {
+                  label: "ReportPayload",
+                  source: "Readonly<{ id: string; labels: readonly string[] }>",
+                },
+              },
+            ],
+          }}
+        />
+      </>,
+    );
+
+    const portLayouts = document.querySelectorAll("[data-slot='workflow-node-ports']");
+
+    expect(portLayouts[0]?.getAttribute("data-port-layout")).toBe("output-only");
+    expect(portLayouts[1]?.getAttribute("data-port-layout")).toBe("input-only");
+    expect(screen.getByText("readonly DocumentInput[]")).toBeTruthy();
+    expect(screen.getByText("ReportPayload")).toBeTruthy();
+    expect(screen.getByText("required")).toBeTruthy();
   });
 });

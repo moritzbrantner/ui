@@ -15,9 +15,12 @@ import {
   type WorkflowNodePort as WorkflowCanvasNodePort,
 } from "../workflow-node";
 
-type WorkflowBuilderPort = WorkflowCanvasNodePort;
+type WorkflowBuilderPort<TypeScriptType = unknown> = WorkflowCanvasNodePort<TypeScriptType>;
 
-type WorkflowBuilderNodeData = WorkflowCanvasNodeData & {
+type WorkflowBuilderNodeData<
+  Inputs extends readonly WorkflowBuilderPort[] = WorkflowBuilderPort[],
+  Outputs extends readonly WorkflowBuilderPort[] = WorkflowBuilderPort[],
+> = WorkflowCanvasNodeData<Inputs, Outputs> & {
   x: number;
   y: number;
 };
@@ -48,7 +51,7 @@ type WorkflowBuilderConnectionValidityInput = {
 
 type WorkflowBuilderConnectionValidity = {
   valid: boolean;
-  reason?: "duplicate" | "kind-mismatch" | "missing-port" | "self-connection";
+  reason?: "duplicate" | "kind-mismatch" | "missing-port" | "self-connection" | "type-mismatch";
 };
 
 type WorkflowBuilderViewport = {
@@ -698,6 +701,13 @@ function getWorkflowBuilderConnectionValidity({
     return { valid: false, reason: "self-connection" };
   }
 
+  const sourceType = getWorkflowBuilderPortTypeSource(sourcePort);
+  const targetType = getWorkflowBuilderPortTypeSource(targetPort);
+
+  if (sourceType && targetType && sourceType !== targetType) {
+    return { valid: false, reason: "type-mismatch" };
+  }
+
   if (sourcePort.kind && targetPort.kind && sourcePort.kind !== targetPort.kind) {
     return { valid: false, reason: "kind-mismatch" };
   }
@@ -864,8 +874,8 @@ function getWorkflowBuilderSnappedNodePosition(
 }
 
 function getWorkflowBuilderPortMatches(
-  nodePorts: WorkflowBuilderPort[] | undefined,
-  otherPorts: WorkflowBuilderPort[] | undefined,
+  nodePorts: readonly WorkflowBuilderPort[] | undefined,
+  otherPorts: readonly WorkflowBuilderPort[] | undefined,
 ) {
   const matches: { nodeIndex: number; otherIndex: number }[] = [];
 
@@ -888,7 +898,21 @@ function workflowBuilderPortsMatch(
 }
 
 function getWorkflowBuilderPortMatchKey(port: WorkflowBuilderPort) {
+  const typeSource = getWorkflowBuilderPortTypeSource(port);
+
+  if (typeSource) {
+    return `type:${typeSource}`;
+  }
+
   return (port.kind ?? port.id ?? port.label).trim().toLowerCase();
+}
+
+function getWorkflowBuilderPortTypeSource(port: WorkflowBuilderPort) {
+  if (!port.type) {
+    return undefined;
+  }
+
+  return (typeof port.type === "string" ? port.type : port.type.source).trim();
 }
 
 function getWorkflowPointDistance(

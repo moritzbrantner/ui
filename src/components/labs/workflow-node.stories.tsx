@@ -1,7 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, screen } from "storybook/test";
 
-import { WorkflowNode, getWorkflowNodeSize, type WorkflowNodeData } from "./workflow-node";
+import {
+  WorkflowInputOnlyNode,
+  WorkflowNode,
+  WorkflowOutputOnlyNode,
+  getWorkflowNodeSize,
+  type WorkflowInputOnlyNodeData,
+  type WorkflowNodeData,
+  type WorkflowOutputOnlyNodeData,
+} from "./workflow-node";
 
 const classifierNode: WorkflowNodeData = {
   id: "classify",
@@ -40,6 +48,41 @@ const compactPublishNode: WorkflowNodeData = {
   status: "success",
   outputs: [{ id: "event", label: "Webhook", kind: "event" }],
   inputs: [{ id: "labels", label: "Labels", kind: "labels" }],
+};
+
+const typedInputNode: WorkflowInputOnlyNodeData = {
+  id: "collect-output",
+  label: "Collect report",
+  category: "Workflow output",
+  description: "Accept the final structured report payload.",
+  tone: "success",
+  inputs: [
+    {
+      id: "report",
+      label: "Report",
+      type: {
+        label: "ReportPayload",
+        source: "Readonly<{ id: string; title: string; labels: readonly string[] }>",
+      },
+      required: true,
+    },
+  ],
+};
+
+const typedOutputNode: WorkflowOutputOnlyNodeData = {
+  id: "workflow-input",
+  label: "Workspace input",
+  category: "Workflow input",
+  description: "Expose the document batch supplied by the consuming app.",
+  tone: "info",
+  outputs: [
+    {
+      id: "documents",
+      label: "Documents",
+      type: "readonly DocumentInput[]",
+      required: true,
+    },
+  ],
 };
 
 const meta = {
@@ -97,5 +140,19 @@ export const Compact: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("button", { name: "Publish" })).toBeVisible();
     await expect(canvas.getByText("labels -> event")).toBeVisible();
+  },
+};
+
+export const TypedBoundaryNodes: Story = {
+  render: () => (
+    <div className="grid max-w-md gap-4 p-4">
+      <WorkflowOutputOnlyNode node={typedOutputNode} />
+      <WorkflowInputOnlyNode node={typedInputNode} />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("readonly DocumentInput[]")).toBeVisible();
+    await expect(canvas.getByText("ReportPayload")).toBeVisible();
+    await expect(canvas.getAllByText("required")).toHaveLength(2);
   },
 };

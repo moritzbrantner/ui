@@ -227,12 +227,18 @@ import {
   TimelineItem,
   TimelineTitle,
   WorkflowBuilder,
+  WorkflowInputOnlyNode,
+  WorkflowOutputOnlyNode,
   getWorkflowBuilderConnectionValidity,
+  type WorkflowInputOnlyNodeData,
   type WorkflowBuilderConnection,
   type WorkflowBuilderEdge,
   type WorkflowBuilderNodeData,
   type WorkflowBuilderViewport,
   type WorkflowNodeMenuItem,
+  type WorkflowNodePort,
+  type WorkflowNodeTypeScriptType,
+  type WorkflowOutputOnlyNodeData,
   moveTimelineEditorClip,
   resizeTimelineEditorClip,
   type TimelineEditorTrack,
@@ -660,9 +666,32 @@ describe("@moritzbrantner/ui package-contract", () => {
       id: "contract-menu-item",
       label: "Contract menu item",
     };
+    const workflowPortType: WorkflowNodeTypeScriptType<{ id: string }> = {
+      label: "ContractPayload",
+      source: "{ id: string }",
+    };
+    const workflowTypedPort: WorkflowNodePort<{ id: string }> = {
+      id: "payload",
+      label: "Payload",
+      type: workflowPortType,
+    };
+    const workflowInputOnlyNode: WorkflowInputOnlyNodeData<[typeof workflowTypedPort]> = {
+      id: "contract-input-only",
+      label: "Contract input only",
+      inputs: [workflowTypedPort],
+    };
+    const workflowOutputOnlyNode: WorkflowOutputOnlyNodeData<[typeof workflowTypedPort]> = {
+      id: "contract-output-only",
+      label: "Contract output only",
+      outputs: [workflowTypedPort],
+    };
     expect(workflowViewport.zoom).toBe(1);
     expect(workflowConnection.sourceNodeId).toBe("source");
     expect(workflowNodeMenuItem.id).toBe("contract-menu-item");
+    expect(workflowInputOnlyNode.inputs[0]?.type).toBe(workflowPortType);
+    expect(workflowOutputOnlyNode.outputs[0]?.type).toBe(workflowPortType);
+    expect(typeof WorkflowInputOnlyNode).toBe("function");
+    expect(typeof WorkflowOutputOnlyNode).toBe("function");
   });
 
   test("exposes metadata-only theme server entrypoints", () => {

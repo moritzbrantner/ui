@@ -12,10 +12,21 @@ import {
   DropdownMenuTrigger,
 } from "../stable/dropdown-menu";
 
-type WorkflowNodePort = {
+type WorkflowNodeTypeScriptType<TypeScriptType = unknown> =
+  | string
+  | {
+      label?: string;
+      source: string;
+      description?: string;
+      metadata?: Record<string, unknown>;
+      readonly __type?: TypeScriptType;
+    };
+
+type WorkflowNodePort<TypeScriptType = unknown> = {
   id: string;
   label: string;
   kind?: string;
+  type?: WorkflowNodeTypeScriptType<TypeScriptType>;
   required?: boolean;
   description?: string;
   badge?: string;
@@ -23,7 +34,10 @@ type WorkflowNodePort = {
   metadata?: Record<string, unknown>;
 };
 
-type WorkflowNodeData = {
+type WorkflowNodeData<
+  Inputs extends readonly WorkflowNodePort[] = readonly WorkflowNodePort[],
+  Outputs extends readonly WorkflowNodePort[] = readonly WorkflowNodePort[],
+> = {
   id: string;
   label: string;
   description?: string;
@@ -36,9 +50,23 @@ type WorkflowNodeData = {
   variant?: "default" | "compact";
   minimized?: boolean;
   tags?: string[];
-  inputs?: WorkflowNodePort[];
-  outputs?: WorkflowNodePort[];
+  inputs?: Inputs;
+  outputs?: Outputs;
   metadata?: Record<string, unknown>;
+};
+
+type WorkflowInputOnlyNodeData<
+  Inputs extends readonly WorkflowNodePort[] = readonly WorkflowNodePort[],
+> = Omit<WorkflowNodeData<Inputs, []>, "outputs"> & {
+  inputs: Inputs;
+  outputs?: never;
+};
+
+type WorkflowOutputOnlyNodeData<
+  Outputs extends readonly WorkflowNodePort[] = readonly WorkflowNodePort[],
+> = Omit<WorkflowNodeData<[], Outputs>, "inputs"> & {
+  inputs?: never;
+  outputs: Outputs;
 };
 
 type WorkflowNodeSize = {
@@ -54,8 +82,11 @@ type WorkflowNodeMenuItem = {
   onSelect?: (node: WorkflowNodeData) => void;
 };
 
-type WorkflowNodeProps = React.ComponentProps<"div"> & {
-  node: WorkflowNodeData;
+type WorkflowNodeProps<
+  Inputs extends readonly WorkflowNodePort[] = readonly WorkflowNodePort[],
+  Outputs extends readonly WorkflowNodePort[] = readonly WorkflowNodePort[],
+> = React.ComponentProps<"div"> & {
+  node: WorkflowNodeData<Inputs, Outputs>;
   selected?: boolean;
   readOnly?: boolean;
   inputDisabled?: boolean;
@@ -69,6 +100,24 @@ type WorkflowNodeProps = React.ComponentProps<"div"> & {
   onOutputClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
   getInputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
   getOutputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
+};
+
+type WorkflowInputOnlyNodeProps<
+  Inputs extends readonly WorkflowNodePort[] = readonly WorkflowNodePort[],
+> = Omit<
+  WorkflowNodeProps<Inputs, []>,
+  "node" | "outputDisabled" | "onOutputClick" | "getOutputAriaLabel"
+> & {
+  node: WorkflowInputOnlyNodeData<Inputs>;
+};
+
+type WorkflowOutputOnlyNodeProps<
+  Outputs extends readonly WorkflowNodePort[] = readonly WorkflowNodePort[],
+> = Omit<
+  WorkflowNodeProps<[], Outputs>,
+  "node" | "inputDisabled" | "onInputClick" | "getInputAriaLabel"
+> & {
+  node: WorkflowOutputOnlyNodeData<Outputs>;
 };
 
 const workflowNodeInlineWidth = 240;
@@ -118,6 +167,7 @@ function WorkflowNode({
   );
   const compact = workflowNodeUsesCompactVariant(resolvedNode);
   const size = getWorkflowNodeSize(resolvedNode);
+  const portLayout = getWorkflowNodePortLayout(resolvedNode);
 
   const changeMinimized = (nextMinimized: boolean) => {
     if (node.minimized === undefined) {
@@ -252,30 +302,60 @@ function WorkflowNode({
       ) : (
         <div
           data-slot="workflow-node-ports"
-          className="grid min-h-0 flex-1 grid-cols-2 gap-3 px-0 py-3 text-xs"
+          data-port-layout={portLayout}
+          className={cn(
+            "grid min-h-0 flex-1 gap-3 px-0 py-3 text-xs",
+            portLayout === "duplex" ? "grid-cols-2" : "grid-cols-1",
+          )}
         >
-          <WorkflowNodePortColumn
-            title="Inputs"
-            direction="input"
-            node={resolvedNode}
-            ports={resolvedNode.inputs ?? []}
-            disabled={inputDisabled}
-            onClick={onInputClick}
-            getAriaLabel={getInputAriaLabel}
-          />
-          <WorkflowNodePortColumn
-            title="Outputs"
-            direction="output"
-            node={resolvedNode}
-            ports={resolvedNode.outputs ?? []}
-            disabled={outputDisabled || readOnly}
-            onClick={onOutputClick}
-            getAriaLabel={getOutputAriaLabel}
-          />
+          {portLayout !== "output-only" ? (
+            <WorkflowNodePortColumn
+              title="Inputs"
+              direction="input"
+              node={resolvedNode}
+              ports={resolvedNode.inputs ?? []}
+              disabled={inputDisabled}
+              onClick={onInputClick}
+              getAriaLabel={getInputAriaLabel}
+            />
+          ) : null}
+          {portLayout !== "input-only" ? (
+            <WorkflowNodePortColumn
+              title="Outputs"
+              direction="output"
+              node={resolvedNode}
+              ports={resolvedNode.outputs ?? []}
+              disabled={outputDisabled || readOnly}
+              onClick={onOutputClick}
+              getAriaLabel={getOutputAriaLabel}
+            />
+          ) : null}
         </div>
       )}
     </div>
   );
+}
+
+function WorkflowInputOnlyNode<
+  Inputs extends readonly WorkflowNodePort[] = readonly WorkflowNodePort[],
+>({ node, ...props }: WorkflowInputOnlyNodeProps<Inputs>) {
+  const resolvedNode = React.useMemo<WorkflowNodeData<Inputs, []>>(
+    () => ({ ...node, outputs: [] }),
+    [node],
+  );
+
+  return <WorkflowNode {...props} node={resolvedNode} outputDisabled />;
+}
+
+function WorkflowOutputOnlyNode<
+  Outputs extends readonly WorkflowNodePort[] = readonly WorkflowNodePort[],
+>({ node, ...props }: WorkflowOutputOnlyNodeProps<Outputs>) {
+  const resolvedNode = React.useMemo<WorkflowNodeData<[], Outputs>>(
+    () => ({ ...node, inputs: [] }),
+    [node],
+  );
+
+  return <WorkflowNode {...props} node={resolvedNode} inputDisabled />;
 }
 
 function WorkflowNodeMinimizeButton({
@@ -538,7 +618,7 @@ function WorkflowNodeMinimizedPortStack({
 }: {
   direction: "input" | "output";
   node: WorkflowNodeData;
-  ports: WorkflowNodePort[];
+  ports: readonly WorkflowNodePort[];
   disabled: boolean;
   onClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
   getAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
@@ -589,7 +669,7 @@ function WorkflowNodePortColumn({
   title: string;
   direction: "input" | "output";
   node: WorkflowNodeData;
-  ports: WorkflowNodePort[];
+  ports: readonly WorkflowNodePort[];
   disabled: boolean;
   onClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
   getAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
@@ -652,6 +732,7 @@ function WorkflowNodePortAnchor({
   }
 
   const color = getWorkflowNodePortColor(port);
+  const typeLabel = getWorkflowNodePortTypeLabel(port);
 
   return (
     <button
@@ -698,7 +779,7 @@ function WorkflowNodePortAnchor({
             isInput ? "justify-start" : "justify-end",
           )}
         >
-          {port.kind ? (
+          {typeLabel ? (
             <span
               className="max-w-full truncate whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase"
               style={{
@@ -706,7 +787,7 @@ function WorkflowNodePortAnchor({
                 color: getWorkflowNodePortBadgeTextColor(color),
               }}
             >
-              {formatWorkflowNodePortKind(port.kind)}
+              {formatWorkflowNodePortKind(typeLabel)}
             </span>
           ) : null}
           {port.badge ? (
@@ -746,7 +827,42 @@ function workflowNodePortSummaryLabel(port: WorkflowNodePort | undefined) {
     return "port";
   }
 
-  return formatWorkflowNodePortKind(port.kind ?? port.badge ?? port.label);
+  return formatWorkflowNodePortKind(getWorkflowNodePortTypeLabel(port) ?? port.badge ?? port.label);
+}
+
+function getWorkflowNodePortTypeLabel(port: WorkflowNodePort) {
+  if (!port.type) {
+    return port.kind;
+  }
+
+  if (typeof port.type === "string") {
+    return port.type.trim();
+  }
+
+  return (port.type.label ?? port.type.source).trim();
+}
+
+function getWorkflowNodePortTypeSource(port: WorkflowNodePort) {
+  if (!port.type) {
+    return undefined;
+  }
+
+  return (typeof port.type === "string" ? port.type : port.type.source).trim();
+}
+
+function getWorkflowNodePortLayout(node: WorkflowNodeData) {
+  const hasInputs = (node.inputs?.length ?? 0) > 0;
+  const hasOutputs = (node.outputs?.length ?? 0) > 0;
+
+  if (hasInputs && !hasOutputs) {
+    return "input-only";
+  }
+
+  if (!hasInputs && hasOutputs) {
+    return "output-only";
+  }
+
+  return "duplex";
 }
 
 function workflowNodeUsesCompactVariant(node: WorkflowNodeData) {
@@ -929,16 +1045,24 @@ function workflowNodeInlineTitle(node: WorkflowNodeData) {
 const workflowNodePortKindColors: Record<string, string> = {
   asset: "#2563eb",
   audio: "#0d9488",
+  boolean: "#059669",
   document: "#7c3aed",
   event: "#ea580c",
   image: "#db2777",
   labels: "#16a34a",
+  null: "#71717a",
+  number: "#ca8a04",
+  object: "#7c3aed",
   page: "#0891b2",
+  promise: "#4f46e5",
   result: "#4f46e5",
+  string: "#0284c7",
   table: "#ca8a04",
   task: "#dc2626",
   text: "#0284c7",
+  unknown: "#71717a",
   video: "#9333ea",
+  void: "#71717a",
 };
 
 const workflowNodePortFallbackColors = [
@@ -957,7 +1081,9 @@ function getWorkflowNodePortColor(port: WorkflowNodePort) {
     return port.color;
   }
 
-  const key = (port.kind ?? port.badge ?? port.label).toLowerCase();
+  const key = (port.kind ?? getWorkflowNodePortTypeLabel(port) ?? port.badge ?? port.label)
+    .toLowerCase()
+    .trim();
   const knownColor = workflowNodePortKindColors[key];
 
   if (knownColor) {
@@ -1008,11 +1134,24 @@ function getWorkflowNodePortBadgeTextColor(color: string) {
   return normalizeHexColor(color) ?? "#18181b";
 }
 
-export { WorkflowNode, getWorkflowNodePortCenterOffset, getWorkflowNodeSize };
+export {
+  WorkflowInputOnlyNode,
+  WorkflowNode,
+  WorkflowOutputOnlyNode,
+  getWorkflowNodePortTypeLabel,
+  getWorkflowNodePortTypeSource,
+  getWorkflowNodePortCenterOffset,
+  getWorkflowNodeSize,
+};
 export type {
+  WorkflowInputOnlyNodeData,
+  WorkflowInputOnlyNodeProps,
   WorkflowNodeData,
   WorkflowNodeMenuItem,
   WorkflowNodePort,
   WorkflowNodeProps,
   WorkflowNodeSize,
+  WorkflowNodeTypeScriptType,
+  WorkflowOutputOnlyNodeData,
+  WorkflowOutputOnlyNodeProps,
 };
