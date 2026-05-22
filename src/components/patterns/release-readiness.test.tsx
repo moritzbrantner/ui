@@ -6,6 +6,7 @@ import {
   AccountMenu,
   NotificationMenu,
   PlatformNavbar,
+  PlatformNavbarActions,
   type PlatformNavbarGroup,
 } from "../../index";
 import {
@@ -223,11 +224,15 @@ describe("@moritzbrantner/ui release readiness composed components", () => {
         brand="Platform"
         groups={groups}
         defaultOpenGroupId="workspace"
-        notificationMenu={{
-          unreadCount: 1,
-          items: [{ id: "approval", title: "Approval needed", unread: true }],
-        }}
-        accountMenu={{ user: { name: "Ada Lovelace", initials: "AL" } }}
+        actionSlot={
+          <PlatformNavbarActions
+            notificationMenu={{
+              unreadCount: 1,
+              items: [{ id: "approval", title: "Approval needed", unread: true }],
+            }}
+            accountMenu={{ user: { name: "Ada Lovelace", initials: "AL" } }}
+          />
+        }
         onNavigate={onNavigate}
       />,
     );

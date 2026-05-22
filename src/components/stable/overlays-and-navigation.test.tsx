@@ -85,6 +85,7 @@ import {
   MobileSlideTitle,
   MobileSlideTrigger,
   PlatformNavbar,
+  PlatformNavbarActions,
   type PlatformNavbarGroup,
   PageActions,
   PageContent,
@@ -546,16 +547,20 @@ describe("@moritzbrantner/ui overlays-and-navigation", () => {
         groups={navigationGroups}
         defaultOpenGroupId={null}
         variant="web"
-        accountMenu={{
-          user: { name: "Mira Brandt", email: "mira@example.com", initials: "MB" },
-          items: [{ id: "profile", label: "Profile" }],
-        }}
-        notificationMenu={{
-          unreadCount: 3,
-          items: [{ id: "mention", title: "New mention", unread: true }],
-        }}
-        languageSwitcher={{ defaultValue: "de" }}
-        themeModeSwitch={{ defaultMode: "dark" }}
+        actionSlot={
+          <PlatformNavbarActions
+            accountMenu={{
+              user: { name: "Mira Brandt", email: "mira@example.com", initials: "MB" },
+              items: [{ id: "profile", label: "Profile" }],
+            }}
+            notificationMenu={{
+              unreadCount: 3,
+              items: [{ id: "mention", title: "New mention", unread: true }],
+            }}
+            languageSwitcher={{ defaultValue: "de" }}
+            themeModeSwitch={{ defaultMode: "dark" }}
+          />
+        }
       />,
     );
 

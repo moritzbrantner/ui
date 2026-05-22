@@ -13,6 +13,7 @@ import {
   UserPlusIcon,
 } from "lucide-react";
 
+import { PlatformNavbarActions } from "./platform-navbar-actions";
 import { PlatformNavbar, type PlatformNavbarGroup } from "./platform-navbar";
 
 const navigationGroups = [
@@ -80,46 +81,6 @@ const meta = {
     brand: "Platform",
     groups: navigationGroups,
     activeItemId: "components",
-    accountMenu: {
-      user: {
-        name: "Mira Brandt",
-        email: "mira@example.com",
-        initials: "MB",
-      },
-      items: [
-        { id: "profile", label: "Profile", icon: <UserCircleIcon className="size-4" /> },
-        { id: "settings", label: "Settings", icon: <SettingsIcon className="size-4" /> },
-        {
-          id: "logout",
-          label: "Sign out",
-          destructive: true,
-          icon: <LogOutIcon className="size-4" />,
-        },
-      ],
-    },
-    notificationMenu: {
-      unreadCount: 2,
-      items: [
-        {
-          id: "follow",
-          title: "Jules followed you",
-          description: "Open the profile page to review their public activity.",
-          unread: true,
-          meta: "2m",
-          icon: <UserPlusIcon className="size-4" />,
-        },
-        {
-          id: "message",
-          title: "New workspace message",
-          description: "The product team mentioned you in the launch thread.",
-          unread: true,
-          meta: "1h",
-          icon: <MessageCircleIcon className="size-4" />,
-        },
-      ],
-      onMarkAllRead: () => {},
-    },
-    themeModeSwitch: true,
   },
   render: (args) => (
     <div className="min-h-[420px] bg-background p-6 text-foreground">
@@ -136,7 +97,51 @@ export const Web: Story = {
   args: {
     variant: "web",
     defaultOpenGroupId: "workspace",
-    languageSwitcher: true,
+    actionSlot: (
+      <PlatformNavbarActions
+        languageSwitcher
+        themeModeSwitch
+        notificationMenu={{
+          unreadCount: 2,
+          items: [
+            {
+              id: "follow",
+              title: "Jules followed you",
+              description: "Open the profile page to review their public activity.",
+              unread: true,
+              meta: "2m",
+              icon: <UserPlusIcon className="size-4" />,
+            },
+            {
+              id: "message",
+              title: "New workspace message",
+              description: "The product team mentioned you in the launch thread.",
+              unread: true,
+              meta: "1h",
+              icon: <MessageCircleIcon className="size-4" />,
+            },
+          ],
+          onMarkAllRead: () => {},
+        }}
+        accountMenu={{
+          user: {
+            name: "Mira Brandt",
+            email: "mira@example.com",
+            initials: "MB",
+          },
+          items: [
+            { id: "profile", label: "Profile", icon: <UserCircleIcon className="size-4" /> },
+            { id: "settings", label: "Settings", icon: <SettingsIcon className="size-4" /> },
+            {
+              id: "logout",
+              label: "Sign out",
+              destructive: true,
+              icon: <LogOutIcon className="size-4" />,
+            },
+          ],
+        }}
+      />
+    ),
   },
   play: async ({ canvas, userEvent }) => {
     const trigger = (await canvas.findAllByRole("button", { name: "Open account menu" })).find(
@@ -163,6 +168,14 @@ export const Web: Story = {
     await expect(
       within(accountMenu as HTMLElement).getByText("mira@example.com"),
     ).toBeInTheDocument();
+  },
+};
+
+export const PublicWithoutAuth: Story = {
+  args: {
+    variant: "web",
+    defaultOpenGroupId: "discover",
+    actionSlot: <PlatformNavbarActions languageSwitcher themeModeSwitch />,
   },
 };
 

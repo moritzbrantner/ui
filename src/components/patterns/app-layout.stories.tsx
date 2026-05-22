@@ -22,6 +22,7 @@ import { Badge } from "../stable/badge";
 import { Button } from "../stable/button";
 import { CommandPalette } from "./command-palette";
 import { PlatformNavbar } from "./platform-navbar";
+import { PlatformNavbarActions } from "./platform-navbar-actions";
 import { Stat, StatDelta, StatDescription, StatGroup, StatLabel, StatValue } from "../stable/stat";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../stable/table";
 
@@ -254,16 +255,20 @@ export const ComprehensiveAppShell: Story = {
         ]}
         activeItemId="overview"
         defaultOpenGroupId={null}
-        languageSwitcher
-        themeModeSwitch
-        notificationMenu={{
-          unreadCount: 1,
-          items: [{ id: "review", title: "Review requested", unread: true, meta: "Now" }],
-        }}
-        accountMenu={{
-          user: { name: "Ada Lovelace", email: "ada@example.com", initials: "AL" },
-          items: [{ id: "profile", label: "Profile" }],
-        }}
+        actionSlot={
+          <PlatformNavbarActions
+            languageSwitcher
+            themeModeSwitch
+            notificationMenu={{
+              unreadCount: 1,
+              items: [{ id: "review", title: "Review requested", unread: true, meta: "Now" }],
+            }}
+            accountMenu={{
+              user: { name: "Ada Lovelace", email: "ada@example.com", initials: "AL" },
+              items: [{ id: "profile", label: "Profile" }],
+            }}
+          />
+        }
       />
       <PageHeader>
         <div className="grid gap-2">

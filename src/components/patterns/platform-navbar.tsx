@@ -5,10 +5,6 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react";
 
 import { cn } from "../../lib/cn";
-import { AccountMenu, type AccountMenuProps } from "./account-menu";
-import { LanguageSwitcher, type LanguageSwitcherProps } from "../stable/language-switcher";
-import { NotificationMenu, type NotificationMenuProps } from "./notification-menu";
-import { ThemeModeSwitch, type ThemeModeSwitchProps } from "../stable/theme-mode-switch";
 
 export type PlatformNavbarItem = {
   id: string;
@@ -45,10 +41,7 @@ type PlatformNavbarProps = Omit<React.ComponentPropsWithoutRef<"nav">, "children
   brand: React.ReactNode;
   groups: PlatformNavbarGroup[];
   actions?: React.ReactNode;
-  accountMenu?: AccountMenuProps;
-  notificationMenu?: NotificationMenuProps;
-  languageSwitcher?: LanguageSwitcherProps | boolean;
-  themeModeSwitch?: ThemeModeSwitchProps | boolean;
+  actionSlot?: React.ReactNode;
   variant?: PlatformNavbarVariant;
   activeItemId?: string;
   activeGroupId?: string;
@@ -179,14 +172,23 @@ function getInitialOpenGroupId(
   return activeGroup?.id ?? null;
 }
 
+export type PlatformNavbarActionGroupProps = React.ComponentPropsWithoutRef<"div">;
+
+export function PlatformNavbarActionGroup({ className, ...props }: PlatformNavbarActionGroupProps) {
+  return (
+    <div
+      data-slot="platform-navbar-actions"
+      className={cn("flex shrink-0 items-center justify-end gap-2", className)}
+      {...props}
+    />
+  );
+}
+
 export function PlatformNavbar({
   brand,
   groups,
   actions,
-  accountMenu,
-  notificationMenu,
-  languageSwitcher,
-  themeModeSwitch,
+  actionSlot,
   variant = "web",
   activeItemId,
   activeGroupId,
@@ -214,9 +216,9 @@ export function PlatformNavbar({
   const currentOpenGroupId = openGroupId !== undefined ? openGroupId : uncontrolledOpenGroupId;
   const openGroup =
     groups.find((group) => group.id === currentOpenGroupId && group.items.length > 0) ?? null;
-  const hasActions = Boolean(
-    actions || accountMenu || notificationMenu || languageSwitcher || themeModeSwitch,
-  );
+  const renderedActions =
+    actionSlot ??
+    (actions ? <PlatformNavbarActionGroup>{actions}</PlatformNavbarActionGroup> : null);
 
   const resolvedActiveGroupId =
     activeGroupId ??
@@ -495,23 +497,6 @@ export function PlatformNavbar({
       ) : null}
     </AnimatePresence>
   );
-  const renderedActions = hasActions ? (
-    <div
-      data-slot="platform-navbar-actions"
-      className="flex shrink-0 items-center justify-end gap-2"
-    >
-      {actions}
-      {languageSwitcher ? (
-        <LanguageSwitcher {...(languageSwitcher === true ? {} : languageSwitcher)} />
-      ) : null}
-      {themeModeSwitch ? (
-        <ThemeModeSwitch {...(themeModeSwitch === true ? {} : themeModeSwitch)} />
-      ) : null}
-      {notificationMenu ? <NotificationMenu {...notificationMenu} /> : null}
-      {accountMenu ? <AccountMenu {...accountMenu} /> : null}
-    </div>
-  ) : null;
-
   return (
     <LayoutGroup>
       <div

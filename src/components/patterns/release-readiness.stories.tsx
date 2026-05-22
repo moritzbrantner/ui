@@ -35,6 +35,7 @@ import { InspectorPanel, type InspectorPanelSectionData } from "../labs/inspecto
 import { NotificationMenu } from "./notification-menu";
 import { PageContent, PageHeader, PageShell, PageTitle, Surface } from "./app-layout";
 import { PlatformNavbar, type PlatformNavbarGroup } from "./platform-navbar";
+import { PlatformNavbarActions } from "./platform-navbar-actions";
 import { SelectDropdown } from "../stable/select";
 import { Switch } from "../stable/switch";
 import { TimelineEditor, type TimelineEditorTrack } from "../labs/timeline-editor";
@@ -174,31 +175,34 @@ function ConsumerDashboardShell({
         brand={<span className="font-semibold">Release Console</span>}
         groups={dashboardGroups}
         defaultOpenGroupId="workspace"
-        notificationMenu={{
-          unreadCount: 2,
-          items: [
-            {
-              id: "coverage",
-              title: "Coverage requires CI",
-              description: "Real V8 coverage is enforced by Node in GitHub Actions.",
-              unread: true,
-            },
-          ],
-        }}
-        accountMenu={{ user: { name: "Ada Lovelace", initials: "AL" } }}
-        actions={
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              setCommandOpen(true);
-              onOpenCommand();
+        actionSlot={
+          <PlatformNavbarActions
+            notificationMenu={{
+              unreadCount: 2,
+              items: [
+                {
+                  id: "coverage",
+                  title: "Coverage requires CI",
+                  description: "Real V8 coverage is enforced by Node in GitHub Actions.",
+                  unread: true,
+                },
+              ],
             }}
+            accountMenu={{ user: { name: "Ada Lovelace", initials: "AL" } }}
           >
-            <CommandIcon />
-            Commands
-          </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setCommandOpen(true);
+                onOpenCommand();
+              }}
+            >
+              <CommandIcon />
+              Commands
+            </Button>
+          </PlatformNavbarActions>
         }
       />
       <PageHeader>

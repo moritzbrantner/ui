@@ -1008,6 +1008,17 @@ const componentRegistry = [
     reason: "Reusable state-light application pattern exported from the root API.",
   },
   {
+    name: "platform-navbar-actions",
+    fileName: "platform-navbar-actions",
+    tier: "patterns",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/patterns/platform-navbar-actions",
+    storyFiles: ["src/components/patterns/platform-navbar.stories.tsx"],
+    testFiles: ["src/components/stable/overlays-and-navigation.test.tsx"],
+    status: "pattern",
+    reason: "Reusable state-light application pattern exported from the root API.",
+  },
+  {
     name: "responsive-action-menu",
     fileName: "responsive-action-menu",
     tier: "patterns",

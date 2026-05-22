@@ -15,6 +15,7 @@ export * from "./components/patterns/filter-bar";
 export * from "./components/patterns/hover-preview";
 export * from "./components/patterns/menu-actions";
 export * from "./components/patterns/notification-menu";
+export * from "./components/patterns/platform-navbar-actions";
 export * from "./components/patterns/platform-navbar";
 export * from "./components/patterns/responsive-action-menu";
 export * from "./components/patterns/search-field";

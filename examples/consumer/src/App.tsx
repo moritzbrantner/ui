@@ -32,6 +32,7 @@ import {
   PageShell,
   PageTitle,
   PlatformNavbar,
+  PlatformNavbarActions,
   SearchField,
   Surface,
   SurfaceContent,
@@ -86,18 +87,22 @@ export function App() {
         brand={<strong>Consumer Fixture</strong>}
         groups={navigationGroups}
         activeItemId="overview"
-        notificationMenu={{
-          unreadCount: 2,
-          items: [
-            { id: "review", title: "Review requested", unread: true, meta: "4m" },
-            { id: "build", title: "Consumer build passed", meta: "1h" },
-          ],
-        }}
-        accountMenu={{
-          user: { name: "Ada Lovelace", email: "ada@example.com", initials: "AL" },
-          items: [{ id: "profile", label: "Profile" }],
-        }}
-        themeModeSwitch
+        actionSlot={
+          <PlatformNavbarActions
+            notificationMenu={{
+              unreadCount: 2,
+              items: [
+                { id: "review", title: "Review requested", unread: true, meta: "4m" },
+                { id: "build", title: "Consumer build passed", meta: "1h" },
+              ],
+            }}
+            accountMenu={{
+              user: { name: "Ada Lovelace", email: "ada@example.com", initials: "AL" },
+              items: [{ id: "profile", label: "Profile" }],
+            }}
+            themeModeSwitch
+          />
+        }
       />
 
       <PageHeader>
