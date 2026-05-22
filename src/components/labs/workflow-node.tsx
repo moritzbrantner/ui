@@ -98,6 +98,21 @@ type WorkflowNodeProps<
   onMenuItemSelect?: (item: WorkflowNodeMenuItem, node: WorkflowNodeData) => void;
   onInputClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
   onOutputClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
+  onInputPointerUp?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
+  onOutputPointerDown?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
+  onOutputPointerUp?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
   getInputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
   getOutputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
 };
@@ -148,6 +163,9 @@ function WorkflowNode({
   onMenuItemSelect,
   onInputClick,
   onOutputClick,
+  onInputPointerUp,
+  onOutputPointerDown,
+  onOutputPointerUp,
   getInputAriaLabel,
   getOutputAriaLabel,
   className,
@@ -199,6 +217,9 @@ function WorkflowNode({
           onNodeSelect={onNodeSelect}
           onInputClick={onInputClick}
           onOutputClick={onOutputClick}
+          onInputPointerUp={onInputPointerUp}
+          onOutputPointerDown={onOutputPointerDown}
+          onOutputPointerUp={onOutputPointerUp}
           getInputAriaLabel={getInputAriaLabel}
           getOutputAriaLabel={getOutputAriaLabel}
         />
@@ -296,6 +317,9 @@ function WorkflowNode({
           outputDisabled={outputDisabled || readOnly}
           onInputClick={onInputClick}
           onOutputClick={onOutputClick}
+          onInputPointerUp={onInputPointerUp}
+          onOutputPointerDown={onOutputPointerDown}
+          onOutputPointerUp={onOutputPointerUp}
           getInputAriaLabel={getInputAriaLabel}
           getOutputAriaLabel={getOutputAriaLabel}
         />
@@ -316,6 +340,7 @@ function WorkflowNode({
               ports={resolvedNode.inputs ?? []}
               disabled={inputDisabled}
               onClick={onInputClick}
+              onPointerUp={onInputPointerUp}
               getAriaLabel={getInputAriaLabel}
             />
           ) : null}
@@ -327,6 +352,8 @@ function WorkflowNode({
               ports={resolvedNode.outputs ?? []}
               disabled={outputDisabled || readOnly}
               onClick={onOutputClick}
+              onPointerDown={onOutputPointerDown}
+              onPointerUp={onOutputPointerUp}
               getAriaLabel={getOutputAriaLabel}
             />
           ) : null}
@@ -453,6 +480,9 @@ function WorkflowNodeInline({
   onNodeSelect,
   onInputClick,
   onOutputClick,
+  onInputPointerUp,
+  onOutputPointerDown,
+  onOutputPointerUp,
   getInputAriaLabel,
   getOutputAriaLabel,
 }: {
@@ -463,6 +493,21 @@ function WorkflowNodeInline({
   onNodeSelect?: (node: WorkflowNodeData) => void;
   onInputClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
   onOutputClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
+  onInputPointerUp?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
+  onOutputPointerDown?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
+  onOutputPointerUp?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
   getInputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
   getOutputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
 }) {
@@ -484,6 +529,7 @@ function WorkflowNodeInline({
         port={input}
         disabled={inputDisabled}
         onClick={onInputClick}
+        onPointerUp={onInputPointerUp}
         getAriaLabel={getInputAriaLabel}
       />
       <button
@@ -507,6 +553,8 @@ function WorkflowNodeInline({
         port={output}
         disabled={outputDisabled || readOnly}
         onClick={onOutputClick}
+        onPointerDown={onOutputPointerDown}
+        onPointerUp={onOutputPointerUp}
         getAriaLabel={getOutputAriaLabel}
       />
     </div>
@@ -519,6 +567,8 @@ function WorkflowNodeInlinePort({
   port,
   disabled,
   onClick,
+  onPointerUp,
+  onPointerDown,
   getAriaLabel,
 }: {
   direction: "input" | "output";
@@ -526,6 +576,16 @@ function WorkflowNodeInlinePort({
   port?: WorkflowNodePort;
   disabled: boolean;
   onClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
+  onPointerUp?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
+  onPointerDown?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
   getAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
 }) {
   if (!port) {
@@ -534,6 +594,7 @@ function WorkflowNodeInlinePort({
 
   const isInput = direction === "input";
   const color = getWorkflowNodePortColor(port);
+  const interactive = Boolean(onClick || onPointerUp || onPointerDown);
 
   return (
     <button
@@ -541,7 +602,7 @@ function WorkflowNodeInlinePort({
       data-slot="workflow-node-port"
       data-port-direction={direction}
       data-port-id={port.id}
-      disabled={disabled || !onClick}
+      disabled={disabled || !interactive}
       aria-label={getAriaLabel?.(port, node) ?? `${node.label} ${port.label}`}
       className={cn(
         "absolute top-1/2 z-10 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-60",
@@ -551,6 +612,14 @@ function WorkflowNodeInlinePort({
       onClick={(event) => {
         event.stopPropagation();
         onClick?.(port, node);
+      }}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+        onPointerDown?.(port, node, event);
+      }}
+      onPointerUp={(event) => {
+        event.stopPropagation();
+        onPointerUp?.(port, node, event);
       }}
     >
       <span data-slot="workflow-node-port-dot" className="block h-full w-full rounded-full" />
@@ -564,6 +633,9 @@ function WorkflowNodeMinimizedPorts({
   outputDisabled,
   onInputClick,
   onOutputClick,
+  onInputPointerUp,
+  onOutputPointerDown,
+  onOutputPointerUp,
   getInputAriaLabel,
   getOutputAriaLabel,
 }: {
@@ -572,6 +644,21 @@ function WorkflowNodeMinimizedPorts({
   outputDisabled: boolean;
   onInputClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
   onOutputClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
+  onInputPointerUp?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
+  onOutputPointerDown?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
+  onOutputPointerUp?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
   getInputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
   getOutputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
 }) {
@@ -594,6 +681,7 @@ function WorkflowNodeMinimizedPorts({
         ports={inputs}
         disabled={inputDisabled}
         onClick={onInputClick}
+        onPointerUp={onInputPointerUp}
         getAriaLabel={getInputAriaLabel}
       />
       <WorkflowNodeMinimizedPortStack
@@ -602,6 +690,8 @@ function WorkflowNodeMinimizedPorts({
         ports={outputs}
         disabled={outputDisabled}
         onClick={onOutputClick}
+        onPointerDown={onOutputPointerDown}
+        onPointerUp={onOutputPointerUp}
         getAriaLabel={getOutputAriaLabel}
       />
     </div>
@@ -614,6 +704,8 @@ function WorkflowNodeMinimizedPortStack({
   ports,
   disabled,
   onClick,
+  onPointerUp,
+  onPointerDown,
   getAriaLabel,
 }: {
   direction: "input" | "output";
@@ -621,6 +713,16 @@ function WorkflowNodeMinimizedPortStack({
   ports: readonly WorkflowNodePort[];
   disabled: boolean;
   onClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
+  onPointerUp?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
+  onPointerDown?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
   getAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
 }) {
   const isInput = direction === "input";
@@ -634,7 +736,7 @@ function WorkflowNodeMinimizedPortStack({
           data-slot="workflow-node-port"
           data-port-direction={direction}
           data-port-id={port.id}
-          disabled={disabled || !onClick}
+          disabled={disabled || !(onClick || onPointerUp || onPointerDown)}
           aria-label={getAriaLabel?.(port, node) ?? `${node.label} ${port.label}`}
           className={cn(
             "absolute z-10 h-3 w-3 rounded-full border-2 border-white outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-60",
@@ -648,6 +750,14 @@ function WorkflowNodeMinimizedPortStack({
           onClick={(event) => {
             event.stopPropagation();
             onClick?.(port, node);
+          }}
+          onPointerDown={(event) => {
+            event.stopPropagation();
+            onPointerDown?.(port, node, event);
+          }}
+          onPointerUp={(event) => {
+            event.stopPropagation();
+            onPointerUp?.(port, node, event);
           }}
         >
           <span data-slot="workflow-node-port-dot" className="block h-full w-full rounded-full" />
@@ -664,6 +774,8 @@ function WorkflowNodePortColumn({
   ports,
   disabled,
   onClick,
+  onPointerUp,
+  onPointerDown,
   getAriaLabel,
 }: {
   title: string;
@@ -672,6 +784,16 @@ function WorkflowNodePortColumn({
   ports: readonly WorkflowNodePort[];
   disabled: boolean;
   onClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
+  onPointerUp?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
+  onPointerDown?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
   getAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
 }) {
   return (
@@ -691,6 +813,8 @@ function WorkflowNodePortColumn({
               port={port}
               disabled={disabled}
               onClick={onClick}
+              onPointerUp={onPointerUp}
+              onPointerDown={onPointerDown}
               getAriaLabel={getAriaLabel}
             />
           ))}
@@ -706,6 +830,8 @@ function WorkflowNodePortAnchor({
   port,
   disabled,
   onClick,
+  onPointerUp,
+  onPointerDown,
   getAriaLabel,
 }: {
   direction: "input" | "output";
@@ -713,6 +839,16 @@ function WorkflowNodePortAnchor({
   port?: WorkflowNodePort;
   disabled: boolean;
   onClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
+  onPointerUp?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
+  onPointerDown?: (
+    port: WorkflowNodePort,
+    node: WorkflowNodeData,
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => void;
   getAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
 }) {
   const isInput = direction === "input";
@@ -740,7 +876,7 @@ function WorkflowNodePortAnchor({
       data-slot="workflow-node-port"
       data-port-direction={direction}
       data-port-id={port.id}
-      disabled={disabled || !onClick}
+      disabled={disabled || !(onClick || onPointerUp || onPointerDown)}
       aria-label={getAriaLabel?.(port, node) ?? `${node.label} ${port.label}`}
       className={cn(
         "relative block h-16 w-full overflow-visible rounded-md border px-2 py-1.5 text-left outline-none transition-colors",
@@ -755,6 +891,14 @@ function WorkflowNodePortAnchor({
       onClick={(event) => {
         event.stopPropagation();
         onClick?.(port, node);
+      }}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+        onPointerDown?.(port, node, event);
+      }}
+      onPointerUp={(event) => {
+        event.stopPropagation();
+        onPointerUp?.(port, node, event);
       }}
     >
       <div

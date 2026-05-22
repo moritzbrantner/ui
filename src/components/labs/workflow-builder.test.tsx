@@ -123,6 +123,48 @@ describe("WorkflowBuilder", () => {
     ).toEqual({ valid: false, reason: "type-mismatch" });
   });
 
+  test("connection validity allows source fan-out and rejects occupied inputs", () => {
+    const fanOutNodes: WorkflowBuilderNodeData[] = [
+      nodes[0]!,
+      nodes[1]!,
+      {
+        id: "target-two",
+        label: "Target two",
+        x: 620,
+        y: 48,
+        inputs: [{ id: "asset", label: "Asset", kind: "asset" }],
+      },
+      {
+        id: "backup-source",
+        label: "Backup source",
+        x: 24,
+        y: 220,
+        outputs: [{ id: "asset", label: "Asset", kind: "asset" }],
+      },
+    ];
+
+    expect(
+      getWorkflowBuilderConnectionValidity({
+        nodes: fanOutNodes,
+        edges,
+        sourceNodeId: "source",
+        sourcePortId: "asset",
+        targetNodeId: "target-two",
+        targetPortId: "asset",
+      }),
+    ).toEqual({ valid: true });
+    expect(
+      getWorkflowBuilderConnectionValidity({
+        nodes: fanOutNodes,
+        edges,
+        sourceNodeId: "backup-source",
+        sourcePortId: "asset",
+        targetNodeId: "target",
+        targetPortId: "asset",
+      }),
+    ).toEqual({ valid: false, reason: "input-occupied" });
+  });
+
   test("controlled viewport calls onViewportChange", () => {
     const onViewportChange = vi.fn();
 
@@ -232,6 +274,72 @@ describe("WorkflowBuilder", () => {
     });
   });
 
+  test("dragging from output to input creates a connection", () => {
+    const onEdgesChange = vi.fn();
+    const onConnectionStart = vi.fn();
+    const onConnectionComplete = vi.fn();
+    const { container } = render(
+      <WorkflowBuilder
+        nodes={nodes}
+        edges={[]}
+        onEdgesChange={onEdgesChange}
+        onConnectionStart={onConnectionStart}
+        onConnectionComplete={onConnectionComplete}
+      />,
+    );
+    const surface = container.querySelector<HTMLElement>("[data-slot='workflow-builder-surface']")!;
+    const sourceOutput = screen.getByRole("button", { name: "Start Source Asset" });
+    const targetInput = screen.getByRole("button", { name: "Connect to Target Asset" });
+
+    fireEvent.pointerDown(sourceOutput, { button: 0, clientX: 24, clientY: 48 });
+    fireEvent.pointerMove(surface, { clientX: 48, clientY: 48 });
+    fireEvent.pointerUp(targetInput, { clientX: 340, clientY: 48 });
+
+    expect(onConnectionStart).toHaveBeenCalledWith({
+      sourceNodeId: "source",
+      sourcePortId: "asset",
+    });
+    expect(onEdgesChange).toHaveBeenCalledWith([
+      expect.objectContaining({
+        sourceNodeId: "source",
+        sourcePortId: "asset",
+        targetNodeId: "target",
+        targetPortId: "asset",
+      }),
+    ]);
+    expect(onConnectionComplete).toHaveBeenCalledWith({
+      sourceNodeId: "source",
+      sourcePortId: "asset",
+      targetNodeId: "target",
+      targetPortId: "asset",
+    });
+  });
+
+  test("dropping a dragged connection on canvas cancels", () => {
+    const onEdgesChange = vi.fn();
+    const onConnectionCancel = vi.fn();
+    const { container } = render(
+      <WorkflowBuilder
+        nodes={nodes}
+        edges={[]}
+        onEdgesChange={onEdgesChange}
+        onConnectionCancel={onConnectionCancel}
+      />,
+    );
+    const surface = container.querySelector<HTMLElement>("[data-slot='workflow-builder-surface']")!;
+
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Start Source Asset" }), {
+      button: 0,
+      clientX: 24,
+      clientY: 48,
+    });
+    fireEvent.pointerMove(surface, { clientX: 72, clientY: 72 });
+    fireEvent.pointerUp(surface, { clientX: 72, clientY: 72 });
+
+    expect(onConnectionCancel).toHaveBeenCalledTimes(1);
+    expect(onEdgesChange).not.toHaveBeenCalled();
+  });
+
   test("rejects duplicate connections without completing the lifecycle", () => {
     const onEdgesChange = vi.fn();
     const onConnectionComplete = vi.fn();
@@ -278,40 +386,76 @@ describe("WorkflowBuilder", () => {
     expect(onEdgesChange).not.toHaveBeenCalled();
   });
 
+  test("read-only mode blocks drag connect and edge double-click disconnect", () => {
+    const onEdgesChange = vi.fn();
+    const onConnectionDisconnect = vi.fn();
+    const { container } = render(
+      <WorkflowBuilder
+        nodes={nodes}
+        edges={edges}
+        selectedEdgeId="edge-source-target"
+        readOnly
+        onEdgesChange={onEdgesChange}
+        onConnectionDisconnect={onConnectionDisconnect}
+      />,
+    );
+    const surface = container.querySelector<HTMLElement>("[data-slot='workflow-builder-surface']")!;
+    const edgeHit = container.querySelector('[data-slot="workflow-builder-edge-hit"]')!;
+
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Start Source Asset" }), {
+      button: 0,
+      clientX: 24,
+      clientY: 48,
+    });
+    fireEvent.pointerMove(surface, { clientX: 72, clientY: 72 });
+    fireEvent.pointerUp(surface, { clientX: 72, clientY: 72 });
+    fireEvent.doubleClick(edgeHit);
+
+    expect(onEdgesChange).not.toHaveBeenCalled();
+    expect(onConnectionDisconnect).not.toHaveBeenCalled();
+  });
+
   test("Delete removes selected edge only when not read-only", () => {
     const onEdgesChange = vi.fn();
+    const onConnectionDisconnect = vi.fn();
     const { container, rerender } = render(
       <WorkflowBuilder
         nodes={nodes}
         edges={edges}
         selectedEdgeId="edge-source-target"
         onEdgesChange={onEdgesChange}
+        onConnectionDisconnect={onConnectionDisconnect}
       />,
     );
     const builder = container.querySelector("[data-slot='workflow-builder']")!;
 
     fireEvent.keyDown(builder, { key: "Delete" });
     expect(onEdgesChange).toHaveBeenCalledWith([]);
+    expect(onConnectionDisconnect).toHaveBeenCalledWith(edges[0], "edge-delete");
 
     onEdgesChange.mockClear();
+    onConnectionDisconnect.mockClear();
     rerender(
       <WorkflowBuilder
         nodes={nodes}
         edges={edges}
         selectedEdgeId="edge-source-target"
         onEdgesChange={onEdgesChange}
+        onConnectionDisconnect={onConnectionDisconnect}
         readOnly
       />,
     );
 
     fireEvent.keyDown(builder, { key: "Delete" });
     expect(onEdgesChange).not.toHaveBeenCalled();
+    expect(onConnectionDisconnect).not.toHaveBeenCalled();
   });
 
   test("selecting and deleting a node removes incident edges", () => {
     const onNodesChange = vi.fn();
     const onEdgesChange = vi.fn();
     const onSelectionChange = vi.fn();
+    const onConnectionDisconnect = vi.fn();
     render(
       <WorkflowBuilder
         nodes={nodes}
@@ -319,6 +463,7 @@ describe("WorkflowBuilder", () => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onSelectionChange={onSelectionChange}
+        onConnectionDisconnect={onConnectionDisconnect}
       />,
     );
 
@@ -330,7 +475,103 @@ describe("WorkflowBuilder", () => {
     );
     expect(onNodesChange).toHaveBeenCalledWith([nodes[1]]);
     expect(onEdgesChange).toHaveBeenCalledWith([]);
+    expect(onConnectionDisconnect).toHaveBeenCalledWith(edges[0], "node-delete");
     expect(onSelectionChange).toHaveBeenLastCalledWith(null);
+  });
+
+  test("double-clicking an edge disconnects it", () => {
+    const onEdgesChange = vi.fn();
+    const onConnectionDisconnect = vi.fn();
+    const { container } = render(
+      <WorkflowBuilder
+        nodes={nodes}
+        edges={edges}
+        selectedEdgeId="edge-source-target"
+        onEdgesChange={onEdgesChange}
+        onConnectionDisconnect={onConnectionDisconnect}
+      />,
+    );
+
+    fireEvent.doubleClick(container.querySelector('[data-slot="workflow-builder-edge-hit"]')!);
+
+    expect(onEdgesChange).toHaveBeenCalledWith([]);
+    expect(onConnectionDisconnect).toHaveBeenCalledWith(edges[0], "edge-double-click");
+  });
+
+  test("rewiring a target endpoint updates only the selected edge", () => {
+    const onEdgesChange = vi.fn();
+    const onConnectionDisconnect = vi.fn();
+    const onConnectionComplete = vi.fn();
+    const rewireNodes: WorkflowBuilderNodeData[] = [
+      ...nodes,
+      {
+        id: "target-two",
+        label: "Target two",
+        x: 620,
+        y: 48,
+        inputs: [{ id: "asset", label: "Asset", kind: "asset" }],
+      },
+    ];
+    const { container } = render(
+      <WorkflowBuilder
+        nodes={rewireNodes}
+        edges={edges}
+        selectedEdgeId="edge-source-target"
+        onEdgesChange={onEdgesChange}
+        onConnectionDisconnect={onConnectionDisconnect}
+        onConnectionComplete={onConnectionComplete}
+      />,
+    );
+    const targetHandle = screen.getByRole("button", {
+      name: "Rewire target for connection edge-source-target",
+    });
+
+    fireEvent.pointerDown(targetHandle, { button: 0, clientX: 340, clientY: 48 });
+    fireEvent.pointerUp(screen.getByRole("button", { name: "Connect to Target two Asset" }), {
+      clientX: 620,
+      clientY: 48,
+    });
+
+    expect(container.querySelector('[data-slot="workflow-builder-edge-handle"]')).toBeTruthy();
+    expect(onEdgesChange).toHaveBeenCalledWith([
+      {
+        ...edges[0]!,
+        targetNodeId: "target-two",
+        targetPortId: "asset",
+      },
+    ]);
+    expect(onConnectionDisconnect).toHaveBeenCalledWith(edges[0], "rewire");
+    expect(onConnectionComplete).toHaveBeenCalledWith({
+      sourceNodeId: "source",
+      sourcePortId: "asset",
+      targetNodeId: "target-two",
+      targetPortId: "asset",
+    });
+  });
+
+  test("dragging an endpoint to blank canvas removes the edge", () => {
+    const onEdgesChange = vi.fn();
+    const onConnectionDisconnect = vi.fn();
+    const { container } = render(
+      <WorkflowBuilder
+        nodes={nodes}
+        edges={edges}
+        selectedEdgeId="edge-source-target"
+        onEdgesChange={onEdgesChange}
+        onConnectionDisconnect={onConnectionDisconnect}
+      />,
+    );
+    const surface = container.querySelector<HTMLElement>("[data-slot='workflow-builder-surface']")!;
+
+    fireEvent.pointerDown(
+      screen.getByRole("button", { name: "Rewire target for connection edge-source-target" }),
+      { button: 0, clientX: 340, clientY: 48 },
+    );
+    fireEvent.pointerMove(surface, { clientX: 420, clientY: 160 });
+    fireEvent.pointerUp(surface, { clientX: 420, clientY: 160 });
+
+    expect(onEdgesChange).toHaveBeenCalledWith([]);
+    expect(onConnectionDisconnect).toHaveBeenCalledWith(edges[0], "endpoint-detach");
   });
 
   test("node minimize controls update builder nodes without starting a drag", () => {

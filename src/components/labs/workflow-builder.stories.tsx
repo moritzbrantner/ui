@@ -260,6 +260,68 @@ const compactEdges: WorkflowBuilderEdge[] = [
   },
 ];
 
+const fanOutNodes: WorkflowBuilderNodeData[] = [
+  {
+    id: "source",
+    label: "Source",
+    category: "Source",
+    tone: "success",
+    x: 48,
+    y: 116,
+    outputs: [{ id: "event", label: "Event", kind: "event" }],
+  },
+  {
+    id: "normalize",
+    label: "Normalize",
+    category: "Transform",
+    x: 360,
+    y: 48,
+    inputs: [{ id: "event", label: "Event", kind: "event" }],
+  },
+  {
+    id: "audit",
+    label: "Audit",
+    category: "Sink",
+    x: 360,
+    y: 244,
+    inputs: [{ id: "event", label: "Event", kind: "event" }],
+  },
+];
+
+const occupiedInputNodes: WorkflowBuilderNodeData[] = [
+  {
+    id: "primary",
+    label: "Primary source",
+    x: 48,
+    y: 48,
+    outputs: [{ id: "event", label: "Event", kind: "event" }],
+  },
+  {
+    id: "fallback",
+    label: "Fallback source",
+    x: 48,
+    y: 240,
+    outputs: [{ id: "event", label: "Event", kind: "event" }],
+  },
+  {
+    id: "target",
+    label: "Target",
+    x: 360,
+    y: 144,
+    inputs: [{ id: "event", label: "Event", kind: "event" }],
+  },
+];
+
+const occupiedInputEdges: WorkflowBuilderEdge[] = [
+  {
+    id: "primary-target",
+    sourceNodeId: "primary",
+    sourcePortId: "event",
+    targetNodeId: "target",
+    targetPortId: "event",
+  },
+];
+
 const meta = {
   title: "Components/Editors/Workflow Builder",
   component: WorkflowBuilder,
@@ -423,6 +485,106 @@ export const ConnectNodes: Story = {
       targetPortId: "labels",
     });
     await expect(canvas.getByTestId("workflow-edge-count")).toHaveTextContent("Edges: 5");
+  },
+};
+
+export const FanOutConnections: Story = {
+  args: {
+    nodes: fanOutNodes,
+    edges: [],
+    surfaceHeight: 420,
+    toolbarLabel: "Fan-out workflow",
+    onConnectionComplete: fn(),
+  },
+  render: (args) => (
+    <StatefulWorkflowBuilder
+      {...args}
+      initialNodes={fanOutNodes}
+      initialEdges={[]}
+      canvasSize={{ width: 760, height: 440 }}
+    />
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByTestId("workflow-edge-count")).toHaveTextContent("Edges: 0");
+
+    await userEvent.click(canvas.getByRole("button", { name: "Start Source Event" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Connect to Normalize Event" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Start Source Event" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Connect to Audit Event" }));
+
+    await expect(args.onConnectionComplete).toHaveBeenCalledTimes(2);
+    await expect(canvas.getByTestId("workflow-edge-count")).toHaveTextContent("Edges: 2");
+  },
+};
+
+export const DragConnectAndDisconnect: Story = {
+  args: {
+    nodes: compactNodes,
+    edges: [],
+    surfaceHeight: 300,
+    toolbarLabel: "Drag workflow",
+    onConnectionComplete: fn(),
+    onConnectionDisconnect: fn(),
+  },
+  render: (args) => (
+    <StatefulWorkflowBuilder
+      {...args}
+      initialNodes={compactNodes}
+      initialEdges={[]}
+      canvasSize={{ width: 920, height: 320 }}
+    />
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.pointer([
+      { keys: "[MouseLeft>]", target: canvas.getByRole("button", { name: "Start Webhook Event" }) },
+      { target: canvas.getByRole("button", { name: "Connect to Parse Event" }) },
+      {
+        keys: "[/MouseLeft]",
+        target: canvas.getByRole("button", { name: "Connect to Parse Event" }),
+      },
+    ]);
+
+    await expect(args.onConnectionComplete).toHaveBeenCalledWith({
+      sourceNodeId: "webhook",
+      sourcePortId: "event",
+      targetNodeId: "parse",
+      targetPortId: "event",
+    });
+    await expect(canvas.getByTestId("workflow-edge-count")).toHaveTextContent("Edges: 1");
+
+    await userEvent.dblClick(
+      canvas.getByRole("button", { name: "Connection edge-webhook-event-parse-event" }),
+    );
+
+    await expect(args.onConnectionDisconnect).toHaveBeenCalled();
+    await expect(canvas.getByTestId("workflow-edge-count")).toHaveTextContent("Edges: 0");
+  },
+};
+
+export const InputOccupiedGuard: Story = {
+  args: {
+    nodes: occupiedInputNodes,
+    edges: occupiedInputEdges,
+    surfaceHeight: 380,
+    toolbarLabel: "Single-source input",
+    onConnectionComplete: fn(),
+  },
+  render: (args) => (
+    <StatefulWorkflowBuilder
+      {...args}
+      initialNodes={occupiedInputNodes}
+      initialEdges={occupiedInputEdges}
+      canvasSize={{ width: 760, height: 420 }}
+    />
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByTestId("workflow-edge-count")).toHaveTextContent("Edges: 1");
+
+    await userEvent.click(canvas.getByRole("button", { name: "Start Fallback source Event" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Connect to Target Event" }));
+
+    await expect(args.onConnectionComplete).not.toHaveBeenCalled();
+    await expect(canvas.getByTestId("workflow-edge-count")).toHaveTextContent("Edges: 1");
   },
 };
 

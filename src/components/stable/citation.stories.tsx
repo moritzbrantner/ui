@@ -18,6 +18,17 @@ import {
 
 const citations = [
   {
+    id: "text",
+    title: "Research note excerpt",
+    kind: "text",
+    publisher: "Research Ops",
+    issued: "2026",
+    citedText: "ranking changes should be staged behind a review flag",
+    fullText:
+      "The complete note says ranking changes should be staged behind a review flag until source-grounded regressions have been checked against the weekly audit set.",
+    status: "cited",
+  },
+  {
     id: "paper",
     title: "Attention Is All You Need",
     authors: ["Vaswani", "Shazeer", "Parmar"],
@@ -31,20 +42,52 @@ const citations = [
     status: "supporting",
   },
   {
-    id: "handbook",
-    title: "Research synthesis handbook",
-    authors: ["Platform Research"],
-    publisher: "Internal Methods",
-    issued: "2026",
-    accessed: "May 18, 2026",
-    note: "Use as methodological background, not as evidence for the factual claim.",
+    id: "audio",
+    title: "Launch interview",
+    kind: "audio",
+    source: "Customer research call",
+    locator: "1:23-1:41",
+    excerpt: "The account owner describes the reporting workflow as their daily checkpoint.",
+    contextSource: {
+      type: "audio",
+      src: "/audio/research-call.mp3",
+      startTime: 83,
+      endTime: 101,
+      title: "Customer research call",
+      transcript:
+        "Transcript: The account owner describes the reporting workflow as their daily checkpoint before reviewing downstream tasks.",
+    },
     status: "cited",
   },
   {
-    id: "missing",
+    id: "youtube",
+    title: "Workflow demo",
+    kind: "youtube",
+    source: "Product demo",
+    locator: "0:42",
+    excerpt: "The demo shows reviewers opening cited evidence from the result row.",
+    contextSource: {
+      type: "youtube",
+      videoId: "dQw4w9WgXcQ",
+      startTime: 42,
+      title: "Workflow demo",
+    },
+    status: "supporting",
+  },
+  {
+    id: "pdf",
     title: "Dataset release notes",
+    kind: "pdf",
     source: "Archive export",
-    locator: "appendix B",
+    locator: "appendix B, p. 7",
+    excerpt: "The release notes define the audit fields used for regression checks.",
+    contextSource: {
+      type: "pdf",
+      src: "/docs/dataset-release-notes.pdf",
+      page: 7,
+      search: "audit fields",
+      title: "Dataset release notes",
+    },
     status: "missing",
   },
 ] satisfies CitationData[];
@@ -92,11 +135,13 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   play: async ({ canvas }) => {
+    await expect(canvas.getByText("Research note excerpt")).toBeVisible();
     await expect(canvas.getByText("Attention Is All You Need")).toBeVisible();
-    await expect(canvas.getByText("Research synthesis handbook")).toBeVisible();
+    await expect(canvas.getByText("Launch interview")).toBeVisible();
+    await expect(canvas.getByText("Workflow demo")).toBeVisible();
     await expect(canvas.getByText("Custom citation layout")).toBeVisible();
     await expect(canvas.getByText("Disputed")).toBeVisible();
-    await userEvent.click(canvas.getByRole("button", { name: "Show context" }));
-    await expect(canvas.getByText(/self-attention connects all token positions/)).toBeVisible();
+    await userEvent.click(canvas.getAllByRole("button", { name: "Show context" })[0]);
+    await expect(canvas.getByText(/complete note says ranking changes/)).toBeVisible();
   },
 };
