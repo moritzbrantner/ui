@@ -232,6 +232,7 @@ import {
   type WorkflowBuilderEdge,
   type WorkflowBuilderNodeData,
   type WorkflowBuilderViewport,
+  type WorkflowNodeMenuItem,
   moveTimelineEditorClip,
   resizeTimelineEditorClip,
   type TimelineEditorTrack,
@@ -655,8 +656,13 @@ describe("@moritzbrantner/ui package-contract", () => {
       targetNodeId: "target",
       targetPortId: "in",
     };
+    const workflowNodeMenuItem: WorkflowNodeMenuItem = {
+      id: "contract-menu-item",
+      label: "Contract menu item",
+    };
     expect(workflowViewport.zoom).toBe(1);
     expect(workflowConnection.sourceNodeId).toBe("source");
+    expect(workflowNodeMenuItem.id).toBe("contract-menu-item");
   });
 
   test("exposes metadata-only theme server entrypoints", () => {

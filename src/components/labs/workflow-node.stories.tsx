@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, screen } from "storybook/test";
 
 import { WorkflowNode, getWorkflowNodeSize, type WorkflowNodeData } from "./workflow-node";
 
@@ -48,7 +48,9 @@ const meta = {
   tags: ["autodocs", "test"],
   args: {
     node: classifierNode,
+    menuItems: [{ id: "duplicate", label: "Duplicate" }],
     onNodeSelect: fn(),
+    onMenuItemSelect: fn(),
   },
 } satisfies Meta<typeof WorkflowNode>;
 
@@ -60,18 +62,23 @@ export const Default: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const expectedSize = getWorkflowNodeSize(args.node);
     await expect(canvas.getByRole("button", { name: "Classify" })).toBeVisible();
-    await expect(canvas.queryByText("@moritzbrantner/text-classification")).not.toBeInTheDocument();
-    await expect(canvas.getByText("running")).toBeVisible();
+    await expect(canvas.getByText("@moritzbrantner/text-classification")).toBeVisible();
+    await expect(canvas.queryByText("running")).not.toBeInTheDocument();
     await expect(canvas.queryByText("routing")).not.toBeInTheDocument();
     await expect(canvas.queryByText("review")).not.toBeInTheDocument();
     await expect(canvas.getByRole("button", { name: "Classify Text" })).toBeVisible();
     await expect(canvas.getByRole("button", { name: "Classify Labels" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Minimize Classify" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Open Classify menu" })).toBeVisible();
     await expect(canvas.getByTestId("workflow-node-size")).toHaveTextContent(
       `${expectedSize.width}x${expectedSize.height}`,
     );
 
     await userEvent.click(canvas.getByRole("button", { name: "Classify" }));
     await expect(args.onNodeSelect).toHaveBeenCalledTimes(1);
+    await userEvent.click(canvas.getByRole("button", { name: "Open Classify menu" }));
+    await userEvent.click(screen.getByRole("menuitem", { name: "Duplicate" }));
+    await expect(args.onMenuItemSelect).toHaveBeenCalledTimes(1);
   },
   render: (args) => (
     <div className="grid gap-4 p-4">
@@ -89,6 +96,6 @@ export const Compact: Story = {
   },
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("button", { name: "Publish" })).toBeVisible();
-    await expect(canvas.getByText("labels to event")).toBeVisible();
+    await expect(canvas.getByText("labels -> event")).toBeVisible();
   },
 };

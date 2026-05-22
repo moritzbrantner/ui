@@ -277,7 +277,7 @@ function WorkflowBuilder({
     if (
       readOnly ||
       (event.button !== 0 && event.button !== undefined) ||
-      isWorkflowPortEvent(event.target)
+      isWorkflowNodeControlEvent(event.target)
     ) {
       return;
     }
@@ -738,7 +738,6 @@ function getWorkflowNodePortPoint(
 ): WorkflowBuilderPoint {
   const size = getWorkflowNodeSize(node);
   const compact = node.variant === "compact";
-  const minimized = node.minimized === true;
   const measuredPoint = portPoints[getWorkflowBuilderPortPointKey(node.id, direction, portId)];
 
   if (measuredPoint) {
@@ -747,7 +746,7 @@ function getWorkflowNodePortPoint(
 
   const x = node.x + getWorkflowNodePortDotXOffset(node, direction);
 
-  if (compact || minimized) {
+  if (compact) {
     return {
       x,
       y: node.y + size.height / 2,
@@ -872,10 +871,19 @@ function isWorkflowBuilderPortDirection(
   return direction === "input" || direction === "output";
 }
 
-function isWorkflowPortEvent(target: EventTarget) {
+function isWorkflowNodeControlEvent(target: EventTarget) {
   return (
     target instanceof HTMLElement &&
-    Boolean(target.closest("[data-slot='workflow-builder-port'], [data-slot='workflow-node-port']"))
+    Boolean(
+      target.closest(
+        [
+          "[data-slot='workflow-builder-port']",
+          "[data-slot='workflow-node-port']",
+          "[data-slot='workflow-node-minimize']",
+          "[data-slot='workflow-node-menu-trigger']",
+        ].join(", "),
+      ),
+    )
   );
 }
 

@@ -228,7 +228,7 @@ describe("@moritzbrantner/ui component edge cases", () => {
     );
 
     expect(container.querySelector("[data-slot='workflow-builder-edge']")?.getAttribute("d")).toBe(
-      "M 248 240 C 296 240, 272 352, 320 352",
+      "M 310 209 C 358 209, 272 281, 320 281",
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Start Source Image" }));
@@ -298,7 +298,7 @@ describe("@moritzbrantner/ui component edge cases", () => {
       "true",
     );
     expect(container.querySelector("[data-slot='workflow-builder-edge']")?.getAttribute("d")).toBe(
-      "M 248 240 C 296 240, 272 26, 320 26",
+      "M 310 209 C 358 209, 272 86, 320 86",
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Minimize Source" }));
@@ -344,6 +344,8 @@ describe("@moritzbrantner/ui component edge cases", () => {
   });
 
   test("workflow node supports compact summaries and expanded port metadata", () => {
+    const onMenuItemSelect = vi.fn();
+
     render(
       <>
         <WorkflowNode
@@ -372,6 +374,8 @@ describe("@moritzbrantner/ui component edge cases", () => {
               },
             ],
           }}
+          menuItems={[{ id: "inspect", label: "Inspect" }]}
+          onMenuItemSelect={onMenuItemSelect}
         />
         <WorkflowNode
           node={{
@@ -398,20 +402,33 @@ describe("@moritzbrantner/ui component edge cases", () => {
     );
 
     expect(screen.getByText("Assign taxonomy labels from normalized text.")).toBeTruthy();
-    expect(screen.queryByText("@platform/classification")).toBeNull();
+    expect(screen.getByText("@platform/classification")).toBeTruthy();
     expect(screen.queryByText("routing")).toBeNull();
     expect(screen.queryByText("review")).toBeNull();
     expect(screen.getByText("required")).toBeTruthy();
-    expect(screen.getByText("labels to event")).toBeTruthy();
+    expect(screen.getByText("labels -> event")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Minimize Classify" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Open Classify menu" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Expand Review" })).toBeTruthy();
     expect(screen.queryByText("Hidden while minimized.")).toBeNull();
+    fireEvent.keyDown(screen.getByRole("button", { name: "Open Classify menu" }), {
+      code: "Enter",
+      key: "Enter",
+    });
+    fireEvent.click(screen.getByRole("menuitem", { name: "Inspect" }));
+    expect(onMenuItemSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "inspect" }),
+      expect.objectContaining({ id: "expanded" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Minimize Classify" }));
+    expect(screen.getByRole("button", { name: "Expand Classify" })).toBeTruthy();
     expect(getWorkflowNodeSize({ id: "compact", label: "Publish", variant: "compact" })).toEqual({
-      width: 224,
-      height: 84,
+      width: 240,
+      height: 48,
     });
     expect(getWorkflowNodeSize({ id: "minimized", label: "Review", minimized: true })).toEqual({
-      width: 192,
-      height: 52,
+      width: 230,
+      height: 94,
     });
   });
 });

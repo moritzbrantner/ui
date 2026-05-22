@@ -1,10 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { ArrowRightIcon, CircleIcon, Maximize2Icon, Minimize2Icon } from "lucide-react";
+import { Maximize2Icon, Minimize2Icon, MoreHorizontalIcon } from "lucide-react";
 
 import { cn } from "../../lib/cn";
-import { Badge } from "../stable/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "../stable/dropdown-menu";
 
 type WorkflowNodePort = {
   id: string;
@@ -13,6 +19,7 @@ type WorkflowNodePort = {
   required?: boolean;
   description?: string;
   badge?: string;
+  color?: string;
   metadata?: Record<string, unknown>;
 };
 
@@ -39,28 +46,45 @@ type WorkflowNodeSize = {
   height: number;
 };
 
+type WorkflowNodeMenuItem = {
+  id: string;
+  label: React.ReactNode;
+  disabled?: boolean;
+  destructive?: boolean;
+  onSelect?: (node: WorkflowNodeData) => void;
+};
+
 type WorkflowNodeProps = React.ComponentProps<"div"> & {
   node: WorkflowNodeData;
   selected?: boolean;
   readOnly?: boolean;
   inputDisabled?: boolean;
   outputDisabled?: boolean;
+  menuItems?: WorkflowNodeMenuItem[];
+  menuLabel?: React.ReactNode;
   onNodeSelect?: (node: WorkflowNodeData) => void;
   onMinimizedChange?: (node: WorkflowNodeData, minimized: boolean) => void;
+  onMenuItemSelect?: (item: WorkflowNodeMenuItem, node: WorkflowNodeData) => void;
   onInputClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
   onOutputClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
   getInputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
   getOutputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
 };
 
-const workflowNodeCompactWidth = 224;
-const workflowNodeDefaultWidth = 248;
-const workflowNodeMinimizedWidth = 192;
-const workflowNodeCompactHeight = 84;
-const workflowNodeMinimizedHeight = 52;
-const workflowNodeHeaderHeight = 72;
-const workflowNodeDescriptionHeight = 28;
-const workflowNodePortRowHeight = 112;
+const workflowNodeInlineWidth = 240;
+const workflowNodeDefaultWidth = 310;
+const workflowNodeMinimizedWidth = 230;
+const workflowNodeCompactHeight = 48;
+const workflowNodeMinimizedHeaderHeight = 54;
+const workflowNodePortRowHeight = 64;
+const workflowNodePortGap = 8;
+const workflowNodePortColumnsPaddingY = 24;
+const workflowNodePortColumnLabelHeight = 21;
+const workflowNodeHeaderBaseHeight = 72;
+const workflowNodeDescriptionLineHeight = 20;
+const workflowNodeDescriptionMaxRows = 4;
+const workflowNodeControlButtonClassName =
+  "inline-flex h-6 w-6 items-center justify-center rounded-md border border-zinc-300 bg-white/80 text-zinc-700 outline-none transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-1";
 
 function WorkflowNode({
   node,
@@ -68,8 +92,11 @@ function WorkflowNode({
   readOnly = false,
   inputDisabled = false,
   outputDisabled = false,
+  menuItems = [],
+  menuLabel = "Actions",
   onNodeSelect,
   onMinimizedChange,
+  onMenuItemSelect,
   onInputClick,
   onOutputClick,
   getInputAriaLabel,
@@ -78,20 +105,66 @@ function WorkflowNode({
   style,
   ...props
 }: WorkflowNodeProps) {
-  const compact = workflowNodeUsesCompactVariant(node);
-  const minimized = workflowNodeUsesMinimizedVariant(node);
-  const size = getWorkflowNodeSize(node);
+  const [uncontrolledMinimized, setUncontrolledMinimized] = React.useState(node.minimized ?? false);
+
+  React.useEffect(() => {
+    setUncontrolledMinimized(node.minimized ?? false);
+  }, [node.id, node.minimized]);
+
+  const minimized = node.minimized ?? uncontrolledMinimized;
+  const resolvedNode = React.useMemo(
+    () => (node.minimized === minimized ? node : { ...node, minimized }),
+    [minimized, node],
+  );
+  const compact = workflowNodeUsesCompactVariant(resolvedNode);
+  const size = getWorkflowNodeSize(resolvedNode);
+
+  const changeMinimized = (nextMinimized: boolean) => {
+    if (node.minimized === undefined) {
+      setUncontrolledMinimized(nextMinimized);
+    }
+    onMinimizedChange?.(resolvedNode, nextMinimized);
+  };
+
+  if (compact) {
+    return (
+      <div
+        data-slot="workflow-node"
+        data-compact="true"
+        data-selected={selected ? "true" : undefined}
+        data-status={resolvedNode.status}
+        className={cn(
+          "relative overflow-visible rounded-lg border bg-white text-left shadow-sm transition-colors",
+          selected ? "border-zinc-950 ring-2 ring-zinc-950/10" : "border-zinc-200",
+          className,
+        )}
+        style={{ width: size.width, height: size.height, ...style }}
+        {...props}
+      >
+        <WorkflowNodeInline
+          node={resolvedNode}
+          readOnly={readOnly}
+          inputDisabled={inputDisabled}
+          outputDisabled={outputDisabled}
+          onNodeSelect={onNodeSelect}
+          onInputClick={onInputClick}
+          onOutputClick={onOutputClick}
+          getInputAriaLabel={getInputAriaLabel}
+          getOutputAriaLabel={getOutputAriaLabel}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
       data-slot="workflow-node"
-      data-compact={compact ? "true" : undefined}
       data-minimized={minimized ? "true" : undefined}
       data-selected={selected ? "true" : undefined}
-      data-status={node.status}
+      data-status={resolvedNode.status}
       className={cn(
-        "relative flex flex-col overflow-visible rounded-xl border bg-card text-card-foreground shadow-sm transition-colors",
-        "data-[selected=true]:border-primary data-[selected=true]:bg-primary/5",
+        "relative flex flex-col overflow-visible rounded-lg border bg-white text-left shadow-sm transition-colors",
+        selected ? "border-zinc-950 ring-2 ring-zinc-950/10" : "border-zinc-200",
         className,
       )}
       style={{ width: size.width, height: size.height, ...style }}
@@ -100,11 +173,17 @@ function WorkflowNode({
       <div
         data-slot="workflow-node-header"
         className={cn(
-          "shrink-0 overflow-hidden px-3 py-2",
-          minimized ? "rounded-xl border-b-0" : "rounded-t-xl border-b",
-          minimized ? "h-full" : compact ? "h-[48px]" : node.description ? "h-[100px]" : "h-[72px]",
-          getWorkflowNodeToneClasses(node.tone ?? getWorkflowNodeToneFromStatus(node.status)),
+          "shrink-0 overflow-hidden rounded-t-lg px-3 py-2",
+          !minimized && "border-b",
+          getWorkflowNodeToneClasses(
+            resolvedNode.tone ?? getWorkflowNodeToneFromStatus(resolvedNode.status),
+          ),
         )}
+        style={{
+          minHeight: minimized
+            ? workflowNodeMinimizedHeaderHeight
+            : getWorkflowNodeHeaderHeight(resolvedNode),
+        }}
       >
         <div
           className={cn("flex justify-between gap-3", minimized ? "items-center" : "items-start")}
@@ -112,102 +191,71 @@ function WorkflowNode({
           <button
             type="button"
             data-slot="workflow-node-select"
-            aria-label={node.label}
+            aria-label={resolvedNode.label}
             className="min-w-0 flex-1 rounded-md text-left outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
             onClick={(event) => {
               event.stopPropagation();
-              onNodeSelect?.(node);
+              onNodeSelect?.(resolvedNode);
             }}
           >
-            {(node.eyebrow ?? node.category ?? node.kind) ? (
-              <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                {node.eyebrow ?? node.category ?? node.kind}
+            <div className="truncate text-sm font-semibold text-zinc-950">{resolvedNode.label}</div>
+            {getWorkflowNodePackageLabel(resolvedNode) ? (
+              <div className="mt-0.5 truncate text-[11px] font-medium text-zinc-600">
+                {getWorkflowNodePackageLabel(resolvedNode)}
               </div>
             ) : null}
-            <div className="truncate text-sm font-semibold">{node.label}</div>
           </button>
           <div className="mt-0.5 flex shrink-0 items-center gap-1.5">
-            {node.status && !minimized ? (
-              <Badge variant={getWorkflowNodeStatusVariant(node.status)}>{node.status}</Badge>
+            {(resolvedNode.eyebrow ?? resolvedNode.category ?? resolvedNode.kind) && !minimized ? (
+              <span className="rounded bg-white/70 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-zinc-600">
+                {resolvedNode.eyebrow ?? resolvedNode.category ?? resolvedNode.kind}
+              </span>
             ) : null}
             <span
               aria-hidden="true"
               className={cn(
-                "block size-2.5 rounded-full",
+                "block h-2.5 w-2.5 rounded-full",
                 getWorkflowNodeToneDotClass(
-                  node.tone ?? getWorkflowNodeToneFromStatus(node.status),
+                  resolvedNode.tone ?? getWorkflowNodeToneFromStatus(resolvedNode.status),
                 ),
               )}
             />
-            {onMinimizedChange ? (
-              <button
-                type="button"
-                data-slot="workflow-node-minimize"
-                aria-label={minimized ? `Expand ${node.label}` : `Minimize ${node.label}`}
-                aria-pressed={minimized}
-                className="inline-flex size-6 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-background/70 hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                onPointerDown={(event) => event.stopPropagation()}
-                onMouseDown={(event) => event.stopPropagation()}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onMinimizedChange(node, !minimized);
-                }}
-              >
-                {minimized ? (
-                  <Maximize2Icon className="size-3.5" aria-hidden="true" />
-                ) : (
-                  <Minimize2Icon className="size-3.5" aria-hidden="true" />
-                )}
-              </button>
-            ) : null}
+            <WorkflowNodeMinimizeButton
+              node={resolvedNode}
+              minimized={minimized}
+              onMinimizedChange={changeMinimized}
+            />
+            <WorkflowNodeMenu
+              node={resolvedNode}
+              items={menuItems}
+              label={menuLabel}
+              onItemSelect={onMenuItemSelect}
+            />
           </div>
         </div>
-        {node.description && !compact && !minimized ? (
-          <p className={cn("mt-1 line-clamp-1 text-xs leading-5 text-muted-foreground")}>
-            {node.description}
+        {resolvedNode.description && !compact && !minimized ? (
+          <p className="mt-2 line-clamp-4 text-xs leading-5 text-zinc-600">
+            {resolvedNode.description}
           </p>
         ) : null}
       </div>
       {minimized ? (
-        <WorkflowNodeMinimizedPorts node={node} />
-      ) : compact ? (
-        <div
-          data-slot="workflow-node-compact-ports"
-          className="relative flex min-h-0 flex-1 items-center justify-center px-8 py-2 text-xs"
-        >
-          <WorkflowNodePortAnchor
-            direction="input"
-            node={node}
-            port={(node.inputs ?? [])[0]}
-            disabled={inputDisabled}
-            onClick={onInputClick}
-            getAriaLabel={getInputAriaLabel}
-            compact
-          />
-          <div
-            data-slot="workflow-node-summary"
-            className="flex min-w-0 items-center justify-center gap-1.5 text-[11px] text-muted-foreground"
-          >
-            <span className="truncate">{workflowNodeCompactPortSummary(node)}</span>
-            <ArrowRightIcon className="size-3 shrink-0" aria-hidden="true" />
-          </div>
-          <WorkflowNodePortAnchor
-            direction="output"
-            node={node}
-            port={(node.outputs ?? [])[0]}
-            disabled={outputDisabled || readOnly}
-            onClick={onOutputClick}
-            getAriaLabel={getOutputAriaLabel}
-            compact
-          />
-        </div>
+        <WorkflowNodeMinimizedPorts
+          node={resolvedNode}
+          inputDisabled={inputDisabled}
+          outputDisabled={outputDisabled || readOnly}
+          onInputClick={onInputClick}
+          onOutputClick={onOutputClick}
+          getInputAriaLabel={getInputAriaLabel}
+          getOutputAriaLabel={getOutputAriaLabel}
+        />
       ) : (
-        <div className="grid min-h-0 flex-1 grid-cols-2 gap-2 p-2 text-xs">
+        <div className="grid min-h-0 flex-1 grid-cols-2 gap-3 p-3 text-xs">
           <WorkflowNodePortColumn
             title="Inputs"
             direction="input"
-            node={node}
-            ports={node.inputs ?? []}
+            node={resolvedNode}
+            ports={resolvedNode.inputs ?? []}
             disabled={inputDisabled}
             onClick={onInputClick}
             getAriaLabel={getInputAriaLabel}
@@ -215,8 +263,8 @@ function WorkflowNode({
           <WorkflowNodePortColumn
             title="Outputs"
             direction="output"
-            node={node}
-            ports={node.outputs ?? []}
+            node={resolvedNode}
+            ports={resolvedNode.outputs ?? []}
             disabled={outputDisabled || readOnly}
             onClick={onOutputClick}
             getAriaLabel={getOutputAriaLabel}
@@ -227,35 +275,301 @@ function WorkflowNode({
   );
 }
 
-function WorkflowNodeMinimizedPorts({ node }: { node: WorkflowNodeData }) {
+function WorkflowNodeMinimizeButton({
+  node,
+  minimized,
+  onMinimizedChange,
+}: {
+  node: WorkflowNodeData;
+  minimized: boolean;
+  onMinimizedChange: (minimized: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      data-slot="workflow-node-minimize"
+      aria-label={minimized ? `Expand ${node.label}` : `Minimize ${node.label}`}
+      aria-pressed={minimized}
+      className={workflowNodeControlButtonClassName}
+      onPointerDown={(event) => event.stopPropagation()}
+      onMouseDown={(event) => event.stopPropagation()}
+      onClick={(event) => {
+        event.stopPropagation();
+        onMinimizedChange(!minimized);
+      }}
+    >
+      {minimized ? (
+        <Maximize2Icon className="size-3.5" aria-hidden="true" />
+      ) : (
+        <Minimize2Icon className="size-3.5" aria-hidden="true" />
+      )}
+    </button>
+  );
+}
+
+function WorkflowNodeMenu({
+  node,
+  items,
+  label,
+  onItemSelect,
+}: {
+  node: WorkflowNodeData;
+  items: WorkflowNodeMenuItem[];
+  label: React.ReactNode;
+  onItemSelect?: (item: WorkflowNodeMenuItem, node: WorkflowNodeData) => void;
+}) {
+  const menuLabel = typeof label === "string" ? label : "Actions";
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          data-slot="workflow-node-menu-trigger"
+          aria-label={`Open ${node.label} menu`}
+          className={workflowNodeControlButtonClassName}
+        >
+          <MoreHorizontalIcon className="size-3.5" aria-hidden="true" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        data-slot="workflow-node-menu"
+        align="end"
+        sideOffset={6}
+        className="min-w-40"
+        aria-label={menuLabel}
+      >
+        {label ? <DropdownMenuLabel>{label}</DropdownMenuLabel> : null}
+        {items.length > 0 ? (
+          items.map((item) => (
+            <DropdownMenuItem
+              key={item.id}
+              disabled={item.disabled}
+              variant={item.destructive ? "destructive" : "default"}
+              onSelect={() => {
+                item.onSelect?.(node);
+                onItemSelect?.(item, node);
+              }}
+            >
+              {item.label}
+            </DropdownMenuItem>
+          ))
+        ) : (
+          <DropdownMenuItem disabled>No actions</DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function WorkflowNodeInline({
+  node,
+  readOnly,
+  inputDisabled,
+  outputDisabled,
+  onNodeSelect,
+  onInputClick,
+  onOutputClick,
+  getInputAriaLabel,
+  getOutputAriaLabel,
+}: {
+  node: WorkflowNodeData;
+  readOnly: boolean;
+  inputDisabled: boolean;
+  outputDisabled: boolean;
+  onNodeSelect?: (node: WorkflowNodeData) => void;
+  onInputClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
+  onOutputClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
+  getInputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
+  getOutputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
+}) {
+  const input = node.inputs?.[0];
+  const output = node.outputs?.[0];
+
+  return (
+    <div
+      data-slot="workflow-node-inline"
+      className={cn(
+        "relative flex h-12 items-center gap-2 rounded-lg px-3",
+        getWorkflowNodeToneClasses(node.tone ?? getWorkflowNodeToneFromStatus(node.status)),
+      )}
+      title={workflowNodeInlineTitle(node)}
+    >
+      <WorkflowNodeInlinePort
+        direction="input"
+        node={node}
+        port={input}
+        disabled={inputDisabled}
+        onClick={onInputClick}
+        getAriaLabel={getInputAriaLabel}
+      />
+      <button
+        type="button"
+        data-slot="workflow-node-select"
+        aria-label={node.label}
+        className="min-w-0 flex-1 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-1"
+        onClick={(event) => {
+          event.stopPropagation();
+          onNodeSelect?.(node);
+        }}
+      >
+        <div className="truncate text-xs font-semibold text-zinc-950">{node.label}</div>
+        <div className="truncate text-[10px] font-medium text-zinc-600">
+          {workflowNodeCompactPortSummary(node)}
+        </div>
+      </button>
+      <WorkflowNodeInlinePort
+        direction="output"
+        node={node}
+        port={output}
+        disabled={outputDisabled || readOnly}
+        onClick={onOutputClick}
+        getAriaLabel={getOutputAriaLabel}
+      />
+    </div>
+  );
+}
+
+function WorkflowNodeInlinePort({
+  direction,
+  node,
+  port,
+  disabled,
+  onClick,
+  getAriaLabel,
+}: {
+  direction: "input" | "output";
+  node: WorkflowNodeData;
+  port?: WorkflowNodePort;
+  disabled: boolean;
+  onClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
+  getAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
+}) {
+  if (!port) {
+    return null;
+  }
+
+  const isInput = direction === "input";
+  const color = getWorkflowNodePortColor(port);
+
+  return (
+    <button
+      type="button"
+      data-slot="workflow-node-port"
+      data-port-direction={direction}
+      data-port-id={port.id}
+      disabled={disabled || !onClick}
+      aria-label={getAriaLabel?.(port, node) ?? `${node.label} ${port.label}`}
+      className={cn(
+        "absolute top-1/2 z-10 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-60",
+        isInput ? "-left-[7px]" : "-right-[7px]",
+      )}
+      style={{ backgroundColor: color }}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick?.(port, node);
+      }}
+    >
+      <span data-slot="workflow-node-port-dot" className="block h-full w-full rounded-full" />
+    </button>
+  );
+}
+
+function WorkflowNodeMinimizedPorts({
+  node,
+  inputDisabled,
+  outputDisabled,
+  onInputClick,
+  onOutputClick,
+  getInputAriaLabel,
+  getOutputAriaLabel,
+}: {
+  node: WorkflowNodeData;
+  inputDisabled: boolean;
+  outputDisabled: boolean;
+  onInputClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
+  onOutputClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
+  getInputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
+  getOutputAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
+}) {
+  const inputs = node.inputs ?? [];
+  const outputs = node.outputs ?? [];
+
+  return (
+    <div
+      data-slot="workflow-node-minimized-ports"
+      className="relative border-t border-zinc-100 bg-white"
+      style={{ height: getWorkflowNodeMinimizedPortsHeight(node) }}
+    >
+      <div className="pointer-events-none absolute inset-x-3 top-1/2 flex -translate-y-1/2 items-center justify-between text-[10px] font-semibold uppercase text-zinc-500">
+        <span>{inputs.length} in</span>
+        <span>{outputs.length} out</span>
+      </div>
+      <WorkflowNodeMinimizedPortStack
+        direction="input"
+        node={node}
+        ports={inputs}
+        disabled={inputDisabled}
+        onClick={onInputClick}
+        getAriaLabel={getInputAriaLabel}
+      />
+      <WorkflowNodeMinimizedPortStack
+        direction="output"
+        node={node}
+        ports={outputs}
+        disabled={outputDisabled}
+        onClick={onOutputClick}
+        getAriaLabel={getOutputAriaLabel}
+      />
+    </div>
+  );
+}
+
+function WorkflowNodeMinimizedPortStack({
+  direction,
+  node,
+  ports,
+  disabled,
+  onClick,
+  getAriaLabel,
+}: {
+  direction: "input" | "output";
+  node: WorkflowNodeData;
+  ports: WorkflowNodePort[];
+  disabled: boolean;
+  onClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
+  getAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
+}) {
+  const isInput = direction === "input";
+
   return (
     <>
-      {(node.inputs?.length ?? 0) > 0 ? (
-        <span
-          data-slot="workflow-node-minimized-port"
-          data-port-direction="input"
+      {ports.map((port, index) => (
+        <button
+          key={`${direction}-${port.id}`}
+          type="button"
+          data-slot="workflow-node-port"
+          data-port-direction={direction}
+          data-port-id={port.id}
+          disabled={disabled || !onClick}
+          aria-label={getAriaLabel?.(port, node) ?? `${node.label} ${port.label}`}
           className={cn(
-            "absolute top-1/2 left-0 flex size-4 -translate-x-1/2 -translate-y-1/2",
-            "items-center justify-center rounded-full border bg-card text-muted-foreground",
+            "absolute z-10 h-3 w-3 rounded-full border-2 border-white outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-60",
+            isInput ? "-left-[7px]" : "-right-[7px]",
           )}
-          aria-hidden="true"
+          style={{
+            backgroundColor: getWorkflowNodePortColor(port),
+            top: `${((index + 1) / (ports.length + 1)) * 100}%`,
+          }}
+          title={`${port.label} ${workflowNodePortSummaryLabel(port)}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            onClick?.(port, node);
+          }}
         >
-          <CircleIcon className="size-2.5 fill-current" />
-        </span>
-      ) : null}
-      {(node.outputs?.length ?? 0) > 0 ? (
-        <span
-          data-slot="workflow-node-minimized-port"
-          data-port-direction="output"
-          className={cn(
-            "absolute top-1/2 right-0 flex size-4 translate-x-1/2 -translate-y-1/2",
-            "items-center justify-center rounded-full border bg-card text-muted-foreground",
-          )}
-          aria-hidden="true"
-        >
-          <CircleIcon className="size-2.5 fill-current" />
-        </span>
-      ) : null}
+          <span data-slot="workflow-node-port-dot" className="block h-full w-full rounded-full" />
+        </button>
+      ))}
     </>
   );
 }
@@ -279,15 +593,13 @@ function WorkflowNodePortColumn({
 }) {
   return (
     <div className="flex min-h-0 flex-col">
-      <div className="mb-1 shrink-0 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-        {title}
-      </div>
+      <div className="mb-2 shrink-0 text-[11px] font-semibold uppercase text-zinc-500">{title}</div>
       {ports.length === 0 ? (
-        <div className="flex min-h-0 flex-1 items-center rounded-lg border border-dashed px-2 py-1.5 text-muted-foreground">
+        <div className="flex h-16 min-h-0 flex-1 items-center rounded-md border border-dashed border-zinc-200 px-2 py-1.5 text-xs text-zinc-400">
           none
         </div>
       ) : (
-        <div className="grid min-h-0 flex-1 gap-1">
+        <div className="grid min-h-0 flex-1 gap-2">
           {ports.map((port) => (
             <WorkflowNodePortAnchor
               key={`${direction}-${port.id}`}
@@ -312,7 +624,6 @@ function WorkflowNodePortAnchor({
   disabled,
   onClick,
   getAriaLabel,
-  compact = false,
 }: {
   direction: "input" | "output";
   node: WorkflowNodeData;
@@ -320,7 +631,6 @@ function WorkflowNodePortAnchor({
   disabled: boolean;
   onClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
   getAriaLabel?: (port: WorkflowNodePort, node: WorkflowNodeData) => string;
-  compact?: boolean;
 }) {
   const isInput = direction === "input";
 
@@ -330,14 +640,15 @@ function WorkflowNodePortAnchor({
         data-slot="workflow-node-port"
         data-port-direction={direction}
         className={cn(
-          "flex min-h-0 items-center rounded-lg border border-dashed px-2 py-1.5 text-muted-foreground",
-          compact && "h-full justify-center text-center",
+          "flex h-16 min-h-0 items-center rounded-md border border-dashed border-zinc-200 px-2 py-1.5 text-xs text-zinc-400",
         )}
       >
         none
       </div>
     );
   }
+
+  const color = getWorkflowNodePortColor(port);
 
   return (
     <button
@@ -348,19 +659,15 @@ function WorkflowNodePortAnchor({
       disabled={disabled || !onClick}
       aria-label={getAriaLabel?.(port, node) ?? `${node.label} ${port.label}`}
       className={cn(
-        "relative block h-full min-h-0 w-full overflow-visible rounded-lg border px-2 py-1.5 text-left outline-none transition-colors",
-        "focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
-        isInput
-          ? "border-border/80 bg-muted/20 hover:bg-muted/40"
-          : "border-border/80 bg-background hover:bg-muted/30",
-        compact &&
-          cn(
-            "absolute top-1/2 size-6 rounded-full p-1.5",
-            isInput
-              ? "left-0 -translate-x-1/2 -translate-y-1/2"
-              : "right-0 translate-x-1/2 -translate-y-1/2",
-          ),
+        "relative block h-16 w-full overflow-visible rounded-md border px-2 py-1.5 text-left outline-none transition-colors",
+        "focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-60",
+        isInput ? "pl-3" : "pr-3",
       )}
+      style={{
+        backgroundColor: hexToRgba(color, 0.08),
+        borderColor: hexToRgba(color, 0.32),
+        boxShadow: `inset ${isInput ? "3px" : "-3px"} 0 0 ${color}`,
+      }}
       onClick={(event) => {
         event.stopPropagation();
         onClick?.(port, node);
@@ -368,37 +675,49 @@ function WorkflowNodePortAnchor({
     >
       <div
         className={cn(
-          "flex h-full min-h-0 items-start gap-2",
-          !isInput && !compact && "flex-row-reverse text-right",
-          compact && "items-center justify-center",
+          "flex h-full min-h-0 flex-col gap-1 overflow-hidden",
+          isInput ? "items-start" : "items-end text-right",
         )}
       >
-        <CircleIcon
+        <span
           data-slot="workflow-node-port-dot"
           className={cn(
-            "size-3 shrink-0 fill-current",
-            !compact &&
-              cn("absolute top-1/2 -translate-y-1/2", isInput ? "-left-3.5" : "-right-3.5"),
+            "absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white",
+            isInput ? "-left-[7px]" : "-right-[7px]",
           )}
+          style={{ backgroundColor: color }}
           aria-hidden="true"
         />
-        <div
+        <span className="max-w-full truncate text-xs font-medium text-zinc-800">{port.label}</span>
+        <span
           className={cn(
-            "min-w-0 flex-1 overflow-hidden",
-            compact && "sr-only",
-            !isInput && !compact && "items-end",
+            "flex max-w-full flex-nowrap gap-1 overflow-hidden",
+            isInput ? "justify-start" : "justify-end",
           )}
         >
-          <div className="truncate text-xs font-medium text-foreground">{port.label}</div>
-          {compact ? null : (
-            <div className={cn("mt-1 flex flex-wrap gap-1", !isInput && "justify-end")}>
-              {port.kind ? <Badge variant="secondary">{port.kind}</Badge> : null}
-              {port.badge ? <Badge variant="outline">{port.badge}</Badge> : null}
-              {port.required ? <Badge variant="outline">required</Badge> : null}
-            </div>
-          )}
-          {port.description && !compact ? <div className="sr-only">{port.description}</div> : null}
-        </div>
+          {port.kind ? (
+            <span
+              className="max-w-full truncate whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase"
+              style={{
+                backgroundColor: hexToRgba(color, 0.16),
+                color: getWorkflowNodePortBadgeTextColor(color),
+              }}
+            >
+              {formatWorkflowNodePortKind(port.kind)}
+            </span>
+          ) : null}
+          {port.badge ? (
+            <span className="max-w-full truncate whitespace-nowrap rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-zinc-500">
+              {port.badge}
+            </span>
+          ) : null}
+          {port.required ? (
+            <span className="max-w-full truncate whitespace-nowrap rounded bg-zinc-950 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white">
+              required
+            </span>
+          ) : null}
+        </span>
+        {port.description ? <span className="sr-only">{port.description}</span> : null}
       </div>
     </button>
   );
@@ -409,7 +728,7 @@ function workflowNodeCompactPortSummary(node: WorkflowNodeData) {
   const output = node.outputs?.[0];
 
   if (input && output) {
-    return `${workflowNodePortSummaryLabel(input)} to ${workflowNodePortSummaryLabel(output)}`;
+    return `${workflowNodePortSummaryLabel(input)} -> ${workflowNodePortSummaryLabel(output)}`;
   }
 
   if (input || output) {
@@ -424,7 +743,7 @@ function workflowNodePortSummaryLabel(port: WorkflowNodePort | undefined) {
     return "port";
   }
 
-  return port.kind ?? port.badge ?? port.label;
+  return formatWorkflowNodePortKind(port.kind ?? port.badge ?? port.label);
 }
 
 function workflowNodeUsesCompactVariant(node: WorkflowNodeData) {
@@ -439,37 +758,50 @@ function getWorkflowNodeSize(node: WorkflowNodeData): WorkflowNodeSize {
   if (workflowNodeUsesMinimizedVariant(node)) {
     return {
       width: workflowNodeMinimizedWidth,
-      height: workflowNodeMinimizedHeight,
+      height: workflowNodeMinimizedHeaderHeight + getWorkflowNodeMinimizedPortsHeight(node),
     };
   }
 
   if (workflowNodeUsesCompactVariant(node)) {
     return {
-      width: workflowNodeCompactWidth,
+      width: workflowNodeInlineWidth,
       height: workflowNodeCompactHeight,
     };
   }
 
   const rows = Math.max(node.inputs?.length ?? 0, node.outputs?.length ?? 0, 1);
-  const descriptionHeight = node.description ? workflowNodeDescriptionHeight : 0;
+  const headerHeight = getWorkflowNodeHeaderHeight(node);
+  const portsHeight =
+    workflowNodePortColumnsPaddingY +
+    workflowNodePortColumnLabelHeight +
+    rows * workflowNodePortRowHeight +
+    Math.max(rows - 1, 0) * workflowNodePortGap;
 
   return {
     width: workflowNodeDefaultWidth,
-    height: workflowNodeHeaderHeight + descriptionHeight + rows * workflowNodePortRowHeight,
+    height: headerHeight + portsHeight,
   };
 }
 
 function getWorkflowNodePortCenterOffset(node: WorkflowNodeData, portIndex: number) {
-  if (workflowNodeUsesCompactVariant(node) || workflowNodeUsesMinimizedVariant(node)) {
+  if (workflowNodeUsesCompactVariant(node)) {
     return getWorkflowNodeSize(node).height / 2;
   }
 
-  const descriptionHeight = node.description ? workflowNodeDescriptionHeight : 0;
+  if (workflowNodeUsesMinimizedVariant(node)) {
+    const ports = Math.max(node.inputs?.length ?? 0, node.outputs?.length ?? 0, 1);
+    const top = workflowNodeMinimizedHeaderHeight;
+
+    return top + ((portIndex + 1) / (ports + 1)) * getWorkflowNodeMinimizedPortsHeight(node);
+  }
+
+  const headerHeight = getWorkflowNodeHeaderHeight(node);
 
   return (
-    workflowNodeHeaderHeight +
-    descriptionHeight +
-    portIndex * workflowNodePortRowHeight +
+    headerHeight +
+    workflowNodePortColumnsPaddingY / 2 +
+    workflowNodePortColumnLabelHeight +
+    portIndex * (workflowNodePortRowHeight + workflowNodePortGap) +
     workflowNodePortRowHeight / 2
   );
 }
@@ -491,48 +823,193 @@ function getWorkflowNodeToneFromStatus(status?: string): WorkflowNodeData["tone"
 }
 
 function getWorkflowNodeToneClasses(tone?: WorkflowNodeData["tone"]) {
-  if (tone === "success") {
-    return "bg-emerald-500/8";
+  if (tone === "success" || tone === "emerald") {
+    return "border-emerald-100 bg-emerald-50";
   }
-  if (tone === "warning") {
-    return "bg-amber-500/8";
+  if (tone === "warning" || tone === "amber") {
+    return "border-amber-100 bg-amber-50";
   }
-  if (tone === "error") {
-    return "bg-destructive/10";
+  if (tone === "error" || tone === "rose") {
+    return "border-rose-100 bg-rose-50";
   }
-  if (tone === "info") {
-    return "bg-primary/10";
+  if (tone === "info" || tone === "sky") {
+    return "border-sky-100 bg-sky-50";
   }
-  return "bg-muted/10";
+  if (tone === "violet") {
+    return "border-violet-100 bg-violet-50";
+  }
+  if (tone === "cyan") {
+    return "border-cyan-100 bg-cyan-50";
+  }
+  if (tone === "indigo") {
+    return "border-indigo-100 bg-indigo-50";
+  }
+  if (tone === "fuchsia") {
+    return "border-fuchsia-100 bg-fuchsia-50";
+  }
+  if (tone === "slate") {
+    return "border-slate-100 bg-slate-50";
+  }
+  return "border-zinc-100 bg-zinc-50";
 }
 
 function getWorkflowNodeToneDotClass(tone?: WorkflowNodeData["tone"]) {
-  if (tone === "success") {
+  if (tone === "success" || tone === "emerald") {
     return "bg-emerald-500";
   }
-  if (tone === "warning") {
+  if (tone === "warning" || tone === "amber") {
     return "bg-amber-500";
   }
-  if (tone === "error") {
-    return "bg-destructive";
+  if (tone === "error" || tone === "rose") {
+    return "bg-rose-500";
   }
-  if (tone === "info") {
-    return "bg-blue-500";
+  if (tone === "info" || tone === "sky") {
+    return "bg-sky-500";
   }
-  return "bg-muted-foreground";
+  if (tone === "violet") {
+    return "bg-violet-500";
+  }
+  if (tone === "cyan") {
+    return "bg-cyan-500";
+  }
+  if (tone === "indigo") {
+    return "bg-indigo-500";
+  }
+  if (tone === "fuchsia") {
+    return "bg-fuchsia-500";
+  }
+  if (tone === "slate") {
+    return "bg-slate-500";
+  }
+  return "bg-zinc-500";
 }
 
-function getWorkflowNodeStatusVariant(
-  status: string,
-): React.ComponentProps<typeof Badge>["variant"] {
-  if (status === "error") {
-    return "destructive";
+function getWorkflowNodeDescriptionRows(node: WorkflowNodeData) {
+  if (!node.description) {
+    return 0;
   }
-  if (status === "running" || status === "success") {
-    return "secondary";
+
+  return Math.max(
+    1,
+    Math.min(workflowNodeDescriptionMaxRows, Math.ceil(node.description.length / 58)),
+  );
+}
+
+function getWorkflowNodeHeaderHeight(node: WorkflowNodeData) {
+  return (
+    workflowNodeHeaderBaseHeight +
+    getWorkflowNodeDescriptionRows(node) * workflowNodeDescriptionLineHeight
+  );
+}
+
+function getWorkflowNodeMinimizedPortsHeight(node: WorkflowNodeData) {
+  const rows = Math.max(node.inputs?.length ?? 0, node.outputs?.length ?? 0, 1);
+
+  return Math.max(40, rows * 16 + 16);
+}
+
+function getWorkflowNodePackageLabel(node: WorkflowNodeData) {
+  return node.packageLabel;
+}
+
+function workflowNodeInlineTitle(node: WorkflowNodeData) {
+  const input = node.inputs?.[0];
+  const output = node.outputs?.[0];
+
+  if (input && output) {
+    return `${node.label} - ${input.label} to ${output.label}`;
   }
-  return "outline";
+
+  return `${node.label} - ${(input ?? output)?.label ?? "port"}`;
+}
+
+const workflowNodePortKindColors: Record<string, string> = {
+  asset: "#2563eb",
+  audio: "#0d9488",
+  document: "#7c3aed",
+  event: "#ea580c",
+  image: "#db2777",
+  labels: "#16a34a",
+  page: "#0891b2",
+  result: "#4f46e5",
+  table: "#ca8a04",
+  task: "#dc2626",
+  text: "#0284c7",
+  video: "#9333ea",
+};
+
+const workflowNodePortFallbackColors = [
+  "#0284c7",
+  "#16a34a",
+  "#ca8a04",
+  "#db2777",
+  "#7c3aed",
+  "#ea580c",
+  "#4f46e5",
+  "#0d9488",
+];
+
+function getWorkflowNodePortColor(port: WorkflowNodePort) {
+  if (port.color) {
+    return port.color;
+  }
+
+  const key = (port.kind ?? port.badge ?? port.label).toLowerCase();
+  const knownColor = workflowNodePortKindColors[key];
+
+  if (knownColor) {
+    return knownColor;
+  }
+
+  const hash = Array.from(key).reduce((value, char) => value + char.charCodeAt(0), 0);
+
+  return workflowNodePortFallbackColors[hash % workflowNodePortFallbackColors.length] ?? "#71717a";
+}
+
+function formatWorkflowNodePortKind(value: string) {
+  return value.replace(/[_-]/g, " ");
+}
+
+function hexToRgba(hex: string, alpha: number) {
+  const normalized = normalizeHexColor(hex);
+
+  if (!normalized) {
+    return `rgba(113, 113, 122, ${alpha})`;
+  }
+
+  const value = Number.parseInt(normalized.slice(1), 16);
+  const red = (value >> 16) & 255;
+  const green = (value >> 8) & 255;
+  const blue = value & 255;
+
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
+
+function normalizeHexColor(value: string) {
+  if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+    return value;
+  }
+
+  if (/^#[0-9A-Fa-f]{3}$/.test(value)) {
+    return `#${value
+      .slice(1)
+      .split("")
+      .map((part) => `${part}${part}`)
+      .join("")}`;
+  }
+
+  return null;
+}
+
+function getWorkflowNodePortBadgeTextColor(color: string) {
+  return normalizeHexColor(color) ?? "#18181b";
 }
 
 export { WorkflowNode, getWorkflowNodePortCenterOffset, getWorkflowNodeSize };
-export type { WorkflowNodeData, WorkflowNodePort, WorkflowNodeProps, WorkflowNodeSize };
+export type {
+  WorkflowNodeData,
+  WorkflowNodeMenuItem,
+  WorkflowNodePort,
+  WorkflowNodeProps,
+  WorkflowNodeSize,
+};
