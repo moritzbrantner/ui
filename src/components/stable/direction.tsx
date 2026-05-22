@@ -21,3 +21,5 @@ function DirectionProvider({
 const useDirection = Direction.useDirection;
 
 export { DirectionProvider, useDirection };
+
+export type DirectionProviderProps = React.ComponentProps<typeof DirectionProvider>;

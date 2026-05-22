@@ -75,3 +75,8 @@ function AlertAction({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 export { Alert, AlertTitle, AlertDescription, AlertAction };
+
+export type AlertProps = React.ComponentProps<typeof Alert>;
+export type AlertTitleProps = React.ComponentProps<typeof AlertTitle>;
+export type AlertDescriptionProps = React.ComponentProps<typeof AlertDescription>;
+export type AlertActionProps = React.ComponentProps<typeof AlertAction>;

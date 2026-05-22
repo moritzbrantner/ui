@@ -19,7 +19,7 @@ type OrgChartProps = React.ComponentProps<"div"> & {
   renderNode?: (node: OrgChartNodeData, depth: number) => React.ReactNode;
 };
 
-type OrgChartNodeProps = React.ComponentProps<"div"> & {
+export type OrgChartNodeProps = React.ComponentProps<"div"> & {
   node: OrgChartNodeData;
   depth?: number;
   renderNode?: OrgChartProps["renderNode"];

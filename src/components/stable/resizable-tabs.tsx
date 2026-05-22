@@ -19,7 +19,7 @@ type ResizableTabsItem = {
   maxSize?: number;
 };
 
-type ResizableTabsProps = Omit<
+export type ResizableTabsProps = Omit<
   React.ComponentProps<"div">,
   "children" | "defaultValue" | "onChange"
 > & {
@@ -317,4 +317,4 @@ function ResizableTabsTrigger({
   );
 }
 
-export { ResizableTabs, type ResizableTabsItem, type ResizableTabsProps };
+export { ResizableTabs, type ResizableTabsItem };

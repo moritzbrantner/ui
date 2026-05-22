@@ -5,7 +5,7 @@ import { Slider as SliderPrimitive } from "radix-ui";
 
 import { cn } from "../../lib/cn";
 
-type SliderProps = React.ComponentProps<typeof SliderPrimitive.Root> & {
+export type SliderProps = React.ComponentProps<typeof SliderPrimitive.Root> & {
   thumbAriaLabel?: string;
   thumbAriaLabelledBy?: string;
 };
@@ -76,4 +76,4 @@ function Slider({
   );
 }
 
-export { Slider, type SliderProps };
+export { Slider };

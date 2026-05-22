@@ -234,3 +234,10 @@ export type {
   InfographicLegendItem,
   InfographicLegendProps,
 };
+
+export type InfographicHeaderProps = React.ComponentProps<typeof InfographicHeader>;
+export type InfographicTitleProps = React.ComponentProps<typeof InfographicTitle>;
+export type InfographicDescriptionProps = React.ComponentProps<typeof InfographicDescription>;
+export type InfographicBodyProps = React.ComponentProps<typeof InfographicBody>;
+export type InfographicFooterProps = React.ComponentProps<typeof InfographicFooter>;
+export type InfographicSourceProps = React.ComponentProps<typeof InfographicSource>;

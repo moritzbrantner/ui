@@ -51,3 +51,8 @@ function TooltipContent({
 }
 
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger };
+
+export type TooltipProps = React.ComponentProps<typeof Tooltip>;
+export type TooltipContentProps = React.ComponentProps<typeof TooltipContent>;
+export type TooltipProviderProps = React.ComponentProps<typeof TooltipProvider>;
+export type TooltipTriggerProps = React.ComponentProps<typeof TooltipTrigger>;

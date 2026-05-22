@@ -196,3 +196,14 @@ export {
   ItemHeader,
   ItemFooter,
 };
+
+export type ItemProps = React.ComponentProps<typeof Item>;
+export type ItemMediaProps = React.ComponentProps<typeof ItemMedia>;
+export type ItemContentProps = React.ComponentProps<typeof ItemContent>;
+export type ItemActionsProps = React.ComponentProps<typeof ItemActions>;
+export type ItemGroupProps = React.ComponentProps<typeof ItemGroup>;
+export type ItemSeparatorProps = React.ComponentProps<typeof ItemSeparator>;
+export type ItemTitleProps = React.ComponentProps<typeof ItemTitle>;
+export type ItemDescriptionProps = React.ComponentProps<typeof ItemDescription>;
+export type ItemHeaderProps = React.ComponentProps<typeof ItemHeader>;
+export type ItemFooterProps = React.ComponentProps<typeof ItemFooter>;

@@ -101,3 +101,11 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent };
+
+export type CardProps = React.ComponentProps<typeof Card>;
+export type CardHeaderProps = React.ComponentProps<typeof CardHeader>;
+export type CardFooterProps = React.ComponentProps<typeof CardFooter>;
+export type CardTitleProps = React.ComponentProps<typeof CardTitle>;
+export type CardActionProps = React.ComponentProps<typeof CardAction>;
+export type CardDescriptionProps = React.ComponentProps<typeof CardDescription>;
+export type CardContentProps = React.ComponentProps<typeof CardContent>;

@@ -160,3 +160,12 @@ export {
   NavigationMenuViewport,
   navigationMenuTriggerStyle,
 };
+
+export type NavigationMenuProps = React.ComponentProps<typeof NavigationMenu>;
+export type NavigationMenuListProps = React.ComponentProps<typeof NavigationMenuList>;
+export type NavigationMenuItemProps = React.ComponentProps<typeof NavigationMenuItem>;
+export type NavigationMenuContentProps = React.ComponentProps<typeof NavigationMenuContent>;
+export type NavigationMenuTriggerProps = React.ComponentProps<typeof NavigationMenuTrigger>;
+export type NavigationMenuLinkProps = React.ComponentProps<typeof NavigationMenuLink>;
+export type NavigationMenuIndicatorProps = React.ComponentProps<typeof NavigationMenuIndicator>;
+export type NavigationMenuViewportProps = React.ComponentProps<typeof NavigationMenuViewport>;

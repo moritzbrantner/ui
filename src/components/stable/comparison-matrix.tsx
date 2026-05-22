@@ -26,12 +26,12 @@ type ComparisonMatrixProps = React.ComponentProps<"div"> & {
   emptyValue?: React.ReactNode;
 };
 
-type ComparisonMatrixHeaderProps = React.ComponentProps<"th">;
-type ComparisonMatrixRowProps = React.ComponentProps<"tr">;
-type ComparisonMatrixCellProps = React.ComponentProps<"td"> & {
+export type ComparisonMatrixHeaderProps = React.ComponentProps<"th">;
+export type ComparisonMatrixRowProps = React.ComponentProps<"tr">;
+export type ComparisonMatrixCellProps = React.ComponentProps<"td"> & {
   tone?: ComparisonMatrixCellTone;
 };
-type ComparisonMatrixBadgeProps = React.ComponentProps<"span"> & {
+export type ComparisonMatrixBadgeProps = React.ComponentProps<"span"> & {
   tone?: ComparisonMatrixCellTone;
 };
 

@@ -62,7 +62,7 @@ type DocumentViewerProps = Omit<React.ComponentProps<"div">, "onSelect"> & {
   onZoomChange?: (zoom: number) => void;
 };
 
-type DocumentViewerToolbarProps = React.ComponentProps<"div"> & {
+export type DocumentViewerToolbarProps = React.ComponentProps<"div"> & {
   pageNumber?: number;
   pageCount: number;
   zoom: number;
@@ -76,7 +76,7 @@ type DocumentViewerToolbarProps = React.ComponentProps<"div"> & {
   onRotate?: () => void;
 };
 
-type DocumentViewerPageProps = React.ComponentProps<"div"> & {
+export type DocumentViewerPageProps = React.ComponentProps<"div"> & {
   page: DocumentViewerPageData;
   highlights?: DocumentViewerHighlight[];
   selectedHighlightId?: string | null;
@@ -86,13 +86,13 @@ type DocumentViewerPageProps = React.ComponentProps<"div"> & {
   onHighlightSelect?: (highlight: DocumentViewerHighlight) => void;
 };
 
-type DocumentViewerThumbnailsProps = React.ComponentProps<typeof ScrollArea> & {
+export type DocumentViewerThumbnailsProps = React.ComponentProps<typeof ScrollArea> & {
   pages: DocumentViewerPageData[];
   currentPageId?: string | null;
   onPageSelect?: (page: DocumentViewerPageData) => void;
 };
 
-type DocumentViewerSearchProps = React.ComponentProps<"div"> & {
+export type DocumentViewerSearchProps = React.ComponentProps<"div"> & {
   query: string;
   matches: DocumentViewerPageData[];
   onQueryChange?: (query: string) => void;

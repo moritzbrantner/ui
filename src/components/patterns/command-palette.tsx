@@ -34,7 +34,7 @@ type CommandPaletteGroup = {
   actions: readonly CommandPaletteAction[];
 };
 
-type CommandPaletteProps = Omit<React.ComponentProps<typeof CommandDialog>, "children"> & {
+export type CommandPaletteProps = Omit<React.ComponentProps<typeof CommandDialog>, "children"> & {
   groups: readonly CommandPaletteGroup[];
   placeholder?: string;
   emptyMessage?: React.ReactNode;
@@ -161,9 +161,4 @@ function textFromNode(node: React.ReactNode) {
   return typeof node === "string" || typeof node === "number" ? String(node) : "";
 }
 
-export {
-  CommandPalette,
-  type CommandPaletteAction,
-  type CommandPaletteGroup,
-  type CommandPaletteProps,
-};
+export { CommandPalette, type CommandPaletteAction, type CommandPaletteGroup };

@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { useMemo } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -222,3 +223,14 @@ export {
   FieldContent,
   FieldTitle,
 };
+
+export type FieldProps = React.ComponentProps<typeof Field>;
+export type FieldLabelProps = React.ComponentProps<typeof FieldLabel>;
+export type FieldDescriptionProps = React.ComponentProps<typeof FieldDescription>;
+export type FieldErrorProps = React.ComponentProps<typeof FieldError>;
+export type FieldGroupProps = React.ComponentProps<typeof FieldGroup>;
+export type FieldLegendProps = React.ComponentProps<typeof FieldLegend>;
+export type FieldSeparatorProps = React.ComponentProps<typeof FieldSeparator>;
+export type FieldSetProps = React.ComponentProps<typeof FieldSet>;
+export type FieldContentProps = React.ComponentProps<typeof FieldContent>;
+export type FieldTitleProps = React.ComponentProps<typeof FieldTitle>;

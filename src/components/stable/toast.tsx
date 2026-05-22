@@ -123,3 +123,10 @@ export {
   toastVariants,
 };
 export type { ToastProps, ToastActionElement };
+
+export type ToastProviderProps = React.ComponentProps<typeof ToastProvider>;
+export type ToastViewportProps = React.ComponentProps<typeof ToastViewport>;
+export type ToastTitleProps = React.ComponentProps<typeof ToastTitle>;
+export type ToastDescriptionProps = React.ComponentProps<typeof ToastDescription>;
+export type ToastCloseProps = React.ComponentProps<typeof ToastClose>;
+export type ToastActionProps = React.ComponentProps<typeof ToastAction>;

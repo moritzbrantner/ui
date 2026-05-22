@@ -679,3 +679,5 @@ function resolveKeyboardHotkeyPlatform(): "linux" | "mac" | "windows" {
 
   return "linux";
 }
+
+export type KeyboardRowProps = React.ComponentProps<typeof KeyboardRow>;

@@ -286,3 +286,14 @@ export {
   SelectValue,
 };
 export type { SelectDropdownOption, SelectDropdownProps };
+
+export type SelectProps = React.ComponentProps<typeof Select>;
+export type SelectContentProps = React.ComponentProps<typeof SelectContent>;
+export type SelectGroupProps = React.ComponentProps<typeof SelectGroup>;
+export type SelectItemProps = React.ComponentProps<typeof SelectItem>;
+export type SelectLabelProps = React.ComponentProps<typeof SelectLabel>;
+export type SelectScrollDownButtonProps = React.ComponentProps<typeof SelectScrollDownButton>;
+export type SelectScrollUpButtonProps = React.ComponentProps<typeof SelectScrollUpButton>;
+export type SelectSeparatorProps = React.ComponentProps<typeof SelectSeparator>;
+export type SelectTriggerProps = React.ComponentProps<typeof SelectTrigger>;
+export type SelectValueProps = React.ComponentProps<typeof SelectValue>;

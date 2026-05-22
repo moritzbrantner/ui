@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { motion, type HTMLMotionProps } from "motion/react";
 
@@ -103,3 +104,10 @@ function EmptyContent({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 export { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent, EmptyMedia };
+
+export type EmptyProps = React.ComponentProps<typeof Empty>;
+export type EmptyHeaderProps = React.ComponentProps<typeof EmptyHeader>;
+export type EmptyTitleProps = React.ComponentProps<typeof EmptyTitle>;
+export type EmptyDescriptionProps = React.ComponentProps<typeof EmptyDescription>;
+export type EmptyContentProps = React.ComponentProps<typeof EmptyContent>;
+export type EmptyMediaProps = React.ComponentProps<typeof EmptyMedia>;

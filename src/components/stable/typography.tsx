@@ -221,3 +221,23 @@ export {
   TypographyTableHead,
   TypographyTableCell,
 };
+
+export type TypographyH1Props = React.ComponentProps<typeof TypographyH1>;
+export type TypographyH2Props = React.ComponentProps<typeof TypographyH2>;
+export type TypographyH3Props = React.ComponentProps<typeof TypographyH3>;
+export type TypographyH4Props = React.ComponentProps<typeof TypographyH4>;
+export type TypographyPProps = React.ComponentProps<typeof TypographyP>;
+export type TypographyBlockquoteProps = React.ComponentProps<typeof TypographyBlockquote>;
+export type TypographyListProps = React.ComponentProps<typeof TypographyList>;
+export type TypographyInlineCodeProps = React.ComponentProps<typeof TypographyInlineCode>;
+export type TypographyLeadProps = React.ComponentProps<typeof TypographyLead>;
+export type TypographyLargeProps = React.ComponentProps<typeof TypographyLarge>;
+export type TypographySmallProps = React.ComponentProps<typeof TypographySmall>;
+export type TypographyMutedProps = React.ComponentProps<typeof TypographyMuted>;
+export type TypographyTableProps = React.ComponentProps<typeof TypographyTable>;
+export type TypographyTableElementProps = React.ComponentProps<typeof TypographyTableElement>;
+export type TypographyTableHeaderProps = React.ComponentProps<typeof TypographyTableHeader>;
+export type TypographyTableBodyProps = React.ComponentProps<typeof TypographyTableBody>;
+export type TypographyTableRowProps = React.ComponentProps<typeof TypographyTableRow>;
+export type TypographyTableHeadProps = React.ComponentProps<typeof TypographyTableHead>;
+export type TypographyTableCellProps = React.ComponentProps<typeof TypographyTableCell>;

@@ -26,3 +26,5 @@ function Separator({
 }
 
 export { Separator };
+
+export type SeparatorProps = React.ComponentProps<typeof Separator>;

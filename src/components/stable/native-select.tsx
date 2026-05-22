@@ -3,7 +3,7 @@ import * as React from "react";
 import { cn } from "../../lib/cn";
 import { ChevronDownIcon } from "lucide-react";
 
-type NativeSelectProps = Omit<React.ComponentProps<"select">, "size"> & {
+export type NativeSelectProps = Omit<React.ComponentProps<"select">, "size"> & {
   size?: "sm" | "default";
 };
 
@@ -41,3 +41,6 @@ function NativeSelectOptGroup({ className, ...props }: React.ComponentProps<"opt
 }
 
 export { NativeSelect, NativeSelectOptGroup, NativeSelectOption };
+
+export type NativeSelectOptGroupProps = React.ComponentProps<typeof NativeSelectOptGroup>;
+export type NativeSelectOptionProps = React.ComponentProps<typeof NativeSelectOption>;

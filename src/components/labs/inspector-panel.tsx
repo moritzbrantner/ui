@@ -71,19 +71,19 @@ type InspectorPanelProps = Omit<React.ComponentProps<"aside">, "onChange"> & {
   onReset?: () => void;
 };
 
-type InspectorPanelHeaderProps = React.ComponentProps<"div"> & {
+export type InspectorPanelHeaderProps = React.ComponentProps<"div"> & {
   title?: React.ReactNode;
   description?: React.ReactNode;
   dirty?: boolean;
 };
 
-type InspectorPanelSectionProps = React.ComponentProps<"section"> & {
+export type InspectorPanelSectionProps = React.ComponentProps<"section"> & {
   title: React.ReactNode;
   description?: React.ReactNode;
   defaultOpen?: boolean;
 };
 
-type InspectorFieldProps = React.ComponentProps<"div"> & {
+export type InspectorFieldProps = React.ComponentProps<"div"> & {
   field: InspectorFieldDefinition;
   value?: InspectorFieldValue;
   readOnly?: boolean;
@@ -91,9 +91,9 @@ type InspectorFieldProps = React.ComponentProps<"div"> & {
   onValueChange?: (value: InspectorFieldValue) => void;
 };
 
-type InspectorFieldGroupProps = React.ComponentProps<"div">;
+export type InspectorFieldGroupProps = React.ComponentProps<"div">;
 
-type InspectorActionsProps = React.ComponentProps<"div"> & {
+export type InspectorActionsProps = React.ComponentProps<"div"> & {
   dirty?: boolean;
   readOnly?: boolean;
   onApply?: () => void;

@@ -2,6 +2,7 @@ import * as React from "react";
 import { cva } from "class-variance-authority";
 
 import { cn } from "../../lib/cn";
+import { ActionBar, type ActionBarProps } from "../internal/action-bar";
 
 const pageShellVariants = cva("min-h-screen bg-background text-foreground", {
   variants: {
@@ -288,41 +289,6 @@ function SectionGrid({ className, columns = "two", gap = "default", ...props }: 
   );
 }
 
-const actionBarVariants = cva("flex flex-wrap items-center gap-2", {
-  variants: {
-    align: {
-      start: "justify-start",
-      end: "justify-end",
-      between: "justify-between",
-    },
-    sticky: {
-      true: "sticky bottom-0 z-10 border-t border-border/60 bg-background/80 p-3 shadow-[var(--glass-shadow)] supports-backdrop-filter:backdrop-blur-xl",
-      false: "",
-    },
-  },
-  defaultVariants: {
-    align: "end",
-    sticky: false,
-  },
-});
-
-type ActionBarProps = React.ComponentProps<"div"> & {
-  align?: "start" | "end" | "between";
-  sticky?: boolean;
-};
-
-function ActionBar({ className, align = "end", sticky = false, ...props }: ActionBarProps) {
-  return (
-    <div
-      data-slot="action-bar"
-      data-align={align}
-      data-sticky={sticky}
-      className={cn(actionBarVariants({ align, sticky }), className)}
-      {...props}
-    />
-  );
-}
-
 export {
   ActionBar,
   PageActions,
@@ -341,3 +307,14 @@ export {
   SurfaceTitle,
 };
 export type { ActionBarProps, PageHeaderProps, PageShellProps, SectionGridProps, SurfaceProps };
+
+export type PageActionsProps = React.ComponentProps<typeof PageActions>;
+export type PageContentProps = React.ComponentProps<typeof PageContent>;
+export type PageDescriptionProps = React.ComponentProps<typeof PageDescription>;
+export type PageTitleProps = React.ComponentProps<typeof PageTitle>;
+export type SurfaceActionProps = React.ComponentProps<typeof SurfaceAction>;
+export type SurfaceContentProps = React.ComponentProps<typeof SurfaceContent>;
+export type SurfaceDescriptionProps = React.ComponentProps<typeof SurfaceDescription>;
+export type SurfaceFooterProps = React.ComponentProps<typeof SurfaceFooter>;
+export type SurfaceHeaderProps = React.ComponentProps<typeof SurfaceHeader>;
+export type SurfaceTitleProps = React.ComponentProps<typeof SurfaceTitle>;

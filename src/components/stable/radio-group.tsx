@@ -42,3 +42,6 @@ function RadioGroupItem({
 }
 
 export { RadioGroup, RadioGroupItem };
+
+export type RadioGroupProps = React.ComponentProps<typeof RadioGroup>;
+export type RadioGroupItemProps = React.ComponentProps<typeof RadioGroupItem>;

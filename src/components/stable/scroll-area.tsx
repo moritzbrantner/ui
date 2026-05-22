@@ -53,3 +53,6 @@ function ScrollBar({
 }
 
 export { ScrollArea, ScrollBar };
+
+export type ScrollAreaProps = React.ComponentProps<typeof ScrollArea>;
+export type ScrollBarProps = React.ComponentProps<typeof ScrollBar>;

@@ -441,3 +441,7 @@ export {
   spinnerVariants,
 };
 export type { DotsSpinnerProps, GeometricSpinnerProps, PulseSpinnerProps, SpinnerProps };
+
+export type BlocksSpinnerProps = React.ComponentProps<typeof BlocksSpinner>;
+export type OrbitSpinnerProps = React.ComponentProps<typeof OrbitSpinner>;
+export type PolygonSpinnerProps = React.ComponentProps<typeof PolygonSpinner>;

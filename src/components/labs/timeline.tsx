@@ -86,3 +86,12 @@ export {
   TimelineTime,
   TimelineTitle,
 };
+
+export type TimelineProps = React.ComponentProps<typeof Timeline>;
+export type TimelineConnectorProps = React.ComponentProps<typeof TimelineConnector>;
+export type TimelineContentProps = React.ComponentProps<typeof TimelineContent>;
+export type TimelineDescriptionProps = React.ComponentProps<typeof TimelineDescription>;
+export type TimelineIndicatorProps = React.ComponentProps<typeof TimelineIndicator>;
+export type TimelineItemProps = React.ComponentProps<typeof TimelineItem>;
+export type TimelineTimeProps = React.ComponentProps<typeof TimelineTime>;
+export type TimelineTitleProps = React.ComponentProps<typeof TimelineTitle>;

@@ -140,3 +140,10 @@ export {
   InputGroupInput,
   InputGroupTextarea,
 };
+
+export type InputGroupProps = React.ComponentProps<typeof InputGroup>;
+export type InputGroupAddonProps = React.ComponentProps<typeof InputGroupAddon>;
+export type InputGroupButtonProps = React.ComponentProps<typeof InputGroupButton>;
+export type InputGroupTextProps = React.ComponentProps<typeof InputGroupText>;
+export type InputGroupInputProps = React.ComponentProps<typeof InputGroupInput>;
+export type InputGroupTextareaProps = React.ComponentProps<typeof InputGroupTextarea>;

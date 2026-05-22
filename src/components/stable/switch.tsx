@@ -31,3 +31,5 @@ function Switch({
 }
 
 export { Switch };
+
+export type SwitchProps = React.ComponentProps<typeof Switch>;

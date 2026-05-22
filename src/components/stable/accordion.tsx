@@ -82,3 +82,8 @@ function AccordionContent({
 }
 
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };
+
+export type AccordionProps = React.ComponentProps<typeof Accordion>;
+export type AccordionItemProps = React.ComponentProps<typeof AccordionItem>;
+export type AccordionTriggerProps = React.ComponentProps<typeof AccordionTrigger>;
+export type AccordionContentProps = React.ComponentProps<typeof AccordionContent>;

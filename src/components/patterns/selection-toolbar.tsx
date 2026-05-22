@@ -7,7 +7,7 @@ import { cn } from "../../lib/cn";
 import { ActionBar } from "./app-layout";
 import { Button } from "../stable/button";
 
-type SelectionToolbarProps = React.ComponentProps<"div"> & {
+export type SelectionToolbarProps = React.ComponentProps<"div"> & {
   selectedCount: number;
   totalCount?: number;
   label?: React.ReactNode;
@@ -73,4 +73,6 @@ function SelectionToolbarActions({ className, ...props }: React.ComponentProps<"
   );
 }
 
-export { SelectionToolbar, SelectionToolbarActions, type SelectionToolbarProps };
+export { SelectionToolbar, SelectionToolbarActions };
+
+export type SelectionToolbarActionsProps = React.ComponentProps<typeof SelectionToolbarActions>;

@@ -29,3 +29,5 @@ function Progress({
 }
 
 export { Progress };
+
+export type ProgressProps = React.ComponentProps<typeof Progress>;

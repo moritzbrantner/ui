@@ -180,3 +180,16 @@ export {
   AlertDialogTitle,
   AlertDialogTrigger,
 };
+
+export type AlertDialogProps = React.ComponentProps<typeof AlertDialog>;
+export type AlertDialogActionProps = React.ComponentProps<typeof AlertDialogAction>;
+export type AlertDialogCancelProps = React.ComponentProps<typeof AlertDialogCancel>;
+export type AlertDialogContentProps = React.ComponentProps<typeof AlertDialogContent>;
+export type AlertDialogDescriptionProps = React.ComponentProps<typeof AlertDialogDescription>;
+export type AlertDialogFooterProps = React.ComponentProps<typeof AlertDialogFooter>;
+export type AlertDialogHeaderProps = React.ComponentProps<typeof AlertDialogHeader>;
+export type AlertDialogMediaProps = React.ComponentProps<typeof AlertDialogMedia>;
+export type AlertDialogOverlayProps = React.ComponentProps<typeof AlertDialogOverlay>;
+export type AlertDialogPortalProps = React.ComponentProps<typeof AlertDialogPortal>;
+export type AlertDialogTitleProps = React.ComponentProps<typeof AlertDialogTitle>;
+export type AlertDialogTriggerProps = React.ComponentProps<typeof AlertDialogTrigger>;

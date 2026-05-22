@@ -18,19 +18,19 @@ type SocialActionButtonProps = Omit<React.ComponentProps<typeof Button>, "aria-p
   showCount?: boolean;
 };
 
-type LikeButtonProps = SocialActionButtonProps & {
+export type LikeButtonProps = SocialActionButtonProps & {
   liked?: boolean;
 };
 
-type FollowButtonProps = SocialActionButtonProps & {
+export type FollowButtonProps = SocialActionButtonProps & {
   following?: boolean;
 };
 
-type ShareButtonProps = SocialActionButtonProps & {
+export type ShareButtonProps = SocialActionButtonProps & {
   shared?: boolean;
 };
 
-type CommentButtonProps = SocialActionButtonProps & {
+export type CommentButtonProps = SocialActionButtonProps & {
   commented?: boolean;
 };
 
@@ -175,9 +175,7 @@ export {
   LikeButton,
   ShareButton,
   SocialActionGroup,
-  type CommentButtonProps,
-  type FollowButtonProps,
-  type LikeButtonProps,
-  type ShareButtonProps,
   type SocialActionButtonProps,
 };
+
+export type SocialActionGroupProps = React.ComponentProps<typeof SocialActionGroup>;

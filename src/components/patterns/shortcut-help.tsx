@@ -25,11 +25,11 @@ type ShortcutHelpGroup = {
   shortcuts: readonly ShortcutHelpItem[];
 };
 
-type ShortcutListProps = React.ComponentProps<"div"> & {
+export type ShortcutListProps = React.ComponentProps<"div"> & {
   groups: readonly ShortcutHelpGroup[];
 };
 
-type ShortcutHelpDialogProps = Omit<React.ComponentProps<typeof Dialog>, "children"> & {
+export type ShortcutHelpDialogProps = Omit<React.ComponentProps<typeof Dialog>, "children"> & {
   groups: readonly ShortcutHelpGroup[];
   title?: React.ReactNode;
   description?: React.ReactNode;
@@ -97,11 +97,4 @@ function ShortcutKeys({ value }: { value: React.ReactNode }) {
   );
 }
 
-export {
-  ShortcutHelpDialog,
-  ShortcutList,
-  type ShortcutHelpDialogProps,
-  type ShortcutHelpGroup,
-  type ShortcutHelpItem,
-  type ShortcutListProps,
-};
+export { ShortcutHelpDialog, ShortcutList, type ShortcutHelpGroup, type ShortcutHelpItem };

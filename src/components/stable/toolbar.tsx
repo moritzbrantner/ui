@@ -91,3 +91,9 @@ function ToolbarSeparator({
 }
 
 export { Toolbar, ToolbarGroup, ToolbarTitle, ToolbarSpacer, ToolbarSeparator, toolbarVariants };
+
+export type ToolbarProps = React.ComponentProps<typeof Toolbar>;
+export type ToolbarGroupProps = React.ComponentProps<typeof ToolbarGroup>;
+export type ToolbarTitleProps = React.ComponentProps<typeof ToolbarTitle>;
+export type ToolbarSpacerProps = React.ComponentProps<typeof ToolbarSpacer>;
+export type ToolbarSeparatorProps = React.ComponentProps<typeof ToolbarSeparator>;

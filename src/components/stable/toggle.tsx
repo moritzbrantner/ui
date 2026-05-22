@@ -44,3 +44,5 @@ function Toggle({
 }
 
 export { Toggle, toggleVariants };
+
+export type ToggleProps = React.ComponentProps<typeof Toggle>;

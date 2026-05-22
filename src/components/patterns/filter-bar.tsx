@@ -167,3 +167,8 @@ export {
   FilterChipGroup,
 };
 export type { FilterBarFilter, FilterBarProps, FilterChipProps };
+
+export type FilterBarActionsProps = React.ComponentProps<typeof FilterBarActions>;
+export type FilterBarContentProps = React.ComponentProps<typeof FilterBarContent>;
+export type FilterBarSearchProps = React.ComponentProps<typeof FilterBarSearch>;
+export type FilterChipGroupProps = React.ComponentProps<typeof FilterChipGroup>;

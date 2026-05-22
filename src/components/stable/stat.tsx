@@ -87,3 +87,10 @@ function StatDescription({ className, ...props }: React.ComponentProps<"p">) {
 }
 
 export { Stat, StatDelta, StatDescription, StatGroup, StatLabel, StatValue, statDeltaVariants };
+
+export type StatProps = React.ComponentProps<typeof Stat>;
+export type StatDeltaProps = React.ComponentProps<typeof StatDelta>;
+export type StatDescriptionProps = React.ComponentProps<typeof StatDescription>;
+export type StatGroupProps = React.ComponentProps<typeof StatGroup>;
+export type StatLabelProps = React.ComponentProps<typeof StatLabel>;
+export type StatValueProps = React.ComponentProps<typeof StatValue>;

@@ -34,7 +34,7 @@ type LogicalArgumentData = {
   children?: readonly LogicalArgumentData[];
 };
 
-type LogicalArgumentProps = React.ComponentProps<"article"> & {
+export type LogicalArgumentProps = React.ComponentProps<"article"> & {
   argument?: LogicalArgumentData;
   depth?: number;
   showStatementLabels?: boolean;
@@ -46,16 +46,16 @@ type LogicalArgumentStatementProps = React.ComponentProps<"li"> & {
   note?: React.ReactNode;
 };
 
-type LogicalArgumentConclusionProps = React.ComponentProps<"section"> & {
+export type LogicalArgumentConclusionProps = React.ComponentProps<"section"> & {
   label?: React.ReactNode;
   note?: React.ReactNode;
 };
 
-type LogicalArgumentStatusBadgeProps = React.ComponentProps<"span"> & {
+export type LogicalArgumentStatusBadgeProps = React.ComponentProps<"span"> & {
   status: LogicalArgumentStatus;
 };
 
-type LogicalArgumentRelationBadgeProps = React.ComponentProps<"span"> & {
+export type LogicalArgumentRelationBadgeProps = React.ComponentProps<"span"> & {
   relation: LogicalArgumentRelation;
 };
 
@@ -440,14 +440,33 @@ export {
   LogicalArgumentStatementText,
   LogicalArgumentStatusBadge,
   LogicalArgumentTitle,
-  type LogicalArgumentConclusionProps,
   type LogicalArgumentData,
-  type LogicalArgumentProps,
   type LogicalArgumentRelation,
-  type LogicalArgumentRelationBadgeProps,
   type LogicalArgumentStatement,
   type LogicalArgumentStatementProps,
   type LogicalArgumentStatus,
-  type LogicalArgumentStatusBadgeProps,
   type LogicalArgumentVariant,
 };
+
+export type LogicalArgumentBodyProps = React.ComponentProps<typeof LogicalArgumentBody>;
+export type LogicalArgumentChildrenProps = React.ComponentProps<typeof LogicalArgumentChildren>;
+export type LogicalArgumentDescriptionProps = React.ComponentProps<
+  typeof LogicalArgumentDescription
+>;
+export type LogicalArgumentHeaderProps = React.ComponentProps<typeof LogicalArgumentHeader>;
+export type LogicalArgumentInferenceProps = React.ComponentProps<typeof LogicalArgumentInference>;
+export type LogicalArgumentMetaProps = React.ComponentProps<typeof LogicalArgumentMeta>;
+export type LogicalArgumentPremiseProps = React.ComponentProps<typeof LogicalArgumentPremise>;
+export type LogicalArgumentPremiseListProps = React.ComponentProps<
+  typeof LogicalArgumentPremiseList
+>;
+export type LogicalArgumentStatementLabelProps = React.ComponentProps<
+  typeof LogicalArgumentStatementLabel
+>;
+export type LogicalArgumentStatementNoteProps = React.ComponentProps<
+  typeof LogicalArgumentStatementNote
+>;
+export type LogicalArgumentStatementTextProps = React.ComponentProps<
+  typeof LogicalArgumentStatementText
+>;
+export type LogicalArgumentTitleProps = React.ComponentProps<typeof LogicalArgumentTitle>;

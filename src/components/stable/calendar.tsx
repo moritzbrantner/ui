@@ -692,3 +692,6 @@ function getCalendarEventDateRangeLabel(event: CalendarEvent, locale?: Partial<L
 
   return event.location ? `${dateRange} - ${event.location}` : dateRange;
 }
+
+export type CalendarDayButtonProps = React.ComponentProps<typeof CalendarDayButton>;
+export type CalendarCardDayButtonProps = React.ComponentProps<typeof CalendarCardDayButton>;

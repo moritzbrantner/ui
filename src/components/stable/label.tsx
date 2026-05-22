@@ -19,3 +19,5 @@ function Label({ className, ...props }: React.ComponentProps<typeof LabelPrimiti
 }
 
 export { Label };
+
+export type LabelProps = React.ComponentProps<typeof Label>;

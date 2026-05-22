@@ -1,3 +1,4 @@
+import * as React from "react";
 import { cn } from "../../lib/cn";
 
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
@@ -11,3 +12,5 @@ function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 export { Skeleton };
+
+export type SkeletonProps = React.ComponentProps<typeof Skeleton>;

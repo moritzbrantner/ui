@@ -42,7 +42,7 @@ type AnnotationCanvasProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   readOnly?: boolean;
 };
 
-type AnnotationCanvasToolbarProps = React.ComponentProps<"div"> & {
+export type AnnotationCanvasToolbarProps = React.ComponentProps<"div"> & {
   tool: AnnotationCanvasTool;
   onToolChange?: (tool: AnnotationCanvasTool) => void;
   readOnly?: boolean;

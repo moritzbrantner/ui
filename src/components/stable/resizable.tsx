@@ -1,6 +1,6 @@
 "use client";
 
-import type * as React from "react";
+import * as React from "react";
 import * as ResizablePrimitive from "react-resizable-panels";
 
 import { cn } from "../../lib/cn";
@@ -82,3 +82,7 @@ function ResizableHandle({
 }
 
 export { ResizableHandle, ResizablePanel, ResizablePanelGroup };
+
+export type ResizableHandleProps = React.ComponentProps<typeof ResizableHandle>;
+export type ResizablePanelProps = React.ComponentProps<typeof ResizablePanel>;
+export type ResizablePanelGroupProps = React.ComponentProps<typeof ResizablePanelGroup>;

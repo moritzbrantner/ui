@@ -26,7 +26,7 @@ type ImageFilterPreset = {
 
 type ImageFilterPreviewMode = "edited" | "split" | "original";
 
-type ImageFilterEditorProps = Omit<
+export type ImageFilterEditorProps = Omit<
   React.ComponentProps<"div">,
   "defaultValue" | "onChange" | "value"
 > & {
@@ -389,7 +389,6 @@ export {
   getImageFilterStyle,
   imageFilterPresets,
   normalizeImageFilterValue,
-  type ImageFilterEditorProps,
   type ImageFilterPreset,
   type ImageFilterValue,
 };

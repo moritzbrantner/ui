@@ -27,3 +27,5 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
 }
 
 export { Checkbox };
+
+export type CheckboxProps = React.ComponentProps<typeof Checkbox>;

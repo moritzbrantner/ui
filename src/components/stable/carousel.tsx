@@ -12,7 +12,7 @@ type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
 type CarouselOptions = UseCarouselParameters[0];
 type CarouselPlugin = UseCarouselParameters[1];
 
-type CarouselProps = {
+export type CarouselProps = {
   opts?: CarouselOptions;
   plugins?: CarouselPlugin;
   orientation?: "horizontal" | "vertical";
@@ -229,3 +229,8 @@ export {
   CarouselNext,
   useCarousel,
 };
+
+export type CarouselContentProps = React.ComponentProps<typeof CarouselContent>;
+export type CarouselItemProps = React.ComponentProps<typeof CarouselItem>;
+export type CarouselPreviousProps = React.ComponentProps<typeof CarouselPrevious>;
+export type CarouselNextProps = React.ComponentProps<typeof CarouselNext>;

@@ -52,7 +52,7 @@ type SharedProps = VariantProps<typeof buttonVariants> & {
   onDrag?: React.ComponentProps<"button">["onDrag"] | boolean;
 };
 
-type ButtonProps = SharedProps & React.ComponentProps<"button">;
+export type ButtonProps = SharedProps & React.ComponentProps<"button">;
 
 function Button(props: ButtonProps) {
   const {

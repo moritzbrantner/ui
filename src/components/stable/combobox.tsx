@@ -268,3 +268,19 @@ export {
   ComboboxValue,
   useComboboxAnchor,
 };
+
+export type ComboboxProps = React.ComponentProps<typeof Combobox>;
+export type ComboboxInputProps = React.ComponentProps<typeof ComboboxInput>;
+export type ComboboxContentProps = React.ComponentProps<typeof ComboboxContent>;
+export type ComboboxListProps = React.ComponentProps<typeof ComboboxList>;
+export type ComboboxItemProps = React.ComponentProps<typeof ComboboxItem>;
+export type ComboboxGroupProps = React.ComponentProps<typeof ComboboxGroup>;
+export type ComboboxLabelProps = React.ComponentProps<typeof ComboboxLabel>;
+export type ComboboxCollectionProps = React.ComponentProps<typeof ComboboxCollection>;
+export type ComboboxEmptyProps = React.ComponentProps<typeof ComboboxEmpty>;
+export type ComboboxSeparatorProps = React.ComponentProps<typeof ComboboxSeparator>;
+export type ComboboxChipsProps = React.ComponentProps<typeof ComboboxChips>;
+export type ComboboxChipProps = React.ComponentProps<typeof ComboboxChip>;
+export type ComboboxChipsInputProps = React.ComponentProps<typeof ComboboxChipsInput>;
+export type ComboboxTriggerProps = React.ComponentProps<typeof ComboboxTrigger>;
+export type ComboboxValueProps = React.ComponentProps<typeof ComboboxValue>;

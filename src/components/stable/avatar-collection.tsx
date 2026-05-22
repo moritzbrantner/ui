@@ -31,7 +31,7 @@ type AvatarCollectionItem = AvatarProps & {
   key?: React.Key;
 };
 
-type AvatarCollectionProps = Omit<React.ComponentProps<"div">, "children"> & {
+export type AvatarCollectionProps = Omit<React.ComponentProps<"div">, "children"> & {
   users: AvatarCollectionItem[];
   maxVisible?: number;
   overflowLabel?: React.ReactNode;
@@ -110,6 +110,9 @@ export {
   AvatarGroupCount,
   avatarCollectionVariants,
   type AvatarCollectionItem,
-  type AvatarCollectionProps,
   type AvatarCollectionSpacing,
 };
+
+export type AvatarCollectionCountProps = React.ComponentProps<typeof AvatarCollectionCount>;
+export type AvatarGroupProps = React.ComponentProps<typeof AvatarGroup>;
+export type AvatarGroupCountProps = React.ComponentProps<typeof AvatarGroupCount>;

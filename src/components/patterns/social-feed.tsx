@@ -6,11 +6,11 @@ import { cn } from "../../lib/cn";
 import { Avatar, type AvatarProps } from "../stable/avatar";
 import { Textarea } from "../stable/textarea";
 
-type SocialPostProps = React.ComponentProps<"article"> & {
+export type SocialPostProps = React.ComponentProps<"article"> & {
   featured?: boolean;
 };
 
-type SocialCommentProps = React.ComponentProps<"div"> & {
+export type SocialCommentProps = React.ComponentProps<"div"> & {
   align?: "start" | "end";
 };
 
@@ -318,6 +318,27 @@ export {
   SocialPostMetrics,
   SocialPostText,
   SocialPostTitle,
-  type SocialCommentProps,
-  type SocialPostProps,
 };
+
+export type SocialCommentActionsProps = React.ComponentProps<typeof SocialCommentActions>;
+export type SocialCommentAvatarProps = React.ComponentProps<typeof SocialCommentAvatar>;
+export type SocialCommentContentProps = React.ComponentProps<typeof SocialCommentContent>;
+export type SocialCommentListProps = React.ComponentProps<typeof SocialCommentList>;
+export type SocialCommentMetaProps = React.ComponentProps<typeof SocialCommentMeta>;
+export type SocialCommentTextProps = React.ComponentProps<typeof SocialCommentText>;
+export type SocialComposerProps = React.ComponentProps<typeof SocialComposer>;
+export type SocialComposerActionsProps = React.ComponentProps<typeof SocialComposerActions>;
+export type SocialComposerHeaderProps = React.ComponentProps<typeof SocialComposerHeader>;
+export type SocialComposerTextareaProps = React.ComponentProps<typeof SocialComposerTextarea>;
+export type SocialComposerToolbarProps = React.ComponentProps<typeof SocialComposerToolbar>;
+export type SocialPostAuthorProps = React.ComponentProps<typeof SocialPostAuthor>;
+export type SocialPostAuthorActionsProps = React.ComponentProps<typeof SocialPostAuthorActions>;
+export type SocialPostAvatarProps = React.ComponentProps<typeof SocialPostAvatar>;
+export type SocialPostBodyProps = React.ComponentProps<typeof SocialPostBody>;
+export type SocialPostFooterProps = React.ComponentProps<typeof SocialPostFooter>;
+export type SocialPostHeaderProps = React.ComponentProps<typeof SocialPostHeader>;
+export type SocialPostMediaProps = React.ComponentProps<typeof SocialPostMedia>;
+export type SocialPostMetaProps = React.ComponentProps<typeof SocialPostMeta>;
+export type SocialPostMetricsProps = React.ComponentProps<typeof SocialPostMetrics>;
+export type SocialPostTextProps = React.ComponentProps<typeof SocialPostText>;
+export type SocialPostTitleProps = React.ComponentProps<typeof SocialPostTitle>;

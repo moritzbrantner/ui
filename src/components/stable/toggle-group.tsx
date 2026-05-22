@@ -84,3 +84,6 @@ function ToggleGroupItem({
 }
 
 export { ToggleGroup, ToggleGroupItem };
+
+export type ToggleGroupProps = React.ComponentProps<typeof ToggleGroup>;
+export type ToggleGroupItemProps = React.ComponentProps<typeof ToggleGroupItem>;

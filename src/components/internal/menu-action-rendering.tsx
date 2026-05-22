@@ -25,7 +25,7 @@ import {
   type MenuActionRenderContext,
   type MenuActionSelectHandler,
   isMenuActionItemDisabled,
-} from "../patterns/menu-actions";
+} from "./menu-actions";
 import { cn } from "../../lib/cn";
 
 export type MenuActionRenderSlots = {

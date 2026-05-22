@@ -29,7 +29,7 @@ type ImageCropperCropArea = {
 
 type ImageCropperShape = "rectangle" | "circle";
 
-type ImageCropperProps = Omit<React.ComponentProps<"div">, "onChange"> & {
+export type ImageCropperProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   src: string;
   alt?: string;
   aspectRatio?: number;
@@ -609,7 +609,6 @@ export {
   type CreateCroppedImageOptions,
   type ImageCropperCrop,
   type ImageCropperCropArea,
-  type ImageCropperProps,
   type ImageCropperShape,
   type ImageCropperSize,
 };

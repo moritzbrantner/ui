@@ -6,7 +6,7 @@ import { cn } from "../../lib/cn";
 type StepperOrientation = "horizontal" | "vertical";
 type StepperStatus = "complete" | "current" | "incomplete" | "error";
 
-type StepperProps = React.ComponentProps<"ol"> & {
+export type StepperProps = React.ComponentProps<"ol"> & {
   orientation?: StepperOrientation;
 };
 
@@ -24,7 +24,7 @@ function Stepper({ className, orientation = "horizontal", ...props }: StepperPro
   );
 }
 
-type StepperItemProps = React.ComponentProps<"li"> & {
+export type StepperItemProps = React.ComponentProps<"li"> & {
   status?: StepperStatus;
 };
 
@@ -119,3 +119,9 @@ export {
   StepperConnector,
 };
 export type { StepperOrientation, StepperStatus };
+
+export type StepperIndicatorProps = React.ComponentProps<typeof StepperIndicator>;
+export type StepperContentProps = React.ComponentProps<typeof StepperContent>;
+export type StepperTitleProps = React.ComponentProps<typeof StepperTitle>;
+export type StepperDescriptionProps = React.ComponentProps<typeof StepperDescription>;
+export type StepperConnectorProps = React.ComponentProps<typeof StepperConnector>;

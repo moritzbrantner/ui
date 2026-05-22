@@ -263,3 +263,19 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
 };
+
+export type DropdownMenuProps = React.ComponentProps<typeof DropdownMenu>;
+export type DropdownMenuPortalProps = React.ComponentProps<typeof DropdownMenuPortal>;
+export type DropdownMenuTriggerProps = React.ComponentProps<typeof DropdownMenuTrigger>;
+export type DropdownMenuContentProps = React.ComponentProps<typeof DropdownMenuContent>;
+export type DropdownMenuGroupProps = React.ComponentProps<typeof DropdownMenuGroup>;
+export type DropdownMenuLabelProps = React.ComponentProps<typeof DropdownMenuLabel>;
+export type DropdownMenuItemProps = React.ComponentProps<typeof DropdownMenuItem>;
+export type DropdownMenuCheckboxItemProps = React.ComponentProps<typeof DropdownMenuCheckboxItem>;
+export type DropdownMenuRadioGroupProps = React.ComponentProps<typeof DropdownMenuRadioGroup>;
+export type DropdownMenuRadioItemProps = React.ComponentProps<typeof DropdownMenuRadioItem>;
+export type DropdownMenuSeparatorProps = React.ComponentProps<typeof DropdownMenuSeparator>;
+export type DropdownMenuShortcutProps = React.ComponentProps<typeof DropdownMenuShortcut>;
+export type DropdownMenuSubProps = React.ComponentProps<typeof DropdownMenuSub>;
+export type DropdownMenuSubTriggerProps = React.ComponentProps<typeof DropdownMenuSubTrigger>;
+export type DropdownMenuSubContentProps = React.ComponentProps<typeof DropdownMenuSubContent>;

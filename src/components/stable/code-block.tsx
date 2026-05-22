@@ -70,3 +70,10 @@ export {
   CodeBlockHeader,
   CodeBlockTitle,
 };
+
+export type CodeBlockProps = React.ComponentProps<typeof CodeBlock>;
+export type CodeBlockActionsProps = React.ComponentProps<typeof CodeBlockActions>;
+export type CodeBlockCodeProps = React.ComponentProps<typeof CodeBlockCode>;
+export type CodeBlockContentProps = React.ComponentProps<typeof CodeBlockContent>;
+export type CodeBlockHeaderProps = React.ComponentProps<typeof CodeBlockHeader>;
+export type CodeBlockTitleProps = React.ComponentProps<typeof CodeBlockTitle>;

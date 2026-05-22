@@ -155,3 +155,15 @@ export {
   MobileSlideTitle,
   MobileSlideTrigger,
 };
+
+export type MobileSlideProps = React.ComponentProps<typeof MobileSlide>;
+export type MobileSlideBodyProps = React.ComponentProps<typeof MobileSlideBody>;
+export type MobileSlideCloseProps = React.ComponentProps<typeof MobileSlideClose>;
+export type MobileSlideContentProps = React.ComponentProps<typeof MobileSlideContent>;
+export type MobileSlideDescriptionProps = React.ComponentProps<typeof MobileSlideDescription>;
+export type MobileSlideFooterProps = React.ComponentProps<typeof MobileSlideFooter>;
+export type MobileSlideHeaderProps = React.ComponentProps<typeof MobileSlideHeader>;
+export type MobileSlideOverlayProps = React.ComponentProps<typeof MobileSlideOverlay>;
+export type MobileSlidePortalProps = React.ComponentProps<typeof MobileSlidePortal>;
+export type MobileSlideTitleProps = React.ComponentProps<typeof MobileSlideTitle>;
+export type MobileSlideTriggerProps = React.ComponentProps<typeof MobileSlideTrigger>;

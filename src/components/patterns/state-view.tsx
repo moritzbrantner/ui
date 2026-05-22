@@ -10,12 +10,12 @@ import { Spinner } from "../stable/spinner";
 type StateViewVariant = "empty" | "loading" | "error" | "offline" | "success";
 type StateViewSize = "sm" | "default" | "lg";
 
-type StateViewProps = React.ComponentProps<"div"> & {
+export type StateViewProps = React.ComponentProps<"div"> & {
   variant?: StateViewVariant;
   size?: StateViewSize;
 };
 
-type LoadingStateProps = StateViewProps & {
+export type LoadingStateProps = StateViewProps & {
   label?: React.ReactNode;
 };
 
@@ -197,8 +197,15 @@ export {
   StateViewMedia,
   StateViewTitle,
   SuccessState,
-  type LoadingStateProps,
-  type StateViewProps,
   type StateViewSize,
   type StateViewVariant,
 };
+
+export type EmptyStateProps = React.ComponentProps<typeof EmptyState>;
+export type ErrorStateProps = React.ComponentProps<typeof ErrorState>;
+export type OfflineStateProps = React.ComponentProps<typeof OfflineState>;
+export type StateViewActionsProps = React.ComponentProps<typeof StateViewActions>;
+export type StateViewDescriptionProps = React.ComponentProps<typeof StateViewDescription>;
+export type StateViewMediaProps = React.ComponentProps<typeof StateViewMedia>;
+export type StateViewTitleProps = React.ComponentProps<typeof StateViewTitle>;
+export type SuccessStateProps = React.ComponentProps<typeof SuccessState>;

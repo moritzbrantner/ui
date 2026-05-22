@@ -663,3 +663,27 @@ export {
   SidebarTrigger,
   useSidebar,
 };
+
+export type SidebarProps = React.ComponentProps<typeof Sidebar>;
+export type SidebarContentProps = React.ComponentProps<typeof SidebarContent>;
+export type SidebarFooterProps = React.ComponentProps<typeof SidebarFooter>;
+export type SidebarGroupProps = React.ComponentProps<typeof SidebarGroup>;
+export type SidebarGroupActionProps = React.ComponentProps<typeof SidebarGroupAction>;
+export type SidebarGroupContentProps = React.ComponentProps<typeof SidebarGroupContent>;
+export type SidebarGroupLabelProps = React.ComponentProps<typeof SidebarGroupLabel>;
+export type SidebarHeaderProps = React.ComponentProps<typeof SidebarHeader>;
+export type SidebarInputProps = React.ComponentProps<typeof SidebarInput>;
+export type SidebarInsetProps = React.ComponentProps<typeof SidebarInset>;
+export type SidebarMenuProps = React.ComponentProps<typeof SidebarMenu>;
+export type SidebarMenuActionProps = React.ComponentProps<typeof SidebarMenuAction>;
+export type SidebarMenuBadgeProps = React.ComponentProps<typeof SidebarMenuBadge>;
+export type SidebarMenuButtonProps = React.ComponentProps<typeof SidebarMenuButton>;
+export type SidebarMenuItemProps = React.ComponentProps<typeof SidebarMenuItem>;
+export type SidebarMenuSkeletonProps = React.ComponentProps<typeof SidebarMenuSkeleton>;
+export type SidebarMenuSubProps = React.ComponentProps<typeof SidebarMenuSub>;
+export type SidebarMenuSubButtonProps = React.ComponentProps<typeof SidebarMenuSubButton>;
+export type SidebarMenuSubItemProps = React.ComponentProps<typeof SidebarMenuSubItem>;
+export type SidebarProviderProps = React.ComponentProps<typeof SidebarProvider>;
+export type SidebarRailProps = React.ComponentProps<typeof SidebarRail>;
+export type SidebarSeparatorProps = React.ComponentProps<typeof SidebarSeparator>;
+export type SidebarTriggerProps = React.ComponentProps<typeof SidebarTrigger>;

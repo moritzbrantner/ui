@@ -4,11 +4,11 @@ import * as React from "react";
 
 import { cn } from "../../lib/cn";
 
-type ChatBoxProps = React.ComponentProps<"section"> & {
+export type ChatBoxProps = React.ComponentProps<"section"> & {
   variant?: "default" | "compact";
 };
 
-type ChatBoxMessageProps = React.ComponentProps<"article"> & {
+export type ChatBoxMessageProps = React.ComponentProps<"article"> & {
   align?: "start" | "end" | "center";
 };
 
@@ -139,6 +139,13 @@ export {
   ChatBoxMessage,
   ChatBoxMeta,
   ChatBoxTitle,
-  type ChatBoxMessageProps,
-  type ChatBoxProps,
 };
+
+export type ChatBoxActionsProps = React.ComponentProps<typeof ChatBoxActions>;
+export type ChatBoxBodyProps = React.ComponentProps<typeof ChatBoxBody>;
+export type ChatBoxBubbleProps = React.ComponentProps<typeof ChatBoxBubble>;
+export type ChatBoxDescriptionProps = React.ComponentProps<typeof ChatBoxDescription>;
+export type ChatBoxFooterProps = React.ComponentProps<typeof ChatBoxFooter>;
+export type ChatBoxHeaderProps = React.ComponentProps<typeof ChatBoxHeader>;
+export type ChatBoxMetaProps = React.ComponentProps<typeof ChatBoxMeta>;
+export type ChatBoxTitleProps = React.ComponentProps<typeof ChatBoxTitle>;

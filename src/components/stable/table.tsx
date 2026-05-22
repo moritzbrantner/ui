@@ -85,3 +85,12 @@ function TableCaption({ className, ...props }: React.ComponentProps<"caption">) 
 }
 
 export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };
+
+export type TableProps = React.ComponentProps<typeof Table>;
+export type TableHeaderProps = React.ComponentProps<typeof TableHeader>;
+export type TableBodyProps = React.ComponentProps<typeof TableBody>;
+export type TableFooterProps = React.ComponentProps<typeof TableFooter>;
+export type TableHeadProps = React.ComponentProps<typeof TableHead>;
+export type TableRowProps = React.ComponentProps<typeof TableRow>;
+export type TableCellProps = React.ComponentProps<typeof TableCell>;
+export type TableCaptionProps = React.ComponentProps<typeof TableCaption>;

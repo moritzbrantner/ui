@@ -9,7 +9,7 @@ import { Input } from "../stable/input";
 import { Kbd } from "../stable/kbd";
 import { Spinner } from "../stable/spinner";
 
-type SearchFieldProps = Omit<React.ComponentProps<"div">, "onChange"> & {
+export type SearchFieldProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
@@ -110,4 +110,4 @@ function SearchField({
   );
 }
 
-export { SearchField, type SearchFieldProps };
+export { SearchField };

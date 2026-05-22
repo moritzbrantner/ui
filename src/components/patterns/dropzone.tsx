@@ -74,3 +74,11 @@ export {
   DropzoneDescription,
   DropzoneDefaultIcon,
 };
+
+export type DropzoneProps = React.ComponentProps<typeof Dropzone>;
+export type DropzoneInputProps = React.ComponentProps<typeof DropzoneInput>;
+export type DropzoneIconProps = React.ComponentProps<typeof DropzoneIcon>;
+export type DropzoneContentProps = React.ComponentProps<typeof DropzoneContent>;
+export type DropzoneTitleProps = React.ComponentProps<typeof DropzoneTitle>;
+export type DropzoneDescriptionProps = React.ComponentProps<typeof DropzoneDescription>;
+export type DropzoneDefaultIconProps = React.ComponentProps<typeof DropzoneDefaultIcon>;

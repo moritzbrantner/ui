@@ -71,7 +71,9 @@ verifyPackageMetadata();
 verifyTierLayout();
 verifyComponentRegistry();
 verifyEntrypointBoundaries();
+verifyComponentDependencyBoundaries();
 verifyComponentContracts();
+verifyComponentPropTypes();
 verifyComponentCoverageMetadata();
 verifyStoryContracts();
 verifyClientDirectives();
@@ -336,10 +338,69 @@ function verifyEntrypointBoundaries() {
   }
 }
 
+function verifyComponentDependencyBoundaries() {
+  const allowedTierImports: Record<ComponentTier | "internal", Set<ComponentTier | "internal">> = {
+    stable: new Set(["stable", "internal"]),
+    patterns: new Set(["patterns", "stable", "internal"]),
+    labs: new Set(["labs", "patterns", "stable", "internal"]),
+    legacy: new Set(["legacy", "patterns", "stable", "internal"]),
+    internal: new Set(["internal", "patterns", "stable"]),
+  };
+  const sourceFiles = listFiles(componentsDir).filter(
+    (filePath) =>
+      /\.(ts|tsx)$/.test(filePath) &&
+      !/\.(stories|test)\.tsx?$/.test(filePath) &&
+      getComponentSourceTier(filePath),
+  );
+
+  for (const sourceFile of sourceFiles) {
+    const sourceTier = getComponentSourceTier(sourceFile);
+
+    if (!sourceTier) {
+      continue;
+    }
+
+    const source = readFileSync(sourceFile, "utf8");
+    const importPaths = [
+      ...source.matchAll(/\bimport\s+(?:type\s+)?[\s\S]*?\s+from\s+["']([^"']+)["']/g),
+      ...source.matchAll(/\bexport\s+(?:type\s+)?[\s\S]*?\s+from\s+["']([^"']+)["']/g),
+    ].map((match) => match[1]);
+
+    for (const importPath of importPaths) {
+      const resolvedPath = resolveTypeScriptModulePath(path.dirname(sourceFile), importPath);
+
+      if (!resolvedPath || !resolvedPath.startsWith(componentsDir)) {
+        continue;
+      }
+
+      const targetTier = getComponentSourceTier(resolvedPath);
+
+      if (!targetTier || allowedTierImports[sourceTier].has(targetTier)) {
+        continue;
+      }
+
+      errors.push(
+        `${path.relative(packageRoot, sourceFile)}: ${sourceTier} components must not import ${targetTier} component code (${importPath})`,
+      );
+    }
+  }
+}
+
+function getComponentSourceTier(filePath: string): ComponentTier | "internal" | undefined {
+  const relativePath = path.relative(componentsDir, filePath);
+  const tier = relativePath.split(path.sep)[0];
+
+  if (["stable", "patterns", "labs", "legacy", "internal"].includes(tier)) {
+    return tier as ComponentTier | "internal";
+  }
+
+  return undefined;
+}
+
 function verifyComponentContracts() {
   for (const entry of registryEntries) {
     const componentPath = path.join(componentsDir, entry.tier, `${entry.fileName}.tsx`);
-    const componentSource = readFileSync(componentPath, "utf8");
+    const componentSource = readComponentContractSource(componentPath);
     const allowlistReason = contractAllowlist.get(entry.name);
 
     if (!allowlistReason && !/data-slot=/.test(componentSource)) {
@@ -359,6 +420,99 @@ function verifyComponentContracts() {
       errors.push(`${entry.name}: public DOM-rendering components must forward DOM props`);
     }
   }
+}
+
+function readComponentContractSource(componentPath: string): string {
+  const componentSource = readFileSync(componentPath, "utf8");
+  const reExportMatches = [...componentSource.matchAll(/export\s+\*\s+from\s+["'](.+)["']/g)];
+
+  if (reExportMatches.length === 0) {
+    return componentSource;
+  }
+
+  const componentDir = path.dirname(componentPath);
+  const nestedSources = reExportMatches
+    .map((match) => resolveTypeScriptModulePath(componentDir, match[1]))
+    .filter((resolvedPath): resolvedPath is string => Boolean(resolvedPath))
+    .map((resolvedPath) => readFileSync(resolvedPath, "utf8"));
+
+  return [componentSource, ...nestedSources].join("\n");
+}
+
+function verifyComponentPropTypes() {
+  for (const entry of registryEntries) {
+    const componentPath = path.join(componentsDir, entry.tier, `${entry.fileName}.tsx`);
+    const componentSource = readComponentContractSource(componentPath);
+
+    for (const componentName of getExportedComponentNames(componentSource)) {
+      const propsName = `${componentName}Props`;
+
+      if (!hasExportedType(componentSource, propsName)) {
+        errors.push(`${entry.name}: exported component ${componentName} must export ${propsName}`);
+      }
+    }
+  }
+}
+
+function getExportedComponentNames(source: string): string[] {
+  const names = new Set<string>();
+
+  for (const match of source.matchAll(/export\s+function\s+([A-Z][A-Za-z0-9_]*)\s*\(/g)) {
+    names.add(match[1]);
+  }
+
+  for (const match of source.matchAll(/export\s+const\s+([A-Z][A-Za-z0-9_]*)\s*=/g)) {
+    names.add(match[1]);
+  }
+
+  for (const match of source.matchAll(/export\s*\{([\s\S]*?)\};/g)) {
+    for (const part of match[1].split(",")) {
+      const trimmed = part.trim();
+
+      if (!trimmed || trimmed.startsWith("type ")) {
+        continue;
+      }
+
+      const name = trimmed.replace(/\s+as\s+.*/, "").trim();
+
+      if (/^[A-Z][A-Za-z0-9_]*$/.test(name)) {
+        names.add(name);
+      }
+    }
+  }
+
+  return [...names].filter(isLikelyComponentExport);
+}
+
+function isLikelyComponentExport(name: string): boolean {
+  if (name.includes("_")) {
+    return false;
+  }
+
+  if (name === name.toUpperCase()) {
+    return false;
+  }
+
+  return true;
+}
+
+function hasExportedType(source: string, typeName: string): boolean {
+  if (new RegExp(`\\bexport\\s+(type|interface)\\s+${escapeRegExp(typeName)}\\b`).test(source)) {
+    return true;
+  }
+
+  return [...source.matchAll(/export\s+(?:type\s+)?\{([\s\S]*?)\};/g)].some((match) =>
+    match[1]
+      .split(",")
+      .map((part) => part.trim())
+      .some((part) => {
+        const withoutType = part.replace(/^type\s+/, "").trim();
+        const aliasMatch = withoutType.match(/\s+as\s+([A-Za-z0-9_]+)$/);
+        const normalized = aliasMatch?.[1] ?? withoutType.replace(/\s+as\s+.*/, "").trim();
+
+        return normalized === typeName;
+      }),
+  );
 }
 
 function verifyComponentCoverageMetadata() {
@@ -454,6 +608,22 @@ function listTierTestFiles(tier: ComponentTier): string[] {
   return listFiles(path.join(componentsDir, tier)).filter((filePath) =>
     /\.test\.tsx?$/.test(filePath),
   );
+}
+
+function resolveTypeScriptModulePath(fromDir: string, importPath: string): string | undefined {
+  if (!importPath.startsWith(".")) {
+    return undefined;
+  }
+
+  const basePath = path.resolve(fromDir, importPath);
+  const candidates = [
+    `${basePath}.tsx`,
+    `${basePath}.ts`,
+    path.join(basePath, "index.tsx"),
+    path.join(basePath, "index.ts"),
+  ];
+
+  return candidates.find((candidate) => existsSync(candidate));
 }
 
 function escapeRegExp(value: string): string {

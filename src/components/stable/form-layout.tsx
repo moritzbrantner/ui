@@ -3,7 +3,7 @@ import { TriangleAlertIcon } from "lucide-react";
 import { cva } from "class-variance-authority";
 
 import { cn } from "../../lib/cn";
-import { ActionBar } from "../patterns/app-layout";
+import { ActionBar } from "../internal/action-bar";
 
 function FormSection({ className, ...props }: React.ComponentProps<"section">) {
   return (
@@ -183,3 +183,13 @@ export {
   FormSectionTitle,
   ValidationSummary,
 };
+
+export type FieldGridProps = React.ComponentProps<typeof FieldGrid>;
+export type FieldRowProps = React.ComponentProps<typeof FieldRow>;
+export type FieldsetProps = React.ComponentProps<typeof Fieldset>;
+export type FormActionsProps = React.ComponentProps<typeof FormActions>;
+export type FormSectionProps = React.ComponentProps<typeof FormSection>;
+export type FormSectionDescriptionProps = React.ComponentProps<typeof FormSectionDescription>;
+export type FormSectionHeaderProps = React.ComponentProps<typeof FormSectionHeader>;
+export type FormSectionTitleProps = React.ComponentProps<typeof FormSectionTitle>;
+export type ValidationSummaryProps = React.ComponentProps<typeof ValidationSummary>;

@@ -70,7 +70,7 @@ type ComponentEditorContextValue = {
   resetComponent: (id: string) => void;
 };
 
-type ComponentEditorProviderProps = React.PropsWithChildren<{
+export type ComponentEditorProviderProps = React.PropsWithChildren<{
   defaultSelectedId?: string;
 }>;
 

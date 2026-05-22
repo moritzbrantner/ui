@@ -23,11 +23,11 @@ type ProcessMapProps = React.ComponentProps<"div"> & {
   orientation?: ProcessMapOrientation;
 };
 
-type ProcessMapStepProps = React.ComponentProps<"div"> & {
+export type ProcessMapStepProps = React.ComponentProps<"div"> & {
   step?: ProcessMapStepData;
 };
 
-type ProcessMapConnectorProps = React.ComponentProps<"div"> & {
+export type ProcessMapConnectorProps = React.ComponentProps<"div"> & {
   orientation?: ProcessMapOrientation;
 };
 

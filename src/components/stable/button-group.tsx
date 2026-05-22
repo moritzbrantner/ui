@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { motion, type HTMLMotionProps } from "motion/react";
 import { Slot } from "radix-ui";
@@ -97,3 +98,7 @@ function ButtonGroupSeparator({
 }
 
 export { ButtonGroup, ButtonGroupSeparator, ButtonGroupText, buttonGroupVariants };
+
+export type ButtonGroupProps = React.ComponentProps<typeof ButtonGroup>;
+export type ButtonGroupSeparatorProps = React.ComponentProps<typeof ButtonGroupSeparator>;
+export type ButtonGroupTextProps = React.ComponentProps<typeof ButtonGroupText>;

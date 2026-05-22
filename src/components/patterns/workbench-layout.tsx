@@ -5,7 +5,7 @@ import * as React from "react";
 import { cn } from "../../lib/cn";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../stable/resizable";
 
-type WorkbenchLayoutProps = React.ComponentProps<"div"> & {
+export type WorkbenchLayoutProps = React.ComponentProps<"div"> & {
   toolbar?: React.ReactNode;
   leftPanel?: React.ReactNode;
   rightPanel?: React.ReactNode;
@@ -17,7 +17,7 @@ type WorkbenchLayoutProps = React.ComponentProps<"div"> & {
   collapsiblePanels?: boolean;
 };
 
-type WorkbenchPanelProps = React.ComponentProps<"div"> & {
+export type WorkbenchPanelProps = React.ComponentProps<"div"> & {
   side?: "left" | "right" | "bottom";
 };
 
@@ -156,11 +156,7 @@ function WorkbenchToolbar({ className, ...props }: React.ComponentProps<"div">) 
   );
 }
 
-export {
-  WorkbenchCanvas,
-  WorkbenchLayout,
-  WorkbenchPanel,
-  WorkbenchToolbar,
-  type WorkbenchLayoutProps,
-  type WorkbenchPanelProps,
-};
+export { WorkbenchCanvas, WorkbenchLayout, WorkbenchPanel, WorkbenchToolbar };
+
+export type WorkbenchCanvasProps = React.ComponentProps<typeof WorkbenchCanvas>;
+export type WorkbenchToolbarProps = React.ComponentProps<typeof WorkbenchToolbar>;

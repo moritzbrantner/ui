@@ -65,19 +65,19 @@ type AssetBrowserProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   showPreview?: boolean;
 };
 
-type AssetBrowserItemCardProps = React.ComponentProps<"button"> & {
+export type AssetBrowserItemCardProps = React.ComponentProps<"button"> & {
   item: AssetBrowserItem;
   selected?: boolean;
   selectionMode?: AssetBrowserSelectionMode;
 };
 
-type AssetBrowserItemRowProps = React.ComponentProps<"button"> & {
+export type AssetBrowserItemRowProps = React.ComponentProps<"button"> & {
   item: AssetBrowserItem;
   selected?: boolean;
   selectionMode?: AssetBrowserSelectionMode;
 };
 
-type AssetBrowserPreviewProps = React.ComponentProps<"aside"> & {
+export type AssetBrowserPreviewProps = React.ComponentProps<"aside"> & {
   item?: AssetBrowserItem;
 };
 

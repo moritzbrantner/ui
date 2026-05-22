@@ -32,26 +32,26 @@ type CitationData = {
   status?: CitationStatus;
 };
 
-type CitationListProps = React.ComponentProps<"ol"> & {
+export type CitationListProps = React.ComponentProps<"ol"> & {
   citations?: readonly CitationData[];
   compact?: boolean;
 };
 
-type CitationItemProps = React.ComponentProps<"li"> & {
+export type CitationItemProps = React.ComponentProps<"li"> & {
   citation?: CitationData;
   compact?: boolean;
 };
 
-type CitationReferenceProps = React.ComponentProps<"sup"> & {
+export type CitationReferenceProps = React.ComponentProps<"sup"> & {
   label: React.ReactNode;
   href?: string;
 };
 
-type CitationStatusBadgeProps = React.ComponentProps<"span"> & {
+export type CitationStatusBadgeProps = React.ComponentProps<"span"> & {
   status: CitationStatus;
 };
 
-type CitationExcerptProps = React.ComponentProps<"blockquote"> & {
+export type CitationExcerptProps = React.ComponentProps<"blockquote"> & {
   context?: React.ReactNode;
   defaultContextOpen?: boolean;
   contextLabel?: React.ReactNode;
@@ -403,10 +403,13 @@ export {
   CitationStatusBadge,
   CitationTitle,
   type CitationData,
-  type CitationExcerptProps,
-  type CitationItemProps,
-  type CitationListProps,
-  type CitationReferenceProps,
   type CitationStatus,
-  type CitationStatusBadgeProps,
 };
+
+export type CitationContextProps = React.ComponentProps<typeof CitationContext>;
+export type CitationHeaderProps = React.ComponentProps<typeof CitationHeader>;
+export type CitationMarkerProps = React.ComponentProps<typeof CitationMarker>;
+export type CitationMetaProps = React.ComponentProps<typeof CitationMeta>;
+export type CitationMetaItemProps = React.ComponentProps<typeof CitationMetaItem>;
+export type CitationNoteProps = React.ComponentProps<typeof CitationNote>;
+export type CitationTitleProps = React.ComponentProps<typeof CitationTitle>;

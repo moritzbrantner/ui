@@ -30,7 +30,7 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
   return <li data-slot="pagination-item" {...props} />;
 }
 
-type PaginationLinkProps = {
+export type PaginationLinkProps = {
   isActive?: boolean;
 } & Pick<React.ComponentProps<typeof Button>, "size"> &
   React.ComponentProps<"a">;
@@ -110,3 +110,10 @@ export {
   PaginationNext,
   PaginationPrevious,
 };
+
+export type PaginationProps = React.ComponentProps<typeof Pagination>;
+export type PaginationContentProps = React.ComponentProps<typeof PaginationContent>;
+export type PaginationEllipsisProps = React.ComponentProps<typeof PaginationEllipsis>;
+export type PaginationItemProps = React.ComponentProps<typeof PaginationItem>;
+export type PaginationNextProps = React.ComponentProps<typeof PaginationNext>;
+export type PaginationPreviousProps = React.ComponentProps<typeof PaginationPrevious>;

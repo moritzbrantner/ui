@@ -78,3 +78,11 @@ export {
   PopoverTitle,
   PopoverTrigger,
 };
+
+export type PopoverProps = React.ComponentProps<typeof Popover>;
+export type PopoverAnchorProps = React.ComponentProps<typeof PopoverAnchor>;
+export type PopoverContentProps = React.ComponentProps<typeof PopoverContent>;
+export type PopoverDescriptionProps = React.ComponentProps<typeof PopoverDescription>;
+export type PopoverHeaderProps = React.ComponentProps<typeof PopoverHeader>;
+export type PopoverTitleProps = React.ComponentProps<typeof PopoverTitle>;
+export type PopoverTriggerProps = React.ComponentProps<typeof PopoverTrigger>;

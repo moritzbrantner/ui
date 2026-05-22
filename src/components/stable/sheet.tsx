@@ -128,3 +128,12 @@ export {
   SheetTitle,
   SheetDescription,
 };
+
+export type SheetProps = React.ComponentProps<typeof Sheet>;
+export type SheetTriggerProps = React.ComponentProps<typeof SheetTrigger>;
+export type SheetCloseProps = React.ComponentProps<typeof SheetClose>;
+export type SheetContentProps = React.ComponentProps<typeof SheetContent>;
+export type SheetHeaderProps = React.ComponentProps<typeof SheetHeader>;
+export type SheetFooterProps = React.ComponentProps<typeof SheetFooter>;
+export type SheetTitleProps = React.ComponentProps<typeof SheetTitle>;
+export type SheetDescriptionProps = React.ComponentProps<typeof SheetDescription>;

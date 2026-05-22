@@ -273,3 +273,20 @@ export {
   MenubarSubTrigger,
   MenubarSubContent,
 };
+
+export type MenubarProps = React.ComponentProps<typeof Menubar>;
+export type MenubarPortalProps = React.ComponentProps<typeof MenubarPortal>;
+export type MenubarMenuProps = React.ComponentProps<typeof MenubarMenu>;
+export type MenubarTriggerProps = React.ComponentProps<typeof MenubarTrigger>;
+export type MenubarContentProps = React.ComponentProps<typeof MenubarContent>;
+export type MenubarGroupProps = React.ComponentProps<typeof MenubarGroup>;
+export type MenubarSeparatorProps = React.ComponentProps<typeof MenubarSeparator>;
+export type MenubarLabelProps = React.ComponentProps<typeof MenubarLabel>;
+export type MenubarItemProps = React.ComponentProps<typeof MenubarItem>;
+export type MenubarShortcutProps = React.ComponentProps<typeof MenubarShortcut>;
+export type MenubarCheckboxItemProps = React.ComponentProps<typeof MenubarCheckboxItem>;
+export type MenubarRadioGroupProps = React.ComponentProps<typeof MenubarRadioGroup>;
+export type MenubarRadioItemProps = React.ComponentProps<typeof MenubarRadioItem>;
+export type MenubarSubProps = React.ComponentProps<typeof MenubarSub>;
+export type MenubarSubTriggerProps = React.ComponentProps<typeof MenubarSubTrigger>;
+export type MenubarSubContentProps = React.ComponentProps<typeof MenubarSubContent>;

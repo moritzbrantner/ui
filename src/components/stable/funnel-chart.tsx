@@ -25,7 +25,7 @@ type FunnelChartProps = Omit<React.ComponentProps<"figure">, "children"> & {
   ) => React.ReactNode;
 };
 
-type FunnelChartSegmentProps = React.ComponentProps<"g"> & {
+export type FunnelChartSegmentProps = React.ComponentProps<"g"> & {
   segment: FunnelChartSegmentData;
   index: number;
   maxValue: number;

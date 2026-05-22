@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { motion, type HTMLMotionProps } from "motion/react";
 
 import { cn } from "../../lib/cn";
@@ -43,3 +44,6 @@ function KbdGroup({
 }
 
 export { Kbd, KbdGroup };
+
+export type KbdProps = React.ComponentProps<typeof Kbd>;
+export type KbdGroupProps = React.ComponentProps<typeof KbdGroup>;

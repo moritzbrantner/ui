@@ -187,3 +187,13 @@ export {
   CommandShortcut,
   CommandSeparator,
 };
+
+export type CommandProps = React.ComponentProps<typeof Command>;
+export type CommandDialogProps = React.ComponentProps<typeof CommandDialog>;
+export type CommandInputProps = React.ComponentProps<typeof CommandInput>;
+export type CommandListProps = React.ComponentProps<typeof CommandList>;
+export type CommandEmptyProps = React.ComponentProps<typeof CommandEmpty>;
+export type CommandGroupProps = React.ComponentProps<typeof CommandGroup>;
+export type CommandItemProps = React.ComponentProps<typeof CommandItem>;
+export type CommandShortcutProps = React.ComponentProps<typeof CommandShortcut>;
+export type CommandSeparatorProps = React.ComponentProps<typeof CommandSeparator>;

@@ -19,3 +19,5 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
 }
 
 export { Input };
+
+export type InputProps = React.ComponentProps<typeof Input>;

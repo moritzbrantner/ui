@@ -7,11 +7,11 @@ import { Avatar } from "../stable/avatar";
 
 type ProfileSummaryOrientation = "horizontal" | "vertical";
 
-type ProfileSummaryProps = React.ComponentProps<"article"> & {
+export type ProfileSummaryProps = React.ComponentProps<"article"> & {
   orientation?: ProfileSummaryOrientation;
 };
 
-type ProfileSummaryAvatarProps = React.ComponentProps<typeof Avatar> & {
+export type ProfileSummaryAvatarProps = React.ComponentProps<typeof Avatar> & {
   imageUrl?: string | null;
   initials?: string;
   name?: string;
@@ -191,7 +191,17 @@ export {
   ProfileSummaryStats,
   ProfileSummarySubtitle,
   ProfileSummaryTitle,
-  type ProfileSummaryAvatarProps,
   type ProfileSummaryOrientation,
-  type ProfileSummaryProps,
 };
+
+export type ProfileSummaryActionsProps = React.ComponentProps<typeof ProfileSummaryActions>;
+export type ProfileSummaryContentProps = React.ComponentProps<typeof ProfileSummaryContent>;
+export type ProfileSummaryDescriptionProps = React.ComponentProps<typeof ProfileSummaryDescription>;
+export type ProfileSummaryHeaderProps = React.ComponentProps<typeof ProfileSummaryHeader>;
+export type ProfileSummaryMetaProps = React.ComponentProps<typeof ProfileSummaryMeta>;
+export type ProfileSummaryStatProps = React.ComponentProps<typeof ProfileSummaryStat>;
+export type ProfileSummaryStatLabelProps = React.ComponentProps<typeof ProfileSummaryStatLabel>;
+export type ProfileSummaryStatValueProps = React.ComponentProps<typeof ProfileSummaryStatValue>;
+export type ProfileSummaryStatsProps = React.ComponentProps<typeof ProfileSummaryStats>;
+export type ProfileSummarySubtitleProps = React.ComponentProps<typeof ProfileSummarySubtitle>;
+export type ProfileSummaryTitleProps = React.ComponentProps<typeof ProfileSummaryTitle>;

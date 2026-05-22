@@ -187,3 +187,15 @@ export {
   TerminalTitle,
 };
 export type { TerminalLineVariant };
+
+export type TerminalProps = React.ComponentProps<typeof Terminal>;
+export type TerminalActionsProps = React.ComponentProps<typeof TerminalActions>;
+export type TerminalCommandProps = React.ComponentProps<typeof TerminalCommand>;
+export type TerminalContentProps = React.ComponentProps<typeof TerminalContent>;
+export type TerminalControlsProps = React.ComponentProps<typeof TerminalControls>;
+export type TerminalCursorProps = React.ComponentProps<typeof TerminalCursor>;
+export type TerminalHeaderProps = React.ComponentProps<typeof TerminalHeader>;
+export type TerminalLineProps = React.ComponentProps<typeof TerminalLine>;
+export type TerminalOutputProps = React.ComponentProps<typeof TerminalOutput>;
+export type TerminalPromptProps = React.ComponentProps<typeof TerminalPrompt>;
+export type TerminalTitleProps = React.ComponentProps<typeof TerminalTitle>;

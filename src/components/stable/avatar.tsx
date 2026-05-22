@@ -9,12 +9,12 @@ import { avatarShapeStyles } from "../internal/avatar-shapes";
 type AvatarSize = "xs" | "sm" | "default" | "lg" | "xl";
 type AvatarShape = keyof typeof avatarShapeStyles;
 
-type AvatarRootProps = React.ComponentProps<typeof AvatarPrimitive.Root> & {
+export type AvatarRootProps = React.ComponentProps<typeof AvatarPrimitive.Root> & {
   size?: AvatarSize;
   shape?: AvatarShape;
 };
 
-type AvatarProps = Omit<AvatarRootProps, "children"> & {
+export type AvatarProps = Omit<AvatarRootProps, "children"> & {
   name?: string | null;
   imageUrl?: string | null;
   imageAlt?: string;
@@ -80,7 +80,7 @@ function AvatarImage({ className, ...props }: React.ComponentProps<typeof Avatar
   );
 }
 
-type AvatarFallbackProps = React.ComponentProps<typeof AvatarPrimitive.Fallback> & {
+export type AvatarFallbackProps = React.ComponentProps<typeof AvatarPrimitive.Fallback> & {
   name?: string | null;
   initials?: string;
   maxInitials?: number;
@@ -160,7 +160,9 @@ export {
   AvatarFallback,
   AvatarBadge,
   getAvatarInitials,
-  type AvatarProps,
   type AvatarSize,
   type AvatarShape,
 };
+
+export type AvatarImageProps = React.ComponentProps<typeof AvatarImage>;
+export type AvatarBadgeProps = React.ComponentProps<typeof AvatarBadge>;

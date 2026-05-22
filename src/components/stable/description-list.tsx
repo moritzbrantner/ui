@@ -42,3 +42,8 @@ function DescriptionListDetail({ className, ...props }: React.ComponentProps<"dd
 }
 
 export { DescriptionList, DescriptionListDetail, DescriptionListItem, DescriptionListTerm };
+
+export type DescriptionListProps = React.ComponentProps<typeof DescriptionList>;
+export type DescriptionListDetailProps = React.ComponentProps<typeof DescriptionListDetail>;
+export type DescriptionListItemProps = React.ComponentProps<typeof DescriptionListItem>;
+export type DescriptionListTermProps = React.ComponentProps<typeof DescriptionListTerm>;

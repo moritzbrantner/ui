@@ -211,3 +211,18 @@ export {
   ChatTitle,
 };
 export type { ChatMessageProps };
+
+export type ChatProps = React.ComponentProps<typeof Chat>;
+export type ChatActionsProps = React.ComponentProps<typeof ChatActions>;
+export type ChatBubbleProps = React.ComponentProps<typeof ChatBubble>;
+export type ChatComposerProps = React.ComponentProps<typeof ChatComposer>;
+export type ChatComposerActionsProps = React.ComponentProps<typeof ChatComposerActions>;
+export type ChatComposerInputProps = React.ComponentProps<typeof ChatComposerInput>;
+export type ChatDescriptionProps = React.ComponentProps<typeof ChatDescription>;
+export type ChatHeaderProps = React.ComponentProps<typeof ChatHeader>;
+export type ChatMessageAvatarProps = React.ComponentProps<typeof ChatMessageAvatar>;
+export type ChatMessageContentProps = React.ComponentProps<typeof ChatMessageContent>;
+export type ChatMessageMetaProps = React.ComponentProps<typeof ChatMessageMeta>;
+export type ChatSendButtonProps = React.ComponentProps<typeof ChatSendButton>;
+export type ChatThreadProps = React.ComponentProps<typeof ChatThread>;
+export type ChatTitleProps = React.ComponentProps<typeof ChatTitle>;

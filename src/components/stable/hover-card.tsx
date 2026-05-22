@@ -36,3 +36,7 @@ function HoverCardContent({
 }
 
 export { HoverCard, HoverCardTrigger, HoverCardContent };
+
+export type HoverCardProps = React.ComponentProps<typeof HoverCard>;
+export type HoverCardTriggerProps = React.ComponentProps<typeof HoverCardTrigger>;
+export type HoverCardContentProps = React.ComponentProps<typeof HoverCardContent>;

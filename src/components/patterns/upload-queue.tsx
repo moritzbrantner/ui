@@ -28,7 +28,7 @@ type UploadQueueFile = {
   preview?: React.ReactNode;
 };
 
-type UploadQueueProps = React.ComponentProps<"div"> & {
+export type UploadQueueProps = React.ComponentProps<"div"> & {
   items: readonly UploadQueueFile[];
   emptyState?: React.ReactNode;
   onRetry?: (item: UploadQueueFile) => void;
@@ -36,7 +36,7 @@ type UploadQueueProps = React.ComponentProps<"div"> & {
   onRemove?: (item: UploadQueueFile) => void;
 };
 
-type UploadQueueItemProps = React.ComponentProps<"div"> & {
+export type UploadQueueItemProps = React.ComponentProps<"div"> & {
   item: UploadQueueFile;
   onRetry?: (item: UploadQueueFile) => void;
   onCancel?: (item: UploadQueueFile) => void;
@@ -191,11 +191,4 @@ function textFromNode(node: React.ReactNode) {
   return typeof node === "string" || typeof node === "number" ? String(node) : "File";
 }
 
-export {
-  UploadQueue,
-  UploadQueueItem,
-  type UploadQueueFile,
-  type UploadQueueItemProps,
-  type UploadQueueItemStatus,
-  type UploadQueueProps,
-};
+export { UploadQueue, UploadQueueItem, type UploadQueueFile, type UploadQueueItemStatus };
