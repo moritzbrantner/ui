@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect } from "storybook/test";
+import { expect, userEvent } from "storybook/test";
 
 import { Avatar } from "./avatar";
 import { OrgChart } from "./org-chart";
@@ -46,6 +46,10 @@ export const TeamStructure: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByText("Mara Klein")).toBeVisible();
     await expect(canvas.getByText("Ivy Chen")).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Collapse Mara Klein" }));
+    await expect(canvas.queryByText("Nina Patel")).not.toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Expand Mara Klein" }));
+    await expect(canvas.getByText("Nina Patel")).toBeVisible();
   },
 };
 
@@ -65,5 +69,16 @@ export const CompactHierarchy: Story = {
   },
   play: async ({ canvas }) => {
     await expect(canvas.getByText("Go to market")).toBeVisible();
+  },
+};
+
+export const MinimizedBranch: Story = {
+  args: {
+    nodes: teamNodes,
+    defaultExpandedIds: ["mara"],
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("Omar Silva")).toBeVisible();
+    await expect(canvas.queryByText("Ivy Chen")).not.toBeInTheDocument();
   },
 };

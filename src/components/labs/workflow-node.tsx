@@ -250,7 +250,10 @@ function WorkflowNode({
           getOutputAriaLabel={getOutputAriaLabel}
         />
       ) : (
-        <div className="grid min-h-0 flex-1 grid-cols-2 gap-3 p-3 text-xs">
+        <div
+          data-slot="workflow-node-ports"
+          className="grid min-h-0 flex-1 grid-cols-2 gap-3 px-0 py-3 text-xs"
+        >
           <WorkflowNodePortColumn
             title="Inputs"
             direction="input"
@@ -462,7 +465,7 @@ function WorkflowNodeInlinePort({
       aria-label={getAriaLabel?.(port, node) ?? `${node.label} ${port.label}`}
       className={cn(
         "absolute top-1/2 z-10 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-60",
-        isInput ? "-left-[7px]" : "-right-[7px]",
+        isInput ? "-left-1.5" : "-right-1.5",
       )}
       style={{ backgroundColor: color }}
       onClick={(event) => {
@@ -555,7 +558,7 @@ function WorkflowNodeMinimizedPortStack({
           aria-label={getAriaLabel?.(port, node) ?? `${node.label} ${port.label}`}
           className={cn(
             "absolute z-10 h-3 w-3 rounded-full border-2 border-white outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-60",
-            isInput ? "-left-[7px]" : "-right-[7px]",
+            isInput ? "-left-1.5" : "-right-1.5",
           )}
           style={{
             backgroundColor: getWorkflowNodePortColor(port),
@@ -683,7 +686,7 @@ function WorkflowNodePortAnchor({
           data-slot="workflow-node-port-dot"
           className={cn(
             "absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white",
-            isInput ? "-left-[7px]" : "-right-[7px]",
+            isInput ? "-left-1.5" : "-right-1.5",
           )}
           style={{ backgroundColor: color }}
           aria-hidden="true"

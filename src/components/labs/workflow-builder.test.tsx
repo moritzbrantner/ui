@@ -190,4 +190,44 @@ describe("WorkflowBuilder", () => {
       expect.objectContaining({ type: "edge", id: "edge-source-target" }),
     );
   });
+
+  test("snaps dragged nodes when adjacent ports match", () => {
+    const onNodesChange = vi.fn();
+    const snapNodes: WorkflowBuilderNodeData[] = [
+      {
+        id: "source",
+        label: "Source",
+        x: 0,
+        y: 0,
+        outputs: [{ id: "asset", label: "Asset", kind: "asset" }],
+      },
+      {
+        id: "target",
+        label: "Target",
+        x: 320,
+        y: 0,
+        inputs: [{ id: "asset", label: "Asset", kind: "asset" }],
+      },
+    ];
+
+    const { container } = render(
+      <WorkflowBuilder nodes={snapNodes} edges={[]} onNodesChange={onNodesChange} />,
+    );
+    const sourceNode = container.querySelector<HTMLElement>(
+      "[data-slot='workflow-builder-node'][data-node-id='source']",
+    )!;
+    const surface = container.querySelector<HTMLElement>("[data-slot='workflow-builder-surface']")!;
+
+    fireEvent.pointerDown(sourceNode, { button: 0, clientX: 0, clientY: 0 });
+    fireEvent.pointerMove(surface, { clientX: 12, clientY: 0 });
+
+    expect(onNodesChange).toHaveBeenCalledWith([
+      {
+        ...snapNodes[0],
+        x: 10,
+        y: 0,
+      },
+      snapNodes[1],
+    ]);
+  });
 });

@@ -150,6 +150,8 @@ type DragState = {
   originalY: number;
 } | null;
 
+const workflowBuilderSnapDistance = 28;
+
 function WorkflowBuilder({
   nodes,
   edges,
@@ -257,14 +259,19 @@ function WorkflowBuilder({
       return;
     }
     const pointer = getWorkflowPointer(event);
+    const draggedNode = nodes.find((node) => node.id === dragState.nodeId);
+
+    if (!draggedNode) {
+      return;
+    }
+
+    const rawPosition = {
+      x: Math.round(dragState.originalX + (pointer.x - dragState.startX) / currentZoom),
+      y: Math.round(dragState.originalY + (pointer.y - dragState.startY) / currentZoom),
+    };
+    const nextPosition = getWorkflowBuilderSnappedNodePosition(draggedNode, nodes, rawPosition);
     const nextNodes = nodes.map((node) =>
-      node.id === dragState.nodeId
-        ? {
-            ...node,
-            x: Math.round(dragState.originalX + (pointer.x - dragState.startX) / currentZoom),
-            y: Math.round(dragState.originalY + (pointer.y - dragState.startY) / currentZoom),
-          }
-        : node,
+      node.id === dragState.nodeId ? { ...node, ...nextPosition } : node,
     );
     onNodesChange?.(nextNodes);
   };
@@ -799,6 +806,96 @@ function getWorkflowNodePortDotXOffset(
   const size = getWorkflowNodeSize(node);
 
   return direction === "input" ? 0 : size.width;
+}
+
+function getWorkflowBuilderSnappedNodePosition(
+  node: WorkflowBuilderNodeData,
+  nodes: WorkflowBuilderNodeData[],
+  position: WorkflowBuilderPoint,
+): WorkflowBuilderPoint {
+  let closestSnap: (WorkflowBuilderPoint & { distance: number }) | null = null;
+  const nodeSize = getWorkflowNodeSize(node);
+
+  for (const otherNode of nodes) {
+    if (otherNode.id === node.id) {
+      continue;
+    }
+
+    const otherSize = getWorkflowNodeSize(otherNode);
+
+    for (const inputMatch of getWorkflowBuilderPortMatches(node.inputs, otherNode.outputs)) {
+      const snap = {
+        x: otherNode.x + otherSize.width,
+        y:
+          otherNode.y +
+          getWorkflowNodePortCenterOffset(otherNode, inputMatch.otherIndex) -
+          getWorkflowNodePortCenterOffset(node, inputMatch.nodeIndex),
+      };
+      const distance = getWorkflowPointDistance(position, snap);
+
+      if (
+        distance <= workflowBuilderSnapDistance &&
+        (!closestSnap || distance < closestSnap.distance)
+      ) {
+        closestSnap = { ...snap, distance };
+      }
+    }
+
+    for (const outputMatch of getWorkflowBuilderPortMatches(node.outputs, otherNode.inputs)) {
+      const snap = {
+        x: otherNode.x - nodeSize.width,
+        y:
+          otherNode.y +
+          getWorkflowNodePortCenterOffset(otherNode, outputMatch.otherIndex) -
+          getWorkflowNodePortCenterOffset(node, outputMatch.nodeIndex),
+      };
+      const distance = getWorkflowPointDistance(position, snap);
+
+      if (
+        distance <= workflowBuilderSnapDistance &&
+        (!closestSnap || distance < closestSnap.distance)
+      ) {
+        closestSnap = { ...snap, distance };
+      }
+    }
+  }
+
+  return closestSnap ? { x: closestSnap.x, y: closestSnap.y } : position;
+}
+
+function getWorkflowBuilderPortMatches(
+  nodePorts: WorkflowBuilderPort[] | undefined,
+  otherPorts: WorkflowBuilderPort[] | undefined,
+) {
+  const matches: { nodeIndex: number; otherIndex: number }[] = [];
+
+  nodePorts?.forEach((nodePort, nodeIndex) => {
+    otherPorts?.forEach((otherPort, otherIndex) => {
+      if (workflowBuilderPortsMatch(nodePort, otherPort)) {
+        matches.push({ nodeIndex, otherIndex });
+      }
+    });
+  });
+
+  return matches;
+}
+
+function workflowBuilderPortsMatch(
+  firstPort: WorkflowBuilderPort,
+  secondPort: WorkflowBuilderPort,
+) {
+  return getWorkflowBuilderPortMatchKey(firstPort) === getWorkflowBuilderPortMatchKey(secondPort);
+}
+
+function getWorkflowBuilderPortMatchKey(port: WorkflowBuilderPort) {
+  return (port.kind ?? port.id ?? port.label).trim().toLowerCase();
+}
+
+function getWorkflowPointDistance(
+  firstPoint: WorkflowBuilderPoint,
+  secondPoint: WorkflowBuilderPoint,
+) {
+  return Math.hypot(firstPoint.x - secondPoint.x, firstPoint.y - secondPoint.y);
 }
 
 function measureWorkflowBuilderPortPoints(

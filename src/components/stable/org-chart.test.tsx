@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, test, vi } from "vitest";
 
 import { OrgChart } from "./org-chart";
 
@@ -34,5 +34,38 @@ describe("OrgChart", () => {
     render(<OrgChart nodes={nodes} renderNode={(node) => <strong>{node.id}</strong>} />);
 
     expect(screen.getByText("vp")).toBeTruthy();
+  });
+
+  test("minimizes child branches", () => {
+    render(<OrgChart nodes={nodes} />);
+
+    const root = screen.getByRole("treeitem", { name: /VP Product/ });
+    expect(root.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByText("Design Lead")).toBeTruthy();
+    expect(screen.getByText("QA Lead")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Collapse VP Product" }));
+
+    expect(root.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByText("Design Lead")).toBeNull();
+    expect(screen.queryByText("QA Lead")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Expand VP Product" }));
+
+    expect(root.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByText("Design Lead")).toBeTruthy();
+  });
+
+  test("supports controlled expanded nodes", () => {
+    const onExpandedIdsChange = vi.fn();
+
+    render(<OrgChart nodes={nodes} expandedIds={[]} onExpandedIdsChange={onExpandedIdsChange} />);
+
+    expect(screen.queryByText("Design Lead")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Expand VP Product" }));
+
+    expect(onExpandedIdsChange).toHaveBeenCalledWith(["vp"], nodes[0]);
+    expect(screen.queryByText("Design Lead")).toBeNull();
   });
 });

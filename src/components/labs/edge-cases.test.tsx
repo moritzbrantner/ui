@@ -405,6 +405,9 @@ describe("@moritzbrantner/ui component edge cases", () => {
     expect(screen.getByText("@platform/classification")).toBeTruthy();
     expect(screen.queryByText("routing")).toBeNull();
     expect(screen.queryByText("review")).toBeNull();
+    expect(document.querySelector("[data-slot='workflow-node-ports']")?.className).toContain(
+      "px-0",
+    );
     expect(screen.getByText("required")).toBeTruthy();
     expect(screen.getByText("labels -> event")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Minimize Classify" })).toBeTruthy();
