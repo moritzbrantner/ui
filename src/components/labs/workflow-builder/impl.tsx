@@ -428,6 +428,7 @@ function WorkflowBuilder({
       />
       <div
         data-slot="workflow-builder-surface"
+        tabIndex={0}
         className="relative overflow-auto rounded-md border bg-muted/20"
         style={{ height: typeof surfaceHeight === "number" ? `${surfaceHeight}px` : surfaceHeight }}
         onPointerMove={handlePointerMove}

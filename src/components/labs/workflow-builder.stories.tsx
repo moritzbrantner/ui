@@ -185,6 +185,81 @@ const initialEdges: WorkflowBuilderEdge[] = [
   },
 ];
 
+const connectableEdges = initialEdges.filter((edge) => edge.id !== "classify-publish");
+
+const typeMismatchNodes: WorkflowBuilderNodeData[] = [
+  {
+    id: "documents",
+    label: "Documents",
+    category: "Source",
+    tone: "info",
+    x: 48,
+    y: 80,
+    outputs: [
+      {
+        id: "items",
+        label: "Items",
+        type: "readonly DocumentInput[]",
+      },
+    ],
+  },
+  {
+    id: "report",
+    label: "Report writer",
+    category: "Sink",
+    tone: "success",
+    x: 360,
+    y: 80,
+    inputs: [
+      {
+        id: "payload",
+        label: "Payload",
+        type: "ReportPayload",
+      },
+    ],
+  },
+];
+
+const compactNodes: WorkflowBuilderNodeData[] = [
+  {
+    id: "webhook",
+    label: "Webhook",
+    variant: "compact",
+    status: "success",
+    x: 48,
+    y: 104,
+    outputs: [{ id: "event", label: "Event", kind: "event" }],
+  },
+  {
+    id: "parse",
+    label: "Parse",
+    variant: "compact",
+    x: 328,
+    y: 104,
+    inputs: [{ id: "event", label: "Event", kind: "event" }],
+    outputs: [{ id: "object", label: "Object", kind: "object" }],
+  },
+  {
+    id: "store",
+    label: "Store",
+    variant: "compact",
+    x: 608,
+    y: 104,
+    inputs: [{ id: "object", label: "Object", kind: "object" }],
+  },
+];
+
+const compactEdges: WorkflowBuilderEdge[] = [
+  {
+    id: "webhook-parse",
+    sourceNodeId: "webhook",
+    sourcePortId: "event",
+    targetNodeId: "parse",
+    targetPortId: "event",
+    status: "success",
+  },
+];
+
 const meta = {
   title: "Components/Editors/Workflow Builder",
   component: WorkflowBuilder,
@@ -242,6 +317,40 @@ function ControlledViewportWorkflowBuilder(args: React.ComponentProps<typeof Wor
   );
 }
 
+function StatefulWorkflowBuilder({
+  initialEdges: edgesProp,
+  initialNodes: nodesProp = initialNodes,
+  ...args
+}: React.ComponentProps<typeof WorkflowBuilder> & {
+  initialNodes?: WorkflowBuilderNodeData[];
+  initialEdges: WorkflowBuilderEdge[];
+}) {
+  const [nodes, setNodes] = React.useState(nodesProp);
+  const [edges, setEdges] = React.useState(edgesProp);
+
+  return (
+    <div className="grid gap-3">
+      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+        <span data-testid="workflow-node-count">Nodes: {nodes.length}</span>
+        <span data-testid="workflow-edge-count">Edges: {edges.length}</span>
+      </div>
+      <WorkflowBuilder
+        {...args}
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={(nextNodes) => {
+          setNodes(nextNodes);
+          args.onNodesChange?.(nextNodes);
+        }}
+        onEdgesChange={(nextEdges) => {
+          setEdges(nextEdges);
+          args.onEdgesChange?.(nextEdges);
+        }}
+      />
+    </div>
+  );
+}
+
 export const AiWorkflowGraph: Story = {
   render: (args) => <WorkflowBuilderDemo {...args} />,
   play: async ({ args, canvas, userEvent }) => {
@@ -287,5 +396,123 @@ export const ReadOnlyOverview: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByText("Workflow overview")).toBeVisible();
     await expect(canvas.getByRole("img", { name: "Workflow minimap" })).toBeVisible();
+  },
+};
+
+export const ConnectNodes: Story = {
+  args: {
+    edges: connectableEdges,
+    onConnectionStart: fn(),
+    onConnectionComplete: fn(),
+  },
+  render: (args) => <StatefulWorkflowBuilder {...args} initialEdges={connectableEdges} />,
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByTestId("workflow-edge-count")).toHaveTextContent("Edges: 4");
+
+    await userEvent.click(canvas.getByRole("button", { name: "Start Classify Labels" }));
+    await expect(args.onConnectionStart).toHaveBeenCalledWith({
+      sourceNodeId: "classify",
+      sourcePortId: "labels",
+    });
+    await userEvent.click(canvas.getByRole("button", { name: "Connect to Publish Labels" }));
+
+    await expect(args.onConnectionComplete).toHaveBeenCalledWith({
+      sourceNodeId: "classify",
+      sourcePortId: "labels",
+      targetNodeId: "publish",
+      targetPortId: "labels",
+    });
+    await expect(canvas.getByTestId("workflow-edge-count")).toHaveTextContent("Edges: 5");
+  },
+};
+
+export const TypeMismatchGuard: Story = {
+  args: {
+    nodes: typeMismatchNodes,
+    edges: [],
+    onConnectionComplete: fn(),
+  },
+  render: (args) => (
+    <StatefulWorkflowBuilder
+      {...args}
+      initialNodes={typeMismatchNodes}
+      initialEdges={[]}
+      toolbarLabel="Typed workflow"
+    />
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Start Documents Items" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Connect to Report writer Payload" }));
+
+    await expect(canvas.getByTestId("workflow-edge-count")).toHaveTextContent("Edges: 0");
+    await expect(args.onConnectionComplete).not.toHaveBeenCalled();
+  },
+};
+
+export const SelectAndDelete: Story = {
+  render: (args) => <StatefulWorkflowBuilder {...args} initialEdges={initialEdges} />,
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "OCR extract" }));
+    await expect(args.onSelectionChange).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "node", id: "ocr" }),
+    );
+
+    await userEvent.click(canvas.getByRole("button", { name: "Delete selected" }));
+
+    await expect(canvas.getByTestId("workflow-node-count")).toHaveTextContent("Nodes: 3");
+    await expect(canvas.getByTestId("workflow-edge-count")).toHaveTextContent("Edges: 1");
+  },
+};
+
+export const CompactChain: Story = {
+  args: {
+    nodes: compactNodes,
+    edges: compactEdges,
+    surfaceHeight: 300,
+    toolbarLabel: "Compact workflow",
+    onConnectionComplete: fn(),
+  },
+  render: (args) => (
+    <StatefulWorkflowBuilder
+      {...args}
+      initialNodes={compactNodes}
+      initialEdges={compactEdges}
+      canvasSize={{ width: 920, height: 320 }}
+    />
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByText("Compact workflow")).toBeVisible();
+    await expect(canvas.getByText("Edges: 1")).toBeVisible();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Start Parse Object" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Connect to Store Object" }));
+
+    await expect(args.onConnectionComplete).toHaveBeenCalledWith({
+      sourceNodeId: "parse",
+      sourcePortId: "object",
+      targetNodeId: "store",
+      targetPortId: "object",
+    });
+    await expect(canvas.getByTestId("workflow-edge-count")).toHaveTextContent("Edges: 2");
+  },
+};
+
+export const EmptyDraft: Story = {
+  args: {
+    nodes: [],
+    edges: [],
+    surfaceHeight: 280,
+    showMiniMap: false,
+    toolbarLabel: "Empty workflow",
+    onViewportChange: fn(),
+  },
+  render: (args) => <WorkflowBuilder {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByText("Empty workflow")).toBeVisible();
+    await expect(canvas.queryByRole("img", { name: "Workflow minimap" })).not.toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Fit view" }));
+
+    await expect(args.onViewportChange).toHaveBeenCalledWith({ x: 0, y: 0, zoom: 1 });
   },
 };

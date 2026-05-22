@@ -1,3 +1,4 @@
+import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, screen } from "storybook/test";
 
@@ -85,6 +86,73 @@ const typedOutputNode: WorkflowOutputOnlyNodeData = {
   ],
 };
 
+const reviewNode: WorkflowNodeData = {
+  id: "review",
+  label: "Human review",
+  category: "Decision",
+  description: "Route low-confidence labels into a queue with priority and reviewer context.",
+  status: "warning",
+  tone: "warning",
+  inputs: [
+    {
+      id: "labels",
+      label: "Labels",
+      kind: "labels",
+      required: true,
+    },
+    {
+      id: "evidence",
+      label: "Evidence",
+      type: {
+        label: "EvidenceBundle",
+        source: "Readonly<{ labelId: string; pageRefs: readonly string[] }>",
+      },
+      badge: "optional",
+    },
+    {
+      id: "policy",
+      label: "Policy",
+      kind: "object",
+      color: "#475569",
+    },
+  ],
+  outputs: [
+    {
+      id: "approved",
+      label: "Approved",
+      kind: "boolean",
+    },
+    {
+      id: "task",
+      label: "Task",
+      kind: "task",
+      required: true,
+    },
+    {
+      id: "audit",
+      label: "Audit event",
+      kind: "event",
+    },
+  ],
+};
+
+const emptyNode: WorkflowNodeData = {
+  id: "note",
+  label: "Annotation",
+  category: "Utility",
+  description: "A visual note with no connection ports.",
+  tone: "slate",
+};
+
+const statusNodes: WorkflowNodeData[] = [
+  { ...classifierNode, id: "idle", label: "Idle", status: "idle", tone: "neutral" },
+  { ...classifierNode, id: "running", label: "Running", status: "running", tone: "info" },
+  { ...classifierNode, id: "success", label: "Success", status: "success", tone: "success" },
+  { ...classifierNode, id: "warning", label: "Warning", status: "warning", tone: "warning" },
+  { ...classifierNode, id: "error", label: "Error", status: "error", tone: "error" },
+  { ...classifierNode, id: "custom", label: "Custom tone", status: "queued", tone: "violet" },
+];
+
 const meta = {
   title: "Components/Editors/Workflow Node",
   component: WorkflowNode,
@@ -122,6 +190,7 @@ export const Default: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Open Classify menu" }));
     await userEvent.click(screen.getByRole("menuitem", { name: "Duplicate" }));
     await expect(args.onMenuItemSelect).toHaveBeenCalledTimes(1);
+    await userEvent.keyboard("{Escape}");
   },
   render: (args) => (
     <div className="grid gap-4 p-4">
@@ -154,5 +223,116 @@ export const TypedBoundaryNodes: Story = {
     await expect(canvas.getByText("readonly DocumentInput[]")).toBeVisible();
     await expect(canvas.getByText("ReportPayload")).toBeVisible();
     await expect(canvas.getAllByText("required")).toHaveLength(2);
+  },
+};
+
+export const ManyPorts: Story = {
+  args: {
+    node: reviewNode,
+    selected: true,
+    onInputClick: fn(),
+    onOutputClick: fn(),
+    getInputAriaLabel: (port) => `Inspect input ${port.label}`,
+    getOutputAriaLabel: (port) => `Inspect output ${port.label}`,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByRole("button", { name: "Human review" })).toBeVisible();
+    await expect(canvas.getByText("EvidenceBundle")).toBeVisible();
+    await expect(canvas.getByText("optional")).toBeVisible();
+    await expect(canvas.getAllByText("required")).toHaveLength(2);
+
+    await userEvent.click(canvas.getByRole("button", { name: "Inspect input Labels" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Inspect output Task" }));
+
+    await expect(args.onInputClick).toHaveBeenCalledTimes(1);
+    await expect(args.onOutputClick).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const MinimizedInteractive: Story = {
+  args: {
+    node: reviewNode,
+    onMinimizedChange: fn(),
+    onInputClick: fn(),
+    onOutputClick: fn(),
+  },
+  render: (args) => {
+    const [minimized, setMinimized] = React.useState(true);
+
+    return (
+      <WorkflowNode
+        {...args}
+        node={{ ...args.node, minimized }}
+        onMinimizedChange={(node, nextMinimized) => {
+          setMinimized(nextMinimized);
+          args.onMinimizedChange?.(node, nextMinimized);
+        }}
+      />
+    );
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByText("3 in")).toBeVisible();
+    await expect(canvas.getByText("3 out")).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Expand Human review" }));
+    await expect(args.onMinimizedChange).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "review" }),
+      false,
+    );
+    await expect(canvas.getByRole("button", { name: "Human review Labels" })).toBeVisible();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Human review Labels" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Human review Approved" }));
+
+    await expect(args.onInputClick).toHaveBeenCalledTimes(1);
+    await expect(args.onOutputClick).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const MenuStates: Story = {
+  args: {
+    node: classifierNode,
+    menuLabel: "Node actions",
+    menuItems: [
+      { id: "duplicate", label: "Duplicate" },
+      { id: "disabled", label: "Disabled action", disabled: true },
+      { id: "delete", label: "Delete", destructive: true },
+    ],
+    onMenuItemSelect: fn(),
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: "Classify" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Open Classify menu" })).toBeVisible();
+  },
+};
+
+export const EmptyAndDisabledPorts: Story = {
+  args: {
+    node: emptyNode,
+    menuItems: [],
+    inputDisabled: true,
+    outputDisabled: true,
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: "Annotation" })).toBeVisible();
+    await expect(canvas.getAllByText("none")).toHaveLength(2);
+    await expect(canvas.getByRole("button", { name: "Open Annotation menu" })).toBeVisible();
+  },
+};
+
+export const StatusToneGallery: Story = {
+  render: () => (
+    <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
+      {statusNodes.map((node) => (
+        <WorkflowNode key={node.id} node={node} />
+      ))}
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: "Idle" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Running" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Success" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Warning" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Error" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Custom tone" })).toBeVisible();
   },
 };

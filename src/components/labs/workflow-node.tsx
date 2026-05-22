@@ -678,7 +678,7 @@ function WorkflowNodePortColumn({
     <div className="flex min-h-0 flex-col">
       <div className="mb-2 shrink-0 text-[11px] font-semibold uppercase text-zinc-500">{title}</div>
       {ports.length === 0 ? (
-        <div className="flex h-16 min-h-0 flex-1 items-center rounded-md border border-dashed border-zinc-200 px-2 py-1.5 text-xs text-zinc-400">
+        <div className="flex h-16 min-h-0 flex-1 items-center rounded-md border border-dashed border-zinc-200 px-2 py-1.5 text-xs text-zinc-700">
           none
         </div>
       ) : (
@@ -723,7 +723,7 @@ function WorkflowNodePortAnchor({
         data-slot="workflow-node-port"
         data-port-direction={direction}
         className={cn(
-          "flex h-16 min-h-0 items-center rounded-md border border-dashed border-zinc-200 px-2 py-1.5 text-xs text-zinc-400",
+          "flex h-16 min-h-0 items-center rounded-md border border-dashed border-zinc-200 px-2 py-1.5 text-xs text-zinc-700",
         )}
       >
         none
@@ -791,7 +791,7 @@ function WorkflowNodePortAnchor({
             </span>
           ) : null}
           {port.badge ? (
-            <span className="max-w-full truncate whitespace-nowrap rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-zinc-500">
+            <span className="max-w-full truncate whitespace-nowrap rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-zinc-700">
               {port.badge}
             </span>
           ) : null}
@@ -1131,7 +1131,8 @@ function normalizeHexColor(value: string) {
 }
 
 function getWorkflowNodePortBadgeTextColor(color: string) {
-  return normalizeHexColor(color) ?? "#18181b";
+  void color;
+  return "#18181b";
 }
 
 export {
