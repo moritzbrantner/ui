@@ -318,3 +318,100 @@ export const Default: Story = {
     await expect(canvas.getAllByRole("button", { name: "Unlike 128" })[0]).toBeVisible();
   },
 };
+
+export const SocialFeed: Story = {
+  render: () => (
+    <div className="max-w-2xl">
+      <SocialPost featured>
+        <SocialPostHeader>
+          <SocialPostAvatar name="Mira Patel" initials="MP" online />
+          <SocialPostAuthor>
+            <SocialPostTitle>Mira Patel</SocialPostTitle>
+            <SocialPostMeta>
+              <span>Product systems lead</span>
+              <span>12 min ago</span>
+            </SocialPostMeta>
+          </SocialPostAuthor>
+          <SocialPostAuthorActions>
+            <FollowButton size="sm" aria-label="Follow Mira Patel" />
+          </SocialPostAuthorActions>
+        </SocialPostHeader>
+        <SocialPostBody>
+          <SocialPostText>
+            Launch rehearsal clips are live, with updated mobile framing and clearer handoff notes.
+          </SocialPostText>
+          <SocialPostMedia>
+            <img src={previewImage} alt="Launch rehearsal clip preview" />
+          </SocialPostMedia>
+        </SocialPostBody>
+        <SocialPostFooter>
+          <SocialPostMetrics>
+            <span>128 likes</span>
+            <span>24 comments</span>
+            <span>16 shares</span>
+          </SocialPostMetrics>
+          <SocialActionGroup>
+            <LikeButton liked count={128} />
+            <CommentButton count={24} />
+            <ShareButton count={16} />
+          </SocialActionGroup>
+          <SocialCommentList aria-label="Recent comments">
+            <SocialComment>
+              <SocialCommentAvatar name="Jordan Ellis" initials="JE" />
+              <SocialCommentContent>
+                <SocialCommentMeta>
+                  <span>Jordan Ellis</span>
+                  <span>9 min ago</span>
+                </SocialCommentMeta>
+                <SocialCommentText>
+                  The mobile crop holds the subject. Ready for the shared review deck.
+                </SocialCommentText>
+              </SocialCommentContent>
+            </SocialComment>
+          </SocialCommentList>
+        </SocialPostFooter>
+      </SocialPost>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: "Follow Mira Patel" })).toBeVisible();
+    await expect(canvas.getByRole("list", { name: "Recent comments" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Unlike 128" })).toBeVisible();
+  },
+};
+
+export const ChatBoxThread: Story = {
+  render: () => (
+    <div className="max-w-lg">
+      <ChatBox variant="compact">
+        <ChatBoxHeader>
+          <div className="min-w-0">
+            <ChatBoxTitle>Direct thread</ChatBoxTitle>
+            <ChatBoxDescription>Mira is active now</ChatBoxDescription>
+          </div>
+        </ChatBoxHeader>
+        <ChatBoxBody className="max-h-72">
+          <ChatBoxMessage>
+            <ChatBoxMeta>Mira, 09:30</ChatBoxMeta>
+            <ChatBoxBubble>The feed update looks ready for review.</ChatBoxBubble>
+          </ChatBoxMessage>
+          <ChatBoxMessage align="end">
+            <ChatBoxMeta>You, now</ChatBoxMeta>
+            <ChatBoxBubble>I’m posting the final cut after the last analytics pass.</ChatBoxBubble>
+          </ChatBoxMessage>
+        </ChatBoxBody>
+        <ChatBoxFooter>
+          <SocialActionGroup>
+            <LikeButton liked count={128} size="sm" />
+            <ShareButton count={16} size="sm" />
+          </SocialActionGroup>
+        </ChatBoxFooter>
+      </ChatBox>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("Direct thread")).toBeVisible();
+    await expect(canvas.getByRole("log")).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Unlike 128" })).toBeVisible();
+  },
+};

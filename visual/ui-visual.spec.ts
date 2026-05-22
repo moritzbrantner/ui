@@ -8,7 +8,12 @@ const viewports = [
 const storyIds = [
   "components-actions-button--variants",
   "components-forms-inputs-form-controls--basic",
+  "components-forms-inputs-stepper--horizontal",
+  "components-navigation-shortcut-help--dialog",
+  "components-feedback-connection-status--states",
   "reference-shadcn-catalog--full-catalog",
+  "components-overlays-dialog--open",
+  "components-overlay-sheet--basic",
   "components-data-display-data-grid--default",
   "components-forms-inputs-filter-bar--default",
   "components-forms-inputs-query-builder--advanced-controls",
@@ -30,6 +35,8 @@ const storyIds = [
   "components-editors-annotation-canvas--default",
   "components-editors-workflow-builder--ai-workflow-graph",
   "components-editors-workflow-builder--controlled-viewport",
+  "components-social-overview--social-feed",
+  "components-social-overview--chat-box-thread",
   "patterns-release-readiness--consumer-dashboard-shell-story",
   "patterns-release-readiness--editor-workspace-story",
   "patterns-release-readiness--forms-settings-story",
@@ -71,6 +78,7 @@ const horizontallyScrollableStories = new Set([
 ]);
 const denseControlStories = new Set([
   "components-data-display-calendar-card-days--default",
+  "components-forms-inputs-form-controls--basic",
   "reference-shadcn-catalog--full-catalog",
   "components-editors-workflow-builder--ai-workflow-graph",
   "components-editors-workflow-builder--controlled-viewport",

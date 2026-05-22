@@ -22,12 +22,17 @@ const legacyPath = path.join(packageRoot, "src", "legacy.ts");
 const errors: string[] = [];
 const publicTiers = ["stable", "patterns", "labs", "legacy"] as const;
 const rootExportTiers = new Set<ComponentTier>(["stable", "patterns"]);
+const releaseBlockingTiers = new Set<ComponentTier>(["stable", "patterns"]);
 const tierBarrelPaths = {
   stable: stablePath,
   patterns: patternsPath,
   labs: labsPath,
   legacy: legacyPath,
 } as const;
+const approvedGroupedContractSuites = new Set([
+  "src/components/stable/stable-contract.test.tsx",
+  "src/components/patterns/patterns-contract.test.tsx",
+]);
 const contractAllowlist = new Map([
   [
     "aspect-ratio",
@@ -67,6 +72,7 @@ verifyTierLayout();
 verifyComponentRegistry();
 verifyEntrypointBoundaries();
 verifyComponentContracts();
+verifyComponentCoverageMetadata();
 verifyStoryContracts();
 verifyClientDirectives();
 verifyConsumerExample();
@@ -355,6 +361,56 @@ function verifyComponentContracts() {
   }
 }
 
+function verifyComponentCoverageMetadata() {
+  for (const entry of registryEntries) {
+    if (!releaseBlockingTiers.has(entry.tier)) {
+      continue;
+    }
+
+    if (entry.storyFiles.length === 0) {
+      errors.push(`${entry.name}: release-blocking components require Storybook coverage`);
+    }
+
+    if (entry.testFiles.length === 0) {
+      errors.push(`${entry.name}: release-blocking components require test coverage`);
+      continue;
+    }
+
+    const candidateTestFiles = new Set([
+      ...entry.testFiles,
+      ...listTierTestFiles(entry.tier).map((filePath) => path.relative(packageRoot, filePath)),
+    ]);
+    const hasHonestTestReference = [...candidateTestFiles].some((relativeFile) => {
+      const absoluteFile = path.join(packageRoot, relativeFile);
+      const testSource = readFileSync(absoluteFile, "utf8");
+      const directImportPattern = new RegExp(
+        `from\\s+["'](?:\\.\\/|\\.\\.\\/${entry.tier}\\/|@moritzbrantner\\/ui\\/components\\/${entry.tier}\\/)${escapeRegExp(
+          entry.fileName,
+        )}["']`,
+      );
+
+      if (directImportPattern.test(testSource)) {
+        return true;
+      }
+
+      if (
+        !approvedGroupedContractSuites.has(relativeFile) &&
+        !relativeFile.startsWith(`src/components/${entry.tier}/`)
+      ) {
+        return false;
+      }
+
+      return componentTestMarkers(entry).some((marker) => testSource.includes(marker));
+    });
+
+    if (!hasHonestTestReference) {
+      errors.push(
+        `${entry.name}: release-blocking components must be directly imported or exercised by a tier test`,
+      );
+    }
+  }
+}
+
 function verifyStoryContracts() {
   const storyFiles = new Set<string>();
 
@@ -371,6 +427,37 @@ function verifyStoryContracts() {
       errors.push(`${relativeFile}: story meta must include tags ["autodocs", "test"]`);
     }
   }
+}
+
+function componentTestMarkers(entry: ComponentRegistryEntry): string[] {
+  const pascalName = entry.fileName
+    .split("-")
+    .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+    .join("");
+
+  const overrides: Record<string, string[]> = {
+    "app-layout": ["PageShell", "PageHeader", "PageContent", "Surface", "SectionGrid"],
+    "chat-box": ["ChatBox"],
+    "connection-status": ["ConnectionStatus"],
+    "form-layout": ["Fieldset", "FieldLegend", "FieldGrid", "ValidationSummary"],
+    "input-otp": ["InputOTP"],
+    kbd: ["Kbd"],
+    "menu-actions": ["getMenuActionItemText", "isMenuActionItemDisabled", "MenuAction"],
+    "social-actions": ["SocialActionGroup", "LikeButton", "ShareButton"],
+    "social-feed": ["SocialPost", "SocialComposer", "SocialComment"],
+  };
+
+  return [entry.fileName, pascalName, ...(overrides[entry.fileName] ?? [])];
+}
+
+function listTierTestFiles(tier: ComponentTier): string[] {
+  return listFiles(path.join(componentsDir, tier)).filter((filePath) =>
+    /\.test\.tsx?$/.test(filePath),
+  );
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function verifyClientDirectives() {

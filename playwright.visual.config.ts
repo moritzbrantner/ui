@@ -14,7 +14,7 @@ export default defineConfig({
     ...devices["Desktop Chrome"],
   },
   webServer: {
-    command: "storybook dev -p 6007 --no-open --config-dir .storybook",
+    command: "storybook dev -p 6007 --host 127.0.0.1 --no-open --config-dir .storybook",
     port: 6007,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
