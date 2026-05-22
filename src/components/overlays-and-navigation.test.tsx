@@ -8,6 +8,8 @@ import {
   AnnotationCanvas,
   type AnnotationCanvasAnnotation,
   type AnnotationCanvasTool,
+  ActionMenu,
+  ActionSheet,
   AssetBrowser,
   type AssetBrowserItem,
   Button,
@@ -42,6 +44,7 @@ import {
   CodeBlockHeader,
   CodeBlockTitle,
   CommandShortcut,
+  ContextActionMenu,
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
@@ -73,6 +76,7 @@ import {
   DropzoneInput,
   DropzoneTitle,
   DropdownMenuShortcut,
+  HoverPreview,
   Empty,
   EmptyDescription,
   EmptyTitle,
@@ -99,6 +103,7 @@ import {
   PageShell,
   PageTitle,
   QueryBuilder,
+  ResponsiveActionMenu,
   evaluateQueryBuilderExpression,
   serializeQueryBuilderExpression,
   type QueryBuilderExpression,
@@ -455,6 +460,46 @@ describe("@moritzbrantner/ui overlays-and-navigation", () => {
     expect(await screen.findByRole("dialog")).toBeTruthy();
     expect(screen.getByText("Filters")).toBeTruthy();
     expect(screen.getByText("Only show blockers.")).toBeTruthy();
+  });
+
+  test("renders composed action overlays without changing primitive escape hatches", async () => {
+    render(
+      <>
+        <ActionMenu
+          defaultOpen
+          modal={false}
+          trigger={<Button>Open action menu</Button>}
+          items={[{ id: "copy", label: "Copy" }]}
+        />
+        <ContextActionMenu items={[{ id: "inspect", label: "Inspect" }]}>
+          <Button>Context target</Button>
+        </ContextActionMenu>
+        <ActionSheet
+          trigger={<Button>Open sheet actions</Button>}
+          title="Sheet actions"
+          description="Touch-first action surface."
+          items={[{ id: "archive", label: "Archive" }]}
+        />
+        <ResponsiveActionMenu
+          mode="desktop"
+          trigger={<Button>Open responsive actions</Button>}
+          items={[{ id: "share", label: "Share" }]}
+        />
+        <HoverPreview
+          open
+          trigger={<Button>Preview target</Button>}
+          title="Preview"
+          description="Read-only content."
+        />
+      </>,
+    );
+
+    expect(await screen.findByRole("menuitem", { name: "Copy" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Open sheet actions" })).toBeTruthy();
+    expect(screen.getByText("Preview")).toBeTruthy();
+
+    fireEvent.contextMenu(screen.getByRole("button", { name: "Context target" }));
+    expect(await screen.findByRole("menuitem", { name: "Inspect" })).toBeTruthy();
   });
 
   test("renders an animated glass navbar with an open submenu", () => {

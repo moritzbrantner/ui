@@ -16,6 +16,14 @@ const storyIds = [
   "components-forms-inputs-form-layout--validated-interaction",
   "components-feedback-toaster--usage",
   "components-navigation-platform-navbar--web",
+  "components-overlay-action-menu--basic",
+  "components-overlay-action-menu--with-descriptions-and-shortcuts",
+  "components-overlay-context-action-menu--right-click-target",
+  "components-overlay-action-sheet--bottom",
+  "components-overlay-action-sheet--right-side",
+  "components-overlay-responsive-action-menu--desktop-mode",
+  "components-overlay-responsive-action-menu--mobile-mode",
+  "components-overlay-hover-preview--profile-preview",
   "components-data-display-calendar-card-days--default",
   "components-data-display-document-viewer--ocr-report-viewer",
   "components-editors-timeline-editor--default",
@@ -46,6 +54,14 @@ const horizontallyScrollableStories = new Set([
   "reference-shadcn-catalog--full-catalog",
   "components-data-display-data-grid--default",
   "components-navigation-platform-navbar--web",
+  "components-overlay-action-menu--basic",
+  "components-overlay-action-menu--with-descriptions-and-shortcuts",
+  "components-overlay-context-action-menu--right-click-target",
+  "components-overlay-action-sheet--bottom",
+  "components-overlay-action-sheet--right-side",
+  "components-overlay-responsive-action-menu--desktop-mode",
+  "components-overlay-responsive-action-menu--mobile-mode",
+  "components-overlay-hover-preview--profile-preview",
   "components-data-display-calendar-card-days--default",
   "components-editors-timeline-editor--default",
   "components-editors-workflow-builder--ai-workflow-graph",
@@ -99,10 +115,105 @@ async function gotoStory(
 ) {
   const globalParam = `designSystem:${globals.designSystem};theme:${globals.theme}`;
 
-  await page.goto(`/iframe.html?id=${storyId}&globals=${encodeURIComponent(globalParam)}`);
-  await page.locator("#storybook-root").waitFor({ state: "visible" });
+  await gotoStoryWithRetry(
+    page,
+    `/iframe.html?id=${storyId}&globals=${encodeURIComponent(globalParam)}`,
+  );
   await page.evaluate(() => document.fonts.ready);
+  await openOverlayStory(page, storyId);
   await page.waitForTimeout(500);
+}
+
+async function gotoStoryWithRetry(page: Page, url: string) {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await page.goto(url);
+
+    const rootVisible = await page
+      .locator("#storybook-root")
+      .waitFor({ state: "visible", timeout: attempt === 0 ? 15_000 : 45_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (rootVisible) {
+      return;
+    }
+
+    const hasDynamicImportError =
+      (await page.getByText(/Failed to fetch dynamically imported module/).count()) > 0;
+
+    if (!hasDynamicImportError || attempt === 1) {
+      await page.locator("#storybook-root").waitFor({ state: "visible" });
+      return;
+    }
+  }
+}
+
+async function openOverlayStory(page: Page, storyId: string) {
+  switch (storyId) {
+    case "components-overlay-action-menu--basic":
+      await page.getByRole("button", { name: "Open row actions" }).click();
+      await page.getByRole("menuitem", { name: /Duplicate/ }).waitFor();
+      break;
+    case "components-overlay-action-menu--with-descriptions-and-shortcuts":
+      await page.getByRole("button", { name: "File actions" }).click();
+      await page.getByRole("menuitem", { name: /Copy link/ }).waitFor();
+      break;
+    case "components-overlay-context-action-menu--right-click-target":
+      await rightClickTarget(page, "Right-click row");
+      await page.getByRole("menuitem", { name: /Duplicate/ }).waitFor();
+      break;
+    case "components-overlay-action-sheet--bottom":
+      await openActionSheet(page, "Open sheet");
+      break;
+    case "components-overlay-action-sheet--right-side":
+      await openActionSheet(page, "Open side actions");
+      break;
+    case "components-overlay-responsive-action-menu--desktop-mode":
+      if ((await page.locator('[data-slot="action-menu-content"]').count()) === 0) {
+        await openWithKeyboard(page, "Open desktop actions", "action-menu-trigger");
+      }
+      await page.locator('[data-slot="action-menu-content"]').waitFor();
+      break;
+    case "components-overlay-responsive-action-menu--mobile-mode":
+      if ((await page.locator('[data-slot="action-sheet-content"]').count()) === 0) {
+        await openWithKeyboard(page, "Open mobile actions", "action-sheet-trigger");
+      }
+      await page.locator('[data-slot="action-sheet-content"]').waitFor();
+      break;
+    case "components-overlay-hover-preview--profile-preview":
+      await page.getByRole("button", { name: "Mira Brandt" }).hover();
+      await page.getByText("Product lead for workspace quality.").waitFor();
+      break;
+  }
+}
+
+async function openWithKeyboard(page: Page, name: string, slot?: string) {
+  const trigger = slot
+    ? page.locator(`[data-slot="${slot}"]`).first()
+    : page.getByRole("button", { name });
+
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+}
+
+async function openActionSheet(page: Page, name: string) {
+  if ((await page.locator('[data-slot="action-sheet-content"]').count()) === 0) {
+    await openWithKeyboard(page, name, "action-sheet-trigger");
+  }
+
+  await page.locator('[data-slot="action-sheet-content"]').waitFor();
+}
+
+async function rightClickTarget(page: Page, name: string) {
+  const target = page.locator('[data-slot="context-action-menu-trigger"]').first();
+  await target.waitFor({ state: "visible" });
+  const box = await target.boundingBox();
+
+  if (!box) {
+    throw new Error(`Could not locate context-menu target ${name}`);
+  }
+
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, { button: "right" });
 }
 
 async function verifyPageLayout(page: Page, storyId: string) {

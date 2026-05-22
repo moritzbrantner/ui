@@ -1,5 +1,16 @@
 # @moritzbrantner/ui
 
+## 0.7.0
+
+### Minor Changes
+
+- Add composed action menu APIs on top of the existing low-level menu primitives.
+- Add right-click `ContextActionMenu` for contextual target actions.
+- Add mobile `ActionSheet` backed by `MobileSlide`.
+- Add `ResponsiveActionMenu` for desktop dropdown and mobile sheet composition.
+- Add read-only `HoverPreview` for hover and focus previews.
+- Expand tests, Storybook coverage, visual checks, docs, coverage tracking, and package contract checks for the new menu layer.
+
 ## 0.6.0
 
 ### Minor Changes

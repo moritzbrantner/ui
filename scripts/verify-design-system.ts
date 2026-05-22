@@ -282,6 +282,7 @@ function verifyComponentContracts() {
       "direction",
       "Provider-only Radix wrapper: it establishes context and does not render a stylable DOM node.",
     ],
+    ["menu-actions", "Typed menu action schema and helpers; it does not render DOM."],
   ]);
 
   for (const componentName of componentNames) {
@@ -289,7 +290,7 @@ function verifyComponentContracts() {
     const componentSource = readFileSync(componentPath, "utf8");
     const allowlistReason = contractAllowlist.get(componentName);
 
-    if (!/data-slot=/.test(componentSource)) {
+    if (!allowlistReason && !/data-slot=/.test(componentSource)) {
       errors.push(`${componentName}: public component files must expose at least one data-slot`);
     }
 

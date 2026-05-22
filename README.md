@@ -130,6 +130,20 @@ import { DataGrid } from "@moritzbrantner/ui/components/data-grid";
 import { cn } from "@moritzbrantner/ui/server";
 ```
 
+## Menu Patterns
+
+Use `ActionMenu` for button-triggered command menus. Use `ContextActionMenu` for right-click or contextual target actions. Use `ActionSheet` for touch-first mobile action menus. Use `ResponsiveActionMenu` when the same trigger should open a desktop dropdown and a mobile slide sheet. Use `HoverPreview` for read-only hover and focus previews.
+
+Use low-level `DropdownMenu`, `ContextMenu`, `Menubar`, `NavigationMenu`, `Popover`, `Sheet`, or `MobileSlide` for custom structures beyond the composed APIs, including nested submenus.
+
+Row actions: put `ActionMenu` on a desktop table row action button, and wrap the row or row affordance with `ContextActionMenu` for right-click actions. Keep mutations, fetching, permissions, analytics, and route changes in the app through callbacks.
+
+Mobile filter and action sheets: use `ActionSheet` with checkbox and radio menu items. Keep URL state, persistence, and backend query contracts in the consuming app.
+
+Responsive overflow menus: use `ResponsiveActionMenu` with the same `items` array for desktop and mobile. Force `mode` only in tests and stories; use the default `"auto"` mode in app code.
+
+Hover previews: use `HoverPreview` for person, file, and status summaries. Do not hide required actions inside hover-only UI.
+
 ## Comprehensive App Usage
 
 Use the root import for compatibility and examples:
@@ -181,6 +195,10 @@ Keep app-specific behavior in consuming packages:
 - Filtered data page: use `FilterBar` for search and active filter display, `DataGrid` for rows, and `QueryBuilder` only when the app needs nested boolean filters; keep fetching, URL state, and backend query contracts in the app.
 - Validated form: use `FormSection`, `Field`, `FieldError`, `ValidationSummary`, and `FormActions`; keep validation rules and submit side effects in the app.
 - Upload queue: use `Dropzone` and `UploadQueue`; keep file storage, retries, cancellation, and transport in the app.
+- Row actions: use `ActionMenu` for click or ellipsis menus and `ContextActionMenu` for right-click menus; keep mutation and fetch logic in the app callbacks.
+- Mobile filters and actions: use `ActionSheet` with checkbox or radio items; keep URL state and backend query contracts in the app.
+- Responsive overflow menu: use `ResponsiveActionMenu` with a shared `items` array, and reserve forced `mode` values for tests and stories.
+- Hover preview: use `HoverPreview` for read-only summaries; keep required commands available through click, focus, context, or touch surfaces.
 - Command palette: pass app-owned actions to `CommandPalette`; keep routing and permissions outside this package.
 - Workflow editor: use `WorkflowBuilder` for graph layout, selection, viewport, and connection interaction; keep execution, persistence, permissions, and run state in the app.
 - Theme switching: wire `ThemeModeSwitch` to the app theme provider and import exactly one UI stylesheet.

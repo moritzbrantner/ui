@@ -43,6 +43,16 @@ Workflow editor: use `WorkflowBuilder` for graph layout, viewport control, selec
 
 Theme switching: wire `ThemeModeSwitch` to the app theme provider or controlled state. `Toaster` accepts an optional `theme` prop and otherwise follows `next-themes`.
 
+Menu patterns: use `ActionMenu` for button-triggered command menus, `ContextActionMenu` for right-click or contextual target actions, `ActionSheet` for touch-first mobile action menus, `ResponsiveActionMenu` when one trigger should open a desktop dropdown and a mobile slide sheet, and `HoverPreview` for read-only hover and focus previews. Use low-level `DropdownMenu`, `ContextMenu`, `Menubar`, `NavigationMenu`, `Popover`, `Sheet`, or `MobileSlide` for custom structures beyond the composed APIs, including nested submenus.
+
+Row actions: place `ActionMenu` on a desktop table row action button and wrap the row or row affordance with `ContextActionMenu` for right-click actions. Apps own mutation, fetch, permission, analytics, and routing behavior through callbacks.
+
+Mobile filter and action sheets: compose `ActionSheet` with checkbox and radio menu items. Apps own URL state, persistence, and backend query contracts.
+
+Responsive overflow menus: compose `ResponsiveActionMenu` with the same `items` array for desktop and mobile. Force `mode` only in tests and stories; use the default `"auto"` mode in app code.
+
+Hover previews: use `HoverPreview` for person, file, and status summaries. Do not hide required actions inside hover-only UI.
+
 Non-happy paths: compose `EmptyState`, `LoadingState`, `ErrorState`, `OfflineState`, and `StateViewActions` with app-owned copy and retry callbacks.
 
 ## Component Contract

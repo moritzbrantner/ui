@@ -8,6 +8,10 @@ import {
   AnnotationCanvas,
   type AnnotationCanvasAnnotation,
   type AnnotationCanvasTool,
+  ActionMenu,
+  type ActionMenuProps,
+  ActionSheet,
+  type ActionSheetProps,
   AssetBrowser,
   type AssetBrowserItem,
   Button,
@@ -44,6 +48,8 @@ import {
   CommandPalette,
   CommandShortcut,
   type CommandPaletteGroup,
+  ContextActionMenu,
+  type ContextActionMenuProps,
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
@@ -83,6 +89,8 @@ import {
   ErrorState,
   FilterBar,
   FilterChip,
+  HoverPreview,
+  type HoverPreviewProps,
   InspectorPanel,
   type InspectorPanelSectionData,
   Kbd,
@@ -90,6 +98,10 @@ import {
   type LanguageSwitcherLanguage,
   LoadingBar,
   LoadingState,
+  type MenuActionCheckboxItem,
+  type MenuActionCommandItem,
+  type MenuActionItem,
+  type MenuActionRadioGroupItem,
   MenubarShortcut,
   MobileSlide,
   MobileSlideBody,
@@ -118,6 +130,8 @@ import {
   SectionGrid,
   SearchField,
   SelectionToolbar,
+  ResponsiveActionMenu,
+  type ResponsiveActionMenuProps,
   ShortcutList,
   Spinner,
   OrbitSpinner,
@@ -185,9 +199,15 @@ import {
   Dialog as ClientDialog,
 } from "./client";
 import { Button as SubpathButton } from "./components/button";
+import { ActionMenu as SubpathActionMenu } from "./components/action-menu";
+import { ActionSheet as SubpathActionSheet } from "./components/action-sheet";
+import { ContextActionMenu as SubpathContextActionMenu } from "./components/context-action-menu";
 import { DataGrid as SubpathDataGrid } from "./components/data-grid";
 import { Dialog as SubpathDialog } from "./components/dialog";
 import { FilterBar as SubpathFilterBar } from "./components/filter-bar";
+import { HoverPreview as SubpathHoverPreview } from "./components/hover-preview";
+import { getMenuActionItemText as subpathGetMenuActionItemText } from "./components/menu-actions";
+import { ResponsiveActionMenu as SubpathResponsiveActionMenu } from "./components/responsive-action-menu";
 import { PaperTheme, paperTheme, uiTheme as paperUiTheme } from "./paper";
 import { paperTheme as paperServerTheme, uiTheme as paperServerUiTheme } from "./paper-server";
 import { cn as serverCn, themeConfig as serverThemeConfig } from "./server";
@@ -447,10 +467,58 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(ClientDataGrid).toBe(DataGrid);
     expect(ClientDialog).toBe(Dialog);
     expect(SubpathButton).toBe(Button);
+    expect(SubpathActionMenu).toBe(ActionMenu);
+    expect(SubpathActionSheet).toBe(ActionSheet);
+    expect(SubpathContextActionMenu).toBe(ContextActionMenu);
     expect(SubpathDataGrid).toBe(DataGrid);
     expect(SubpathDialog).toBe(Dialog);
     expect(SubpathFilterBar).toBe(FilterBar);
+    expect(SubpathHoverPreview).toBe(HoverPreview);
+    expect(SubpathResponsiveActionMenu).toBe(ResponsiveActionMenu);
+    expect(subpathGetMenuActionItemText({ id: "contract", label: "Contract" })).toBe("Contract");
     expect(typeof FilterChip).toBe("function");
+    expect(typeof ActionMenu).toBe("function");
+    expect(typeof ContextActionMenu).toBe("function");
+    expect(typeof ActionSheet).toBe("function");
+    expect(typeof ResponsiveActionMenu).toBe("function");
+    expect(typeof HoverPreview).toBe("function");
+    const rootMenuActionItem: MenuActionItem = { id: "contract-action", label: "Contract action" };
+    const rootCommandItem: MenuActionCommandItem = {
+      id: "contract-command",
+      label: "Contract command",
+    };
+    const rootCheckboxItem: MenuActionCheckboxItem = {
+      id: "contract-checkbox",
+      type: "checkbox",
+      label: "Contract checkbox",
+    };
+    const rootRadioGroupItem: MenuActionRadioGroupItem = {
+      id: "contract-radio",
+      type: "radio-group",
+      options: [{ id: "one", label: "One", value: "one" }],
+    };
+    const actionMenuProps: ActionMenuProps = {
+      trigger: React.createElement("button", { type: "button" }, "Actions"),
+      items: [rootMenuActionItem],
+    };
+    const contextActionMenuProps: ContextActionMenuProps = {
+      children: React.createElement("button", { type: "button" }, "Target"),
+      items: [rootCommandItem],
+    };
+    const actionSheetProps: ActionSheetProps = { items: [rootCheckboxItem] };
+    const responsiveActionMenuProps: ResponsiveActionMenuProps = {
+      trigger: React.createElement("button", { type: "button" }, "Responsive"),
+      items: [rootRadioGroupItem],
+    };
+    const hoverPreviewProps: HoverPreviewProps = {
+      trigger: React.createElement("button", { type: "button" }, "Preview"),
+      title: "Preview",
+    };
+    expect(actionMenuProps.items).toHaveLength(1);
+    expect(contextActionMenuProps.items).toHaveLength(1);
+    expect(actionSheetProps.items).toHaveLength(1);
+    expect(responsiveActionMenuProps.items).toHaveLength(1);
+    expect(hoverPreviewProps.title).toBe("Preview");
     const queryBuilderIdFactory: QueryBuilderIdFactory = (kind) => `contract-${kind}`;
     const queryBuilderGroup = createQueryBuilderGroup([], queryBuilderIdFactory);
     expect(queryBuilderGroup.id).toBe("contract-group");
