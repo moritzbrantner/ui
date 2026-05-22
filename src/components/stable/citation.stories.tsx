@@ -24,8 +24,21 @@ const citations = [
     publisher: "Research Ops",
     issued: "2026",
     citedText: "ranking changes should be staged behind a review flag",
+    contextStartText: "The complete note says",
+    contextEndText: "weekly audit set.",
     fullText:
-      "The complete note says ranking changes should be staged behind a review flag until source-grounded regressions have been checked against the weekly audit set.",
+      "Earlier notes discuss the export. The complete note says ranking changes should be staged behind a review flag until source-grounded regressions have been checked against the weekly audit set. Later notes assign follow-up owners.",
+    textParts: [
+      { type: "added", text: "The team" },
+      { text: " says " },
+      { type: "highlight", text: "ranking changes should be staged behind a review flag" },
+      { text: " " },
+      {
+        type: "hidden",
+        text: "until source-grounded regressions have been checked",
+      },
+      { text: " against the weekly audit set." },
+    ],
     status: "cited",
   },
   {
@@ -141,7 +154,8 @@ export const Default: Story = {
     await expect(canvas.getByText("Workflow demo")).toBeVisible();
     await expect(canvas.getByText("Custom citation layout")).toBeVisible();
     await expect(canvas.getByText("Disputed")).toBeVisible();
+    await expect(canvas.getByText("[...]")).toBeVisible();
     await userEvent.click(canvas.getAllByRole("button", { name: "Show context" })[0]);
-    await expect(canvas.getByText(/complete note says ranking changes/)).toBeVisible();
+    await expect(canvas.getByText(/source-grounded regressions have been checked/)).toBeVisible();
   },
 };

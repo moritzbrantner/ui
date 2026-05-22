@@ -96,8 +96,10 @@ describe("Citation", () => {
             id: "statement",
             title: "Research note",
             citedText: "the quoted claim",
+            contextStartText: "The complete source paragraph",
+            contextEndText: "qualifying context.",
             fullText:
-              "The complete source paragraph starts earlier, includes the quoted claim, and continues with qualifying context.",
+              "Opening section. The complete source paragraph starts earlier, includes the quoted claim, and continues with qualifying context. Closing section.",
           },
         ]}
       />,
@@ -110,8 +112,54 @@ describe("Citation", () => {
 
     expect(context?.textContent).toContain("The complete source paragraph starts earlier");
     expect(context?.textContent).toContain("continues with qualifying context.");
+    expect(context?.textContent).not.toContain("Opening section.");
+    expect(context?.textContent).not.toContain("Closing section.");
     expect(highlight?.textContent).toBe("the quoted claim");
     expect(scrollIntoView).toHaveBeenCalled();
+  });
+
+  test("supports ranged text citations with omissions and added clarification words", () => {
+    render(
+      <CitationList
+        citations={[
+          {
+            id: "edited-quote",
+            title: "Edited research note",
+            fullText:
+              "Opening context. The reviewer wrote that the ranking change stayed stable after checking Friday's audit log and backfill traces before release. Follow-up context.",
+            citedText: "the ranking change stayed stable",
+            contextStartText: "The reviewer wrote",
+            contextEndText: "before release.",
+            textParts: [
+              { type: "added", text: "The reviewer" },
+              { text: " wrote that " },
+              { type: "highlight", text: "the ranking change stayed stable" },
+              { text: " " },
+              {
+                type: "hidden",
+                text: "after checking Friday's audit log and backfill traces",
+              },
+              { text: " before release." },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("[...]")).toBeTruthy();
+    expect(screen.getByText("[The reviewer]")).toBeTruthy();
+    expect(screen.queryByText(/Friday's audit log/)).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: /show context/i }));
+
+    const context = document.querySelector('[data-slot="citation-context"]');
+    const hiddenText = document.querySelector('[data-slot="citation-text-hidden"]');
+
+    expect(context?.textContent).toContain("[The reviewer] wrote that");
+    expect(context?.textContent).toContain("after checking Friday's audit log");
+    expect(context?.textContent).not.toContain("Opening context.");
+    expect(context?.textContent).not.toContain("Follow-up context.");
+    expect(hiddenText?.className).toContain("animate-in");
   });
 
   test("loads audio, youtube, and pdf citation context at cited locations", () => {

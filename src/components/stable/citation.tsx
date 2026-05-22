@@ -19,6 +19,13 @@ import { cn } from "../../lib/cn";
 
 type CitationStatus = "cited" | "supporting" | "disputed" | "missing";
 type CitationKind = "text" | "audio" | "youtube" | "pdf" | "web";
+type CitationTextPartType = "text" | "hidden" | "added" | "highlight";
+
+type CitationTextPart = {
+  type?: CitationTextPartType;
+  text: React.ReactNode;
+  marker?: React.ReactNode;
+};
 
 type CitationContextSource =
   | CitationTextContextSource
@@ -30,6 +37,9 @@ type CitationTextContextSource = {
   type: "text";
   text: React.ReactNode;
   citedText?: React.ReactNode;
+  parts?: readonly CitationTextPart[];
+  startText?: string;
+  endText?: string;
   label?: React.ReactNode;
 };
 
@@ -75,6 +85,9 @@ type CitationData = {
   contextSource?: CitationContextSource;
   citedText?: React.ReactNode;
   fullText?: React.ReactNode;
+  textParts?: readonly CitationTextPart[];
+  contextStartText?: string;
+  contextEndText?: string;
   note?: React.ReactNode;
   status?: CitationStatus;
 };
@@ -109,6 +122,9 @@ export type CitationExcerptProps = React.ComponentProps<"blockquote"> & {
 export type CitationTextContextProps = React.ComponentProps<"div"> & {
   text?: React.ReactNode;
   citedText?: React.ReactNode;
+  parts?: readonly CitationTextPart[];
+  startText?: string;
+  endText?: string;
   label?: React.ReactNode;
   active?: boolean;
 };
@@ -416,6 +432,9 @@ function CitationTextContext({
   children,
   text,
   citedText,
+  parts,
+  startText,
+  endText,
   label,
   active = true,
   ...props
@@ -428,7 +447,8 @@ function CitationTextContext({
     }
   }, [active]);
 
-  const content = children ?? renderTextContext(text, citedText, citedRef);
+  const content =
+    children ?? renderTextContext({ text, citedText, parts, startText, endText }, citedRef);
 
   return (
     <div
@@ -440,6 +460,75 @@ function CitationTextContext({
       <div>{content}</div>
     </div>
   );
+}
+
+function CitationTextParts({
+  parts,
+  mode = "excerpt",
+}: {
+  parts: readonly CitationTextPart[];
+  mode?: "excerpt" | "context";
+}) {
+  return (
+    <>
+      {parts.map((part, index) => (
+        <CitationTextPartView key={index} part={part} mode={mode} />
+      ))}
+    </>
+  );
+}
+
+function CitationTextPartView({
+  part,
+  mode,
+}: {
+  part: CitationTextPart;
+  mode: "excerpt" | "context";
+}) {
+  const type = part.type ?? "text";
+
+  if (type === "hidden") {
+    if (mode === "excerpt") {
+      return (
+        <span
+          data-slot="citation-text-omission"
+          className="rounded-sm bg-muted px-1 font-medium text-muted-foreground"
+        >
+          {part.marker ?? "[...]"}
+        </span>
+      );
+    }
+
+    return (
+      <span
+        data-slot="citation-text-hidden"
+        className="inline rounded-sm bg-muted px-1 text-muted-foreground duration-300 animate-in fade-in-0 slide-in-from-bottom-1"
+      >
+        {part.text}
+      </span>
+    );
+  }
+
+  if (type === "added") {
+    return (
+      <span data-slot="citation-text-added" className="font-medium text-foreground">
+        [{part.text}]
+      </span>
+    );
+  }
+
+  if (type === "highlight") {
+    return (
+      <mark
+        data-slot="citation-text-highlight"
+        className="rounded-sm bg-primary/15 px-0.5 text-foreground"
+      >
+        {part.text}
+      </mark>
+    );
+  }
+
+  return <>{part.text}</>;
 }
 
 function CitationAudioContext({
@@ -573,6 +662,9 @@ function CitationContextSourceView({
       <CitationTextContext
         text={source.text}
         citedText={source.citedText}
+        parts={source.parts}
+        startText={source.startText}
+        endText={source.endText}
         label={source.label}
         active={active}
       />
@@ -752,7 +844,7 @@ function getCitationKind(citation: CitationData): CitationKind | undefined {
     return citation.contextSource.type;
   }
 
-  if (citation.fullText || citation.citedText) {
+  if (citation.fullText || citation.citedText || citation.textParts) {
     return "text";
   }
 
@@ -764,6 +856,10 @@ function getCitationKind(citation: CitationData): CitationKind | undefined {
 }
 
 function getCitationExcerpt(citation: CitationData) {
+  if (citation.textParts) {
+    return <CitationTextParts parts={citation.textParts} />;
+  }
+
   return citation.excerpt ?? citation.citedText;
 }
 
@@ -772,11 +868,14 @@ function getCitationContextSource(citation: CitationData): CitationContextSource
     return citation.contextSource;
   }
 
-  if (citation.fullText) {
+  if (citation.fullText || citation.textParts) {
     return {
       type: "text",
       text: citation.fullText,
       citedText: getCitationExcerpt(citation),
+      parts: citation.textParts,
+      startText: citation.contextStartText,
+      endText: citation.contextEndText,
     };
   }
 
@@ -793,17 +892,35 @@ function formatCitationAuthors(authors: readonly React.ReactNode[]) {
 }
 
 function renderTextContext(
-  text: React.ReactNode,
-  citedText: React.ReactNode,
+  {
+    text,
+    citedText,
+    parts,
+    startText,
+    endText,
+  }: {
+    text: React.ReactNode;
+    citedText: React.ReactNode;
+    parts?: readonly CitationTextPart[];
+    startText?: string;
+    endText?: string;
+  },
   citedRef: React.RefObject<HTMLElement | null>,
 ) {
-  if (typeof text === "string" && typeof citedText === "string") {
-    const citationIndex = text.indexOf(citedText);
+  if (parts) {
+    return <CitationTextParts parts={parts} mode="context" />;
+  }
+
+  const rangedText =
+    typeof text === "string" ? getTextContextRange(text, startText, endText) : text;
+
+  if (typeof rangedText === "string" && typeof citedText === "string") {
+    const citationIndex = rangedText.indexOf(citedText);
 
     if (citationIndex >= 0) {
       return (
         <>
-          {text.slice(0, citationIndex)}
+          {rangedText.slice(0, citationIndex)}
           <mark
             ref={citedRef}
             data-slot="citation-text-highlight"
@@ -811,13 +928,36 @@ function renderTextContext(
           >
             {citedText}
           </mark>
-          {text.slice(citationIndex + citedText.length)}
+          {rangedText.slice(citationIndex + citedText.length)}
         </>
       );
     }
   }
 
-  return text;
+  return rangedText;
+}
+
+function getTextContextRange(text: string, startText?: string, endText?: string) {
+  let startIndex = 0;
+  let endIndex = text.length;
+
+  if (startText) {
+    const index = text.indexOf(startText);
+
+    if (index >= 0) {
+      startIndex = index;
+    }
+  }
+
+  if (endText) {
+    const index = text.indexOf(endText, startIndex);
+
+    if (index >= 0) {
+      endIndex = index + endText.length;
+    }
+  }
+
+  return text.slice(startIndex, endIndex);
 }
 
 function scrollCitationTargetIntoView(element: HTMLElement | null) {
@@ -932,6 +1072,8 @@ export {
   type CitationKind,
   type CitationPdfContextSource,
   type CitationStatus,
+  type CitationTextPart,
+  type CitationTextPartType,
   type CitationTextContextSource,
   type CitationYouTubeContextSource,
 };
