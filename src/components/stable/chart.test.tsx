@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import {
   ChartAreaGraph,
@@ -52,6 +52,52 @@ describe("chart graph components", () => {
     expect(screen.getByRole("img", { name: "Quarterly bars" })).toBeTruthy();
     expect(screen.getAllByText("Actual")).toHaveLength(1);
     expect(screen.getAllByText("Target")).toHaveLength(1);
+  });
+
+  test("renders graph summaries, value labels, and empty reasons", () => {
+    const { container } = render(
+      <ChartBarGraph
+        ariaLabel="Quarterly bars"
+        data={data}
+        series={series.slice(0, 1)}
+        summary="Pipeline is ahead of target."
+        valueLabels
+      />,
+    );
+
+    expect(screen.getByText("Pipeline is ahead of target.")).toBeTruthy();
+    expect(container.querySelectorAll('[data-slot="chart-value-label"]')).toHaveLength(3);
+
+    render(
+      <ChartLineGraph
+        ariaLabel="Empty trend"
+        data={[]}
+        series={series}
+        emptyMessage="No trend data."
+        noDataReason="Filters removed all rows."
+      />,
+    );
+
+    expect(screen.getByText("No trend data.")).toBeTruthy();
+    expect(screen.getByText("Filters removed all rows.")).toBeTruthy();
+  });
+
+  test("calls onDatumFocus when graph hit areas receive keyboard focus", () => {
+    const handleDatumFocus = vi.fn();
+    const { container } = render(
+      <ChartLineGraph
+        ariaLabel="Quarterly trend"
+        data={data}
+        series={series}
+        xKey="label"
+        onDatumFocus={handleDatumFocus}
+      />,
+    );
+    const hitAreas = container.querySelectorAll('[data-slot="chart-hit-area"]');
+
+    fireEvent.focus(hitAreas[1]);
+
+    expect(handleDatumFocus).toHaveBeenCalledWith(data[1], 1);
   });
 
   test("renders histogram bins from raw values", () => {

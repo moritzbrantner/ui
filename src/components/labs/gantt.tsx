@@ -35,9 +35,11 @@ type GanttMarker = {
   color?: string;
 };
 
-type GanttProps = Omit<React.ComponentProps<"div">, "onSelect"> & {
+type GanttProps = Omit<React.ComponentProps<"figure">, "onSelect"> & {
   tasks: GanttTask[];
   markers?: GanttMarker[];
+  ariaLabel?: string;
+  caption?: React.ReactNode;
   startDate?: GanttDateInput;
   endDate?: GanttDateInput;
   scale?: GanttScale;
@@ -51,6 +53,16 @@ type GanttProps = Omit<React.ComponentProps<"div">, "onSelect"> & {
   onExpandedTaskIdsChange?: (taskIds: string[]) => void;
   showToday?: boolean;
   today?: GanttDateInput;
+  showDependencyLines?: boolean;
+  showProgressLabels?: boolean;
+  taskRenderer?: (
+    task: GanttTask,
+    context: {
+      selected: boolean;
+      progress: number;
+      color: string;
+    },
+  ) => React.ReactNode;
   emptyLabel?: string;
   formatDate?: (date: Date, scale: GanttScale) => string;
 };
@@ -89,15 +101,17 @@ const scaleColumnWidth: Record<GanttScale, number> = {
 };
 
 const statusColors: Record<GanttTaskStatus, string> = {
-  pending: "#374151",
-  active: "#7c2d12",
-  done: "#134e4a",
-  blocked: "#7f1d1d",
+  pending: "var(--muted-foreground)",
+  active: "var(--chart-1)",
+  done: "var(--chart-2)",
+  blocked: "var(--destructive)",
 };
 
 function Gantt({
   tasks,
   markers = [],
+  ariaLabel = "Gantt chart",
+  caption,
   startDate,
   endDate,
   scale = "week",
@@ -111,6 +125,9 @@ function Gantt({
   onExpandedTaskIdsChange,
   showToday = true,
   today = new Date(),
+  showDependencyLines = true,
+  showProgressLabels = false,
+  taskRenderer,
   emptyLabel = "No tasks",
   formatDate = formatGanttDate,
   className,
@@ -173,7 +190,7 @@ function Gantt({
   };
 
   return (
-    <div
+    <figure
       data-slot="gantt"
       className={cn("overflow-hidden rounded-md border bg-card text-card-foreground", className)}
       {...props}
@@ -186,7 +203,7 @@ function Gantt({
         <div className="overflow-x-auto">
           <div
             role="region"
-            aria-label="Gantt chart"
+            aria-label={ariaLabel}
             className="grid"
             style={{
               gridTemplateColumns: `${labelWidth}px ${timelineWidth}px`,
@@ -298,6 +315,7 @@ function Gantt({
                 timelineWidth={timelineWidth}
                 showToday={showToday}
                 today={today}
+                showDependencyLines={showDependencyLines}
               />
               {visibleTasks.map((task, index) => {
                 const metrics = metricsByTaskId.get(task.id);
@@ -318,6 +336,8 @@ function Gantt({
                     formatDate={formatDate}
                     scale={scale}
                     onTaskSelect={onTaskSelect}
+                    showProgressLabels={showProgressLabels}
+                    taskRenderer={taskRenderer}
                   />
                 );
               })}
@@ -325,7 +345,15 @@ function Gantt({
           </div>
         </div>
       )}
-    </div>
+      {caption ? (
+        <figcaption
+          data-slot="gantt-caption"
+          className="border-t px-3 py-2 text-xs leading-5 text-muted-foreground"
+        >
+          {caption}
+        </figcaption>
+      ) : null}
+    </figure>
   );
 }
 
@@ -339,6 +367,8 @@ function GanttTaskButton({
   formatDate,
   scale,
   onTaskSelect,
+  showProgressLabels,
+  taskRenderer,
 }: {
   task: NormalizedGanttTask;
   metrics: GanttTaskMetrics;
@@ -349,6 +379,8 @@ function GanttTaskButton({
   formatDate: (date: Date, scale: GanttScale) => string;
   scale: GanttScale;
   onTaskSelect?: (task: GanttTask) => void;
+  showProgressLabels: boolean;
+  taskRenderer?: GanttProps["taskRenderer"];
 }) {
   const ariaLabel = task.milestone
     ? `${task.label}, milestone on ${formatDate(task.startDate, scale)}`
@@ -380,23 +412,36 @@ function GanttTaskButton({
       data-selected={selected ? "true" : undefined}
       disabled={task.disabled}
       aria-label={ariaLabel}
-      className="absolute z-10 flex min-w-9 items-center overflow-hidden rounded-md border border-white/30 px-2 text-left text-xs font-medium text-white shadow-sm outline-none transition disabled:cursor-not-allowed disabled:opacity-50 data-[selected=true]:ring-2 data-[selected=true]:ring-ring"
+      className="absolute z-10 flex min-w-9 items-center overflow-hidden rounded-md border bg-background px-2 text-left text-xs font-medium text-foreground shadow-sm outline-none transition disabled:cursor-not-allowed disabled:opacity-50 data-[selected=true]:ring-2 data-[selected=true]:ring-ring"
       style={{
         left: metrics.left,
         top: topOffset + rowHeight / 2 - 13,
         width: metrics.width,
         height: 26,
-        backgroundColor: color,
+        borderColor: color,
       }}
       onClick={() => onTaskSelect?.(task)}
     >
       <span
         aria-hidden="true"
         data-slot="gantt-task-progress"
-        className="absolute inset-y-0 left-0 bg-white/25"
-        style={{ width: `${clampGanttPercent(task.progress ?? 0)}%` }}
+        className="absolute inset-y-0 left-0 opacity-20"
+        style={{ width: `${clampGanttPercent(task.progress ?? 0)}%`, backgroundColor: color }}
       />
-      <span className="relative truncate">{task.label}</span>
+      <span className="relative flex min-w-0 items-center gap-1 truncate">
+        {taskRenderer
+          ? taskRenderer(task, {
+              selected,
+              progress: clampGanttPercent(task.progress ?? 0),
+              color,
+            })
+          : task.label}
+        {showProgressLabels ? (
+          <span data-slot="gantt-task-progress-label" className="shrink-0 text-[10px] opacity-85">
+            {clampGanttPercent(task.progress ?? 0)}%
+          </span>
+        ) : null}
+      </span>
     </button>
   );
 }
@@ -411,6 +456,7 @@ function GanttOverlay({
   timelineWidth,
   showToday,
   today,
+  showDependencyLines,
 }: {
   tasks: NormalizedGanttTask[];
   markers: Array<GanttMarker & { dateValue: Date }>;
@@ -421,6 +467,7 @@ function GanttOverlay({
   timelineWidth: number;
   showToday: boolean;
   today: GanttDateInput;
+  showDependencyLines: boolean;
 }) {
   const chartHeight = rowHeight * tasks.length;
   const todayDate = parseGanttDate(today);
@@ -428,45 +475,47 @@ function GanttOverlay({
 
   return (
     <>
-      <svg
-        aria-hidden="true"
-        data-slot="gantt-dependencies"
-        className="pointer-events-none absolute left-0 top-0 z-0 overflow-visible"
-        width={timelineWidth}
-        height={chartHeight}
-      >
-        {tasks.flatMap((task, taskIndex) =>
-          (task.dependencies ?? []).map((dependencyId) => {
-            const dependencyIndex = tasks.findIndex((item) => item.id === dependencyId);
-            const dependencyMetrics = metricsByTaskId.get(dependencyId);
-            const taskMetrics = metricsByTaskId.get(task.id);
+      {showDependencyLines ? (
+        <svg
+          aria-hidden="true"
+          data-slot="gantt-dependencies"
+          className="pointer-events-none absolute left-0 top-0 z-0 overflow-visible"
+          width={timelineWidth}
+          height={chartHeight}
+        >
+          {tasks.flatMap((task, taskIndex) =>
+            (task.dependencies ?? []).map((dependencyId) => {
+              const dependencyIndex = tasks.findIndex((item) => item.id === dependencyId);
+              const dependencyMetrics = metricsByTaskId.get(dependencyId);
+              const taskMetrics = metricsByTaskId.get(task.id);
 
-            if (!dependencyMetrics || !taskMetrics || dependencyIndex < 0) {
-              return null;
-            }
+              if (!dependencyMetrics || !taskMetrics || dependencyIndex < 0) {
+                return null;
+              }
 
-            const fromX = dependencyMetrics.left + dependencyMetrics.width;
-            const fromY = dependencyIndex * rowHeight + rowHeight / 2;
-            const toX = taskMetrics.left;
-            const toY = taskIndex * rowHeight + rowHeight / 2;
-            const controlOffset = Math.max(24, Math.abs(toX - fromX) / 2);
+              const fromX = dependencyMetrics.left + dependencyMetrics.width;
+              const fromY = dependencyIndex * rowHeight + rowHeight / 2;
+              const toX = taskMetrics.left;
+              const toY = taskIndex * rowHeight + rowHeight / 2;
+              const controlOffset = Math.max(24, Math.abs(toX - fromX) / 2);
 
-            return (
-              <path
-                key={`${dependencyId}-${task.id}`}
-                d={`M ${fromX} ${fromY} C ${fromX + controlOffset} ${fromY}, ${
-                  toX - controlOffset
-                } ${toY}, ${toX} ${toY}`}
-                fill="none"
-                stroke="var(--muted-foreground)"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeOpacity="0.5"
-              />
-            );
-          }),
-        )}
-      </svg>
+              return (
+                <path
+                  key={`${dependencyId}-${task.id}`}
+                  d={`M ${fromX} ${fromY} C ${fromX + controlOffset} ${fromY}, ${
+                    toX - controlOffset
+                  } ${toY}, ${toX} ${toY}`}
+                  fill="none"
+                  stroke="var(--muted-foreground)"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeOpacity="0.5"
+                />
+              );
+            }),
+          )}
+        </svg>
+      ) : null}
       {markers.map((marker) => {
         const left = getGanttDayDiff(range.start, marker.dateValue) * dayWidth;
 

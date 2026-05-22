@@ -740,20 +740,28 @@ function getPositionedUmlDiagramNodes(
   autoLayoutColumns?: number,
 ): PositionedUmlDiagramNode[] {
   const columns = autoLayoutColumns ?? Math.max(1, Math.ceil(Math.sqrt(nodes.length)));
+  const seenIds = new Set<string>();
 
-  return nodes.map((node, index) => {
+  return nodes.flatMap((node, index) => {
+    if (seenIds.has(node.id)) {
+      return [];
+    }
+
+    seenIds.add(node.id);
     const width = node.width ?? DEFAULT_NODE_SIZE.width;
     const height = node.height ?? DEFAULT_NODE_SIZE.height;
     const column = index % columns;
     const row = Math.floor(index / columns);
 
-    return {
-      ...node,
-      width,
-      height,
-      x: node.x ?? column * (width + UML_AUTO_LAYOUT_GAP.x),
-      y: node.y ?? row * (height + UML_AUTO_LAYOUT_GAP.y),
-    };
+    return [
+      {
+        ...node,
+        width,
+        height,
+        x: node.x ?? column * (width + UML_AUTO_LAYOUT_GAP.x),
+        y: node.y ?? row * (height + UML_AUTO_LAYOUT_GAP.y),
+      },
+    ];
   });
 }
 

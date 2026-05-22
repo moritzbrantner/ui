@@ -172,3 +172,48 @@ export const NestedDonutData: Story = {
     await expect(canvas.getByText("Referral")).toBeVisible();
   },
 };
+
+export const BusinessDashboard: Story = {
+  render: () => (
+    <div className="grid max-w-5xl gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+      <ChartBarGraph
+        ariaLabel="Release readiness by workstream"
+        data={[
+          { workstream: "Design", ready: 92, target: 85 },
+          { workstream: "Build", ready: 78, target: 85 },
+          { workstream: "Docs", ready: 84, target: 85 },
+          { workstream: "QA", ready: 88, target: 85 },
+        ]}
+        series={[
+          { key: "ready", label: "Ready", color: "var(--chart-1)" },
+          { key: "target", label: "Target", color: "var(--chart-4)" },
+        ]}
+        xKey="workstream"
+        valueLabels="auto"
+        summary="Readiness is above target in two of four workstreams."
+        caption="Percent complete by release workstream."
+      />
+      <ChartLineGraph
+        ariaLabel="Stakeholder confidence trend"
+        data={[
+          { week: "W1", confidence: 62 },
+          { week: "W2", confidence: 68 },
+          { week: "W3", confidence: 73 },
+          { week: "W4", confidence: 81 },
+        ]}
+        series={[{ key: "confidence", label: "Confidence", color: "var(--chart-2)" }]}
+        xKey="week"
+        valueLabels="auto"
+        summary="Confidence improved after package-consumption checks landed."
+      />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("img", { name: "Release readiness by workstream" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("Readiness is above target in two of four workstreams."),
+    ).toBeVisible();
+  },
+};

@@ -100,3 +100,17 @@ export const Default: Story = {
     await expect(canvas.getByText("Custom layout")).toBeVisible();
   },
 };
+
+export const DecisionMap: Story = {
+  render: () => (
+    <div className="max-w-4xl">
+      <LogicalArgument argument={moderationArgument} variant="map" />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("Model output requires review")).toBeVisible();
+    await expect(
+      canvas.getByText("This output needs a human review checkpoint before it is applied."),
+    ).toBeVisible();
+  },
+};

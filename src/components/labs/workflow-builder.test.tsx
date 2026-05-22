@@ -142,4 +142,52 @@ describe("WorkflowBuilder", () => {
     fireEvent.keyDown(builder, { key: "Delete" });
     expect(onEdgesChange).not.toHaveBeenCalled();
   });
+
+  test("supports minimap visibility, surface height, toolbar labels, and computed fit view", () => {
+    const onViewportChange = vi.fn();
+    const { container, rerender } = render(
+      <WorkflowBuilder
+        nodes={nodes}
+        edges={edges}
+        showMiniMap={false}
+        surfaceHeight={360}
+        toolbarLabel="Release workflow"
+        canvasSize={{ width: 800, height: 400 }}
+        onViewportChange={onViewportChange}
+      />,
+    );
+
+    expect(screen.getByText("Release workflow")).toBeTruthy();
+    expect(container.querySelector('[data-slot="workflow-builder-minimap"]')).toBeNull();
+    expect(
+      (container.querySelector('[data-slot="workflow-builder-surface"]') as HTMLElement).style
+        .height,
+    ).toBe("360px");
+
+    fireEvent.click(screen.getByRole("button", { name: "Fit view" }));
+
+    expect(onViewportChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        zoom: expect.any(Number),
+      }),
+    );
+
+    rerender(<WorkflowBuilder nodes={nodes} edges={edges} showMiniMap />);
+
+    expect(container.querySelector('[data-slot="workflow-builder-minimap"]')).toBeTruthy();
+  });
+
+  test("selects edges with keyboard activation", () => {
+    const onSelectionChange = vi.fn();
+    const { container } = render(
+      <WorkflowBuilder nodes={nodes} edges={edges} onSelectionChange={onSelectionChange} />,
+    );
+    const edgeHit = container.querySelector('[data-slot="workflow-builder-edge-hit"]')!;
+
+    fireEvent.keyDown(edgeHit, { key: "Enter" });
+
+    expect(onSelectionChange).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "edge", id: "edge-source-target" }),
+    );
+  });
 });

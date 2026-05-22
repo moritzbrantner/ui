@@ -13,6 +13,7 @@ import { cn } from "../../lib/cn";
 
 type LogicalArgumentStatus = "valid" | "invalid" | "sound" | "unsound" | "open";
 type LogicalArgumentRelation = "supports" | "objects" | "rebuts" | "undercuts";
+type LogicalArgumentVariant = "stack" | "map";
 
 type LogicalArgumentStatement = {
   id?: string;
@@ -37,6 +38,7 @@ type LogicalArgumentProps = React.ComponentProps<"article"> & {
   argument?: LogicalArgumentData;
   depth?: number;
   showStatementLabels?: boolean;
+  variant?: LogicalArgumentVariant;
 };
 
 type LogicalArgumentStatementProps = React.ComponentProps<"li"> & {
@@ -95,6 +97,7 @@ function LogicalArgument({
   argument,
   depth = 0,
   showStatementLabels = true,
+  variant = "stack",
   className,
   children,
   ...props
@@ -105,8 +108,10 @@ function LogicalArgument({
       data-depth={depth}
       data-status={argument?.status}
       data-relation={argument?.relation}
+      data-variant={variant}
       className={cn(
         "grid gap-3 rounded-md border bg-card p-4 text-sm text-card-foreground",
+        variant === "map" && "overflow-x-auto",
         depth > 0 && "border-dashed bg-background p-3",
         className,
       )}
@@ -140,8 +145,14 @@ function LogicalArgument({
                   ) : null}
                 </LogicalArgumentHeader>
               ) : null}
-              <LogicalArgumentBody>
-                <LogicalArgumentPremiseList>
+              <LogicalArgumentBody
+                className={
+                  variant === "map"
+                    ? "min-w-[44rem] grid-cols-[minmax(12rem,1fr)_8rem_minmax(12rem,1fr)] items-center gap-4"
+                    : undefined
+                }
+              >
+                <LogicalArgumentPremiseList className={variant === "map" ? "relative" : undefined}>
                   {argument.premises.map((premise, index) => (
                     <LogicalArgumentPremise
                       key={premise.id ?? index}
@@ -152,12 +163,21 @@ function LogicalArgument({
                     </LogicalArgumentPremise>
                   ))}
                 </LogicalArgumentPremiseList>
-                {argument.inferenceRule ? (
-                  <LogicalArgumentInference>{argument.inferenceRule}</LogicalArgumentInference>
+                {argument.inferenceRule || variant === "map" ? (
+                  <LogicalArgumentInference
+                    className={
+                      variant === "map"
+                        ? "justify-center rounded-md border border-dashed bg-muted/30 p-3 text-center"
+                        : undefined
+                    }
+                  >
+                    {argument.inferenceRule ?? "Therefore"}
+                  </LogicalArgumentInference>
                 ) : null}
                 <LogicalArgumentConclusion
                   label={showStatementLabels ? (argument.conclusion.label ?? "C") : undefined}
                   note={argument.conclusion.note}
+                  className={variant === "map" ? "relative" : undefined}
                 >
                   {argument.conclusion.text}
                 </LogicalArgumentConclusion>
@@ -170,6 +190,7 @@ function LogicalArgument({
                       argument={childArgument}
                       depth={depth + 1}
                       showStatementLabels={showStatementLabels}
+                      variant={variant}
                     />
                   ))}
                 </LogicalArgumentChildren>
@@ -428,4 +449,5 @@ export {
   type LogicalArgumentStatementProps,
   type LogicalArgumentStatus,
   type LogicalArgumentStatusBadgeProps,
+  type LogicalArgumentVariant,
 };

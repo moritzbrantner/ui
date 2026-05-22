@@ -89,6 +89,10 @@ type WorkflowBuilderProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   onConnectionComplete?: (connection: WorkflowBuilderConnection) => void;
   minZoom?: number;
   maxZoom?: number;
+  surfaceHeight?: number | string;
+  canvasSize?: { width: number; height: number };
+  showMiniMap?: boolean;
+  toolbarLabel?: React.ReactNode;
 };
 
 type WorkflowBuilderNodeProps = Omit<React.ComponentProps<"div">, "onSelect"> & {
@@ -112,6 +116,7 @@ type WorkflowBuilderToolbarProps = React.ComponentProps<"div"> & {
   maxZoom?: number;
   readOnly?: boolean;
   selectedLabel?: string;
+  toolbarLabel?: React.ReactNode;
   onZoomChange?: (zoom: number) => void;
   onFitView?: () => void;
   onDeleteSelection?: () => void;
@@ -166,6 +171,10 @@ function WorkflowBuilder({
   onConnectionComplete,
   minZoom = 0.5,
   maxZoom = 1.75,
+  surfaceHeight = "32rem",
+  canvasSize,
+  showMiniMap = true,
+  toolbarLabel = "Workflow",
   className,
   ...props
 }: WorkflowBuilderProps) {
@@ -325,7 +334,29 @@ function WorkflowBuilder({
   };
 
   const fitView = () => {
-    commitViewport({ x: 0, y: 0, zoom: 1 });
+    if (!canvasSize || nodes.length === 0) {
+      commitViewport({ x: 0, y: 0, zoom: 1 });
+      return;
+    }
+
+    const bounds = getWorkflowBounds(nodes);
+    const padding = 48;
+    const nextZoom = Math.min(
+      maxZoom,
+      Math.max(
+        minZoom,
+        Math.min(
+          canvasSize.width / Math.max(bounds.width + padding * 2, 1),
+          canvasSize.height / Math.max(bounds.height + padding * 2, 1),
+        ),
+      ),
+    );
+
+    commitViewport({
+      x: Math.round(padding - bounds.x * nextZoom),
+      y: Math.round(padding - bounds.y * nextZoom),
+      zoom: nextZoom,
+    });
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -380,13 +411,15 @@ function WorkflowBuilder({
         maxZoom={maxZoom}
         readOnly={readOnly}
         selectedLabel={selectedNode?.label ?? selectedEdge?.id}
+        toolbarLabel={toolbarLabel}
         onZoomChange={commitZoom}
         onFitView={fitView}
         onDeleteSelection={deleteSelection}
       />
       <div
         data-slot="workflow-builder-surface"
-        className="relative h-[32rem] overflow-auto rounded-md border bg-muted/20"
+        className="relative overflow-auto rounded-md border bg-muted/20"
+        style={{ height: typeof surfaceHeight === "number" ? `${surfaceHeight}px` : surfaceHeight }}
         onPointerMove={handlePointerMove}
         onPointerUp={() => setDragState(null)}
         onPointerLeave={() => setDragState(null)}
@@ -400,6 +433,8 @@ function WorkflowBuilder({
           className="relative min-h-[52rem] min-w-[72rem] origin-top-left"
           style={{
             transform: `translate(${currentViewport.x}px, ${currentViewport.y}px) scale(${currentZoom})`,
+            minWidth: canvasSize?.width,
+            minHeight: canvasSize?.height,
             width: `${100 / currentZoom}%`,
           }}
         >
@@ -422,6 +457,12 @@ function WorkflowBuilder({
                     className="pointer-events-auto cursor-pointer fill-none stroke-transparent"
                     strokeWidth={16}
                     onClick={() => selectEdge(edge)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        selectEdge(edge);
+                      }
+                    }}
                   />
                   <path
                     data-slot="workflow-builder-edge"
@@ -460,12 +501,14 @@ function WorkflowBuilder({
             />
           ))}
         </div>
-        <WorkflowBuilderMiniMap
-          nodes={nodes}
-          edges={edges}
-          selectedNodeId={currentSelectedNodeId}
-          className="absolute right-3 bottom-3"
-        />
+        {showMiniMap ? (
+          <WorkflowBuilderMiniMap
+            nodes={nodes}
+            edges={edges}
+            selectedNodeId={currentSelectedNodeId}
+            className="absolute right-3 bottom-3"
+          />
+        ) : null}
       </div>
     </div>
   );
@@ -521,6 +564,7 @@ function WorkflowBuilderToolbar({
   maxZoom = 1.75,
   readOnly,
   selectedLabel,
+  toolbarLabel = "Workflow",
   onZoomChange,
   onFitView,
   onDeleteSelection,
@@ -537,7 +581,7 @@ function WorkflowBuilderToolbar({
     >
       <div className="flex items-center gap-2 text-sm font-medium">
         <WorkflowIcon className="size-4 text-muted-foreground" aria-hidden="true" />
-        Workflow
+        {toolbarLabel}
         {selectedLabel ? <Badge variant="secondary">{selectedLabel}</Badge> : null}
       </div>
       <div className="flex items-center gap-2">

@@ -40,9 +40,9 @@ Before running visual tests locally for the first time, install the Chromium bro
 
 ## Release Flow
 
-This package is published to GitHub Packages for the `@moritzbrantner` scope. There is no local `release` or `publish` script because publishing is intentionally handled by `.github/workflows/publish.yml` on `v*` tags or manual workflow dispatch.
+This package is published directly to the public npm registry for the `@moritzbrantner` scope. Use `bun run publish:npm` for a local npm publish after authenticating with npm. `.github/workflows/publish.yml` can also publish on `v*` tags or manual workflow dispatch when `NPM_TOKEN` is configured.
 
-Before tagging or dispatching a publish, run `bun run verify:release` and inspect `npm pack --dry-run --ignore-scripts --json` output through `bun run pack:dry`.
+Before tagging, dispatching, or publishing manually, run `bun run verify:release` and inspect `npm pack --dry-run --ignore-scripts --json` output through `bun run pack:dry`.
 
 ## Do Not Edit Manually
 

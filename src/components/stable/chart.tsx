@@ -57,7 +57,9 @@ type ChartGraphProps = Omit<React.ComponentProps<"figure">, "children"> & {
   xKey?: string;
   ariaLabel?: string;
   caption?: React.ReactNode;
+  summary?: React.ReactNode;
   emptyMessage?: React.ReactNode;
+  noDataReason?: React.ReactNode;
   height?: number;
   width?: number;
   yDomain?: [number, number];
@@ -69,6 +71,8 @@ type ChartGraphProps = Omit<React.ComponentProps<"figure">, "children"> & {
   interactive?: boolean;
   scrollable?: boolean;
   scrollPointWidth?: number;
+  valueLabels?: boolean | "auto";
+  onDatumFocus?: (datum: ChartDatum, index: number) => void;
   formatLabel?: (value: ChartDatumValue, datum: ChartDatum, index: number) => React.ReactNode;
   formatValue?: (value: number) => React.ReactNode;
   pretext?: ChartPretextItem[];
@@ -934,7 +938,9 @@ function ChartGraph({
   xKey = "label",
   ariaLabel,
   caption,
+  summary,
   emptyMessage = "No chart data.",
+  noDataReason,
   height = GRAPH_VIEWBOX.height,
   width = GRAPH_VIEWBOX.width,
   yDomain,
@@ -946,6 +952,8 @@ function ChartGraph({
   interactive = true,
   scrollable,
   scrollPointWidth = GRAPH_SCROLL_POINT_WIDTH,
+  valueLabels = false,
+  onDatumFocus,
   formatLabel = defaultFormatLabel,
   formatValue = defaultFormatValue,
   pretext,
@@ -987,6 +995,16 @@ function ChartGraph({
           };
         })
       : [];
+  const setFocusedDatum = React.useCallback(
+    (index: number | null) => {
+      setActiveIndex(index);
+
+      if (index != null) {
+        onDatumFocus?.(data[index] as ChartDatum, index);
+      }
+    },
+    [data, onDatumFocus],
+  );
 
   return (
     <figure data-slot={slot} className={cn("grid gap-2", className)} {...props}>
@@ -1029,10 +1047,34 @@ function ChartGraph({
                 <ChartGraphPretext pretext={pretext} />
                 <g data-slot={`${slot}-series`}>
                   {graph === "line"
-                    ? renderLineGraphSeries(data, series, layout, domain, activeIndex)
+                    ? renderLineGraphSeries(
+                        data,
+                        series,
+                        layout,
+                        domain,
+                        activeIndex,
+                        valueLabels,
+                        formatValue,
+                      )
                     : graph === "area"
-                      ? renderAreaGraphSeries(data, series, layout, domain, activeIndex)
-                      : renderBarGraphSeries(data, series, layout, domain, activeIndex)}
+                      ? renderAreaGraphSeries(
+                          data,
+                          series,
+                          layout,
+                          domain,
+                          activeIndex,
+                          valueLabels,
+                          formatValue,
+                        )
+                      : renderBarGraphSeries(
+                          data,
+                          series,
+                          layout,
+                          domain,
+                          activeIndex,
+                          valueLabels,
+                          formatValue,
+                        )}
                 </g>
                 {interactive ? (
                   <ChartInteractionLayer
@@ -1044,7 +1086,7 @@ function ChartGraph({
                     domain={domain}
                     formatLabel={formatLabel}
                     layout={layout}
-                    onActiveIndexChange={setActiveIndex}
+                    onActiveIndexChange={setFocusedDatum}
                     series={series}
                     xKey={xKey}
                     xScale={xScale}
@@ -1059,11 +1101,21 @@ function ChartGraph({
         <div
           role="img"
           aria-label={ariaLabel}
-          className="flex min-h-40 items-center justify-center border border-dashed text-sm text-muted-foreground"
+          className="flex min-h-40 flex-col items-center justify-center gap-1 border border-dashed text-center text-sm text-muted-foreground"
         >
-          {emptyMessage}
+          <span>{emptyMessage}</span>
+          {noDataReason ? (
+            <span data-slot="chart-empty-reason" className="text-xs">
+              {noDataReason}
+            </span>
+          ) : null}
         </div>
       )}
+      {summary ? (
+        <div data-slot="chart-summary" className="text-sm leading-6 text-foreground">
+          {summary}
+        </div>
+      ) : null}
       {caption ? (
         <figcaption className="text-sm text-muted-foreground">{caption}</figcaption>
       ) : null}
@@ -1096,6 +1148,8 @@ function renderLineGraphSeries(
   layout: ChartLayout,
   domain: [number, number],
   activeIndex: number | null,
+  valueLabels: boolean | "auto",
+  formatValue: (value: number) => React.ReactNode,
 ) {
   return series.map((item, index) => {
     const color = getSeriesColor(item, index);
@@ -1138,6 +1192,25 @@ function renderLineGraphSeries(
             strokeWidth={activeIndex === point.index ? 2 : 1.5}
           />
         ))}
+        {shouldRenderValueLabels(valueLabels, data.length)
+          ? points.map((point) => {
+              const value = getNumericValue(
+                getChartDatumScalar(data[point.index] as ChartDatum, item.key),
+              );
+
+              return value == null ? null : (
+                <ChartPretextText
+                  key={`label-${point.index}`}
+                  data-slot="chart-value-label"
+                  x={point.x}
+                  y={point.y - 12}
+                  className="fill-foreground"
+                >
+                  {formatValue(value)}
+                </ChartPretextText>
+              );
+            })
+          : null}
       </g>
     );
   });
@@ -1149,6 +1222,8 @@ function renderAreaGraphSeries(
   layout: ChartLayout,
   domain: [number, number],
   activeIndex: number | null,
+  valueLabels: boolean | "auto",
+  formatValue: (value: number) => React.ReactNode,
 ) {
   const baseline = scaleY(layout, domain, 0);
 
@@ -1198,6 +1273,25 @@ function renderAreaGraphSeries(
             strokeWidth={2}
           />
         ))}
+        {shouldRenderValueLabels(valueLabels, data.length)
+          ? points.map((point) => {
+              const value = getNumericValue(
+                getChartDatumScalar(data[point.index] as ChartDatum, item.key),
+              );
+
+              return value == null ? null : (
+                <ChartPretextText
+                  key={`label-${point.index}`}
+                  data-slot="chart-value-label"
+                  x={point.x}
+                  y={point.y - 12}
+                  className="fill-foreground"
+                >
+                  {formatValue(value)}
+                </ChartPretextText>
+              );
+            })
+          : null}
       </g>
     );
   });
@@ -1209,6 +1303,8 @@ function renderBarGraphSeries(
   layout: ChartLayout,
   domain: [number, number],
   activeIndex: number | null,
+  valueLabels: boolean | "auto",
+  formatValue: (value: number) => React.ReactNode,
 ) {
   const bandWidth = layout.plotWidth / data.length;
   const groupWidth = bandWidth * 0.68;
@@ -1222,18 +1318,32 @@ function renderBarGraphSeries(
       const y = scaleY(layout, domain, value);
       const zeroY = scaleY(layout, domain, 0);
 
+      const x = groupX + barWidth * seriesIndex;
+      const barTop = Math.min(y, zeroY);
+
       return (
-        <rect
-          key={`${datumIndex}-${item.key}`}
-          data-slot="chart-bar-graph-bar"
-          x={groupX + barWidth * seriesIndex}
-          y={Math.min(y, zeroY)}
-          width={Math.max(barWidth - 3, 1)}
-          height={Math.abs(zeroY - y)}
-          fill={getSeriesColor(item, seriesIndex)}
-          className={item.className}
-          opacity={activeIndex == null || activeIndex === datumIndex ? undefined : 0.35}
-        />
+        <g key={`${datumIndex}-${item.key}`}>
+          <rect
+            data-slot="chart-bar-graph-bar"
+            x={x}
+            y={barTop}
+            width={Math.max(barWidth - 3, 1)}
+            height={Math.abs(zeroY - y)}
+            fill={getSeriesColor(item, seriesIndex)}
+            className={item.className}
+            opacity={activeIndex == null || activeIndex === datumIndex ? undefined : 0.35}
+          />
+          {shouldRenderValueLabels(valueLabels, data.length) ? (
+            <ChartPretextText
+              data-slot="chart-value-label"
+              x={x + Math.max(barWidth - 3, 1) / 2}
+              y={barTop - 10}
+              className="fill-foreground"
+            >
+              {formatValue(value)}
+            </ChartPretextText>
+          ) : null}
+        </g>
       );
     });
   });
@@ -2137,6 +2247,10 @@ function getDatumHitArea(
 
 function getSeriesColor(series: ChartSeries, index: number): string {
   return series.color ?? `var(--chart-${(index % 5) + 1})`;
+}
+
+function shouldRenderValueLabels(valueLabels: boolean | "auto", dataLength: number) {
+  return valueLabels === true || (valueLabels === "auto" && dataLength <= 8);
 }
 
 function clamp(value: number, min: number, max: number): number {

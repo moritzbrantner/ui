@@ -102,6 +102,38 @@ describe("@moritzbrantner/ui gantt", () => {
     expect(document.querySelector('[data-slot="gantt-dependencies"] path')).toBeTruthy();
   });
 
+  test("supports aria label, caption, dependency visibility, and progress labels", () => {
+    const { rerender } = render(
+      <Gantt
+        tasks={tasks}
+        ariaLabel="Release plan"
+        caption="Release plan caption"
+        showDependencyLines={false}
+        showProgressLabels
+      />,
+    );
+
+    expect(screen.getByRole("region", { name: "Release plan" })).toBeTruthy();
+    expect(screen.getByText("Release plan caption")).toBeTruthy();
+    expect(document.querySelector('[data-slot="gantt-dependencies"]')).toBeNull();
+    expect(screen.getByText("40%")).toBeTruthy();
+
+    rerender(<Gantt tasks={tasks} showDependencyLines />);
+
+    expect(document.querySelector('[data-slot="gantt-dependencies"]')).toBeTruthy();
+  });
+
+  test("uses a custom task renderer", () => {
+    render(
+      <Gantt
+        tasks={tasks}
+        taskRenderer={(task, context) => `${task.label}: ${context.progress}`}
+      />,
+    );
+
+    expect(screen.getByText("Build: 40")).toBeTruthy();
+  });
+
   test("calls onTaskSelect with the selected task", () => {
     const onTaskSelect = vi.fn();
 

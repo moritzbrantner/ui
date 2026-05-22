@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   publish:
@@ -23,11 +22,13 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          scope: "@moritzbrantner"
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
         env:
-          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps chromium
@@ -36,6 +37,6 @@ jobs:
         run: npm run verify:release:ci
 
       - name: Publish package
-        run: npm publish
+        run: npm publish --access public
         env:
-          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

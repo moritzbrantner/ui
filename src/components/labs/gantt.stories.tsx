@@ -125,3 +125,26 @@ export const Default: Story = {
     ).not.toBeInTheDocument();
   },
 };
+
+export const ReleasePlan: Story = {
+  render: () => (
+    <Gantt
+      ariaLabel="Release plan Gantt chart"
+      caption="Compact release plan with dependency lines and progress labels."
+      tasks={tasks}
+      markers={markers}
+      scale="week"
+      startDate="2026-04-06"
+      endDate="2026-05-29"
+      today="2026-05-20"
+      showProgressLabels
+      className="max-w-5xl"
+    />
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("region", { name: "Release plan Gantt chart" })).toBeVisible();
+    await expect(
+      canvas.getByText("Compact release plan with dependency lines and progress labels."),
+    ).toBeVisible();
+  },
+};

@@ -24,6 +24,11 @@ type AnnotationCanvasAnnotation = {
 type AnnotationCanvasProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   annotations: AnnotationCanvasAnnotation[];
   onAnnotationsChange?: (annotations: AnnotationCanvasAnnotation[]) => void;
+  ariaLabel?: string;
+  createAnnotationId?: () => string;
+  onAnnotationCreate?: (annotation: AnnotationCanvasAnnotation) => void;
+  onAnnotationMove?: (annotation: AnnotationCanvasAnnotation) => void;
+  onAnnotationDelete?: (annotation: AnnotationCanvasAnnotation) => void;
   selectedAnnotationId?: string | null;
   onSelectedAnnotationChange?: (
     annotationId: string | null,
@@ -72,6 +77,11 @@ function AnnotationCanvas({
   height,
   imageUrl,
   readOnly = false,
+  ariaLabel = "Annotation canvas",
+  createAnnotationId,
+  onAnnotationCreate,
+  onAnnotationMove,
+  onAnnotationDelete,
   className,
   ...props
 }: AnnotationCanvasProps) {
@@ -95,7 +105,7 @@ function AnnotationCanvas({
     shape: AnnotationCanvasShape,
     points: AnnotationCanvasPoint[],
   ): AnnotationCanvasAnnotation => ({
-    id: `annotation-${Date.now()}-${Math.round(Math.random() * 10000)}`,
+    id: createAnnotationId?.() ?? `annotation-${Date.now()}-${Math.round(Math.random() * 10000)}`,
     shape,
     points,
     color: "var(--primary)",
@@ -116,6 +126,7 @@ function AnnotationCanvas({
     if (tool === "point") {
       const annotation = createAnnotation("point", [point]);
       commitAnnotations([...annotations, annotation]);
+      onAnnotationCreate?.(annotation);
       commitSelection(annotation.id);
       return;
     }
@@ -142,19 +153,27 @@ function AnnotationCanvas({
     if (moveState && !readOnly) {
       const deltaX = point.x - moveState.start.x;
       const deltaY = point.y - moveState.start.y;
+      let movedAnnotation: AnnotationCanvasAnnotation | undefined;
       commitAnnotations(
-        annotations.map((annotation) =>
-          annotation.id === moveState.id
-            ? {
-                ...annotation,
-                points: moveState.originalPoints.map((originalPoint) => ({
-                  x: originalPoint.x + deltaX,
-                  y: originalPoint.y + deltaY,
-                })),
-              }
-            : annotation,
-        ),
+        annotations.map((annotation) => {
+          if (annotation.id !== moveState.id) {
+            return annotation;
+          }
+
+          movedAnnotation = {
+            ...annotation,
+            points: moveState.originalPoints.map((originalPoint) => ({
+              x: originalPoint.x + deltaX,
+              y: originalPoint.y + deltaY,
+            })),
+          };
+
+          return movedAnnotation;
+        }),
       );
+      if (movedAnnotation) {
+        onAnnotationMove?.(movedAnnotation);
+      }
     }
   };
 
@@ -164,6 +183,7 @@ function AnnotationCanvas({
       const safePoints = ensureRectangleSize(points);
       const annotation = createAnnotation("rectangle", safePoints);
       commitAnnotations([...annotations, annotation]);
+      onAnnotationCreate?.(annotation);
       commitSelection(annotation.id);
       setDraft(null);
     }
@@ -177,6 +197,7 @@ function AnnotationCanvas({
     }
     const annotation = createAnnotation("polygon", draft.points);
     commitAnnotations([...annotations, annotation]);
+    onAnnotationCreate?.(annotation);
     commitSelection(annotation.id);
     setDraft(null);
     onToolChange?.("select");
@@ -189,6 +210,9 @@ function AnnotationCanvas({
 
     if ((event.key === "Delete" || event.key === "Backspace") && selection) {
       event.preventDefault();
+      if (selectedAnnotation) {
+        onAnnotationDelete?.(selectedAnnotation);
+      }
       commitAnnotations(annotations.filter((annotation) => annotation.id !== selection));
       commitSelection(null);
     }
@@ -217,7 +241,7 @@ function AnnotationCanvas({
       <svg
         data-slot="annotation-canvas-surface"
         role="img"
-        aria-label="Annotation canvas"
+        aria-label={ariaLabel}
         viewBox={`0 0 ${width} ${height}`}
         className="block h-auto w-full rounded-md border bg-muted/30"
         onPointerDown={handlePointerDown}

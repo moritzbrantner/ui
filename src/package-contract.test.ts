@@ -52,6 +52,9 @@ import {
   ContextMenuTrigger,
   cn,
   CopyButton,
+  ComparisonMatrix,
+  type ComparisonMatrixColumn,
+  type ComparisonMatrixRowData,
   DataGrid,
   DataGridColumnHeader,
   DescriptionList,
@@ -81,8 +84,11 @@ import {
   ErrorState,
   FilterBar,
   FilterChip,
+  FunnelChart,
+  type FunnelChartSegmentData,
   HoverPreview,
   type HoverPreviewProps,
+  Infographic,
   Kbd,
   LanguageSwitcher,
   type LanguageSwitcherLanguage,
@@ -93,6 +99,8 @@ import {
   type MenuActionItem,
   type MenuActionRadioGroupItem,
   MenubarShortcut,
+  MetricStrip,
+  type MetricStripItemData,
   MobileSlide,
   MobileSlideBody,
   MobileSlideClose,
@@ -118,8 +126,12 @@ import {
   ShortcutList,
   Spinner,
   OrbitSpinner,
+  OrgChart,
+  type OrgChartNodeData,
   PolygonSpinner,
   PulseSpinner,
+  ProcessMap,
+  type ProcessMapStepData,
   Stat,
   StatDelta,
   StatGroup,
@@ -150,6 +162,9 @@ import {
   UploadQueue,
   ValidationSummary,
   WorkbenchLayout,
+  RelationshipMap,
+  type RelationshipMapEdge,
+  type RelationshipMapNode,
   defaultUiThemeName,
   themeConfig,
   uiThemeLabels,
@@ -167,6 +182,13 @@ import {
   Dialog as ClientDialog,
 } from "./client";
 import { Button as SubpathButton } from "./components/stable/button";
+import { ComparisonMatrix as SubpathComparisonMatrix } from "./components/stable/comparison-matrix";
+import { FunnelChart as SubpathFunnelChart } from "./components/stable/funnel-chart";
+import { Infographic as SubpathInfographic } from "./components/stable/infographic";
+import { MetricStrip as SubpathMetricStrip } from "./components/stable/metric-strip";
+import { OrgChart as SubpathOrgChart } from "./components/stable/org-chart";
+import { ProcessMap as SubpathProcessMap } from "./components/stable/process-map";
+import { RelationshipMap as SubpathRelationshipMap } from "./components/stable/relationship-map";
 import { ActionMenu as SubpathActionMenu } from "./components/patterns/action-menu";
 import { ActionSheet as SubpathActionSheet } from "./components/patterns/action-sheet";
 import { ContextActionMenu as SubpathContextActionMenu } from "./components/patterns/context-action-menu";
@@ -503,6 +525,13 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(ClientDataGrid).toBe(DataGrid);
     expect(ClientDialog).toBe(Dialog);
     expect(SubpathButton).toBe(Button);
+    expect(SubpathComparisonMatrix).toBe(ComparisonMatrix);
+    expect(SubpathFunnelChart).toBe(FunnelChart);
+    expect(SubpathInfographic).toBe(Infographic);
+    expect(SubpathMetricStrip).toBe(MetricStrip);
+    expect(SubpathOrgChart).toBe(OrgChart);
+    expect(SubpathProcessMap).toBe(ProcessMap);
+    expect(SubpathRelationshipMap).toBe(RelationshipMap);
     expect(SubpathActionMenu).toBe(ActionMenu);
     expect(SubpathActionSheet).toBe(ActionSheet);
     expect(SubpathContextActionMenu).toBe(ContextActionMenu);
@@ -520,6 +549,13 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(typeof ActionSheet).toBe("function");
     expect(typeof ResponsiveActionMenu).toBe("function");
     expect(typeof HoverPreview).toBe("function");
+    expect(typeof FunnelChart).toBe("function");
+    expect(typeof MetricStrip).toBe("function");
+    expect(typeof ProcessMap).toBe("function");
+    expect(typeof ComparisonMatrix).toBe("function");
+    expect(typeof OrgChart).toBe("function");
+    expect(typeof RelationshipMap).toBe("function");
+    expect(typeof Infographic).toBe("function");
     const rootMenuActionItem: MenuActionItem = { id: "contract-action", label: "Contract action" };
     const rootCommandItem: MenuActionCommandItem = {
       id: "contract-command",
@@ -552,11 +588,63 @@ describe("@moritzbrantner/ui package-contract", () => {
       trigger: React.createElement("button", { type: "button" }, "Preview"),
       title: "Preview",
     };
+    const metricItem: MetricStripItemData = {
+      id: "contract-metric",
+      label: "Contract metric",
+      value: "42",
+      deltaTone: "positive",
+    };
+    const funnelSegment: FunnelChartSegmentData = {
+      id: "contract-segment",
+      label: "Contract segment",
+      value: 42,
+    };
+    const processStep: ProcessMapStepData = {
+      id: "contract-step",
+      label: "Contract step",
+      status: "active",
+      tone: "accent",
+    };
+    const matrixColumn: ComparisonMatrixColumn = {
+      id: "contract-column",
+      label: "Contract column",
+    };
+    const matrixRow: ComparisonMatrixRowData = {
+      id: "contract-row",
+      label: "Contract row",
+      values: { "contract-column": "Ready" },
+      toneByColumn: { "contract-column": "positive" },
+    };
+    const orgNode: OrgChartNodeData = {
+      id: "contract-node",
+      label: "Contract node",
+      children: [{ id: "contract-child", label: "Contract child" }],
+    };
+    const relationshipNode: RelationshipMapNode = {
+      id: "contract-source",
+      label: "Contract source",
+      tone: "accent",
+    };
+    const relationshipEdge: RelationshipMapEdge = {
+      id: "contract-edge",
+      source: "contract-source",
+      target: "contract-target",
+      kind: "dependency",
+      direction: "both",
+    };
     expect(actionMenuProps.items).toHaveLength(1);
     expect(contextActionMenuProps.items).toHaveLength(1);
     expect(actionSheetProps.items).toHaveLength(1);
     expect(responsiveActionMenuProps.items).toHaveLength(1);
     expect(hoverPreviewProps.title).toBe("Preview");
+    expect(metricItem.deltaTone).toBe("positive");
+    expect(funnelSegment.value).toBe(42);
+    expect(processStep.status).toBe("active");
+    expect(matrixColumn.id).toBe("contract-column");
+    expect(matrixRow.toneByColumn?.["contract-column"]).toBe("positive");
+    expect(orgNode.children).toHaveLength(1);
+    expect(relationshipNode.tone).toBe("accent");
+    expect(relationshipEdge.direction).toBe("both");
     const queryBuilderIdFactory: QueryBuilderIdFactory = (kind) => `contract-${kind}`;
     const queryBuilderGroup = createQueryBuilderGroup([], queryBuilderIdFactory);
     expect(queryBuilderGroup.id).toBe("contract-group");

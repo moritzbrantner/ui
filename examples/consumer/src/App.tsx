@@ -24,6 +24,8 @@ import {
   FormSectionDescription,
   FormSectionHeader,
   FormSectionTitle,
+  FunnelChart,
+  MetricStrip,
   NotificationMenu,
   PageActions,
   PageContent,
@@ -33,6 +35,7 @@ import {
   PageTitle,
   PlatformNavbar,
   PlatformNavbarActions,
+  ProcessMap,
   SearchField,
   Surface,
   SurfaceContent,
@@ -54,6 +57,46 @@ const columns = [
   { accessorKey: "name", header: "Name" },
   { accessorKey: "status", header: "Status" },
   { accessorKey: "owner", header: "Owner" },
+];
+
+const businessMetrics = [
+  {
+    id: "readiness",
+    label: "Readiness",
+    value: "86%",
+    delta: "+9 pts",
+    deltaTone: "positive" as const,
+  },
+  {
+    id: "risks",
+    label: "Open risks",
+    value: "3",
+    delta: "1 critical",
+    deltaTone: "warning" as const,
+  },
+];
+
+const releaseSteps = [
+  {
+    id: "scope",
+    label: "Scope",
+    description: "Stable business visuals selected.",
+    status: "done" as const,
+    tone: "success" as const,
+  },
+  {
+    id: "verify",
+    label: "Verify",
+    description: "Package and consumer checks.",
+    status: "active" as const,
+    tone: "accent" as const,
+  },
+  {
+    id: "ship",
+    label: "Ship",
+    description: "Publish workflow handles release.",
+    status: "pending" as const,
+  },
 ];
 
 const navigationGroups = [
@@ -143,6 +186,29 @@ export function App() {
             {visibleRows.length === 0 ? (
               <EmptyState>No packages match the search.</EmptyState>
             ) : null}
+          </SurfaceContent>
+        </Surface>
+
+        <Surface>
+          <SurfaceHeader>
+            <SurfaceTitle>Business visuals</SurfaceTitle>
+            <SurfaceDescription>
+              Stable dashboard and reporting components imported from the package root.
+            </SurfaceDescription>
+          </SurfaceHeader>
+          <SurfaceContent className="mt-4 grid gap-4">
+            <MetricStrip items={businessMetrics} />
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)]">
+              <ProcessMap steps={releaseSteps} />
+              <FunnelChart
+                ariaLabel="Consumer conversion funnel"
+                data={[
+                  { id: "visitors", label: "Visitors", value: 12000 },
+                  { id: "trials", label: "Trials", value: 2100 },
+                  { id: "customers", label: "Customers", value: 420 },
+                ]}
+              />
+            </div>
           </SurfaceContent>
         </Surface>
 

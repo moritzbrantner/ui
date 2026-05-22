@@ -97,4 +97,14 @@ describe("LogicalArgument", () => {
     expect(screen.getByText("Valid")).toBeTruthy();
     expect(screen.getByText("This reviewed change has an owner.")).toBeTruthy();
   });
+
+  test("renders the map variant with diagram slots", () => {
+    render(<LogicalArgument argument={argument} variant="map" data-testid="argument-map" />);
+
+    const root = screen.getByTestId("argument-map");
+
+    expect(root.getAttribute("data-variant")).toBe("map");
+    expect(screen.getByText("Conjunction elimination")).toBeTruthy();
+    expect(screen.getByText("The release can proceed.")).toBeTruthy();
+  });
 });

@@ -270,3 +270,22 @@ export const ControlledViewport: Story = {
     await expect(args.onViewportChange).toHaveBeenCalled();
   },
 };
+
+export const ReadOnlyOverview: Story = {
+  render: (args) => (
+    <WorkflowBuilder
+      {...args}
+      nodes={initialNodes}
+      edges={initialEdges}
+      readOnly
+      toolbarLabel="Workflow overview"
+      surfaceHeight={420}
+      canvasSize={{ width: 1040, height: 620 }}
+      showMiniMap
+    />
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("Workflow overview")).toBeVisible();
+    await expect(canvas.getByRole("img", { name: "Workflow minimap" })).toBeVisible();
+  },
+};

@@ -16,7 +16,7 @@ Generic visual affordances such as `AccountMenu` and `NotificationMenu` live in 
 bun add @moritzbrantner/ui
 ```
 
-The package is published to GitHub Packages for the `@moritzbrantner` scope, so consumers need registry access configured for that scope.
+The package is published to the public npm registry for the `@moritzbrantner` scope, so consumers can install it with their normal npm/Bun registry configuration.
 
 ## Development Workflow
 
@@ -64,8 +64,6 @@ bun run verify
 ```sh
 bunx playwright install chromium
 ```
-
-If installation or CI cannot read GitHub Packages, make sure `GH_PACKAGES_TOKEN` is available for the `@moritzbrantner` scope configured in `.npmrc`.
 
 `bun run test:coverage` is a local fallback when Bun's `node` shim cannot expose V8 coverage APIs. It runs the unit suite and reports that coverage was not measured. Release coverage must use `npm run test:coverage:real` with a real Node runtime, which CI gets from `actions/setup-node`.
 
@@ -347,9 +345,15 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) and [docs/design-system.md](./docs/desi
 
 ## Release Checks
 
-Publishing is handled by `.github/workflows/publish.yml` on `v*` tags or manual workflow dispatch. There is no local `release` script because publishing requires GitHub Packages credentials and should go through the workflow.
+Publishing goes directly to the public npm registry. For a local publish, authenticate with npm, run the release checks, then publish:
 
-Before tagging or dispatching a publish, run:
+```sh
+bun run publish:npm
+```
+
+The `.github/workflows/publish.yml` workflow can also publish on `v*` tags or manual dispatch when the repository has an `NPM_TOKEN` secret with publish access.
+
+Before tagging, dispatching, or publishing manually, run:
 
 ```sh
 bun run verify:release
