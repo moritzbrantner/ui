@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArchiveIcon, DownloadIcon, PlusIcon } from "lucide-react";
-import { expect, fn } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { Button } from "../stable/button";
 import { ViewHeader } from "./view-header";
@@ -57,7 +57,10 @@ export const Default: Story = {
     await expect(canvas.getByRole("heading", { name: "Packages" })).toBeVisible();
     await expect(canvas.getByRole("link", { name: "Packages" })).toBeVisible();
     await userEvent.click(canvas.getByRole("button", { name: "Open page actions" }));
-    await userEvent.click(canvas.getByRole("menuitem", { name: "Archive" }));
+    await userEvent.click(await screen.findByRole("menuitem", { name: "Archive" }));
+    await waitFor(() => {
+      expect(screen.queryByRole("menuitem", { name: "Archive" })).not.toBeInTheDocument();
+    });
     await expect(args.actionMenu?.onItemSelect).toHaveBeenCalled();
   },
 };

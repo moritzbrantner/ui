@@ -40,19 +40,19 @@ function WorkbenchLayout({
     <div
       data-slot="workbench-layout"
       className={cn(
-        "grid min-h-0 w-full overflow-hidden rounded-md border border-border/60 bg-background text-foreground",
+        "grid min-h-0 w-full min-w-0 overflow-hidden rounded-md border border-border/60 bg-background text-foreground",
         className,
       )}
       {...props}
     >
       {toolbar ? <WorkbenchToolbar>{toolbar}</WorkbenchToolbar> : null}
-      <div className="grid min-h-0 lg:hidden">
+      <div data-slot="workbench-mobile-layout" className="grid min-h-0 min-w-0 lg:hidden">
         {leftPanel ? <WorkbenchPanel side="left">{leftPanel}</WorkbenchPanel> : null}
         <WorkbenchCanvas>{children}</WorkbenchCanvas>
         {rightPanel ? <WorkbenchPanel side="right">{rightPanel}</WorkbenchPanel> : null}
         {bottomPanel ? <WorkbenchPanel side="bottom">{bottomPanel}</WorkbenchPanel> : null}
       </div>
-      <div className="hidden min-h-0 lg:block">
+      <div data-slot="workbench-desktop-layout" className="hidden min-h-0 min-w-0 lg:block">
         <ResizablePanelGroup orientation="vertical" className="min-h-[28rem]">
           <ResizablePanel
             defaultSize={100 - (bottomPanel ? bottomPanelDefaultSize : 0)}
@@ -125,7 +125,7 @@ function WorkbenchPanel({ side = "left", className, ...props }: WorkbenchPanelPr
       data-slot="workbench-panel"
       data-side={side}
       className={cn(
-        "min-h-0 overflow-auto border-border/60 bg-card/65 p-3 text-sm data-[side=bottom]:border-t data-[side=left]:border-b data-[side=right]:border-b lg:data-[side=left]:border-r lg:data-[side=right]:border-l",
+        "min-h-0 min-w-0 overflow-auto border-border/60 bg-card/65 p-3 text-sm data-[side=bottom]:border-t data-[side=left]:border-b data-[side=right]:border-b lg:data-[side=left]:border-r lg:data-[side=right]:border-l",
         className,
       )}
       {...props}
@@ -137,7 +137,7 @@ function WorkbenchCanvas({ className, ...props }: React.ComponentProps<"main">) 
   return (
     <main
       data-slot="workbench-canvas"
-      className={cn("min-h-0 overflow-auto bg-background p-4", className)}
+      className={cn("min-h-0 min-w-0 overflow-auto bg-background p-4", className)}
       {...props}
     />
   );
@@ -148,7 +148,7 @@ function WorkbenchToolbar({ className, ...props }: React.ComponentProps<"div">) 
     <div
       data-slot="workbench-toolbar"
       className={cn(
-        "flex min-h-11 flex-wrap items-center gap-2 border-b bg-card/75 px-3 py-2",
+        "flex min-h-11 min-w-0 flex-wrap items-center gap-2 border-b bg-card/75 px-3 py-2 [&>*]:min-w-0",
         className,
       )}
       {...props}

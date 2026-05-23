@@ -397,6 +397,13 @@ describe("@moritzbrantner/ui data-grid", () => {
     });
 
     expect(screen.getByRole("button", { name: /View/ })).toBeTruthy();
+    expect(
+      screen.getByLabelText("Search rows").closest('[data-slot="data-grid-toolbar"]')?.className,
+    ).toContain("flex-col");
+    expect(
+      screen.getByText(/row\(s\) selected/).closest('[data-slot="data-grid-pagination"]')
+        ?.className,
+    ).toContain("flex-col");
 
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(screen.getByText("Charlie")).toBeTruthy();

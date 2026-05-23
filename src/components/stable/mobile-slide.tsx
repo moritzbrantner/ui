@@ -134,7 +134,7 @@ function MobileSlideFooter({ className, ...props }: React.ComponentProps<"div">)
     <div
       data-slot="mobile-slide-footer"
       className={cn(
-        "mt-auto grid gap-2 border-t border-border/60 bg-muted/35 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]",
+        "mt-auto grid gap-2 border-t border-border/60 bg-muted/35 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:flex sm:flex-wrap sm:justify-end [&>*]:min-w-0",
         className,
       )}
       {...props}

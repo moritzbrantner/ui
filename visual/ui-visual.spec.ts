@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const viewports = [
+  { name: "narrow-mobile", width: 360, height: 740 },
   { name: "mobile", width: 390, height: 844 },
   { name: "tablet", width: 768, height: 1024 },
   { name: "desktop", width: 1440, height: 900 },
@@ -21,6 +22,10 @@ const storyIds = [
   "components-forms-inputs-form-layout--validated-interaction",
   "components-feedback-toaster--usage",
   "components-navigation-platform-navbar--web",
+  "components-navigation-platform-navbar--mobile",
+  "components-actions-toolbar--default",
+  "components-navigation-tabs--basic",
+  "components-navigation-pagination--responsive",
   "components-overlay-action-menu--basic",
   "components-overlay-action-menu--with-descriptions-and-shortcuts",
   "components-overlay-context-action-menu--right-click-target",
@@ -33,18 +38,22 @@ const storyIds = [
   "components-data-display-funnel-chart--conversion-funnel",
   "components-data-display-process-map--release-lifecycle",
   "components-data-display-comparison-matrix--plan-comparison",
+  "components-data-display-comparison-matrix--mobile-scroll",
+  "components-forms-inputs-calendar--with-events",
   "components-data-display-org-chart--team-structure",
   "components-data-display-relationship-map--stakeholder-map",
   "components-data-display-infographic--release-summary",
   "components-data-display-chart--business-dashboard",
   "components-data-display-calendar-card-days--default",
   "components-data-display-document-viewer--ocr-report-viewer",
+  "components-data-display-resource-list--default",
   "components-editors-timeline-editor--default",
   "components-editors-annotation-canvas--default",
   "components-editors-workflow-builder--ai-workflow-graph",
   "components-editors-workflow-builder--controlled-viewport",
   "components-social-overview--social-feed",
   "components-social-overview--chat-box-thread",
+  "components-layout-workbench-layout--full-workbench",
   "patterns-release-readiness--consumer-dashboard-shell-story",
   "patterns-release-readiness--editor-workspace-story",
   "patterns-release-readiness--forms-settings-story",
@@ -94,6 +103,20 @@ const denseControlStories = new Set([
   "components-stable-primitive-components--overview",
   "components-editors-workflow-builder--ai-workflow-graph",
   "components-editors-workflow-builder--controlled-viewport",
+]);
+const internalScrollStories = new Map([
+  ["components-data-display-data-grid--default", '[data-slot="table-container"]'],
+  ["components-data-display-comparison-matrix--plan-comparison", '[data-slot="comparison-matrix"]'],
+  ["components-data-display-comparison-matrix--mobile-scroll", '[data-slot="comparison-matrix"]'],
+  ["components-data-display-calendar-card-days--default", '[data-slot="calendar"]'],
+  ["components-data-display-resource-list--default", '[data-slot="table-container"]'],
+  ["components-data-display-process-map--release-lifecycle", '[data-slot="process-map"]'],
+  ["components-data-display-org-chart--team-structure", '[data-slot="org-chart"]'],
+  [
+    "components-data-display-relationship-map--stakeholder-map",
+    '[data-slot="relationship-map-scroll-area"]',
+  ],
+  ["components-layout-workbench-layout--full-workbench", '[data-slot="workbench-canvas"]'],
 ]);
 
 for (const viewport of viewports) {
@@ -327,6 +350,26 @@ async function verifyPageLayout(page: Page, storyId: string) {
   }
   expect(layout.badBoxes, "visible elements should have finite boxes").toEqual([]);
   expect(layout.clippedButtons, "button text should not be clipped").toEqual([]);
+
+  const internalScrollSelector = internalScrollStories.get(storyId);
+
+  if (internalScrollSelector) {
+    const hasScrollContainer = await page
+      .locator(internalScrollSelector)
+      .first()
+      .evaluate((element) => {
+        const style = window.getComputedStyle(element);
+
+        return (
+          style.overflowX === "auto" ||
+          style.overflowX === "scroll" ||
+          style.overflowY === "auto" ||
+          style.overflowY === "scroll"
+        );
+      });
+
+    expect(hasScrollContainer, `${storyId} should own its scroll region`).toBe(true);
+  }
 
   await page.keyboard.press("Tab");
 

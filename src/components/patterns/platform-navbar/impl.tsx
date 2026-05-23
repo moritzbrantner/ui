@@ -4,6 +4,7 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react";
 
+import { useIsMobile } from "../../../hooks/use-mobile";
 import { cn } from "../../../lib/cn";
 
 export type PlatformNavbarItem = {
@@ -29,6 +30,7 @@ export type PlatformNavbarGroup = {
 };
 
 export type PlatformNavbarVariant = "mobile" | "web" | "desktop";
+export type PlatformNavbarResponsiveVariant = PlatformNavbarVariant | "auto";
 
 export type PlatformNavbarRenderLinkProps = PlatformNavbarItem & {
   className: string;
@@ -42,7 +44,7 @@ export type PlatformNavbarProps = Omit<React.ComponentPropsWithoutRef<"nav">, "c
   groups: PlatformNavbarGroup[];
   actions?: React.ReactNode;
   actionSlot?: React.ReactNode;
-  variant?: PlatformNavbarVariant;
+  variant?: PlatformNavbarResponsiveVariant;
   activeItemId?: string;
   activeGroupId?: string;
   defaultOpenGroupId?: string | null;
@@ -189,7 +191,7 @@ export function PlatformNavbar({
   groups,
   actions,
   actionSlot,
-  variant = "web",
+  variant = "auto",
   activeItemId,
   activeGroupId,
   defaultOpenGroupId,
@@ -202,6 +204,7 @@ export function PlatformNavbar({
   ...props
 }: PlatformNavbarProps) {
   const reduceMotion = useReducedMotion();
+  const isMobile = useIsMobile();
   const instanceId = React.useId();
   const containerRef = React.useRef<HTMLDivElement>(null);
   const navRef = React.useRef<HTMLElement>(null);
@@ -212,7 +215,9 @@ export function PlatformNavbar({
   const [uncontrolledOpenGroupId, setUncontrolledOpenGroupId] = React.useState<string | null>(() =>
     getInitialOpenGroupId(groups, activeGroupId, activeItemId, defaultOpenGroupId),
   );
-  const config = variantConfig[variant];
+  const resolvedVariant: PlatformNavbarVariant =
+    variant === "auto" ? (isMobile ? "mobile" : "web") : variant;
+  const config = variantConfig[resolvedVariant];
   const currentOpenGroupId = openGroupId !== undefined ? openGroupId : uncontrolledOpenGroupId;
   const openGroup =
     groups.find((group) => group.id === currentOpenGroupId && group.items.length > 0) ?? null;
@@ -273,22 +278,23 @@ export function PlatformNavbar({
     const navRect = navRef.current?.getBoundingClientRect() ?? containerRect;
     const triggerRect = trigger?.getBoundingClientRect();
     const submenuRect = submenuRef.current?.getBoundingClientRect();
-    const { gap, margin, maxWidth } = submenuSizeConfig[variant];
+    const { gap, margin, maxWidth } = submenuSizeConfig[resolvedVariant];
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     const availableWidth = Math.max(0, viewportWidth - margin * 2);
-    const anchorRect = variant === "mobile" ? navRect : containerRect;
+    const anchorRect = resolvedVariant === "mobile" ? navRect : containerRect;
     const anchorWidth = anchorRect.width || availableWidth;
     const preferredMobileWidth = Math.min(anchorWidth - margin * 2, maxWidth);
     const width =
-      variant === "mobile"
+      resolvedVariant === "mobile"
         ? Math.min(Math.max(preferredMobileWidth, 0), availableWidth)
         : Math.min(maxWidth, availableWidth);
     const triggerCenter =
       triggerRect && triggerRect.width > 0
         ? triggerRect.left + triggerRect.width / 2
         : anchorRect.left + anchorWidth / 2;
-    const rawLeft = variant === "mobile" ? anchorRect.left + margin : triggerCenter - width / 2;
+    const rawLeft =
+      resolvedVariant === "mobile" ? anchorRect.left + margin : triggerCenter - width / 2;
     const left = clamp(rawLeft, margin, viewportWidth - width - margin);
     const verticalAnchorRect = navRect;
     const belowTop = verticalAnchorRect.bottom + gap;
@@ -310,7 +316,7 @@ export function PlatformNavbar({
       transformOrigin: shouldOpenAbove ? "bottom center" : "top center",
       width,
     });
-  }, [openGroup, variant]);
+  }, [openGroup, resolvedVariant]);
 
   React.useEffect(() => {
     setPortalContainer(document.body);
@@ -508,7 +514,7 @@ export function PlatformNavbar({
           ref={navRef}
           aria-label={ariaLabel}
           data-slot="platform-navbar"
-          data-variant={variant}
+          data-variant={resolvedVariant}
           className={cn(
             "relative isolate overflow-hidden border border-border/60 bg-card/70 text-foreground shadow-[var(--glass-shadow)] backdrop-blur-2xl supports-backdrop-filter:backdrop-blur-2xl",
             config.nav,
@@ -524,7 +530,7 @@ export function PlatformNavbar({
           >
             <div className={cn("flex min-w-0 items-center gap-2", config.brand)}>
               <div className="min-w-0 truncate text-sm font-semibold">{brand}</div>
-              {variant === "mobile" ? renderedActions : null}
+              {resolvedVariant === "mobile" ? renderedActions : null}
             </div>
 
             <div className={config.groups}>
@@ -578,7 +584,7 @@ export function PlatformNavbar({
               })}
             </div>
 
-            {variant !== "mobile" ? renderedActions : null}
+            {resolvedVariant !== "mobile" ? renderedActions : null}
           </motion.div>
         </nav>
       </div>

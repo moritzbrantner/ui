@@ -510,6 +510,7 @@ function OrgChartNode({
       typeof nodeActions === "function" ? nodeActions(node, renderContext) : (nodeActions ?? []),
     [node, nodeActions, renderContext],
   );
+  const hasNestedControls = hasChildren || resolvedActions.length > 0;
   const selectNode = React.useCallback(() => {
     if (!disabled) {
       renderContext.selectNode();
@@ -542,7 +543,7 @@ function OrgChartNode({
         data-selected={selected ? "true" : undefined}
         data-focused={focused ? "true" : undefined}
         data-disabled={disabled ? "true" : undefined}
-        role={onNodeSelect ? "button" : undefined}
+        role={onNodeSelect && !hasNestedControls ? "button" : undefined}
         tabIndex={
           keyboardMode === "tree" && focused && !disabled
             ? 0
@@ -550,7 +551,7 @@ function OrgChartNode({
               ? 0
               : -1
         }
-        aria-label={onNodeSelect ? accessibleName : undefined}
+        aria-label={onNodeSelect && !hasNestedControls ? accessibleName : undefined}
         aria-disabled={disabled || undefined}
         className={cn(
           "relative min-w-56 rounded-md border bg-background p-3 shadow-sm outline-none transition-colors",

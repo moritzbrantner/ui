@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, screen } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import {
   WorkflowInputOnlyNode,
@@ -189,8 +189,10 @@ export const Default: Story = {
     await expect(args.onNodeSelect).toHaveBeenCalledTimes(1);
     await userEvent.click(canvas.getByRole("button", { name: "Open Classify menu" }));
     await userEvent.click(screen.getByRole("menuitem", { name: "Duplicate" }));
+    await waitFor(() => {
+      expect(screen.queryByRole("menuitem", { name: "Duplicate" })).not.toBeInTheDocument();
+    });
     await expect(args.onMenuItemSelect).toHaveBeenCalledTimes(1);
-    await userEvent.keyboard("{Escape}");
   },
   render: (args) => (
     <div className="grid gap-4 p-4">

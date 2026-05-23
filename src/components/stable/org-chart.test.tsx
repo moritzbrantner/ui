@@ -15,6 +15,17 @@ const nodes = [
   },
 ];
 
+function getOrgChartNode(name: string) {
+  const branch = screen.getByRole("treeitem", { name });
+  const node = branch.querySelector<HTMLElement>('[data-slot="org-chart-node"]');
+
+  if (!node) {
+    throw new Error(`Could not find org chart node ${name}`);
+  }
+
+  return node;
+}
+
 describe("OrgChart", () => {
   test("renders recursive child nodes", () => {
     render(<OrgChart nodes={nodes} />);
@@ -74,14 +85,12 @@ describe("OrgChart", () => {
 
     render(<OrgChart nodes={nodes} onNodeSelect={onNodeSelect} />);
 
-    const root = screen.getByRole("button", { name: "VP Product" });
+    const root = getOrgChartNode("VP Product");
     root.focus();
 
     fireEvent.keyDown(root, { key: "ArrowDown" });
 
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Design Lead" })).toBe(document.activeElement),
-    );
+    await waitFor(() => expect(getOrgChartNode("Design Lead")).toBe(document.activeElement));
 
     fireEvent.keyDown(document.activeElement as HTMLElement, { key: "ArrowUp" });
 
@@ -91,21 +100,21 @@ describe("OrgChart", () => {
   test("expands collapsed branches and focuses the first child with arrow right", async () => {
     render(<OrgChart nodes={nodes} defaultExpandedIds={[]} onNodeSelect={vi.fn()} />);
 
-    const root = screen.getByRole("button", { name: "VP Product" });
+    const root = getOrgChartNode("VP Product");
     root.focus();
 
     fireEvent.keyDown(root, { key: "ArrowRight" });
 
     await waitFor(() => {
       expect(screen.getByText("Design Lead")).toBeTruthy();
-      expect(screen.getByRole("button", { name: "Design Lead" })).toBe(document.activeElement);
+      expect(getOrgChartNode("Design Lead")).toBe(document.activeElement);
     });
   });
 
   test("collapses expanded branches or moves focus to the parent with arrow left", async () => {
     render(<OrgChart nodes={nodes} defaultFocusedNodeId="eng" onNodeSelect={vi.fn()} />);
 
-    const engineering = screen.getByRole("button", { name: "Engineering Lead" });
+    const engineering = getOrgChartNode("Engineering Lead");
     engineering.focus();
 
     fireEvent.keyDown(engineering, { key: "ArrowLeft" });
@@ -115,28 +124,22 @@ describe("OrgChart", () => {
 
     fireEvent.keyDown(engineering, { key: "ArrowLeft" });
 
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: "VP Product" })).toBe(document.activeElement),
-    );
+    await waitFor(() => expect(getOrgChartNode("VP Product")).toBe(document.activeElement));
   });
 
   test("moves focus to the first and last visible nodes with home and end", async () => {
     render(<OrgChart nodes={nodes} defaultFocusedNodeId="design" onNodeSelect={vi.fn()} />);
 
-    const design = screen.getByRole("button", { name: "Design Lead" });
+    const design = getOrgChartNode("Design Lead");
     design.focus();
 
     fireEvent.keyDown(design, { key: "End" });
 
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: "QA Lead" })).toBe(document.activeElement),
-    );
+    await waitFor(() => expect(getOrgChartNode("QA Lead")).toBe(document.activeElement));
 
     fireEvent.keyDown(document.activeElement as HTMLElement, { key: "Home" });
 
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: "VP Product" })).toBe(document.activeElement),
-    );
+    await waitFor(() => expect(getOrgChartNode("VP Product")).toBe(document.activeElement));
   });
 
   test("skips disabled nodes during keyboard navigation", async () => {
@@ -148,14 +151,12 @@ describe("OrgChart", () => {
       />,
     );
 
-    const root = screen.getByRole("button", { name: "VP Product" });
+    const root = getOrgChartNode("VP Product");
     root.focus();
 
     fireEvent.keyDown(root, { key: "ArrowDown" });
 
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Engineering Lead" })).toBe(document.activeElement),
-    );
+    await waitFor(() => expect(getOrgChartNode("Engineering Lead")).toBe(document.activeElement));
     expect(
       screen.getByRole("treeitem", { name: "Design Lead" }).getAttribute("aria-disabled"),
     ).toBe("true");
@@ -172,7 +173,7 @@ describe("OrgChart", () => {
       />,
     );
 
-    const root = screen.getByRole("button", { name: "VP Product" });
+    const root = getOrgChartNode("VP Product");
     root.focus();
     fireEvent.keyDown(root, { key: "ArrowDown" });
 
@@ -208,7 +209,7 @@ describe("OrgChart", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Engineering Lead" }));
+    fireEvent.click(getOrgChartNode("Engineering Lead"));
     fireEvent.click(screen.getAllByRole("button", { name: "Add child" })[2] as HTMLElement);
 
     const selectedBranch = container.querySelector(

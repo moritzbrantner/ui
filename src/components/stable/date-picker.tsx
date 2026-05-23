@@ -77,7 +77,7 @@ function DatePicker({
           data-empty={!selected}
           disabled={disabled}
           className={cn(
-            "w-[280px] justify-start text-left font-normal data-[empty=true]:text-muted-foreground",
+            "w-[min(280px,100%)] min-w-0 justify-start text-left font-normal data-[empty=true]:text-muted-foreground",
             className,
             triggerClassName,
           )}
@@ -150,7 +150,7 @@ function DateRangePicker({
           data-empty={!label}
           disabled={disabled}
           className={cn(
-            "w-[300px] justify-start text-left font-normal data-[empty=true]:text-muted-foreground",
+            "w-[min(300px,100%)] min-w-0 justify-start text-left font-normal data-[empty=true]:text-muted-foreground",
             className,
             triggerClassName,
           )}

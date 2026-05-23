@@ -142,7 +142,10 @@ function ResourceListHeader({ className, ...props }: React.ComponentProps<"div">
   return (
     <div
       data-slot="resource-list-header"
-      className={cn("flex min-w-0 flex-wrap items-start justify-between gap-3", className)}
+      className={cn(
+        "flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between",
+        className,
+      )}
       {...props}
     />
   );
@@ -152,7 +155,10 @@ function ResourceListToolbar({ className, ...props }: React.ComponentProps<"div"
   return (
     <div
       data-slot="resource-list-toolbar"
-      className={cn("flex shrink-0 flex-wrap items-center justify-end gap-2", className)}
+      className={cn(
+        "flex w-full min-w-0 flex-wrap items-center gap-2 sm:w-auto sm:shrink-0 sm:justify-end",
+        className,
+      )}
       {...props}
     />
   );

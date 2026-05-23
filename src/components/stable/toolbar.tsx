@@ -5,7 +5,7 @@ import { cn } from "../../lib/cn";
 import { Separator } from "./separator";
 
 const toolbarVariants = cva(
-  "flex min-h-[var(--ui-toolbar-min-height)] w-full flex-wrap items-center gap-[var(--ui-toolbar-gap,var(--ui-control-gap))] border border-border/60 bg-card/70 px-[var(--ui-toolbar-padding-x)] py-[var(--ui-toolbar-padding-y)] text-sm shadow-[var(--ui-shadow-surface)] supports-backdrop-filter:backdrop-blur-xl",
+  "flex min-h-[var(--ui-toolbar-min-height)] w-full min-w-0 flex-wrap items-center gap-[var(--ui-toolbar-gap,var(--ui-control-gap))] border border-border/60 bg-card/70 px-[var(--ui-toolbar-padding-x)] py-[var(--ui-toolbar-padding-y)] text-sm shadow-[var(--ui-shadow-surface)] supports-backdrop-filter:backdrop-blur-xl",
   {
     variants: {
       justify: {
@@ -62,7 +62,7 @@ function ToolbarTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="toolbar-title"
-      className={cn("truncate text-sm font-medium", className)}
+      className={cn("min-w-0 truncate text-sm font-medium", className)}
       {...props}
     />
   );

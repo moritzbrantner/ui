@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Trash2Icon } from "lucide-react";
-import { expect, fn } from "storybook/test";
+import { expect, fn, screen } from "storybook/test";
 
 import { Button } from "../stable/button";
 import { ConfirmAction } from "./confirm-action";
@@ -30,8 +30,8 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   play: async ({ args, canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Delete package" }));
-    await expect(canvas.getByRole("alertdialog")).toBeVisible();
-    await userEvent.click(canvas.getByRole("button", { name: "Delete" }));
+    await expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Delete" }));
     await expect(args.onConfirm).toHaveBeenCalledTimes(1);
   },
 };

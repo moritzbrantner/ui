@@ -69,6 +69,10 @@ describe("pattern layout and navigation", () => {
     expect(
       screen.getByText("Component coverage").closest('[data-slot="page-shell"]')?.className,
     ).toContain("contract-page-shell");
+    expect(
+      screen.getByRole("button", { name: "Run checks" }).closest('[data-slot="page-actions"]')
+        ?.className,
+    ).toContain("w-full");
     expect(screen.getByRole("button", { name: "Run checks" })).toBeTruthy();
     expect(screen.getByText("74 components")).toBeTruthy();
   });
@@ -101,5 +105,13 @@ describe("pattern layout and navigation", () => {
       expect.objectContaining({ id: "workspace" }),
     );
     expect(renderLink).toHaveBeenCalled();
+  });
+
+  test("defaults platform navbar to the automatic responsive variant", () => {
+    render(<PlatformNavbar brand="Platform" groups={groups} />);
+
+    expect(
+      screen.getByRole("navigation", { name: "Primary navigation" }).getAttribute("data-variant"),
+    ).toBe("web");
   });
 });

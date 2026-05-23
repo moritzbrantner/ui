@@ -55,7 +55,10 @@ function ComparisonMatrix({
   return (
     <div
       data-slot="comparison-matrix"
-      className={cn("relative min-w-0 overflow-x-auto rounded-md border bg-card", className)}
+      className={cn(
+        "relative w-full max-w-[calc(100vw-2rem)] min-w-0 overflow-x-auto rounded-md border bg-card",
+        className,
+      )}
       {...props}
     >
       {hasData ? (

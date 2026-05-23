@@ -91,7 +91,10 @@ function FilterBarContent({ className, ...props }: React.ComponentProps<"div">) 
   return (
     <div
       data-slot="filter-bar-content"
-      className={cn("flex min-w-0 flex-wrap items-center gap-2", className)}
+      className={cn(
+        "flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center",
+        className,
+      )}
       {...props}
     />
   );
@@ -101,7 +104,7 @@ function FilterBarSearch(props: React.ComponentProps<typeof SearchField>) {
   return (
     <SearchField
       data-slot="filter-bar-search"
-      className={cn("min-w-64 flex-1", props.className)}
+      className={cn("w-full min-w-0 flex-1 sm:min-w-64", props.className)}
       {...props}
     />
   );
@@ -111,7 +114,10 @@ function FilterBarActions({ className, ...props }: React.ComponentProps<"div">) 
   return (
     <div
       data-slot="filter-bar-actions"
-      className={cn("ml-auto flex shrink-0 items-center gap-2", className)}
+      className={cn(
+        "flex w-full min-w-0 flex-wrap items-center gap-2 sm:ml-auto sm:w-auto sm:shrink-0",
+        className,
+      )}
       {...props}
     />
   );

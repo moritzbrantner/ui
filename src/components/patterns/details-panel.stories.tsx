@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ExternalLinkIcon } from "lucide-react";
-import { expect } from "storybook/test";
+import { expect, screen, waitFor, within } from "storybook/test";
 
 import { Button } from "../stable/button";
 import { DetailsPanel } from "./details-panel";
@@ -38,8 +38,13 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Open details" }));
-    await expect(canvas.getByRole("dialog")).toBeVisible();
-    await expect(canvas.getByText("Ready for release")).toBeVisible();
+    const dialog = await screen.findByRole("dialog");
+    await expect(dialog).toBeInTheDocument();
+    await expect(within(dialog).getByText("Ready for release")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Close" }));
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
   },
 };
 

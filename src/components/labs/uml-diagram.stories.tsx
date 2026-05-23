@@ -264,6 +264,21 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+function getUmlDiagramStoryNode(
+  canvas: Parameters<NonNullable<Story["play"]>>[0]["canvas"],
+  name: string,
+) {
+  const node = canvas
+    .getByText(name)
+    .closest<SVGGElement>('[data-slot="uml-diagram-node-interaction"]');
+
+  if (!node) {
+    throw new Error(`Could not find UML diagram node ${name}`);
+  }
+
+  return node;
+}
+
 export const Default: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("img", { name: "Order domain class diagram" })).toBeVisible();
@@ -279,7 +294,7 @@ export const EditableServiceMap: Story = {
   render: () => <EditableServiceMapDemo />,
   play: async ({ canvas }) => {
     await expect(
-      canvas.getByRole("img", { name: "Editable service dependency diagram" }),
+      canvas.getByRole("group", { name: "Editable service dependency diagram" }),
     ).toBeVisible();
     await userEvent.click(canvas.getAllByRole("button", { name: "Add node" })[1]);
     await expect(canvas.getByText("Service 1")).toBeVisible();
@@ -311,20 +326,19 @@ export const KeyboardNodeSelection: Story = {
     );
   },
   play: async ({ canvas }) => {
-    const orders = canvas.getByRole("button", { name: "Orders Service" });
+    const orders = getUmlDiagramStoryNode(canvas, "Orders Service");
 
     orders.focus();
     await userEvent.keyboard("{ArrowLeft}");
-    await expect(canvas.getByRole("button", { name: "API Gateway" })).toHaveFocus();
+    await expect(getUmlDiagramStoryNode(canvas, "API Gateway")).toHaveFocus();
     await userEvent.keyboard("{Enter}");
-    await expect(canvas.getByRole("button", { name: "API Gateway" })).toHaveAttribute(
-      "aria-pressed",
+    await expect(getUmlDiagramStoryNode(canvas, "API Gateway")).toHaveAttribute(
+      "data-selected",
       "true",
     );
     await userEvent.keyboard("{Escape}");
-    await expect(canvas.getByRole("button", { name: "API Gateway" })).toHaveAttribute(
-      "aria-pressed",
-      "false",
+    await expect(getUmlDiagramStoryNode(canvas, "API Gateway")).not.toHaveAttribute(
+      "data-selected",
     );
   },
 };

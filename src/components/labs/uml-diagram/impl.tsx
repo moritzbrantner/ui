@@ -346,7 +346,7 @@ function UmlDiagram({
       <div data-slot="uml-diagram-scroll-area" className="overflow-auto">
         <svg
           data-slot="uml-diagram-svg"
-          role="img"
+          role={onNodeSelect || nodeActions ? "group" : "img"}
           aria-label={ariaLabel}
           viewBox={viewBox}
           className="block min-h-64 w-full min-w-160 text-foreground"
@@ -505,10 +505,12 @@ function UmlDiagramInteractiveNode({
       data-selected={selected ? "true" : undefined}
       data-focused={focused ? "true" : undefined}
       data-disabled={disabled ? "true" : undefined}
-      role={onNodeSelect ? "button" : undefined}
-      aria-label={onNodeSelect ? accessibleName : undefined}
-      aria-pressed={onNodeSelect ? selected : undefined}
-      aria-disabled={disabled || undefined}
+      role={onNodeSelect && resolvedActions.length === 0 ? "button" : undefined}
+      aria-label={onNodeSelect && resolvedActions.length === 0 ? accessibleName : undefined}
+      aria-pressed={onNodeSelect && resolvedActions.length === 0 ? selected : undefined}
+      aria-disabled={
+        onNodeSelect && resolvedActions.length === 0 ? disabled || undefined : undefined
+      }
       tabIndex={keyboardMode === "nodes" && focused && !disabled ? 0 : -1}
       className={cn(
         "outline-none",

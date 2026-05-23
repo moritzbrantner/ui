@@ -21,6 +21,20 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+function getOrgChartStoryNode(
+  canvas: Parameters<NonNullable<Story["play"]>>[0]["canvas"],
+  name: string,
+) {
+  const branch = canvas.getByRole("treeitem", { name });
+  const node = branch.querySelector<HTMLElement>('[data-slot="org-chart-node"]');
+
+  if (!node) {
+    throw new Error(`Could not find org chart node ${name}`);
+  }
+
+  return node;
+}
+
 const teamNodes = [
   {
     id: "mara",
@@ -136,7 +150,7 @@ export const MinimizedBranch: Story = {
 export const EditableHierarchy: Story = {
   render: () => <EditableHierarchyDemo />,
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole("button", { name: "Mara Klein" })).toBeVisible();
+    await expect(getOrgChartStoryNode(canvas, "Mara Klein")).toBeVisible();
     await userEvent.click(canvas.getAllByRole("button", { name: "Add child" })[0]);
     await expect(canvas.getByText("New role 1")).toBeVisible();
     const deleteButtons = canvas.getAllByRole("button", { name: "Delete node" });
@@ -162,13 +176,13 @@ export const KeyboardNavigation: Story = {
     );
   },
   play: async ({ canvas }) => {
-    const mara = canvas.getByRole("button", { name: "Mara Klein" });
+    const mara = getOrgChartStoryNode(canvas, "Mara Klein");
 
     mara.focus();
     await userEvent.keyboard("{ArrowDown}");
-    await expect(canvas.getByRole("button", { name: "Nina Patel" })).toHaveFocus();
+    await expect(getOrgChartStoryNode(canvas, "Nina Patel")).toHaveFocus();
     await userEvent.keyboard("{End}");
-    await expect(canvas.getByRole("button", { name: "Omar Silva" })).toHaveFocus();
+    await expect(getOrgChartStoryNode(canvas, "Omar Silva")).toHaveFocus();
     await userEvent.keyboard("{Enter}");
     await expect(canvas.getByRole("treeitem", { name: "Omar Silva" })).toHaveAttribute(
       "aria-selected",

@@ -150,7 +150,15 @@ describe("UML diagram", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Orders" }));
+    const ordersNode = screen
+      .getByText("Orders")
+      .closest<SVGGElement>('[data-slot="uml-diagram-node-interaction"]');
+
+    if (!ordersNode) {
+      throw new Error("Could not find Orders node interaction target");
+    }
+
+    fireEvent.click(ordersNode);
     fireEvent.click(screen.getAllByRole("button", { name: "Add node" })[1] as HTMLElement);
 
     expect(onNodeSelect).toHaveBeenCalledWith(

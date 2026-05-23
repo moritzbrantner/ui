@@ -14,7 +14,7 @@ type FormControlsDemoProps = {
 
 function FormControlsDemo({ disabled = false }: FormControlsDemoProps) {
   return (
-    <form className="grid w-[360px] gap-5">
+    <form className="grid w-full max-w-[360px] min-w-0 gap-5">
       <div className="grid gap-2">
         <Label htmlFor="project-name">Project name</Label>
         <Input

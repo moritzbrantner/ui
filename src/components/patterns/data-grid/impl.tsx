@@ -411,7 +411,7 @@ function DataGrid<TData, TValue = unknown>({
       data-slot="data-grid"
       data-density={density}
       data-status={status}
-      className={cn("space-y-4", className)}
+      className={cn("min-w-0 space-y-4", className)}
       {...props}
     >
       {toolbar === undefined ? (
@@ -426,7 +426,7 @@ function DataGrid<TData, TValue = unknown>({
       ) : (
         toolbar
       )}
-      <div className={cn("overflow-hidden rounded-md border", densityClasses[density])}>
+      <div className={cn("min-w-0 overflow-hidden rounded-md border", densityClasses[density])}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -499,17 +499,20 @@ function DataGridToolbar<TData>({
   return (
     <div
       data-slot="data-grid-toolbar"
-      className={cn("flex flex-wrap items-center justify-between gap-2", className)}
+      className={cn(
+        "flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between",
+        className,
+      )}
       {...props}
     >
-      <div className="flex min-w-0 flex-1 items-center gap-2">
+      <div className="flex w-full min-w-0 flex-1 flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
         {onSearchChange ? (
           <Input
             aria-label="Search rows"
             value={searchValue ?? ""}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder={searchPlaceholder}
-            className="max-w-sm"
+            className="w-full sm:max-w-sm"
           />
         ) : null}
         {children}
@@ -523,21 +526,25 @@ function DataGridPagination<TData>({ table, className, ...props }: DataGridPagin
   return (
     <div
       data-slot="data-grid-pagination"
-      className={cn("flex flex-wrap items-center justify-between gap-3", className)}
+      className={cn(
+        "flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between",
+        className,
+      )}
       {...props}
     >
-      <p className="text-sm text-muted-foreground">
+      <p className="min-w-0 text-sm text-muted-foreground">
         {table.getFilteredSelectedRowModel().rows.length} of{" "}
         {table.getFilteredRowModel().rows.length} row(s) selected
       </p>
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">
+      <div className="flex w-full min-w-0 flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+        <span className="min-w-0 flex-1 text-sm text-muted-foreground sm:flex-none">
           Page {table.getState().pagination.pageIndex + 1} of {Math.max(table.getPageCount(), 1)}
         </span>
         <Button
           type="button"
           variant="outline"
           size="sm"
+          className="flex-1 sm:flex-none"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
@@ -547,6 +554,7 @@ function DataGridPagination<TData>({ table, className, ...props }: DataGridPagin
           type="button"
           variant="outline"
           size="sm"
+          className="flex-1 sm:flex-none"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >

@@ -584,7 +584,7 @@ const componentRegistry = [
     tier: "stable",
     rootExport: true,
     publicSubpath: "@moritzbrantner/ui/components/stable/pagination",
-    storyFiles: ["src/components/stable/primitive-components.stories.tsx"],
+    storyFiles: ["src/components/stable/pagination.stories.tsx"],
     testFiles: ["src/components/stable/stable-contract.test.tsx"],
     status: "stable",
     reason: "Reusable primitive or low-level control with stable support.",

@@ -129,7 +129,7 @@ function PageActions({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="page-actions"
       className={cn(
-        "flex flex-wrap items-center gap-2 group-data-[align=center]/page-header:justify-center @md/page-header:group-data-[align=start]/page-header:justify-end",
+        "flex w-full min-w-0 flex-wrap items-center gap-2 group-data-[align=center]/page-header:justify-center @md/page-header:w-auto @md/page-header:group-data-[align=start]/page-header:justify-end [&>*]:min-w-0",
         className,
       )}
       {...props}
@@ -187,7 +187,7 @@ function SurfaceHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="surface-header"
       className={cn(
-        "grid auto-rows-min items-start gap-1 px-[var(--ui-surface-padding-md)] group-data-[padding=compact]/surface:px-[var(--ui-surface-padding-sm)] group-data-[padding=none]/surface:px-0 has-data-[slot=surface-action]:grid-cols-[1fr_auto] has-data-[slot=surface-description]:grid-rows-[auto_auto]",
+        "@container/surface-header grid auto-rows-min items-start gap-1 px-[var(--ui-surface-padding-md)] group-data-[padding=compact]/surface:px-[var(--ui-surface-padding-sm)] group-data-[padding=none]/surface:px-0 has-data-[slot=surface-action]:gap-y-3 @md/surface-header:has-data-[slot=surface-action]:grid-cols-[minmax(0,1fr)_auto] has-data-[slot=surface-description]:grid-rows-[auto_auto]",
         className,
       )}
       {...props}
@@ -219,7 +219,10 @@ function SurfaceAction({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="surface-action"
-      className={cn("col-start-2 row-span-2 row-start-1 self-start justify-self-end", className)}
+      className={cn(
+        "min-w-0 self-start justify-self-start @md/surface-header:col-start-2 @md/surface-header:row-span-2 @md/surface-header:row-start-1 @md/surface-header:justify-self-end",
+        className,
+      )}
       {...props}
     />
   );

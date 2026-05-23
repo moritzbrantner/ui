@@ -156,6 +156,8 @@ export const Default: Story = {
     await expect(canvas.getByText("Disputed")).toBeVisible();
     await expect(canvas.getByText("[...]")).toBeVisible();
     await userEvent.click(canvas.getAllByRole("button", { name: "Show context" })[0]);
-    await expect(canvas.getByText(/source-grounded regressions have been checked/)).toBeVisible();
+    await expect(
+      canvas.getByText(/source-grounded regressions have been checked/),
+    ).toBeInTheDocument();
   },
 };

@@ -29,6 +29,8 @@ describe("workbench layout", () => {
     expect(screen.getAllByText("Assets")[0]).toBeTruthy();
     expect(screen.getAllByText("Inspector")[0]).toBeTruthy();
     expect(screen.getAllByText("Console")[0]).toBeTruthy();
+    expect(document.querySelector('[data-slot="workbench-mobile-layout"]')).toBeTruthy();
+    expect(document.querySelector('[data-slot="workbench-desktop-layout"]')).toBeTruthy();
   });
 
   test("omits missing panels cleanly and exposes data slots", () => {

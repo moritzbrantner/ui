@@ -3,7 +3,7 @@ import { cva } from "class-variance-authority";
 
 import { cn } from "../../lib/cn";
 
-const actionBarVariants = cva("flex flex-wrap items-center gap-2", {
+const actionBarVariants = cva("flex min-w-0 flex-wrap items-center gap-2", {
   variants: {
     align: {
       start: "justify-start",

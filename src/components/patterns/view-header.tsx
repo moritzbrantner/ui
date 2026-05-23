@@ -14,7 +14,7 @@ import {
   BreadcrumbSeparator,
 } from "../stable/breadcrumb";
 import { Button } from "../stable/button";
-import { Tabs, TabsList, TabsTrigger } from "../stable/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../stable/tabs";
 import { ActionMenu, type ActionMenuProps } from "./action-menu";
 
 type ViewHeaderBreadcrumbItem = {
@@ -130,7 +130,7 @@ function ViewHeader({
         {actions || actionMenu ? (
           <div
             data-slot="view-header-actions"
-            className="flex flex-wrap items-center gap-2 md:justify-end"
+            className="flex min-w-0 flex-wrap items-center gap-2 md:justify-end [&>*]:min-w-0"
           >
             {actions}
             {actionMenu ? <ViewHeaderActionMenu actionMenu={actionMenu} /> : null}
@@ -152,6 +152,9 @@ function ViewHeader({
               </TabsTrigger>
             ))}
           </TabsList>
+          {tabs.map((tab) => (
+            <TabsContent key={tab.value} value={tab.value} forceMount hidden />
+          ))}
         </Tabs>
       ) : null}
     </header>
