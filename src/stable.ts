@@ -72,6 +72,7 @@ export * from "./components/stable/stat";
 export * from "./components/stable/switch";
 export * from "./components/stable/table";
 export * from "./components/stable/tabs";
+export * from "./components/stable/tag-input";
 export * from "./components/stable/textarea";
 export * from "./components/stable/theme-mode-switch";
 export * from "./components/stable/toast";

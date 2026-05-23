@@ -810,6 +810,17 @@ const componentRegistry = [
     reason: "Reusable primitive or low-level control with stable support.",
   },
   {
+    name: "tag-input",
+    fileName: "tag-input",
+    tier: "stable",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/stable/tag-input",
+    storyFiles: ["src/components/stable/tag-input.stories.tsx"],
+    testFiles: ["src/components/stable/tag-input.test.tsx"],
+    status: "stable",
+    reason: "Reusable primitive or low-level control with stable support.",
+  },
+  {
     name: "textarea",
     fileName: "textarea",
     tier: "stable",
