@@ -136,8 +136,25 @@ type ChartDonutGraphProps = Omit<React.ComponentProps<"figure">, "children"> & {
   defaultActivePath?: readonly number[];
   onActivePathChange?: (path: number[], datum: ChartDatum | null) => void;
   onSegmentSelect?: (datum: ChartDatum, index: number, path: number[]) => void;
+  showBreadcrumbs?: boolean;
+  renderBreadcrumb?: (
+    item: ChartDonutBreadcrumbItem,
+    index: number,
+    items: ChartDonutBreadcrumbItem[],
+  ) => React.ReactNode;
+  focusedSegmentPath?: readonly number[] | null;
+  defaultFocusedSegmentPath?: readonly number[] | null;
+  onFocusedSegmentPathChange?: (path: number[] | null, datum: ChartDatum | null) => void;
+  onDrillDown?: (datum: ChartDatum, path: number[]) => void;
+  onDrillUp?: (path: number[], datum: ChartDatum | null) => void;
   formatLabel?: (value: ChartDatumValue, datum: ChartDatum, index: number) => React.ReactNode;
   formatValue?: (value: number) => React.ReactNode;
+};
+
+type ChartDonutBreadcrumbItem = {
+  label: React.ReactNode;
+  path: number[];
+  datum: ChartDatum | null;
 };
 
 export type ChartConfig = Record<
@@ -744,6 +761,13 @@ function ChartDonutGraph({
   defaultActivePath,
   onActivePathChange,
   onSegmentSelect,
+  showBreadcrumbs,
+  renderBreadcrumb,
+  focusedSegmentPath,
+  defaultFocusedSegmentPath,
+  onFocusedSegmentPathChange,
+  onDrillDown,
+  onDrillUp,
   formatLabel = defaultFormatLabel,
   formatValue = defaultFormatValue,
   className,
@@ -752,10 +776,20 @@ function ChartDonutGraph({
   const [internalActivePath, setInternalActivePath] = React.useState<number[]>(() => [
     ...(defaultActivePath ?? []),
   ]);
+  const [internalFocusedSegmentPath, setInternalFocusedSegmentPath] = React.useState<
+    number[] | null
+  >(() => (defaultFocusedSegmentPath ? [...defaultFocusedSegmentPath] : null));
+  const segmentRefs = React.useRef(new Map<string, SVGPathElement>());
   const currentActivePath = activePath ? [...activePath] : internalActivePath;
   const safeActivePath = getValidDonutPath(data, currentActivePath, childrenKey);
   const activeNode = getDonutNodeAtPath(data, safeActivePath, childrenKey);
   const activeData = activeNode ? getChartDatumChildren(activeNode, childrenKey) : data;
+  const currentFocusedSegmentPath =
+    focusedSegmentPath !== undefined
+      ? focusedSegmentPath
+        ? [...focusedSegmentPath]
+        : null
+      : internalFocusedSegmentPath;
   const setDonutPath = React.useCallback(
     (path: number[]) => {
       const nextPath = getValidDonutPath(data, path, childrenKey);
@@ -770,8 +804,12 @@ function ChartDonutGraph({
   );
   const canGoUp = safeActivePath.length > 0;
   const goUp = React.useCallback(() => {
-    setDonutPath(safeActivePath.slice(0, -1));
-  }, [safeActivePath, setDonutPath]);
+    const nextPath = safeActivePath.slice(0, -1);
+    const nextDatum = getDonutNodeAtPath(data, nextPath, childrenKey);
+
+    setDonutPath(nextPath);
+    onDrillUp?.(nextPath, nextDatum);
+  }, [childrenKey, data, onDrillUp, safeActivePath, setDonutPath]);
   const handleGoUpKeyDown = React.useCallback(
     (event: React.KeyboardEvent<SVGCircleElement>) => {
       if (!isActivationKey(event)) {
@@ -819,33 +857,111 @@ function ChartDonutGraph({
   const hasData = total > 0;
   const hasInteractiveSegments = segments.some((segment) => segment.children.length > 0);
   const isInteractiveDonut = hasInteractiveSegments || canGoUp || Boolean(onSegmentSelect);
+  const interactiveSegments = segments.filter(
+    (segment) => segment.children.length > 0 || Boolean(onSegmentSelect),
+  );
+  const hasNestedData = hasNestedChartData(data, childrenKey);
+  const shouldShowBreadcrumbs = showBreadcrumbs ?? hasNestedData;
+  const breadcrumbItems = React.useMemo(
+    () =>
+      getDonutBreadcrumbItems(data, safeActivePath, {
+        ariaLabel,
+        childrenKey,
+        formatLabel,
+        labelKey,
+      }),
+    [ariaLabel, childrenKey, data, formatLabel, labelKey, safeActivePath],
+  );
+  const liveRegionText = getDonutLiveRegionText(
+    breadcrumbItems[breadcrumbItems.length - 1],
+    segments.length,
+    ariaLabel,
+  );
   const center = size / 2;
   const radiusOuter = Math.min(outerRadius, center - 2);
   const radiusInner = Math.min(innerRadius, radiusOuter - 8);
   let currentAngle = 0;
+  const setSegmentRef = React.useCallback((path: number[], element: SVGPathElement | null) => {
+    const key = getDonutPathKey(path);
+
+    if (element) {
+      segmentRefs.current.set(key, element);
+    } else {
+      segmentRefs.current.delete(key);
+    }
+  }, []);
+  const setFocusedDonutSegment = React.useCallback(
+    (path: number[] | null, shouldFocusElement = true) => {
+      if (focusedSegmentPath === undefined) {
+        setInternalFocusedSegmentPath(path ? [...path] : null);
+      }
+
+      onFocusedSegmentPathChange?.(
+        path ? [...path] : null,
+        path ? getDonutNodeAtPath(data, path, childrenKey) : null,
+      );
+
+      if (path && shouldFocusElement) {
+        queueMicrotask(() => segmentRefs.current.get(getDonutPathKey(path))?.focus());
+      }
+    },
+    [childrenKey, data, focusedSegmentPath, onFocusedSegmentPathChange],
+  );
   const handleSegmentClick = React.useCallback(
     (segment: (typeof segments)[number]) => {
       const nextPath = [...safeActivePath, segment.index];
+
+      setFocusedDonutSegment(nextPath, false);
       onSegmentSelect?.(segment.datum, segment.index, nextPath);
 
       if (!segment.children.length) {
         return;
       }
 
+      onDrillDown?.(segment.datum, nextPath);
       setDonutPath(nextPath);
     },
-    [onSegmentSelect, safeActivePath, setDonutPath, segments],
+    [onDrillDown, onSegmentSelect, safeActivePath, setDonutPath, setFocusedDonutSegment],
   );
   const handleSegmentKeyDown = React.useCallback(
     (event: React.KeyboardEvent<SVGPathElement>, segment: (typeof segments)[number]) => {
-      if (!isActivationKey(event)) {
+      if (isActivationKey(event)) {
+        event.preventDefault();
+        handleSegmentClick(segment);
+        return;
+      }
+
+      if (event.key === "Escape" && canGoUp) {
+        event.preventDefault();
+        goUp();
+        return;
+      }
+
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
         return;
       }
 
       event.preventDefault();
-      handleSegmentClick(segment);
+
+      const currentIndex = interactiveSegments.findIndex((item) => item.index === segment.index);
+      const nextIndex =
+        event.key === "ArrowRight"
+          ? (currentIndex + 1) % interactiveSegments.length
+          : (currentIndex - 1 + interactiveSegments.length) % interactiveSegments.length;
+      const nextSegment = interactiveSegments[nextIndex];
+
+      if (nextSegment) {
+        setFocusedDonutSegment([...safeActivePath, nextSegment.index]);
+      }
     },
-    [handleSegmentClick],
+    [
+      canGoUp,
+      goUp,
+      handleSegmentClick,
+      interactiveSegments,
+      safeActivePath,
+      setFocusedDonutSegment,
+    ],
   );
 
   return (
@@ -889,12 +1005,26 @@ function ChartDonutGraph({
                       "outline-none transition-opacity hover:opacity-80 focus:opacity-80",
                       isInteractiveSegment && "cursor-pointer",
                     )}
+                    data-focused={
+                      areDonutPathsEqual(currentFocusedSegmentPath, [
+                        ...safeActivePath,
+                        segment.index,
+                      ])
+                        ? "true"
+                        : undefined
+                    }
                     onClick={isInteractiveSegment ? () => handleSegmentClick(segment) : undefined}
+                    onFocus={
+                      isInteractiveSegment
+                        ? () => setFocusedDonutSegment([...safeActivePath, segment.index], false)
+                        : undefined
+                    }
                     onKeyDown={
                       isInteractiveSegment
                         ? (event) => handleSegmentKeyDown(event, segment)
                         : undefined
                     }
+                    ref={(element) => setSegmentRef([...safeActivePath, segment.index], element)}
                     tabIndex={isInteractiveSegment ? 0 : undefined}
                   />
                 );
@@ -938,6 +1068,17 @@ function ChartDonutGraph({
               </ChartPretext>
             ) : null}
           </svg>
+          <span className="sr-only" aria-live="polite">
+            {liveRegionText}
+          </span>
+          {shouldShowBreadcrumbs ? (
+            <ChartDonutBreadcrumbs
+              ariaLabel={`${ariaLabel} breadcrumb`}
+              items={breadcrumbItems}
+              renderBreadcrumb={renderBreadcrumb}
+              onNavigate={(path) => setDonutPath(path)}
+            />
+          ) : null}
           {showLegend ? <ChartDonutLegend segments={segments} formatValue={formatValue} /> : null}
         </>
       ) : (
@@ -1884,6 +2025,53 @@ function ChartDonutLegend({
   );
 }
 
+function ChartDonutBreadcrumbs({
+  ariaLabel,
+  items,
+  renderBreadcrumb,
+  onNavigate,
+}: {
+  ariaLabel: string;
+  items: ChartDonutBreadcrumbItem[];
+  renderBreadcrumb?: ChartDonutGraphProps["renderBreadcrumb"];
+  onNavigate: (path: number[]) => void;
+}) {
+  return (
+    <nav data-slot="chart-donut-graph-breadcrumbs" aria-label={ariaLabel}>
+      <ol className="flex min-w-0 flex-wrap items-center gap-1 text-xs text-muted-foreground">
+        {items.map((item, index) => {
+          const current = index === items.length - 1;
+          const label = renderBreadcrumb?.(item, index, items) ?? item.label;
+
+          return (
+            <li key={getDonutPathKey(item.path)} className="flex min-w-0 items-center gap-1">
+              {index > 0 ? <span aria-hidden="true">/</span> : null}
+              {current ? (
+                <span
+                  data-slot="chart-donut-graph-breadcrumb-current"
+                  aria-current="page"
+                  className="min-w-0 truncate font-medium text-foreground"
+                >
+                  {label}
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  data-slot="chart-donut-graph-breadcrumb"
+                  className="min-w-0 truncate rounded-sm px-1 py-0.5 outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+                  onClick={() => onNavigate(item.path)}
+                >
+                  {label}
+                </button>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
+
 function getChartDatumScalar(datum: ChartDatum, key: string): ChartDatumValue {
   const value = datum[key];
 
@@ -1960,6 +2148,81 @@ function getDonutNodeAtPath(
   }
 
   return currentNode;
+}
+
+function getDonutBreadcrumbItems(
+  data: ChartDatum[],
+  path: number[],
+  {
+    ariaLabel,
+    childrenKey,
+    formatLabel,
+    labelKey,
+  }: {
+    ariaLabel: string;
+    childrenKey: string;
+    formatLabel: NonNullable<ChartDonutGraphProps["formatLabel"]>;
+    labelKey: string;
+  },
+): ChartDonutBreadcrumbItem[] {
+  const items: ChartDonutBreadcrumbItem[] = [{ label: ariaLabel, path: [], datum: null }];
+  let currentData = data;
+  const currentPath: number[] = [];
+
+  path.forEach((itemIndex) => {
+    const datum = currentData[itemIndex];
+
+    if (!datum) {
+      return;
+    }
+
+    currentPath.push(itemIndex);
+    items.push({
+      label: formatLabel(getChartDatumScalar(datum, labelKey), datum, itemIndex),
+      path: [...currentPath],
+      datum,
+    });
+    currentData = getChartDatumChildren(datum, childrenKey);
+  });
+
+  return items;
+}
+
+function hasNestedChartData(data: ChartDatum[], childrenKey: string): boolean {
+  return data.some((datum) => {
+    const children = getChartDatumChildren(datum, childrenKey);
+
+    return children.length > 0 || hasNestedChartData(children, childrenKey);
+  });
+}
+
+function getDonutLiveRegionText(
+  item: ChartDonutBreadcrumbItem | undefined,
+  segmentCount: number,
+  fallbackLabel: string,
+) {
+  const label = getRenderableText(item?.label) || fallbackLabel;
+
+  return `Viewing ${label}, ${segmentCount} ${segmentCount === 1 ? "segment" : "segments"}`;
+}
+
+function getRenderableText(value: React.ReactNode): string {
+  return typeof value === "string" || typeof value === "number" ? String(value) : "";
+}
+
+function getDonutPathKey(path: readonly number[]): string {
+  return path.length ? path.join(".") : "root";
+}
+
+function areDonutPathsEqual(
+  first: readonly number[] | null | undefined,
+  second: readonly number[] | null | undefined,
+) {
+  if (!first || !second || first.length !== second.length) {
+    return false;
+  }
+
+  return first.every((item, index) => item === second[index]);
 }
 
 function isActivationKey(event: React.KeyboardEvent): boolean {
@@ -2342,6 +2605,7 @@ export {
 export type {
   ChartDatum,
   ChartDatumValue,
+  ChartDonutBreadcrumbItem,
   ChartDonutGraphProps,
   ChartGraphProps,
   ChartHistogramBin,

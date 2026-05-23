@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import {
@@ -160,5 +160,125 @@ describe("UML diagram", () => {
       expect.objectContaining({ id: "add" }),
       expect.objectContaining({ id: "orders" }),
     );
+  });
+
+  test("moves keyboard focus to the nearest spatial node", async () => {
+    render(
+      <UmlDiagram
+        ariaLabel="Spatial graph"
+        defaultFocusedNodeId="center"
+        nodes={[
+          { id: "left", label: "Left", x: 0, y: 0 },
+          { id: "center", label: "Center", x: 260, y: 0 },
+          { id: "right", label: "Right", x: 520, y: 20 },
+          { id: "down", label: "Down", x: 260, y: 180 },
+        ]}
+        onNodeSelect={vi.fn()}
+      />,
+    );
+
+    const center = screen.getByRole("button", { name: "Center" });
+    center.focus();
+
+    fireEvent.keyDown(center, { key: "ArrowRight" });
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Right" })).toBe(document.activeElement),
+    );
+
+    fireEvent.keyDown(document.activeElement as Element, { key: "ArrowDown" });
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Down" })).toBe(document.activeElement),
+    );
+  });
+
+  test("selects the focused UML node with enter", () => {
+    const onNodeSelect = vi.fn();
+
+    render(
+      <UmlDiagram
+        ariaLabel="Selectable graph"
+        nodes={[
+          { id: "api", label: "API", x: 0, y: 0 },
+          { id: "orders", label: "Orders", x: 260, y: 0 },
+        ]}
+        defaultFocusedNodeId="orders"
+        onNodeSelect={onNodeSelect}
+      />,
+    );
+
+    fireEvent.keyDown(screen.getByRole("button", { name: "Orders" }), { key: "Enter" });
+
+    expect(onNodeSelect).toHaveBeenCalledWith(expect.objectContaining({ id: "orders" }));
+  });
+
+  test("calls onNodeDeselect with escape when a UML node is selected", () => {
+    const onNodeDeselect = vi.fn();
+
+    render(
+      <UmlDiagram
+        ariaLabel="Selectable graph"
+        selectedNodeId="orders"
+        nodes={[
+          { id: "api", label: "API", x: 0, y: 0 },
+          { id: "orders", label: "Orders", x: 260, y: 0 },
+        ]}
+        defaultFocusedNodeId="orders"
+        onNodeSelect={vi.fn()}
+        onNodeDeselect={onNodeDeselect}
+      />,
+    );
+
+    fireEvent.keyDown(screen.getByRole("button", { name: "Orders" }), { key: "Escape" });
+
+    expect(onNodeDeselect).toHaveBeenCalledTimes(1);
+  });
+
+  test("skips disabled UML nodes during keyboard navigation", async () => {
+    render(
+      <UmlDiagram
+        ariaLabel="Disabled graph"
+        defaultFocusedNodeId="left"
+        nodes={[
+          { id: "left", label: "Left", x: 0, y: 0 },
+          { id: "center", label: "Center", x: 260, y: 0 },
+          { id: "right", label: "Right", x: 520, y: 0 },
+        ]}
+        getNodeDisabled={(node) => node.id === "center"}
+        onNodeSelect={vi.fn()}
+      />,
+    );
+
+    const left = screen.getByRole("button", { name: "Left" });
+    left.focus();
+
+    fireEvent.keyDown(left, { key: "ArrowRight" });
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Right" })).toBe(document.activeElement),
+    );
+    expect(screen.getByRole("button", { name: "Center" }).getAttribute("aria-disabled")).toBe(
+      "true",
+    );
+  });
+
+  test("renders a custom UML node selection affordance", () => {
+    const { container } = render(
+      <UmlDiagram
+        ariaLabel="Custom selection graph"
+        selectedNodeId="orders"
+        nodes={[
+          { id: "api", label: "API", x: 0, y: 0 },
+          { id: "orders", label: "Orders", x: 260, y: 0 },
+        ]}
+        renderNodeSelection={(node) => (
+          <circle data-slot="custom-node-selection" cx={node.x + node.width} cy={node.y} r={8} />
+        )}
+        onNodeSelect={vi.fn()}
+      />,
+    );
+
+    expect(container.querySelector('[data-slot="custom-node-selection"]')).toBeTruthy();
   });
 });

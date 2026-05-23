@@ -154,6 +154,8 @@ export const NestedDonutData: Story = {
         data={channelData}
         labelKey="channel"
         centerLabel="Sessions"
+        showBreadcrumbs
+        onSegmentSelect={() => undefined}
         caption="Parent segments roll up child totals. Enter a segment to inspect its sources, then use the center to go back."
       />
     </div>
@@ -162,10 +164,18 @@ export const NestedDonutData: Story = {
     await expect(canvas.getByRole("group", { name: "Acquisition channel split" })).toBeVisible();
     await expect(canvas.getByRole("button", { name: "Organic: 42. Enter folder" })).toBeVisible();
 
-    await userEvent.click(canvas.getByRole("button", { name: "Organic: 42. Enter folder" }));
+    canvas.getByRole("button", { name: "Organic: 42. Enter folder" }).focus();
+    await userEvent.keyboard("{Enter}");
 
     await expect(canvas.getByText("Search")).toBeVisible();
     await expect(canvas.getByText("Content")).toBeVisible();
+    await expect(
+      canvas.getByRole("navigation", { name: "Acquisition channel split breadcrumb" }),
+    ).toBeVisible();
+
+    canvas.getByRole("button", { name: "Search: 28" }).focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(canvas.getByRole("button", { name: "Content: 14" })).toHaveFocus();
 
     await userEvent.click(canvas.getByRole("button", { name: "Go one folder up" }));
 

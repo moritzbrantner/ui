@@ -144,3 +144,35 @@ export const EditableHierarchy: Story = {
     await expect(canvas.queryByText("New role 1")).not.toBeInTheDocument();
   },
 };
+
+export const KeyboardNavigation: Story = {
+  render: () => {
+    const [selectedNodeId, setSelectedNodeId] = React.useState<string | null>("mara");
+    const [focusedNodeId, setFocusedNodeId] = React.useState<string | null>("mara");
+
+    return (
+      <OrgChart
+        nodes={teamNodes}
+        selectedNodeId={selectedNodeId}
+        focusedNodeId={focusedNodeId}
+        onFocusedNodeIdChange={(nodeId) => setFocusedNodeId(nodeId)}
+        onNodeSelect={(node) => setSelectedNodeId(node.id)}
+        getNodeDisabled={(node) => node.id === "ivy"}
+      />
+    );
+  },
+  play: async ({ canvas }) => {
+    const mara = canvas.getByRole("button", { name: "Mara Klein" });
+
+    mara.focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(canvas.getByRole("button", { name: "Nina Patel" })).toHaveFocus();
+    await userEvent.keyboard("{End}");
+    await expect(canvas.getByRole("button", { name: "Omar Silva" })).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(canvas.getByRole("treeitem", { name: "Omar Silva" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+  },
+};

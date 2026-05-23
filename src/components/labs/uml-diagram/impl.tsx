@@ -14,6 +14,8 @@ type UmlDiagramEdgeKind =
   | "realization"
   | "transition";
 type UmlDiagramEdgeDirection = "forward" | "backward" | "both" | "none";
+type UmlDiagramKeyboardMode = "nodes" | "none";
+type UmlDiagramNodeActionPlacement = "inside-bottom-end" | "outside-top-end";
 
 type UmlDiagramPoint = {
   x: number;
@@ -75,10 +77,18 @@ export type UmlDiagramProps = Omit<React.ComponentProps<"figure">, "children"> &
   padding?: number;
   autoLayoutColumns?: number;
   selectedNodeId?: string | null;
+  keyboardMode?: UmlDiagramKeyboardMode;
+  focusedNodeId?: string | null;
+  defaultFocusedNodeId?: string | null;
+  onFocusedNodeIdChange?: (node: PositionedUmlDiagramNode | null) => void;
+  nodeActionPlacement?: UmlDiagramNodeActionPlacement;
+  getNodeDisabled?: (node: PositionedUmlDiagramNode) => boolean;
+  renderNodeSelection?: (node: PositionedUmlDiagramNode) => React.ReactNode;
   nodeActions?:
     | readonly UmlDiagramNodeAction[]
     | ((node: PositionedUmlDiagramNode) => readonly UmlDiagramNodeAction[]);
   onNodeSelect?: (node: PositionedUmlDiagramNode) => void;
+  onNodeDeselect?: () => void;
   onNodeActionSelect?: (action: UmlDiagramNodeAction, node: PositionedUmlDiagramNode) => void;
   renderNode?: (node: PositionedUmlDiagramNode) => React.ReactNode;
   renderEdge?: (edge: UmlDiagramEdge, context: UmlDiagramEdgeRenderContext) => React.ReactNode;
@@ -183,7 +193,15 @@ function UmlDiagram({
   autoLayoutColumns,
   selectedNodeId,
   nodeActions,
+  keyboardMode,
+  focusedNodeId,
+  defaultFocusedNodeId,
+  onFocusedNodeIdChange,
+  nodeActionPlacement = "inside-bottom-end",
+  getNodeDisabled,
+  renderNodeSelection,
   onNodeSelect,
+  onNodeDeselect,
   onNodeActionSelect,
   renderNode = renderDefaultUmlNode,
   renderEdge = renderDefaultUmlEdge,
@@ -198,6 +216,112 @@ function UmlDiagram({
   const nodeMap = React.useMemo(
     () => new Map(positionedNodes.map((node) => [node.id, node])),
     [positionedNodes],
+  );
+  const resolvedKeyboardMode = keyboardMode ?? (onNodeSelect ? "nodes" : "none");
+  const nodeRefs = React.useRef(new Map<string, SVGGElement>());
+  const [internalFocusedNodeId, setInternalFocusedNodeId] = React.useState<string | null>(
+    () => defaultFocusedNodeId ?? null,
+  );
+  const enabledNodes = React.useMemo(
+    () => positionedNodes.filter((node) => !getNodeDisabled?.(node)),
+    [getNodeDisabled, positionedNodes],
+  );
+  const requestedFocusedNodeId =
+    focusedNodeId !== undefined ? focusedNodeId : internalFocusedNodeId;
+  const effectiveFocusedNodeId =
+    resolvedKeyboardMode === "nodes"
+      ? (enabledNodes.find((node) => node.id === requestedFocusedNodeId)?.id ??
+        enabledNodes[0]?.id ??
+        null)
+      : null;
+  const setNodeRef = React.useCallback((nodeId: string, element: SVGGElement | null) => {
+    if (element) {
+      nodeRefs.current.set(nodeId, element);
+    } else {
+      nodeRefs.current.delete(nodeId);
+    }
+  }, []);
+  const focusNodeById = React.useCallback(
+    (nodeId: string | null, shouldFocusElement = true) => {
+      const nextNode = nodeId ? (nodeMap.get(nodeId) ?? null) : null;
+
+      if (focusedNodeId === undefined) {
+        setInternalFocusedNodeId(nodeId);
+      }
+
+      onFocusedNodeIdChange?.(nextNode);
+
+      if (nodeId && shouldFocusElement) {
+        queueMicrotask(() => nodeRefs.current.get(nodeId)?.focus());
+      }
+    },
+    [focusedNodeId, nodeMap, onFocusedNodeIdChange],
+  );
+  const handleNodeFocus = React.useCallback(
+    (node: PositionedUmlDiagramNode) => {
+      if (getNodeDisabled?.(node)) {
+        return;
+      }
+
+      if (focusedNodeId === undefined) {
+        setInternalFocusedNodeId(node.id);
+      }
+
+      onFocusedNodeIdChange?.(node);
+    },
+    [focusedNodeId, getNodeDisabled, onFocusedNodeIdChange],
+  );
+  const handleNodeKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<SVGGElement>, node: PositionedUmlDiagramNode) => {
+      if (resolvedKeyboardMode === "none" || getNodeDisabled?.(node)) {
+        return;
+      }
+
+      if (isActivationKey(event)) {
+        event.preventDefault();
+        onNodeSelect?.(node);
+        return;
+      }
+
+      if (event.key === "Escape") {
+        if (selectedNodeId != null && onNodeSelect && onNodeDeselect) {
+          event.preventDefault();
+          onNodeDeselect();
+        }
+
+        return;
+      }
+
+      if (
+        event.key !== "ArrowRight" &&
+        event.key !== "ArrowLeft" &&
+        event.key !== "ArrowDown" &&
+        event.key !== "ArrowUp"
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const nextNode = getNearestUmlDiagramNode(
+        node,
+        enabledNodes.filter((item) => item.id !== node.id),
+        event.key,
+      );
+
+      if (nextNode) {
+        focusNodeById(nextNode.id);
+      }
+    },
+    [
+      enabledNodes,
+      focusNodeById,
+      getNodeDisabled,
+      onNodeDeselect,
+      onNodeSelect,
+      resolvedKeyboardMode,
+      selectedNodeId,
+    ],
   );
   const bounds = getUmlDiagramBounds(positionedNodes, edges);
   const viewBox = `${bounds.x - padding} ${bounds.y - padding} ${bounds.width + padding * 2} ${
@@ -243,10 +367,18 @@ function UmlDiagram({
                     key={node.id}
                     node={node}
                     nodeActions={nodeActions}
+                    nodeActionPlacement={nodeActionPlacement}
+                    keyboardMode={resolvedKeyboardMode}
+                    focused={effectiveFocusedNodeId === node.id}
+                    disabled={Boolean(getNodeDisabled?.(node))}
+                    renderNodeSelection={renderNodeSelection}
                     onNodeActionSelect={onNodeActionSelect}
                     onNodeSelect={onNodeSelect}
+                    onNodeFocus={handleNodeFocus}
+                    onNodeKeyDown={handleNodeKeyDown}
                     renderNode={renderNode}
                     selected={selectedNodeId === node.id}
+                    setNodeRef={setNodeRef}
                   />
                 ))}
               </g>
@@ -322,35 +454,48 @@ function UmlStateDiagram({
 function UmlDiagramInteractiveNode({
   node,
   nodeActions,
+  nodeActionPlacement,
   renderNode,
+  renderNodeSelection,
   selected,
+  focused,
+  disabled,
+  keyboardMode,
   onNodeSelect,
+  onNodeFocus,
+  onNodeKeyDown,
   onNodeActionSelect,
+  setNodeRef,
 }: {
   node: PositionedUmlDiagramNode;
   nodeActions?: UmlDiagramProps["nodeActions"];
+  nodeActionPlacement: UmlDiagramNodeActionPlacement;
   renderNode: NonNullable<UmlDiagramProps["renderNode"]>;
+  renderNodeSelection?: UmlDiagramProps["renderNodeSelection"];
   selected: boolean;
+  focused: boolean;
+  disabled: boolean;
+  keyboardMode: UmlDiagramKeyboardMode;
   onNodeSelect?: UmlDiagramProps["onNodeSelect"];
+  onNodeFocus: (node: PositionedUmlDiagramNode) => void;
+  onNodeKeyDown: (event: React.KeyboardEvent<SVGGElement>, node: PositionedUmlDiagramNode) => void;
   onNodeActionSelect?: UmlDiagramProps["onNodeActionSelect"];
+  setNodeRef: (nodeId: string, element: SVGGElement | null) => void;
 }) {
   const resolvedActions =
     typeof nodeActions === "function" ? nodeActions(node) : (nodeActions ?? []);
-  const interactive = Boolean(onNodeSelect);
+  const interactive = Boolean(onNodeSelect) && !disabled;
   const accessibleName = getUmlDiagramNodeAccessibleName(node);
   const selectNode = React.useCallback(() => {
-    onNodeSelect?.(node);
-  }, [node, onNodeSelect]);
+    if (!disabled) {
+      onNodeSelect?.(node);
+    }
+  }, [disabled, node, onNodeSelect]);
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<SVGGElement>) => {
-      if (!interactive || !isActivationKey(event)) {
-        return;
-      }
-
-      event.preventDefault();
-      selectNode();
+      onNodeKeyDown(event, node);
     },
-    [interactive, selectNode],
+    [node, onNodeKeyDown],
   );
 
   return (
@@ -358,19 +503,37 @@ function UmlDiagramInteractiveNode({
       data-slot="uml-diagram-node-interaction"
       data-node-id={node.id}
       data-selected={selected ? "true" : undefined}
-      role={interactive ? "button" : undefined}
-      aria-label={interactive ? accessibleName : undefined}
-      aria-pressed={interactive ? selected : undefined}
-      tabIndex={interactive ? 0 : undefined}
+      data-focused={focused ? "true" : undefined}
+      data-disabled={disabled ? "true" : undefined}
+      role={onNodeSelect ? "button" : undefined}
+      aria-label={onNodeSelect ? accessibleName : undefined}
+      aria-pressed={onNodeSelect ? selected : undefined}
+      aria-disabled={disabled || undefined}
+      tabIndex={keyboardMode === "nodes" && focused && !disabled ? 0 : -1}
       className={cn(
         "outline-none",
-        interactive &&
+        onNodeSelect &&
           "cursor-pointer focus-visible:[&_[data-slot='uml-diagram-node-focus']]:stroke-ring",
+        disabled && "opacity-60",
       )}
       onClick={interactive ? selectNode : undefined}
+      onFocus={() => onNodeFocus(node)}
       onKeyDown={handleKeyDown}
+      ref={(element) => setNodeRef(node.id, element)}
     >
       {selected ? (
+        (renderNodeSelection?.(node) ?? (
+          <rect
+            data-slot="uml-diagram-node-focus"
+            x={node.x - 6}
+            y={node.y - 6}
+            width={node.width + 12}
+            height={node.height + 12}
+            rx="12"
+            className="fill-transparent stroke-primary stroke-2"
+          />
+        ))
+      ) : focused ? (
         <rect
           data-slot="uml-diagram-node-focus"
           x={node.x - 6}
@@ -378,7 +541,7 @@ function UmlDiagramInteractiveNode({
           width={node.width + 12}
           height={node.height + 12}
           rx="12"
-          className="fill-transparent stroke-primary stroke-2"
+          className="fill-transparent stroke-ring stroke-2"
         />
       ) : null}
       {renderNode(node)}
@@ -386,6 +549,7 @@ function UmlDiagramInteractiveNode({
         <UmlDiagramNodeActions
           actions={resolvedActions}
           node={node}
+          placement={nodeActionPlacement}
           onNodeActionSelect={onNodeActionSelect}
         />
       ) : null}
@@ -396,21 +560,29 @@ function UmlDiagramInteractiveNode({
 function UmlDiagramNodeActions({
   actions,
   node,
+  placement,
   onNodeActionSelect,
 }: {
   actions: readonly UmlDiagramNodeAction[];
   node: PositionedUmlDiagramNode;
+  placement: UmlDiagramNodeActionPlacement;
   onNodeActionSelect?: UmlDiagramProps["onNodeActionSelect"];
 }) {
   const actionSize = 28;
   const actionGap = 4;
   const width = actions.length * actionSize + Math.max(0, actions.length - 1) * actionGap;
+  const x = node.x + node.width - width - 8;
+  const y =
+    placement === "outside-top-end"
+      ? node.y - actionSize - 4
+      : node.y + node.height - actionSize - 8;
 
   return (
     <foreignObject
       data-slot="uml-diagram-node-actions"
-      x={node.x + node.width - width - 8}
-      y={node.y + node.height - actionSize - 8}
+      data-placement={placement}
+      x={x}
+      y={y}
       width={width}
       height={actionSize}
     >
@@ -1036,6 +1208,40 @@ function getUmlDiagramNodeCenter(node: PositionedUmlDiagramNode): UmlDiagramPoin
   };
 }
 
+function getNearestUmlDiagramNode(
+  currentNode: PositionedUmlDiagramNode,
+  candidates: PositionedUmlDiagramNode[],
+  key: "ArrowRight" | "ArrowLeft" | "ArrowDown" | "ArrowUp",
+): PositionedUmlDiagramNode | null {
+  const currentCenter = getUmlDiagramNodeCenter(currentNode);
+  const horizontal = key === "ArrowRight" || key === "ArrowLeft";
+  const forward = key === "ArrowRight" || key === "ArrowDown";
+
+  return (
+    candidates
+      .map((candidate) => {
+        const center = getUmlDiagramNodeCenter(candidate);
+        const primaryDelta = horizontal ? center.x - currentCenter.x : center.y - currentCenter.y;
+        const perpendicularDelta = horizontal
+          ? center.y - currentCenter.y
+          : center.x - currentCenter.x;
+
+        return {
+          candidate,
+          primaryDelta,
+          perpendicularDistance: Math.abs(perpendicularDelta),
+          totalDistance: Math.hypot(center.x - currentCenter.x, center.y - currentCenter.y),
+        };
+      })
+      .filter((item) => (forward ? item.primaryDelta > 0 : item.primaryDelta < 0))
+      .sort(
+        (first, second) =>
+          first.perpendicularDistance - second.perpendicularDistance ||
+          first.totalDistance - second.totalDistance,
+      )[0]?.candidate ?? null
+  );
+}
+
 function getUmlDiagramBoundaryPoint(
   node: PositionedUmlDiagramNode,
   toward: UmlDiagramPoint,
@@ -1099,8 +1305,10 @@ export {
   type UmlDiagramEdge,
   type UmlDiagramEdgeDirection,
   type UmlDiagramEdgeKind,
+  type UmlDiagramKeyboardMode,
   type UmlDiagramNode,
   type UmlDiagramNodeAction,
+  type UmlDiagramNodeActionPlacement,
   type UmlDiagramNodeVariant,
   type UmlDiagramPoint,
   type UmlDiagramSection,

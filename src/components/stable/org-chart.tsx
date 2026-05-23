@@ -17,13 +17,20 @@ type OrgChartNodeData = {
 type OrgChartRenderNodeContext = {
   depth: number;
   index: number;
+  siblingCount: number;
   parentNode?: OrgChartNodeData;
   path: string[];
   expanded: boolean;
   hasChildren: boolean;
   selected: boolean;
+  focused: boolean;
+  disabled: boolean;
   toggleExpanded: () => void;
+  focusNode: () => void;
+  selectNode: () => void;
 };
+
+type OrgChartKeyboardMode = "tree" | "none";
 
 type OrgChartProps = React.ComponentProps<"div"> & {
   nodes?: readonly OrgChartNodeData[];
@@ -37,6 +44,15 @@ type OrgChartProps = React.ComponentProps<"div"> & {
   defaultExpandedIds?: readonly string[];
   onExpandedIdsChange?: (nodeIds: string[], node: OrgChartNodeData) => void;
   selectedNodeId?: string | null;
+  keyboardMode?: OrgChartKeyboardMode;
+  focusedNodeId?: string | null;
+  defaultFocusedNodeId?: string | null;
+  onFocusedNodeIdChange?: (
+    nodeId: string | null,
+    node: OrgChartNodeData | null,
+    context: OrgChartRenderNodeContext | null,
+  ) => void;
+  getNodeDisabled?: (node: OrgChartNodeData, context: OrgChartRenderNodeContext) => boolean;
   nodeActions?:
     | readonly OrgChartNodeAction[]
     | ((
@@ -49,6 +65,15 @@ type OrgChartProps = React.ComponentProps<"div"> & {
     node: OrgChartNodeData,
     context: OrgChartRenderNodeContext,
   ) => void;
+};
+
+type OrgChartVisibleNode = {
+  node: OrgChartNodeData;
+  depth: number;
+  index: number;
+  siblingCount: number;
+  parentNode?: OrgChartNodeData;
+  path: string[];
 };
 
 type OrgChartNodeAction = {
@@ -64,6 +89,7 @@ export type OrgChartNodeProps = React.ComponentProps<"div"> & {
   node: OrgChartNodeData;
   depth?: number;
   index?: number;
+  siblingCount?: number;
   parentNode?: OrgChartNodeData;
   path?: string[];
   renderNode?: OrgChartProps["renderNode"];
@@ -72,9 +98,20 @@ export type OrgChartNodeProps = React.ComponentProps<"div"> & {
   defaultExpanded?: boolean;
   selected?: boolean;
   selectedNodeId?: string | null;
+  focused?: boolean;
+  focusedNodeId?: string | null;
+  disabled?: boolean;
+  keyboardMode?: OrgChartKeyboardMode;
   onExpandedChange?: (expanded: boolean, node: OrgChartNodeData) => void;
   getNodeExpanded?: (node: OrgChartNodeData) => boolean;
   onToggleNode?: (node: OrgChartNodeData, expanded: boolean) => void;
+  onFocusNode?: (node: OrgChartNodeData, context: OrgChartRenderNodeContext) => void;
+  onNodeKeyDown?: (
+    event: React.KeyboardEvent<HTMLDivElement>,
+    node: OrgChartNodeData,
+    context: OrgChartRenderNodeContext,
+  ) => void;
+  getNodeDisabled?: OrgChartProps["getNodeDisabled"];
   onNodeSelect?: OrgChartProps["onNodeSelect"];
   onNodeActionSelect?: OrgChartProps["onNodeActionSelect"];
 };
@@ -87,6 +124,11 @@ function OrgChart({
   defaultExpandedIds,
   onExpandedIdsChange,
   selectedNodeId,
+  keyboardMode = "tree",
+  focusedNodeId,
+  defaultFocusedNodeId,
+  onFocusedNodeIdChange,
+  getNodeDisabled,
   nodeActions,
   onNodeSelect,
   onNodeActionSelect,
@@ -102,6 +144,41 @@ function OrgChart({
     () => new Set(expandedIds ?? internalExpandedIds ?? defaultExpandableIds),
     [defaultExpandableIds, expandedIds, internalExpandedIds],
   );
+  const visibleNodes = React.useMemo(
+    () => getVisibleOrgChartNodes(nodes, currentExpandedIds),
+    [currentExpandedIds, nodes],
+  );
+  const nodeRefs = React.useRef(new Map<string, HTMLDivElement>());
+  const [internalFocusedNodeId, setInternalFocusedNodeId] = React.useState<string | null>(
+    () => defaultFocusedNodeId ?? null,
+  );
+  const isNodeDisabled = React.useCallback(
+    (item: OrgChartVisibleNode) =>
+      getNodeDisabled?.(
+        item.node,
+        createOrgChartContext({
+          ...item,
+          expanded: item.node.children?.length ? currentExpandedIds.has(item.node.id) : false,
+          selected: selectedNodeId === item.node.id,
+          focused: false,
+          disabled: false,
+          toggleExpanded: () => undefined,
+          focusNode: () => undefined,
+          selectNode: () => undefined,
+        }),
+      ) ?? false,
+    [currentExpandedIds, getNodeDisabled, selectedNodeId],
+  );
+  const enabledVisibleNodes = React.useMemo(
+    () => visibleNodes.filter((item) => !isNodeDisabled(item)),
+    [isNodeDisabled, visibleNodes],
+  );
+  const requestedFocusedNodeId =
+    focusedNodeId !== undefined ? focusedNodeId : internalFocusedNodeId;
+  const effectiveFocusedNodeId =
+    enabledVisibleNodes.find((item) => item.node.id === requestedFocusedNodeId)?.node.id ??
+    enabledVisibleNodes[0]?.node.id ??
+    null;
 
   const toggleNode = React.useCallback(
     (node: OrgChartNodeData, expanded: boolean) => {
@@ -116,6 +193,157 @@ function OrgChart({
       onExpandedIdsChange?.(nextExpandedIds, node);
     },
     [currentExpandedIds, expandedIds, onExpandedIdsChange],
+  );
+  const setNodeRef = React.useCallback((nodeId: string, element: HTMLDivElement | null) => {
+    if (element) {
+      nodeRefs.current.set(nodeId, element);
+    } else {
+      nodeRefs.current.delete(nodeId);
+    }
+  }, []);
+  const getFocusChangeContext = React.useCallback(
+    (item: OrgChartVisibleNode, focused: boolean) =>
+      createOrgChartContext({
+        ...item,
+        expanded: item.node.children?.length ? currentExpandedIds.has(item.node.id) : false,
+        selected: selectedNodeId === item.node.id,
+        focused,
+        disabled: isNodeDisabled(item),
+        toggleExpanded: () => toggleNode(item.node, !currentExpandedIds.has(item.node.id)),
+        focusNode: () => undefined,
+        selectNode: () => undefined,
+      }),
+    [currentExpandedIds, isNodeDisabled, selectedNodeId, toggleNode],
+  );
+  const focusNodeById = React.useCallback(
+    (nodeId: string | null, shouldFocusElement = true) => {
+      const item = nodeId
+        ? visibleNodes.find((visibleNode) => visibleNode.node.id === nodeId)
+        : null;
+
+      if (focusedNodeId === undefined) {
+        setInternalFocusedNodeId(nodeId);
+      }
+
+      onFocusedNodeIdChange?.(
+        nodeId,
+        item?.node ?? null,
+        item ? getFocusChangeContext(item, true) : null,
+      );
+
+      if (nodeId && shouldFocusElement) {
+        queueMicrotask(() => nodeRefs.current.get(nodeId)?.focus());
+      }
+    },
+    [focusedNodeId, getFocusChangeContext, onFocusedNodeIdChange, visibleNodes],
+  );
+  const focusVisibleItem = React.useCallback(
+    (item: OrgChartVisibleNode | undefined) => {
+      if (!item || isNodeDisabled(item)) {
+        return;
+      }
+
+      focusNodeById(item.node.id);
+    },
+    [focusNodeById, isNodeDisabled],
+  );
+  const handleFocusNode = React.useCallback(
+    (node: OrgChartNodeData, context: OrgChartRenderNodeContext) => {
+      if (context.disabled) {
+        return;
+      }
+
+      if (focusedNodeId === undefined) {
+        setInternalFocusedNodeId(node.id);
+      }
+
+      onFocusedNodeIdChange?.(node.id, node, context);
+    },
+    [focusedNodeId, onFocusedNodeIdChange],
+  );
+  const handleNodeKeyDown = React.useCallback(
+    (
+      event: React.KeyboardEvent<HTMLDivElement>,
+      node: OrgChartNodeData,
+      context: OrgChartRenderNodeContext,
+    ) => {
+      if (context.disabled) {
+        return;
+      }
+
+      if (isActivationKey(event)) {
+        if (onNodeSelect) {
+          event.preventDefault();
+          context.selectNode();
+        }
+
+        return;
+      }
+
+      if (keyboardMode === "none") {
+        return;
+      }
+
+      const currentIndex = enabledVisibleNodes.findIndex((item) => item.node.id === node.id);
+
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          focusVisibleItem(enabledVisibleNodes[currentIndex + 1] ?? enabledVisibleNodes[0]);
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          focusVisibleItem(
+            enabledVisibleNodes[currentIndex - 1] ??
+              enabledVisibleNodes[enabledVisibleNodes.length - 1],
+          );
+          break;
+        case "ArrowRight":
+          if (!context.hasChildren) {
+            return;
+          }
+
+          event.preventDefault();
+          if (!context.expanded) {
+            toggleNode(node, true);
+          }
+
+          focusVisibleItem(
+            getVisibleOrgChartNodes(nodes, new Set([...currentExpandedIds, node.id])).find(
+              (item) => item.parentNode?.id === node.id && !isNodeDisabled(item),
+            ),
+          );
+          break;
+        case "ArrowLeft":
+          if (context.hasChildren && context.expanded) {
+            event.preventDefault();
+            toggleNode(node, false);
+          } else if (context.parentNode) {
+            event.preventDefault();
+            focusVisibleItem(visibleNodes.find((item) => item.node.id === context.parentNode?.id));
+          }
+          break;
+        case "Home":
+          event.preventDefault();
+          focusVisibleItem(enabledVisibleNodes[0]);
+          break;
+        case "End":
+          event.preventDefault();
+          focusVisibleItem(enabledVisibleNodes[enabledVisibleNodes.length - 1]);
+          break;
+      }
+    },
+    [
+      currentExpandedIds,
+      enabledVisibleNodes,
+      focusVisibleItem,
+      isNodeDisabled,
+      keyboardMode,
+      nodes,
+      onNodeSelect,
+      toggleNode,
+      visibleNodes,
+    ],
   );
 
   return (
@@ -138,14 +366,22 @@ function OrgChart({
               key={node.id}
               node={node}
               index={index}
+              siblingCount={nodes.length}
               path={[node.id]}
               renderNode={renderNode}
               nodeActions={nodeActions}
               getNodeExpanded={(chartNode) => currentExpandedIds.has(chartNode.id)}
               onToggleNode={toggleNode}
               selectedNodeId={selectedNodeId}
+              focused={effectiveFocusedNodeId === node.id}
+              focusedNodeId={effectiveFocusedNodeId}
+              keyboardMode={keyboardMode}
+              getNodeDisabled={getNodeDisabled}
+              onFocusNode={handleFocusNode}
+              onNodeKeyDown={handleNodeKeyDown}
               onNodeSelect={onNodeSelect}
               onNodeActionSelect={onNodeActionSelect}
+              setNodeRef={setNodeRef}
             />
           ))}
         </div>
@@ -164,6 +400,7 @@ function OrgChartNode({
   node,
   depth = 0,
   index = 0,
+  siblingCount = 1,
   parentNode,
   path = [node.id],
   renderNode,
@@ -172,20 +409,31 @@ function OrgChartNode({
   defaultExpanded = true,
   selected: selectedProp,
   selectedNodeId,
+  focused: focusedProp,
+  focusedNodeId,
+  disabled: disabledProp,
+  keyboardMode = "tree",
   onExpandedChange,
   getNodeExpanded,
   onToggleNode,
+  onFocusNode,
+  onNodeKeyDown,
+  getNodeDisabled,
   onNodeSelect,
   onNodeActionSelect,
+  setNodeRef,
   className,
   ...props
-}: OrgChartNodeProps) {
+}: OrgChartNodeProps & {
+  setNodeRef?: (nodeId: string, element: HTMLDivElement | null) => void;
+}) {
   const hasChildren = Boolean(node.children?.length);
   const [internalExpanded, setInternalExpanded] = React.useState(defaultExpanded);
   const expanded = hasChildren
     ? (getNodeExpanded?.(node) ?? expandedProp ?? internalExpanded)
     : false;
   const selected = selectedProp ?? selectedNodeId === node.id;
+  const focused = focusedProp ?? focusedNodeId === node.id;
   const accessibleName = getNodeAccessibleName(node);
   const toggleExpanded = React.useCallback(() => {
     const nextExpanded = !expanded;
@@ -198,37 +446,80 @@ function OrgChartNode({
     onToggleNode?.(node, nextExpanded);
   }, [expanded, expandedProp, getNodeExpanded, node, onExpandedChange, onToggleNode]);
 
-  const renderContext = React.useMemo<OrgChartRenderNodeContext>(
-    () => ({
+  const disabled =
+    disabledProp ??
+    getNodeDisabled?.(
+      node,
+      createOrgChartContext({
+        depth,
+        index,
+        siblingCount,
+        parentNode,
+        path,
+        node,
+        expanded,
+        hasChildren,
+        selected,
+        focused,
+        disabled: false,
+        toggleExpanded,
+        focusNode: () => undefined,
+        selectNode: () => undefined,
+      }),
+    ) ??
+    false;
+  const renderContext = React.useMemo<OrgChartRenderNodeContext>(() => {
+    let context: OrgChartRenderNodeContext;
+
+    context = createOrgChartContext({
       depth,
       index,
+      siblingCount,
       parentNode,
       path,
+      node,
       expanded,
       hasChildren,
       selected,
+      focused,
+      disabled,
       toggleExpanded,
-    }),
-    [depth, expanded, hasChildren, index, parentNode, path, selected, toggleExpanded],
-  );
+      focusNode: () => onFocusNode?.(node, context),
+      selectNode: () => onNodeSelect?.(node, context),
+    });
+
+    return context;
+  }, [
+    depth,
+    disabled,
+    expanded,
+    focused,
+    hasChildren,
+    index,
+    node,
+    onFocusNode,
+    onNodeSelect,
+    parentNode,
+    path,
+    selected,
+    siblingCount,
+    toggleExpanded,
+  ]);
   const resolvedActions = React.useMemo(
     () =>
       typeof nodeActions === "function" ? nodeActions(node, renderContext) : (nodeActions ?? []),
     [node, nodeActions, renderContext],
   );
   const selectNode = React.useCallback(() => {
-    onNodeSelect?.(node, renderContext);
-  }, [node, onNodeSelect, renderContext]);
+    if (!disabled) {
+      renderContext.selectNode();
+    }
+  }, [disabled, renderContext]);
   const handleNodeKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (!onNodeSelect || (event.key !== "Enter" && event.key !== " ")) {
-        return;
-      }
-
-      event.preventDefault();
-      selectNode();
+      onNodeKeyDown?.(event, node, renderContext);
     },
-    [onNodeSelect, selectNode],
+    [node, onNodeKeyDown, renderContext],
   );
 
   return (
@@ -239,22 +530,39 @@ function OrgChartNode({
       aria-label={accessibleName}
       aria-expanded={hasChildren ? expanded : undefined}
       aria-selected={selected || undefined}
+      aria-disabled={disabled || undefined}
+      aria-level={depth + 1}
+      aria-posinset={index + 1}
+      aria-setsize={siblingCount}
       className={cn("grid justify-items-center gap-3", className)}
       {...props}
     >
       <div
         data-slot="org-chart-node"
         data-selected={selected ? "true" : undefined}
+        data-focused={focused ? "true" : undefined}
+        data-disabled={disabled ? "true" : undefined}
         role={onNodeSelect ? "button" : undefined}
-        tabIndex={onNodeSelect ? 0 : undefined}
+        tabIndex={
+          keyboardMode === "tree" && focused && !disabled
+            ? 0
+            : onNodeSelect && keyboardMode === "none" && !disabled
+              ? 0
+              : -1
+        }
         aria-label={onNodeSelect ? accessibleName : undefined}
+        aria-disabled={disabled || undefined}
         className={cn(
           "relative min-w-56 rounded-md border bg-background p-3 shadow-sm outline-none transition-colors",
           selected && "border-primary ring-2 ring-primary/20",
+          focused && !selected && "ring-2 ring-ring/35",
+          disabled && "opacity-60",
           onNodeSelect &&
             "cursor-pointer focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
         )}
+        ref={(element) => setNodeRef?.(node.id, element)}
         onClick={onNodeSelect ? selectNode : undefined}
+        onFocus={() => renderContext.focusNode()}
         onKeyDown={handleNodeKeyDown}
       >
         {hasChildren ? (
@@ -362,8 +670,15 @@ function OrgChartNode({
                 getNodeExpanded={getNodeExpanded}
                 onToggleNode={onToggleNode}
                 selectedNodeId={selectedNodeId}
+                focusedNodeId={focusedNodeId}
+                keyboardMode={keyboardMode}
+                getNodeDisabled={getNodeDisabled}
+                onFocusNode={onFocusNode}
+                onNodeKeyDown={onNodeKeyDown}
                 onNodeSelect={onNodeSelect}
                 onNodeActionSelect={onNodeActionSelect}
+                setNodeRef={setNodeRef}
+                siblingCount={node.children?.length ?? 0}
               />
             ))}
           </div>
@@ -386,6 +701,104 @@ function collectExpandableNodeIds(nodes: readonly OrgChartNodeData[]) {
   return expandedNodeIds;
 }
 
+function findOrgChartNode(
+  nodes: readonly OrgChartNodeData[],
+  nodeId: string,
+): { node: OrgChartNodeData; path: string[] } | null {
+  for (const node of nodes) {
+    if (node.id === nodeId) {
+      return { node, path: [node.id] };
+    }
+
+    if (node.children?.length) {
+      const childMatch = findOrgChartNode(node.children, nodeId);
+
+      if (childMatch) {
+        return { node: childMatch.node, path: [node.id, ...childMatch.path] };
+      }
+    }
+  }
+
+  return null;
+}
+
+function getVisibleOrgChartNodes(
+  nodes: readonly OrgChartNodeData[],
+  expandedIds: ReadonlySet<string>,
+): OrgChartVisibleNode[] {
+  const visibleNodes: OrgChartVisibleNode[] = [];
+
+  function visit(
+    currentNodes: readonly OrgChartNodeData[],
+    depth: number,
+    parentNode: OrgChartNodeData | undefined,
+    parentPath: string[],
+  ) {
+    currentNodes.forEach((node, index) => {
+      const path = [...parentPath, node.id];
+
+      visibleNodes.push({
+        node,
+        depth,
+        index,
+        siblingCount: currentNodes.length,
+        parentNode,
+        path,
+      });
+
+      if (node.children?.length && expandedIds.has(node.id)) {
+        visit(node.children, depth + 1, node, path);
+      }
+    });
+  }
+
+  visit(nodes, 0, undefined, []);
+
+  return visibleNodes;
+}
+
+function createOrgChartContext({
+  node,
+  depth,
+  index,
+  siblingCount,
+  parentNode,
+  path,
+  expanded,
+  hasChildren = Boolean(node.children?.length),
+  selected,
+  focused,
+  disabled,
+  toggleExpanded,
+  focusNode,
+  selectNode,
+}: OrgChartVisibleNode & {
+  expanded: boolean;
+  hasChildren?: boolean;
+  selected: boolean;
+  focused: boolean;
+  disabled: boolean;
+  toggleExpanded: () => void;
+  focusNode: () => void;
+  selectNode: () => void;
+}): OrgChartRenderNodeContext {
+  return {
+    depth,
+    index,
+    siblingCount,
+    parentNode,
+    path,
+    expanded,
+    hasChildren,
+    selected,
+    focused,
+    disabled,
+    toggleExpanded,
+    focusNode,
+    selectNode,
+  };
+}
+
 function getNodeAccessibleName(node: OrgChartNodeData) {
   return typeof node.label === "string" || typeof node.label === "number"
     ? String(node.label)
@@ -396,6 +809,10 @@ function getActionAccessibleLabel(action: OrgChartNodeAction) {
   return typeof action.label === "string" || typeof action.label === "number"
     ? String(action.label)
     : action.id;
+}
+
+function isActivationKey(event: React.KeyboardEvent): boolean {
+  return event.key === "Enter" || event.key === " ";
 }
 
 function insertOrgChartNode(
@@ -464,5 +881,17 @@ function removeOrgChartNode(
 }
 
 export { OrgChart, OrgChartNode };
-export { insertOrgChartNode, removeOrgChartNode, updateOrgChartNode };
-export type { OrgChartProps, OrgChartNodeAction, OrgChartNodeData, OrgChartRenderNodeContext };
+export {
+  findOrgChartNode,
+  getVisibleOrgChartNodes,
+  insertOrgChartNode,
+  removeOrgChartNode,
+  updateOrgChartNode,
+};
+export type {
+  OrgChartKeyboardMode,
+  OrgChartProps,
+  OrgChartNodeAction,
+  OrgChartNodeData,
+  OrgChartRenderNodeContext,
+};

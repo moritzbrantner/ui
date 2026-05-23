@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import {
@@ -329,6 +329,154 @@ describe("chart graph components", () => {
       [0, 0],
     );
     expect(onActivePathChange).toHaveBeenCalledWith([], null);
+  });
+
+  test("renders donut breadcrumbs for nested active paths", () => {
+    render(
+      <ChartDonutGraph
+        ariaLabel="Folder sizes"
+        data={[
+          {
+            label: "Design",
+            children: [
+              { label: "Icons", value: 8 },
+              { label: "Illustrations", value: 2 },
+            ],
+          },
+          { label: "Code", value: 10 },
+        ]}
+        activePath={[0]}
+      />,
+    );
+
+    const breadcrumbs = screen.getByRole("navigation", { name: "Folder sizes breadcrumb" });
+
+    expect(within(breadcrumbs).getByRole("button", { name: "Folder sizes" })).toBeTruthy();
+    expect(within(breadcrumbs).getByText("Design").getAttribute("aria-current")).toBe("page");
+  });
+
+  test("changes donut active path when a breadcrumb is clicked", () => {
+    const onActivePathChange = vi.fn();
+
+    render(
+      <ChartDonutGraph
+        ariaLabel="Folder sizes"
+        data={[
+          {
+            label: "Design",
+            children: [
+              { label: "Icons", value: 8 },
+              { label: "Illustrations", value: 2 },
+            ],
+          },
+          { label: "Code", value: 10 },
+        ]}
+        activePath={[0]}
+        onActivePathChange={onActivePathChange}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Folder sizes" }));
+
+    expect(onActivePathChange).toHaveBeenCalledWith([], null);
+  });
+
+  test("drills up from donut segments with escape", () => {
+    const onActivePathChange = vi.fn();
+    const onDrillUp = vi.fn();
+
+    render(
+      <ChartDonutGraph
+        ariaLabel="Folder sizes"
+        data={[
+          {
+            label: "Design",
+            children: [
+              { label: "Icons", value: 8 },
+              { label: "Illustrations", value: 2 },
+            ],
+          },
+          { label: "Code", value: 10 },
+        ]}
+        activePath={[0]}
+        onActivePathChange={onActivePathChange}
+        onDrillUp={onDrillUp}
+        onSegmentSelect={vi.fn()}
+      />,
+    );
+
+    fireEvent.keyDown(screen.getByRole("button", { name: "Icons: 8" }), { key: "Escape" });
+
+    expect(onActivePathChange).toHaveBeenCalledWith([], null);
+    expect(onDrillUp).toHaveBeenCalledWith([], null);
+  });
+
+  test("moves focused donut segments with arrow keys", async () => {
+    const onFocusedSegmentPathChange = vi.fn();
+
+    render(
+      <ChartDonutGraph
+        ariaLabel="Folder sizes"
+        data={[
+          {
+            label: "Design",
+            children: [
+              { label: "Icons", value: 8 },
+              { label: "Illustrations", value: 2 },
+            ],
+          },
+          { label: "Code", value: 10 },
+        ]}
+        activePath={[0]}
+        defaultFocusedSegmentPath={[0, 0]}
+        onFocusedSegmentPathChange={onFocusedSegmentPathChange}
+        onSegmentSelect={vi.fn()}
+      />,
+    );
+
+    fireEvent.keyDown(screen.getByRole("button", { name: "Icons: 8" }), { key: "ArrowRight" });
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Illustrations: 2" })).toBe(document.activeElement),
+    );
+    expect(onFocusedSegmentPathChange).toHaveBeenLastCalledWith(
+      [0, 1],
+      expect.objectContaining({ label: "Illustrations", value: 2 }),
+    );
+  });
+
+  test("fires donut drill-down and focused segment callbacks", () => {
+    const onDrillDown = vi.fn();
+    const onFocusedSegmentPathChange = vi.fn();
+
+    render(
+      <ChartDonutGraph
+        ariaLabel="Folder sizes"
+        data={[
+          {
+            label: "Design",
+            children: [
+              { label: "Icons", value: 8 },
+              { label: "Illustrations", value: 2 },
+            ],
+          },
+          { label: "Code", value: 10 },
+        ]}
+        onDrillDown={onDrillDown}
+        onFocusedSegmentPathChange={onFocusedSegmentPathChange}
+      />,
+    );
+
+    fireEvent.focus(screen.getByRole("button", { name: "Design: 10. Enter folder" }));
+    fireEvent.keyDown(screen.getByRole("button", { name: "Design: 10. Enter folder" }), {
+      key: "Enter",
+    });
+
+    expect(onFocusedSegmentPathChange).toHaveBeenCalledWith(
+      [0],
+      expect.objectContaining({ label: "Design" }),
+    );
+    expect(onDrillDown).toHaveBeenCalledWith(expect.objectContaining({ label: "Design" }), [0]);
   });
 
   test("shows donut empty state when values are not positive", () => {

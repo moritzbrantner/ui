@@ -176,6 +176,7 @@ function EditableServiceMapDemo() {
       edges={edges}
       selectedNodeId={selectedNodeId}
       onNodeSelect={(node) => setSelectedNodeId(node.id)}
+      onNodeDeselect={() => setSelectedNodeId(null)}
       nodeActions={(node) => [
         {
           id: "add",
@@ -285,5 +286,45 @@ export const EditableServiceMap: Story = {
     const deleteButtons = canvas.getAllByRole("button", { name: "Delete node" });
     await userEvent.click(deleteButtons[deleteButtons.length - 1]);
     await expect(canvas.queryByText("Service 1")).not.toBeInTheDocument();
+  },
+};
+
+export const KeyboardNodeSelection: Story = {
+  render: () => {
+    const [selectedNodeId, setSelectedNodeId] = React.useState<string | null>("orders");
+    const [focusedNodeId, setFocusedNodeId] = React.useState<string | null>("orders");
+
+    return (
+      <UmlDiagram
+        ariaLabel="Keyboard service dependency diagram"
+        nodes={serviceNodes}
+        edges={serviceEdges}
+        selectedNodeId={selectedNodeId}
+        focusedNodeId={focusedNodeId}
+        onFocusedNodeIdChange={(node) => setFocusedNodeId(node?.id ?? null)}
+        onNodeSelect={(node) => setSelectedNodeId(node.id)}
+        onNodeDeselect={() => setSelectedNodeId(null)}
+        nodeActionPlacement="outside-top-end"
+        getNodeDisabled={(node) => node.id === "billing"}
+        nodeActions={[{ id: "inspect", label: "Inspect" }]}
+      />
+    );
+  },
+  play: async ({ canvas }) => {
+    const orders = canvas.getByRole("button", { name: "Orders Service" });
+
+    orders.focus();
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect(canvas.getByRole("button", { name: "API Gateway" })).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(canvas.getByRole("button", { name: "API Gateway" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await userEvent.keyboard("{Escape}");
+    await expect(canvas.getByRole("button", { name: "API Gateway" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
   },
 };

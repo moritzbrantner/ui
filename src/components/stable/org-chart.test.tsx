@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import { OrgChart, insertOrgChartNode, removeOrgChartNode, updateOrgChartNode } from "./org-chart";
@@ -67,6 +67,128 @@ describe("OrgChart", () => {
 
     expect(onExpandedIdsChange).toHaveBeenCalledWith(["vp"], nodes[0]);
     expect(screen.queryByText("Design Lead")).toBeNull();
+  });
+
+  test("moves focus through visible nodes with arrow up and down", async () => {
+    const onNodeSelect = vi.fn();
+
+    render(<OrgChart nodes={nodes} onNodeSelect={onNodeSelect} />);
+
+    const root = screen.getByRole("button", { name: "VP Product" });
+    root.focus();
+
+    fireEvent.keyDown(root, { key: "ArrowDown" });
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Design Lead" })).toBe(document.activeElement),
+    );
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: "ArrowUp" });
+
+    await waitFor(() => expect(root).toBe(document.activeElement));
+  });
+
+  test("expands collapsed branches and focuses the first child with arrow right", async () => {
+    render(<OrgChart nodes={nodes} defaultExpandedIds={[]} onNodeSelect={vi.fn()} />);
+
+    const root = screen.getByRole("button", { name: "VP Product" });
+    root.focus();
+
+    fireEvent.keyDown(root, { key: "ArrowRight" });
+
+    await waitFor(() => {
+      expect(screen.getByText("Design Lead")).toBeTruthy();
+      expect(screen.getByRole("button", { name: "Design Lead" })).toBe(document.activeElement);
+    });
+  });
+
+  test("collapses expanded branches or moves focus to the parent with arrow left", async () => {
+    render(<OrgChart nodes={nodes} defaultFocusedNodeId="eng" onNodeSelect={vi.fn()} />);
+
+    const engineering = screen.getByRole("button", { name: "Engineering Lead" });
+    engineering.focus();
+
+    fireEvent.keyDown(engineering, { key: "ArrowLeft" });
+
+    await waitFor(() => expect(screen.queryByText("QA Lead")).toBeNull());
+    expect(engineering).toBe(document.activeElement);
+
+    fireEvent.keyDown(engineering, { key: "ArrowLeft" });
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "VP Product" })).toBe(document.activeElement),
+    );
+  });
+
+  test("moves focus to the first and last visible nodes with home and end", async () => {
+    render(<OrgChart nodes={nodes} defaultFocusedNodeId="design" onNodeSelect={vi.fn()} />);
+
+    const design = screen.getByRole("button", { name: "Design Lead" });
+    design.focus();
+
+    fireEvent.keyDown(design, { key: "End" });
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "QA Lead" })).toBe(document.activeElement),
+    );
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: "Home" });
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "VP Product" })).toBe(document.activeElement),
+    );
+  });
+
+  test("skips disabled nodes during keyboard navigation", async () => {
+    render(
+      <OrgChart
+        nodes={nodes}
+        onNodeSelect={vi.fn()}
+        getNodeDisabled={(node) => node.id === "design"}
+      />,
+    );
+
+    const root = screen.getByRole("button", { name: "VP Product" });
+    root.focus();
+
+    fireEvent.keyDown(root, { key: "ArrowDown" });
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Engineering Lead" })).toBe(document.activeElement),
+    );
+    expect(
+      screen.getByRole("treeitem", { name: "Design Lead" }).getAttribute("aria-disabled"),
+    ).toBe("true");
+  });
+
+  test("reports focused node changes with node and render context", async () => {
+    const onFocusedNodeIdChange = vi.fn();
+
+    render(
+      <OrgChart
+        nodes={nodes}
+        onNodeSelect={vi.fn()}
+        onFocusedNodeIdChange={onFocusedNodeIdChange}
+      />,
+    );
+
+    const root = screen.getByRole("button", { name: "VP Product" });
+    root.focus();
+    fireEvent.keyDown(root, { key: "ArrowDown" });
+
+    await waitFor(() =>
+      expect(onFocusedNodeIdChange).toHaveBeenLastCalledWith(
+        "design",
+        nodes[0].children?.[0],
+        expect.objectContaining({
+          depth: 1,
+          siblingCount: 2,
+          focused: true,
+          disabled: false,
+          path: ["vp", "design"],
+        }),
+      ),
+    );
   });
 
   test("selects nodes and runs node actions with nested context", () => {
