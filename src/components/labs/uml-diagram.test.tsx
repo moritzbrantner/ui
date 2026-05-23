@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, test, vi } from "vitest";
 
 import {
   UmlClassDiagram,
@@ -127,5 +127,38 @@ describe("UML diagram", () => {
         { id: "edge", source: "a", target: "b", points: [{ x: 180, y: -20 }] },
       ]),
     ).toEqual({ x: 10, y: -20, width: 350, height: 240 });
+  });
+
+  test("supports selectable nodes and inline node actions", () => {
+    const onNodeSelect = vi.fn();
+    const onNodeActionSelect = vi.fn();
+
+    render(
+      <UmlDiagram
+        ariaLabel="Editable services"
+        selectedNodeId="orders"
+        nodes={[
+          { id: "api", label: "API", x: 0, y: 0 },
+          { id: "orders", label: "Orders", x: 260, y: 0 },
+        ]}
+        nodeActions={[
+          { id: "add", label: "Add node" },
+          { id: "delete", label: "Delete node", destructive: true },
+        ]}
+        onNodeSelect={onNodeSelect}
+        onNodeActionSelect={onNodeActionSelect}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Orders" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Add node" })[1] as HTMLElement);
+
+    expect(onNodeSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "orders", x: 260, y: 0 }),
+    );
+    expect(onNodeActionSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "add" }),
+      expect.objectContaining({ id: "orders" }),
+    );
   });
 });

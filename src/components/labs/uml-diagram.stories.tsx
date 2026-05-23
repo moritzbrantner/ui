@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect } from "storybook/test";
+import { PlusIcon, Trash2Icon } from "lucide-react";
+import * as React from "react";
+import { expect, userEvent } from "storybook/test";
 
 import {
   UmlClassDiagram,
@@ -161,6 +163,71 @@ const serviceEdges = [
   },
 ] satisfies UmlDiagramEdge[];
 
+function EditableServiceMapDemo() {
+  const [nodes, setNodes] = React.useState<UmlDiagramNode[]>(serviceNodes);
+  const [edges, setEdges] = React.useState<UmlDiagramEdge[]>(serviceEdges);
+  const [selectedNodeId, setSelectedNodeId] = React.useState<string | null>("orders");
+  const nextNodeId = React.useRef(1);
+
+  return (
+    <UmlDiagram
+      ariaLabel="Editable service dependency diagram"
+      nodes={nodes}
+      edges={edges}
+      selectedNodeId={selectedNodeId}
+      onNodeSelect={(node) => setSelectedNodeId(node.id)}
+      nodeActions={(node) => [
+        {
+          id: "add",
+          label: "Add node",
+          icon: <PlusIcon aria-hidden="true" />,
+          onSelect: () => {
+            const id = `service-${nextNodeId.current++}`;
+            const newNode: UmlDiagramNode = {
+              id,
+              label: `Service ${nextNodeId.current - 1}`,
+              description: "Draft dependency",
+              x: node.x,
+              y: node.y + node.height + 92,
+              variant: "accent",
+            };
+
+            setNodes((currentNodes) => [...currentNodes, newNode]);
+            setEdges((currentEdges) => [
+              ...currentEdges,
+              {
+                id: `${node.id}-${id}`,
+                source: node.id,
+                target: id,
+                kind: "dependency",
+                label: "uses",
+              },
+            ]);
+            setSelectedNodeId(id);
+          },
+        },
+        {
+          id: "delete",
+          label: "Delete node",
+          icon: <Trash2Icon aria-hidden="true" />,
+          destructive: true,
+          disabled: nodes.length <= 1,
+          onSelect: () => {
+            setNodes((currentNodes) => currentNodes.filter((item) => item.id !== node.id));
+            setEdges((currentEdges) =>
+              currentEdges.filter((edge) => edge.source !== node.id && edge.target !== node.id),
+            );
+            setSelectedNodeId((currentSelectedNodeId) =>
+              currentSelectedNodeId === node.id ? null : currentSelectedNodeId,
+            );
+          },
+        },
+      ]}
+      caption="Draft service map with editable dependencies."
+    />
+  );
+}
+
 function UmlDiagramPreview() {
   return (
     <div className="grid max-w-5xl gap-8">
@@ -204,5 +271,19 @@ export const Default: Story = {
     await expect(canvas.getByText("Order")).toBeVisible();
     await expect(canvas.getByText("Fulfilled")).toBeVisible();
     await expect(canvas.getByText("Billing Adapter")).toBeVisible();
+  },
+};
+
+export const EditableServiceMap: Story = {
+  render: () => <EditableServiceMapDemo />,
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("img", { name: "Editable service dependency diagram" }),
+    ).toBeVisible();
+    await userEvent.click(canvas.getAllByRole("button", { name: "Add node" })[1]);
+    await expect(canvas.getByText("Service 1")).toBeVisible();
+    const deleteButtons = canvas.getAllByRole("button", { name: "Delete node" });
+    await userEvent.click(deleteButtons[deleteButtons.length - 1]);
+    await expect(canvas.queryByText("Service 1")).not.toBeInTheDocument();
   },
 };

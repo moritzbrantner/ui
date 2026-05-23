@@ -294,6 +294,43 @@ describe("chart graph components", () => {
     expect(screen.queryByText("Icons")).toBeNull();
   });
 
+  test("supports controlled donut paths and segment callbacks", () => {
+    const onActivePathChange = vi.fn();
+    const onSegmentSelect = vi.fn();
+
+    render(
+      <ChartDonutGraph
+        ariaLabel="Folder sizes"
+        data={[
+          {
+            label: "Design",
+            children: [
+              { label: "Icons", value: 8 },
+              { label: "Illustrations", value: 2 },
+            ],
+          },
+          { label: "Code", value: 10 },
+        ]}
+        activePath={[0]}
+        onActivePathChange={onActivePathChange}
+        onSegmentSelect={onSegmentSelect}
+      />,
+    );
+
+    expect(screen.getByText("Icons")).toBeTruthy();
+    expect(screen.queryByText("Code")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Icons: 8" }));
+    fireEvent.click(screen.getByRole("button", { name: "Go one folder up" }));
+
+    expect(onSegmentSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "Icons", value: 8 }),
+      0,
+      [0, 0],
+    );
+    expect(onActivePathChange).toHaveBeenCalledWith([], null);
+  });
+
   test("shows donut empty state when values are not positive", () => {
     render(
       <ChartDonutGraph

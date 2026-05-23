@@ -1,8 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { PlusIcon, Trash2Icon } from "lucide-react";
+import * as React from "react";
 import { expect, userEvent } from "storybook/test";
 
 import { Avatar } from "./avatar";
-import { OrgChart } from "./org-chart";
+import {
+  OrgChart,
+  insertOrgChartNode,
+  removeOrgChartNode,
+  type OrgChartNodeData,
+} from "./org-chart";
 
 const meta = {
   title: "Components/Data Display/Org Chart",
@@ -40,6 +47,49 @@ const teamNodes = [
     ],
   },
 ];
+
+function EditableHierarchyDemo() {
+  const [nodes, setNodes] = React.useState<OrgChartNodeData[]>(teamNodes);
+  const [selectedNodeId, setSelectedNodeId] = React.useState<string | null>("mara");
+  const nextNodeId = React.useRef(1);
+
+  return (
+    <OrgChart
+      nodes={nodes}
+      selectedNodeId={selectedNodeId}
+      onNodeSelect={(node) => setSelectedNodeId(node.id)}
+      nodeActions={(node, context) => [
+        {
+          id: "add",
+          label: "Add child",
+          icon: <PlusIcon aria-hidden="true" />,
+          onSelect: () => {
+            const id = `new-${nextNodeId.current++}`;
+            setNodes((currentNodes) =>
+              insertOrgChartNode(currentNodes, node.id, {
+                id,
+                label: `New role ${nextNodeId.current - 1}`,
+                description: "Draft node",
+              }),
+            );
+            setSelectedNodeId(id);
+          },
+        },
+        {
+          id: "delete",
+          label: "Delete node",
+          icon: <Trash2Icon aria-hidden="true" />,
+          destructive: true,
+          disabled: context.depth === 0,
+          onSelect: () => {
+            setNodes((currentNodes) => removeOrgChartNode(currentNodes, node.id));
+            setSelectedNodeId(context.parentNode?.id ?? null);
+          },
+        },
+      ]}
+    />
+  );
+}
 
 export const TeamStructure: Story = {
   args: { nodes: teamNodes },
@@ -80,5 +130,17 @@ export const MinimizedBranch: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByText("Omar Silva")).toBeVisible();
     await expect(canvas.queryByText("Ivy Chen")).not.toBeInTheDocument();
+  },
+};
+
+export const EditableHierarchy: Story = {
+  render: () => <EditableHierarchyDemo />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: "Mara Klein" })).toBeVisible();
+    await userEvent.click(canvas.getAllByRole("button", { name: "Add child" })[0]);
+    await expect(canvas.getByText("New role 1")).toBeVisible();
+    const deleteButtons = canvas.getAllByRole("button", { name: "Delete node" });
+    await userEvent.click(deleteButtons[deleteButtons.length - 1]);
+    await expect(canvas.queryByText("New role 1")).not.toBeInTheDocument();
   },
 };

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { OrgChart } from "./org-chart";
+import { OrgChart, insertOrgChartNode, removeOrgChartNode, updateOrgChartNode } from "./org-chart";
 
 const nodes = [
   {
@@ -67,5 +67,58 @@ describe("OrgChart", () => {
 
     expect(onExpandedIdsChange).toHaveBeenCalledWith(["vp"], nodes[0]);
     expect(screen.queryByText("Design Lead")).toBeNull();
+  });
+
+  test("selects nodes and runs node actions with nested context", () => {
+    const onNodeSelect = vi.fn();
+    const onNodeActionSelect = vi.fn();
+
+    const { container } = render(
+      <OrgChart
+        nodes={nodes}
+        selectedNodeId="eng"
+        nodeActions={[
+          { id: "add", label: "Add child" },
+          { id: "delete", label: "Delete node", destructive: true },
+        ]}
+        onNodeSelect={onNodeSelect}
+        onNodeActionSelect={onNodeActionSelect}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Engineering Lead" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Add child" })[2] as HTMLElement);
+
+    const selectedBranch = container.querySelector(
+      '[data-slot="org-chart-node-branch"][aria-selected="true"]',
+    );
+
+    expect(selectedBranch?.textContent).toContain("Engineering Lead");
+    expect(onNodeSelect).toHaveBeenCalledWith(
+      nodes[0].children?.[1],
+      expect.objectContaining({ depth: 1, path: ["vp", "eng"], selected: true }),
+    );
+    expect(onNodeActionSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "add" }),
+      nodes[0].children?.[1],
+      expect.objectContaining({ depth: 1, path: ["vp", "eng"] }),
+    );
+  });
+
+  test("updates nested node data immutably", () => {
+    const inserted = insertOrgChartNode(nodes, "eng", { id: "platform", label: "Platform Lead" });
+    const updated = updateOrgChartNode(inserted, "platform", (node) => ({
+      ...node,
+      description: "Frontend quality",
+    }));
+    const removed = removeOrgChartNode(updated, "design");
+
+    expect(inserted[0]?.children?.[1]?.children?.map((node) => node.id)).toEqual([
+      "qa",
+      "platform",
+    ]);
+    expect(updated[0]?.children?.[1]?.children?.[1]?.description).toBe("Frontend quality");
+    expect(removed[0]?.children?.map((node) => node.id)).toEqual(["eng"]);
+    expect(nodes[0]?.children?.[1]?.children).toHaveLength(1);
   });
 });

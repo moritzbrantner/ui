@@ -74,8 +74,23 @@ export type UmlDiagramProps = Omit<React.ComponentProps<"figure">, "children"> &
   emptyMessage?: React.ReactNode;
   padding?: number;
   autoLayoutColumns?: number;
+  selectedNodeId?: string | null;
+  nodeActions?:
+    | readonly UmlDiagramNodeAction[]
+    | ((node: PositionedUmlDiagramNode) => readonly UmlDiagramNodeAction[]);
+  onNodeSelect?: (node: PositionedUmlDiagramNode) => void;
+  onNodeActionSelect?: (action: UmlDiagramNodeAction, node: PositionedUmlDiagramNode) => void;
   renderNode?: (node: PositionedUmlDiagramNode) => React.ReactNode;
   renderEdge?: (edge: UmlDiagramEdge, context: UmlDiagramEdgeRenderContext) => React.ReactNode;
+};
+
+type UmlDiagramNodeAction = {
+  id: string;
+  label: React.ReactNode;
+  icon?: React.ReactNode;
+  disabled?: boolean;
+  destructive?: boolean;
+  onSelect?: (node: PositionedUmlDiagramNode) => void;
 };
 
 type UmlDiagramEdgeRenderContext = {
@@ -166,6 +181,10 @@ function UmlDiagram({
   emptyMessage = "No diagram elements.",
   padding = 32,
   autoLayoutColumns,
+  selectedNodeId,
+  nodeActions,
+  onNodeSelect,
+  onNodeActionSelect,
   renderNode = renderDefaultUmlNode,
   renderEdge = renderDefaultUmlEdge,
   className,
@@ -220,7 +239,15 @@ function UmlDiagram({
               </g>
               <g data-slot="uml-diagram-nodes">
                 {positionedNodes.map((node) => (
-                  <React.Fragment key={node.id}>{renderNode(node)}</React.Fragment>
+                  <UmlDiagramInteractiveNode
+                    key={node.id}
+                    node={node}
+                    nodeActions={nodeActions}
+                    onNodeActionSelect={onNodeActionSelect}
+                    onNodeSelect={onNodeSelect}
+                    renderNode={renderNode}
+                    selected={selectedNodeId === node.id}
+                  />
                 ))}
               </g>
             </>
@@ -289,6 +316,132 @@ function UmlStateDiagram({
       renderNode={renderUmlStateNode}
       {...props}
     />
+  );
+}
+
+function UmlDiagramInteractiveNode({
+  node,
+  nodeActions,
+  renderNode,
+  selected,
+  onNodeSelect,
+  onNodeActionSelect,
+}: {
+  node: PositionedUmlDiagramNode;
+  nodeActions?: UmlDiagramProps["nodeActions"];
+  renderNode: NonNullable<UmlDiagramProps["renderNode"]>;
+  selected: boolean;
+  onNodeSelect?: UmlDiagramProps["onNodeSelect"];
+  onNodeActionSelect?: UmlDiagramProps["onNodeActionSelect"];
+}) {
+  const resolvedActions =
+    typeof nodeActions === "function" ? nodeActions(node) : (nodeActions ?? []);
+  const interactive = Boolean(onNodeSelect);
+  const accessibleName = getUmlDiagramNodeAccessibleName(node);
+  const selectNode = React.useCallback(() => {
+    onNodeSelect?.(node);
+  }, [node, onNodeSelect]);
+  const handleKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<SVGGElement>) => {
+      if (!interactive || !isActivationKey(event)) {
+        return;
+      }
+
+      event.preventDefault();
+      selectNode();
+    },
+    [interactive, selectNode],
+  );
+
+  return (
+    <g
+      data-slot="uml-diagram-node-interaction"
+      data-node-id={node.id}
+      data-selected={selected ? "true" : undefined}
+      role={interactive ? "button" : undefined}
+      aria-label={interactive ? accessibleName : undefined}
+      aria-pressed={interactive ? selected : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      className={cn(
+        "outline-none",
+        interactive &&
+          "cursor-pointer focus-visible:[&_[data-slot='uml-diagram-node-focus']]:stroke-ring",
+      )}
+      onClick={interactive ? selectNode : undefined}
+      onKeyDown={handleKeyDown}
+    >
+      {selected ? (
+        <rect
+          data-slot="uml-diagram-node-focus"
+          x={node.x - 6}
+          y={node.y - 6}
+          width={node.width + 12}
+          height={node.height + 12}
+          rx="12"
+          className="fill-transparent stroke-primary stroke-2"
+        />
+      ) : null}
+      {renderNode(node)}
+      {resolvedActions.length ? (
+        <UmlDiagramNodeActions
+          actions={resolvedActions}
+          node={node}
+          onNodeActionSelect={onNodeActionSelect}
+        />
+      ) : null}
+    </g>
+  );
+}
+
+function UmlDiagramNodeActions({
+  actions,
+  node,
+  onNodeActionSelect,
+}: {
+  actions: readonly UmlDiagramNodeAction[];
+  node: PositionedUmlDiagramNode;
+  onNodeActionSelect?: UmlDiagramProps["onNodeActionSelect"];
+}) {
+  const actionSize = 28;
+  const actionGap = 4;
+  const width = actions.length * actionSize + Math.max(0, actions.length - 1) * actionGap;
+
+  return (
+    <foreignObject
+      data-slot="uml-diagram-node-actions"
+      x={node.x + node.width - width - 8}
+      y={node.y + node.height - actionSize - 8}
+      width={width}
+      height={actionSize}
+    >
+      <div className="flex gap-1">
+        {actions.map((action) => (
+          <button
+            key={action.id}
+            type="button"
+            data-slot="uml-diagram-node-action"
+            data-action-id={action.id}
+            data-destructive={action.destructive ? "true" : undefined}
+            aria-label={getUmlDiagramActionAccessibleLabel(action)}
+            disabled={action.disabled}
+            className={cn(
+              "inline-flex size-7 items-center justify-center rounded-sm border bg-background/90 text-xs font-medium text-foreground shadow-sm outline-none transition-colors",
+              "hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50",
+              action.destructive &&
+                "text-destructive hover:bg-destructive/10 hover:text-destructive",
+              "[&_svg]:size-3.5",
+            )}
+            onClick={(event) => {
+              event.stopPropagation();
+              action.onSelect?.(node);
+              onNodeActionSelect?.(action, node);
+            }}
+          >
+            {action.icon ?? action.label}
+          </button>
+        ))}
+      </div>
+    </foreignObject>
   );
 }
 
@@ -917,6 +1070,22 @@ function getUmlDiagramMidpoint(
   };
 }
 
+function getUmlDiagramNodeAccessibleName(node: UmlDiagramNode) {
+  return typeof node.label === "string" || typeof node.label === "number"
+    ? String(node.label)
+    : node.id;
+}
+
+function getUmlDiagramActionAccessibleLabel(action: UmlDiagramNodeAction) {
+  return typeof action.label === "string" || typeof action.label === "number"
+    ? String(action.label)
+    : action.id;
+}
+
+function isActivationKey(event: React.KeyboardEvent) {
+  return event.key === "Enter" || event.key === " ";
+}
+
 export {
   UmlClassDiagram,
   UmlDiagram,
@@ -931,6 +1100,7 @@ export {
   type UmlDiagramEdgeDirection,
   type UmlDiagramEdgeKind,
   type UmlDiagramNode,
+  type UmlDiagramNodeAction,
   type UmlDiagramNodeVariant,
   type UmlDiagramPoint,
   type UmlDiagramSection,

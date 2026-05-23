@@ -132,6 +132,10 @@ type ChartDonutGraphProps = Omit<React.ComponentProps<"figure">, "children"> & {
   showTotal?: boolean;
   centerLabel?: React.ReactNode | ((total: number) => React.ReactNode);
   childrenKey?: string;
+  activePath?: readonly number[];
+  defaultActivePath?: readonly number[];
+  onActivePathChange?: (path: number[], datum: ChartDatum | null) => void;
+  onSegmentSelect?: (datum: ChartDatum, index: number, path: number[]) => void;
   formatLabel?: (value: ChartDatumValue, datum: ChartDatum, index: number) => React.ReactNode;
   formatValue?: (value: number) => React.ReactNode;
 };
@@ -736,19 +740,38 @@ function ChartDonutGraph({
   showTotal = true,
   centerLabel,
   childrenKey = "children",
+  activePath,
+  defaultActivePath,
+  onActivePathChange,
+  onSegmentSelect,
   formatLabel = defaultFormatLabel,
   formatValue = defaultFormatValue,
   className,
   ...props
 }: ChartDonutGraphProps) {
-  const [activePath, setActivePath] = React.useState<number[]>([]);
-  const safeActivePath = getValidDonutPath(data, activePath, childrenKey);
+  const [internalActivePath, setInternalActivePath] = React.useState<number[]>(() => [
+    ...(defaultActivePath ?? []),
+  ]);
+  const currentActivePath = activePath ? [...activePath] : internalActivePath;
+  const safeActivePath = getValidDonutPath(data, currentActivePath, childrenKey);
   const activeNode = getDonutNodeAtPath(data, safeActivePath, childrenKey);
   const activeData = activeNode ? getChartDatumChildren(activeNode, childrenKey) : data;
+  const setDonutPath = React.useCallback(
+    (path: number[]) => {
+      const nextPath = getValidDonutPath(data, path, childrenKey);
+
+      if (!activePath) {
+        setInternalActivePath(nextPath);
+      }
+
+      onActivePathChange?.(nextPath, getDonutNodeAtPath(data, nextPath, childrenKey));
+    },
+    [activePath, childrenKey, data, onActivePathChange],
+  );
   const canGoUp = safeActivePath.length > 0;
   const goUp = React.useCallback(() => {
-    setActivePath((path) => path.slice(0, -1));
-  }, []);
+    setDonutPath(safeActivePath.slice(0, -1));
+  }, [safeActivePath, setDonutPath]);
   const handleGoUpKeyDown = React.useCallback(
     (event: React.KeyboardEvent<SVGCircleElement>) => {
       if (!isActivationKey(event)) {
@@ -795,31 +818,34 @@ function ChartDonutGraph({
   const total = segments.reduce((sum, item) => sum + item.value, 0);
   const hasData = total > 0;
   const hasInteractiveSegments = segments.some((segment) => segment.children.length > 0);
-  const isInteractiveDonut = hasInteractiveSegments || canGoUp;
+  const isInteractiveDonut = hasInteractiveSegments || canGoUp || Boolean(onSegmentSelect);
   const center = size / 2;
   const radiusOuter = Math.min(outerRadius, center - 2);
   const radiusInner = Math.min(innerRadius, radiusOuter - 8);
   let currentAngle = 0;
   const handleSegmentClick = React.useCallback(
     (segment: (typeof segments)[number]) => {
+      const nextPath = [...safeActivePath, segment.index];
+      onSegmentSelect?.(segment.datum, segment.index, nextPath);
+
       if (!segment.children.length) {
         return;
       }
 
-      setActivePath([...safeActivePath, segment.index]);
+      setDonutPath(nextPath);
     },
-    [safeActivePath, segments],
+    [onSegmentSelect, safeActivePath, setDonutPath, segments],
   );
   const handleSegmentKeyDown = React.useCallback(
     (event: React.KeyboardEvent<SVGPathElement>, segment: (typeof segments)[number]) => {
-      if (!segment.children.length || !isActivationKey(event)) {
+      if (!isActivationKey(event)) {
         return;
       }
 
       event.preventDefault();
-      setActivePath([...safeActivePath, segment.index]);
+      handleSegmentClick(segment);
     },
-    [safeActivePath, segments],
+    [handleSegmentClick],
   );
 
   return (
@@ -839,7 +865,8 @@ function ChartDonutGraph({
                 const startAngle = currentAngle + gap / 2;
                 const endAngle = currentAngle + angle - gap / 2;
                 currentAngle += angle;
-                const isInteractiveSegment = segment.children.length > 0;
+                const isInteractiveSegment =
+                  segment.children.length > 0 || Boolean(onSegmentSelect);
 
                 return (
                   <path
@@ -847,7 +874,7 @@ function ChartDonutGraph({
                     data-slot="chart-donut-graph-segment"
                     role={isInteractiveSegment ? "button" : "graphics-symbol"}
                     aria-label={`${segment.label}: ${formatValue(segment.value)}${
-                      isInteractiveSegment ? ". Enter folder" : ""
+                      segment.children.length ? ". Enter folder" : ""
                     }`}
                     d={getDonutSegmentPath(
                       center,
