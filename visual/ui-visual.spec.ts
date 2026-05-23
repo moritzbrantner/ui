@@ -11,7 +11,7 @@ const storyIds = [
   "components-forms-inputs-stepper--horizontal",
   "components-navigation-shortcut-help--dialog",
   "components-feedback-connection-status--states",
-  "reference-shadcn-catalog--full-catalog",
+  "components-stable-primitive-components--overview",
   "components-overlays-dialog--open",
   "components-overlay-sheet--basic",
   "components-data-display-data-grid--default",
@@ -66,7 +66,7 @@ const releaseReadinessThemeStories = [
 const uiThemes = ["bobba", "zleek", "atlas", "studio", "paper"] as const;
 const colorSchemes = ["light", "dark"] as const;
 const horizontallyScrollableStories = new Set([
-  "reference-shadcn-catalog--full-catalog",
+  "components-stable-primitive-components--overview",
   "components-data-display-data-grid--default",
   "components-navigation-platform-navbar--web",
   "components-overlay-action-menu--basic",
@@ -91,7 +91,7 @@ const horizontallyScrollableStories = new Set([
 const denseControlStories = new Set([
   "components-data-display-calendar-card-days--default",
   "components-forms-inputs-form-controls--basic",
-  "reference-shadcn-catalog--full-catalog",
+  "components-stable-primitive-components--overview",
   "components-editors-workflow-builder--ai-workflow-graph",
   "components-editors-workflow-builder--controlled-viewport",
 ]);
@@ -110,12 +110,12 @@ for (const viewport of viewports) {
     }
 
     for (const designSystem of uiThemes) {
-      test(`catalog renders ${designSystem}`, async ({ page }) => {
-        await gotoStory(page, "reference-shadcn-catalog--full-catalog", {
+      test(`primitive components render ${designSystem}`, async ({ page }) => {
+        await gotoStory(page, "components-stable-primitive-components--overview", {
           designSystem,
           theme: "light",
         });
-        await verifyPageLayout(page, "reference-shadcn-catalog--full-catalog");
+        await verifyPageLayout(page, "components-stable-primitive-components--overview");
       });
     }
 
