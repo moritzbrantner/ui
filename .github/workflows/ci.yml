@@ -31,3 +31,11 @@ jobs:
 
       - name: Verify release contract
         run: npm run verify:release:ci
+
+      - name: Upload Unlighthouse report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: unlighthouse-report
+          path: unlighthouse-report
+          if-no-files-found: ignore

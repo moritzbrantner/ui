@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react";
 
 import { useIsMobile } from "../../../hooks/use-mobile";
 import { cn } from "../../../lib/cn";
@@ -203,7 +202,6 @@ export function PlatformNavbar({
   "aria-label": ariaLabel = "Primary navigation",
   ...props
 }: PlatformNavbarProps) {
-  const reduceMotion = useReducedMotion();
   const isMobile = useIsMobile();
   const instanceId = React.useId();
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -395,116 +393,104 @@ export function PlatformNavbar({
     };
   }, [containsNavbarTarget, openGroup, setOpenGroupId]);
 
-  const submenu = (
-    <AnimatePresence>
-      {openGroup ? (
-        <motion.div
-          key={openGroup.id}
-          ref={submenuRef}
-          id={getSubmenuId(openGroup.id)}
-          data-slot="platform-navbar-submenu"
-          className={cn(
-            "fixed z-[100] overflow-hidden border border-border/60 bg-popover/74 text-popover-foreground shadow-[var(--glass-shadow)] backdrop-blur-2xl",
-            config.panel,
-          )}
-          style={submenuStyle}
-          onBlurCapture={handleBlurCapture}
-          initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: -8, scale: 0.98 }}
-          animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.98 }}
-          transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {openGroup.eyebrow || openGroup.description ? (
-            <div className="mb-2 px-2 py-1">
-              {openGroup.eyebrow ? (
-                <p className="text-xs font-medium uppercase text-muted-foreground">
-                  {openGroup.eyebrow}
-                </p>
-              ) : null}
-              {openGroup.description ? (
-                <p className="mt-1 text-sm leading-5 text-muted-foreground">
-                  {openGroup.description}
-                </p>
-              ) : null}
-            </div>
+  const submenu = openGroup ? (
+    <div
+      key={openGroup.id}
+      ref={submenuRef}
+      id={getSubmenuId(openGroup.id)}
+      data-slot="platform-navbar-submenu"
+      data-open
+      className={cn(
+        "fixed z-[100] overflow-hidden border border-border/60 bg-popover/74 text-popover-foreground opacity-100 shadow-[var(--glass-shadow)] backdrop-blur-2xl transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
+        config.panel,
+      )}
+      style={submenuStyle}
+      onBlurCapture={handleBlurCapture}
+    >
+      {openGroup.eyebrow || openGroup.description ? (
+        <div className="mb-2 px-2 py-1">
+          {openGroup.eyebrow ? (
+            <p className="text-xs font-medium uppercase text-muted-foreground">
+              {openGroup.eyebrow}
+            </p>
           ) : null}
+          {openGroup.description ? (
+            <p className="mt-1 text-sm leading-5 text-muted-foreground">{openGroup.description}</p>
+          ) : null}
+        </div>
+      ) : null}
 
-          <div className={config.list}>
-            {openGroup.items.map((item) => {
-              const isCurrent = item.id === activeItemId || item.active;
-              const itemClassName = cn(
-                "group flex min-h-16 min-w-0 items-center gap-3 rounded-xl border px-3 py-2 text-left text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50",
-                isCurrent
-                  ? "border-primary/45 bg-primary text-primary-foreground"
-                  : "border-border/45 bg-background/36 text-foreground hover:border-border hover:bg-accent/45",
-                item.disabled ? "pointer-events-none opacity-50" : undefined,
-              );
-              const content = (
-                <>
-                  {item.icon ? <span className="shrink-0 text-current">{item.icon}</span> : null}
-                  <span className="min-w-0 flex-1">
-                    <span className="flex min-w-0 items-center gap-2">
-                      <span className="truncate font-medium">{item.label}</span>
-                      {item.badge ? (
-                        <span className="shrink-0 rounded-full border border-current/20 px-2 py-0.5 text-[0.68rem]">
-                          {item.badge}
-                        </span>
-                      ) : null}
-                    </span>
-                    {item.description ? (
-                      <span
-                        className={cn(
-                          "mt-1 block text-xs leading-5",
-                          isCurrent ? "text-primary-foreground/75" : "text-muted-foreground",
-                        )}
-                      >
-                        {item.description}
-                      </span>
-                    ) : null}
-                  </span>
-                  {item.meta ? (
-                    <span
-                      className={cn(
-                        "shrink-0 text-xs",
-                        isCurrent ? "text-primary-foreground/75" : "text-muted-foreground",
-                      )}
-                    >
-                      {item.meta}
+      <div className={config.list}>
+        {openGroup.items.map((item) => {
+          const isCurrent = item.id === activeItemId || item.active;
+          const itemClassName = cn(
+            "group flex min-h-16 min-w-0 items-center gap-3 rounded-xl border px-3 py-2 text-left text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50",
+            isCurrent
+              ? "border-primary/45 bg-primary text-primary-foreground"
+              : "border-border/45 bg-background/36 text-foreground hover:border-border hover:bg-accent/45",
+            item.disabled ? "pointer-events-none opacity-50" : undefined,
+          );
+          const content = (
+            <>
+              {item.icon ? <span className="shrink-0 text-current">{item.icon}</span> : null}
+              <span className="min-w-0 flex-1">
+                <span className="flex min-w-0 items-center gap-2">
+                  <span className="truncate font-medium">{item.label}</span>
+                  {item.badge ? (
+                    <span className="shrink-0 rounded-full border border-current/20 px-2 py-0.5 text-[0.68rem]">
+                      {item.badge}
                     </span>
                   ) : null}
-                </>
-              );
-              const handleItemClick = () => {
-                item.onSelect?.();
-                onNavigate?.(item, openGroup);
-                setOpenGroupId(null);
-              };
-
-              return (
-                <motion.div
-                  key={item.id}
-                  layout
-                  initial={reduceMotion ? false : { opacity: 0, y: 8 }}
-                  animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-                  transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                </span>
+                {item.description ? (
+                  <span
+                    className={cn(
+                      "mt-1 block text-xs leading-5",
+                      isCurrent ? "text-primary-foreground/75" : "text-muted-foreground",
+                    )}
+                  >
+                    {item.description}
+                  </span>
+                ) : null}
+              </span>
+              {item.meta ? (
+                <span
+                  className={cn(
+                    "shrink-0 text-xs",
+                    isCurrent ? "text-primary-foreground/75" : "text-muted-foreground",
+                  )}
                 >
-                  {(renderLink ?? DefaultLink)({
-                    ...item,
-                    className: itemClassName,
-                    children: content,
-                    "aria-current": isCurrent ? "page" : undefined,
-                    onClick: handleItemClick,
-                  })}
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
-  );
+                  {item.meta}
+                </span>
+              ) : null}
+            </>
+          );
+          const handleItemClick = () => {
+            item.onSelect?.();
+            onNavigate?.(item, openGroup);
+            setOpenGroupId(null);
+          };
+
+          return (
+            <div
+              key={item.id}
+              className="transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none"
+            >
+              {(renderLink ?? DefaultLink)({
+                ...item,
+                className: itemClassName,
+                children: content,
+                "aria-current": isCurrent ? "page" : undefined,
+                onClick: handleItemClick,
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  ) : null;
   return (
-    <LayoutGroup>
+    <>
       <div
         ref={containerRef}
         className="relative overflow-visible"
@@ -522,12 +508,7 @@ export function PlatformNavbar({
           )}
           {...props}
         >
-          <motion.div
-            className={cn("flex min-w-0", config.chrome)}
-            initial={reduceMotion ? false : { opacity: 0, y: -8 }}
-            animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-          >
+          <div className={cn("flex min-w-0", config.chrome)}>
             <div className={cn("flex min-w-0 items-center gap-2", config.brand)}>
               <div className="min-w-0 truncate text-sm font-semibold">{brand}</div>
               {resolvedVariant === "mobile" ? renderedActions : null}
@@ -539,7 +520,7 @@ export function PlatformNavbar({
                 const isActive = group.id === resolvedActiveGroupId;
 
                 return (
-                  <motion.button
+                  <button
                     key={group.id}
                     ref={(node) => {
                       if (node) {
@@ -552,22 +533,16 @@ export function PlatformNavbar({
                     aria-controls={getSubmenuId(group.id)}
                     aria-expanded={isOpen}
                     className={cn(
-                      "relative inline-flex min-w-0 shrink-0 items-center justify-center gap-2 overflow-hidden rounded-md border text-center font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50",
+                      "relative inline-flex min-w-0 shrink-0 items-center justify-center gap-2 overflow-hidden rounded-md border text-center font-medium outline-none transition-[transform,background-color,border-color,color,box-shadow] focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none hover:-translate-y-px active:scale-[0.97]",
                       config.trigger,
                       isOpen || isActive
                         ? "border-primary/45 bg-primary text-primary-foreground shadow-[var(--glass-interactive-shadow)]"
                         : "border-border/55 bg-background/36 text-foreground/78 hover:border-border hover:bg-accent/45 hover:text-foreground",
                     )}
-                    whileHover={reduceMotion ? undefined : { y: -1 }}
-                    whileTap={reduceMotion ? undefined : { scale: 0.97 }}
-                    onClick={() => setOpenGroupId(isOpen ? null : group.id)}
+                    onClick={() => setOpenGroupId(group.id)}
                   >
                     {isOpen ? (
-                      <motion.span
-                        layoutId="platform-navbar-active-pill"
-                        className="absolute inset-0 -z-10 rounded-md bg-primary"
-                        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                      />
+                      <span className="absolute inset-0 -z-10 rounded-md bg-primary" />
                     ) : null}
                     {group.icon ? (
                       <span className="shrink-0 text-current">{group.icon}</span>
@@ -579,16 +554,16 @@ export function PlatformNavbar({
                         isOpen ? "rotate-180" : undefined,
                       )}
                     />
-                  </motion.button>
+                  </button>
                 );
               })}
             </div>
 
             {resolvedVariant !== "mobile" ? renderedActions : null}
-          </motion.div>
+          </div>
         </nav>
       </div>
       {portalContainer ? createPortal(submenu, portalContainer) : submenu}
-    </LayoutGroup>
+    </>
   );
 }

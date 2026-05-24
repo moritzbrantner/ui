@@ -265,6 +265,8 @@ function WorkflowBuilder({
   const [portPoints, setPortPoints] = React.useState<WorkflowBuilderPortPointMap>({});
   const viewportRef = React.useRef<HTMLDivElement>(null);
   const suppressNextPortClickRef = React.useRef(false);
+  const pendingDragNodesRef = React.useRef<WorkflowBuilderNodeData[] | null>(null);
+  const dragFrameRef = React.useRef<number | null>(null);
   const currentViewport = viewport ?? {
     ...internalViewport,
     zoom: zoom ?? internalViewport.zoom ?? internalZoom,
@@ -272,8 +274,62 @@ function WorkflowBuilder({
   const currentZoom = currentViewport.zoom;
   const currentSelectedNodeId = selectedNodeId ?? internalSelectedNodeId;
   const currentSelectedEdgeId = selectedEdgeId ?? internalSelectedEdgeId;
-  const selectedNode = nodes.find((node) => node.id === currentSelectedNodeId);
-  const selectedEdge = edges.find((edge) => edge.id === currentSelectedEdgeId);
+  const nodeById = React.useMemo(
+    () => new Map(nodes.map((node) => [node.id, node] as const)),
+    [nodes],
+  );
+  const selectedNode = currentSelectedNodeId ? nodeById.get(currentSelectedNodeId) : undefined;
+  const selectedEdge = React.useMemo(
+    () => edges.find((edge) => edge.id === currentSelectedEdgeId),
+    [currentSelectedEdgeId, edges],
+  );
+  const edgeGeometry = React.useMemo(
+    () =>
+      new Map(
+        edges.map((edge) => [
+          edge.id,
+          {
+            line: getWorkflowEdgeLine(nodes, edge, portPoints),
+            sourcePoint: getWorkflowEdgeEndpointPoint(nodes, edge, "source", portPoints),
+            targetPoint: getWorkflowEdgeEndpointPoint(nodes, edge, "target", portPoints),
+          },
+        ]),
+      ),
+    [edges, nodes, portPoints],
+  );
+  const scheduleDraggedNodesChange = React.useCallback(
+    (nextNodes: WorkflowBuilderNodeData[], immediate = false) => {
+      if (immediate) {
+        pendingDragNodesRef.current = null;
+        if (dragFrameRef.current !== null && typeof window !== "undefined") {
+          window.cancelAnimationFrame(dragFrameRef.current);
+          dragFrameRef.current = null;
+        }
+        onNodesChange?.(nextNodes);
+        return;
+      }
+
+      pendingDragNodesRef.current = nextNodes;
+
+      if (dragFrameRef.current !== null || typeof window === "undefined") {
+        if (typeof window === "undefined") {
+          onNodesChange?.(nextNodes);
+        }
+        return;
+      }
+
+      dragFrameRef.current = window.requestAnimationFrame(() => {
+        dragFrameRef.current = null;
+        const pendingNodes = pendingDragNodesRef.current;
+        pendingDragNodesRef.current = null;
+
+        if (pendingNodes) {
+          onNodesChange?.(pendingNodes);
+        }
+      });
+    },
+    [onNodesChange],
+  );
 
   const commitViewport = (nextViewport: WorkflowBuilderViewport) => {
     const safeViewport = {
@@ -476,7 +532,7 @@ function WorkflowBuilder({
       return;
     }
     const pointer = getWorkflowPointer(event);
-    const draggedNode = nodes.find((node) => node.id === dragState.nodeId);
+    const draggedNode = nodeById.get(dragState.nodeId);
 
     if (!draggedNode) {
       return;
@@ -487,10 +543,12 @@ function WorkflowBuilder({
       y: Math.round(dragState.originalY + (pointer.y - dragState.startY) / currentZoom),
     };
     const nextPosition = getWorkflowBuilderSnappedNodePosition(draggedNode, nodes, rawPosition);
+    const shouldCommitImmediately =
+      nextPosition.x !== rawPosition.x || nextPosition.y !== rawPosition.y;
     const nextNodes = nodes.map((node) =>
       node.id === dragState.nodeId ? { ...node, ...nextPosition } : node,
     );
-    onNodesChange?.(nextNodes);
+    scheduleDraggedNodesChange(nextNodes, shouldCommitImmediately);
   };
 
   const handleNodePointerDown = (
@@ -692,6 +750,14 @@ function WorkflowBuilder({
     );
   }, [connectionDrag, currentZoom, edges, nodes, pendingConnection]);
 
+  React.useEffect(() => {
+    return () => {
+      if (dragFrameRef.current !== null) {
+        window.cancelAnimationFrame(dragFrameRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div
       data-slot="workflow-builder"
@@ -747,11 +813,16 @@ function WorkflowBuilder({
             className="pointer-events-none absolute inset-0 size-full overflow-visible"
           >
             {edges.map((edge) => {
-              const line = getWorkflowEdgeLine(nodes, edge, portPoints);
+              const geometry = edgeGeometry.get(edge.id);
+              const line = geometry?.line ?? getWorkflowEdgeLine(nodes, edge, portPoints);
               const selected = edge.id === currentSelectedEdgeId;
               const showEndpointHandles = !readOnly && (selected || edge.id === hoveredEdgeId);
-              const sourcePoint = getWorkflowEdgeEndpointPoint(nodes, edge, "source", portPoints);
-              const targetPoint = getWorkflowEdgeEndpointPoint(nodes, edge, "target", portPoints);
+              const sourcePoint =
+                geometry?.sourcePoint ??
+                getWorkflowEdgeEndpointPoint(nodes, edge, "source", portPoints);
+              const targetPoint =
+                geometry?.targetPoint ??
+                getWorkflowEdgeEndpointPoint(nodes, edge, "target", portPoints);
               return (
                 <g
                   key={edge.id}
@@ -933,7 +1004,7 @@ function WorkflowBuilder({
   );
 }
 
-function WorkflowBuilderNode({
+const WorkflowBuilderNode = React.memo(function WorkflowBuilderNode({
   node,
   selected,
   readOnly,
@@ -982,7 +1053,7 @@ function WorkflowBuilderNode({
       />
     </div>
   );
-}
+});
 
 function WorkflowBuilderToolbar({
   zoom,
@@ -1067,7 +1138,16 @@ function WorkflowBuilderMiniMap({
   ...props
 }: WorkflowBuilderMiniMapProps) {
   void _edges;
-  const bounds = getWorkflowBounds(nodes);
+  const bounds = React.useMemo(() => getWorkflowBounds(nodes), [nodes]);
+  const minimapNodes = React.useMemo(
+    () =>
+      nodes.map((node) => ({
+        id: node.id,
+        left: ((node.x - bounds.x) / bounds.width) * 100,
+        top: ((node.y - bounds.y) / bounds.height) * 100,
+      })),
+    [bounds, nodes],
+  );
 
   return (
     <div
@@ -1078,16 +1158,14 @@ function WorkflowBuilderMiniMap({
       {...props}
     >
       <div className="relative size-full">
-        {nodes.map((node) => {
-          const left = ((node.x - bounds.x) / bounds.width) * 100;
-          const top = ((node.y - bounds.y) / bounds.height) * 100;
+        {minimapNodes.map((node) => {
           return (
             <span
               key={node.id}
               data-slot="workflow-builder-minimap-node"
               data-selected={node.id === selectedNodeId ? "true" : undefined}
               className="absolute size-2 rounded-sm bg-muted-foreground data-[selected=true]:bg-primary"
-              style={{ left: `${left}%`, top: `${top}%` }}
+              style={{ left: `${node.left}%`, top: `${node.top}%` }}
             />
           );
         })}

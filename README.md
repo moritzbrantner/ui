@@ -59,11 +59,19 @@ Full local confidence check:
 bun run verify
 ```
 
-`bun run verify` reports repository hygiene first, then runs the release verification contract. The heavy checks include Storybook tests, coverage, Playwright visual tests, the consumer example build, benchmarks, build-size checks, and an npm pack dry run. Install the local Playwright browser before running visual tests for the first time:
+`bun run verify` reports repository hygiene first, then runs the release verification contract. The heavy checks include Storybook tests, coverage, Playwright visual tests, Unlighthouse performance and usability audits, the consumer example build, benchmarks, build-size checks, and an npm pack dry run. Install the local Playwright browser before running visual or Unlighthouse tests for the first time:
 
 ```sh
 bunx playwright install chromium
 ```
+
+Run the Storybook-based Unlighthouse audit by itself with:
+
+```sh
+bun run test:unlighthouse
+```
+
+The audit builds Storybook, serves the static output locally, checks representative component stories, and writes the generated report to `unlighthouse-report/`.
 
 `bun run test:coverage` is a local fallback when Bun's `node` shim cannot expose V8 coverage APIs. It runs the unit suite and reports that coverage was not measured. Release coverage must use `npm run test:coverage:real` with a real Node runtime, which CI gets from `actions/setup-node`.
 

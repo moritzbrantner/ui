@@ -6,6 +6,8 @@ import type { TooltipValueType } from "recharts";
 
 import { cn } from "../../../lib/cn";
 
+// TODO: split Recharts-backed exports from native SVG graph exports in an additive subpath
+// if chart remains a top audited chunk after the shared runtime cleanup.
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const;
 

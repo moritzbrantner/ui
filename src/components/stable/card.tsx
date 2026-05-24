@@ -1,28 +1,30 @@
 "use client";
 
 import * as React from "react";
-import { motion, type HTMLMotionProps } from "motion/react";
 
 import { cn } from "../../lib/cn";
-import { glassSurfaceMotion } from "../../lib/motion";
+import type { LegacyMotionProps } from "../../lib/motion";
 
 function Card({
   className,
   size = "default",
-  layout = glassSurfaceMotion.layout,
-  transition = glassSurfaceMotion.transition,
+  layout: _layout,
+  transition: _transition,
+  initial: _initial,
+  animate: _animate,
+  exit: _exit,
+  whileHover: _whileHover,
+  whileTap: _whileTap,
   ...props
-}: HTMLMotionProps<"div"> & { size?: "default" | "sm" }) {
+}: React.ComponentProps<"div"> & LegacyMotionProps & { size?: "default" | "sm" }) {
   return (
-    <motion.div
+    <div
       data-slot="card"
       data-size={size}
       className={cn(
         "group/card flex flex-col gap-[var(--ui-card-gap,var(--ui-surface-gap))] overflow-hidden rounded-[var(--ui-card-radius,var(--ui-radius-surface))] bg-card py-[var(--ui-card-padding,var(--ui-surface-padding-md))] text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-[var(--ui-surface-padding-sm)] data-[size=sm]:py-[var(--ui-surface-padding-sm)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[var(--ui-card-radius,var(--ui-radius-surface))] *:[img:last-child]:rounded-b-[var(--ui-card-radius,var(--ui-radius-surface))]",
         className,
       )}
-      layout={layout}
-      transition={transition}
       {...props}
     />
   );

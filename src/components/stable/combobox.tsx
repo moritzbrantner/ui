@@ -8,6 +8,8 @@ import { Button } from "./button";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "./input-group";
 import { ChevronDownIcon, XIcon, CheckIcon } from "lucide-react";
 
+// TODO: keep the Base UI implementation for compatibility, then optimize only if route-level
+// audits still show combobox as a top cost after shared runtime cleanup.
 const Combobox = ComboboxPrimitive.Root;
 
 function ComboboxValue({ ...props }: ComboboxPrimitive.Value.Props) {

@@ -115,6 +115,28 @@ const benchmarks: BenchmarkRunner[] = [
       targetPortId: "in",
     });
   }),
+  benchmark("logic.workflowBuilderConnectionValidity1000", "logic", () => {
+    const nodes = createWorkflowNodes(150);
+    const edges = createWorkflowEdges(250, 150);
+
+    for (let index = 0; index < 1000; index += 1) {
+      labs.getWorkflowBuilderConnectionValidity({
+        nodes,
+        edges,
+        sourceNodeId: `node-${index % 75}`,
+        sourcePortId: "out",
+        targetNodeId: `node-${(index % 75) + 75}`,
+        targetPortId: "in",
+      });
+    }
+  }),
+  benchmark("logic.dataGridFilter1000Rows", "logic", () => {
+    const rows = createRows(1000);
+
+    rows.filter((row) =>
+      [row.name, row.amount, row.status].join(" ").toLocaleLowerCase().includes("paid"),
+    );
+  }),
   benchmark("logic.timelineHelpers1000", "logic", () => {
     const tracks = [
       {
@@ -156,6 +178,34 @@ const benchmarks: BenchmarkRunner[] = [
           { accessorKey: "status", header: "Status" },
         ],
         data: createRows(1000),
+      }),
+    );
+  }),
+  benchmark("render.dataGrid500Rows10Columns", "render", () => {
+    renderUi(
+      React.createElement(ui.DataGrid, {
+        columns: Array.from({ length: 10 }, (_, index) => ({
+          accessorKey: `field${index}`,
+          header: `Field ${index}`,
+          meta: { dataGridFilter: index % 2 === 0 ? "text" : "number" },
+        })),
+        data: Array.from({ length: 500 }, (_, rowIndex) =>
+          Object.fromEntries(
+            Array.from({ length: 10 }, (_, columnIndex) => [
+              `field${columnIndex}`,
+              columnIndex % 2 === 0 ? `Row ${rowIndex}` : rowIndex * columnIndex,
+            ]),
+          ),
+        ),
+      }),
+    );
+  }),
+  benchmark("render.workflowBuilder50Nodes80Edges", "render", () => {
+    renderUi(
+      React.createElement(labs.WorkflowBuilder, {
+        nodes: createWorkflowNodes(50),
+        edges: createWorkflowEdges(80, 50),
+        showMiniMap: true,
       }),
     );
   }),
@@ -387,6 +437,27 @@ function createCalendarData(count: number): unknown[] {
       [],
     ]),
   ];
+}
+
+function createWorkflowNodes(count: number) {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `node-${index}`,
+    label: `Node ${index}`,
+    x: (index % 10) * 220,
+    y: Math.floor(index / 10) * 140,
+    inputs: [{ id: "in", label: "Input", kind: "text" }],
+    outputs: [{ id: "out", label: "Output", kind: "text" }],
+  }));
+}
+
+function createWorkflowEdges(count: number, nodeCount: number) {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `edge-${index}`,
+    sourceNodeId: `node-${index % Math.max(nodeCount - 1, 1)}`,
+    sourcePortId: "out",
+    targetNodeId: `node-${(index + 1) % nodeCount}`,
+    targetPortId: "in",
+  }));
 }
 
 function percentile(samples: number[], value: number): number {

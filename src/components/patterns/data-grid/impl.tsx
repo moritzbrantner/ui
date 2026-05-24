@@ -356,8 +356,13 @@ function DataGrid<TData, TValue = unknown>({
       ...(columns as ColumnDef<TData, unknown>[]),
     ];
   }, [columns, enableRowSelection]);
+  const hasFacetedColumnFilters = React.useMemo(
+    () => tableColumns.some(hasDataGridFilterMeta),
+    [tableColumns],
+  );
+  const densityClassName = densityClasses[density];
 
-  const table = useReactTable({
+  const table = useReactTable<TData>({
     data,
     columns: tableColumns,
     getRowId,
@@ -385,17 +390,25 @@ function DataGrid<TData, TValue = unknown>({
       filterFn: dataGridFilterFn as FilterFn<TData>,
     },
     getCoreRowModel: getCoreRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
+    ...(hasFacetedColumnFilters
+      ? {
+          getFacetedRowModel: getFacetedRowModel(),
+          getFacetedUniqueValues: getFacetedUniqueValues(),
+        }
+      : {}),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     globalFilterFn: "includesString",
   });
+  const selectedRows = React.useMemo(
+    () => table.getSelectedRowModel().rows.map((row) => row.original),
+    [resolvedRowSelection, table],
+  );
 
   React.useEffect(() => {
-    onSelectedRowsChange?.(table.getSelectedRowModel().rows.map((row) => row.original));
-  }, [onSelectedRowsChange, resolvedRowSelection, table]);
+    onSelectedRowsChange?.(selectedRows);
+  }, [onSelectedRowsChange, selectedRows]);
 
   const visibleColumnCount = Math.max(table.getVisibleLeafColumns().length, 1);
   const status: DataGridStatus = loading
@@ -426,7 +439,7 @@ function DataGrid<TData, TValue = unknown>({
       ) : (
         toolbar
       )}
-      <div className={cn("min-w-0 overflow-hidden rounded-md border", densityClasses[density])}>
+      <div className={cn("min-w-0 overflow-hidden rounded-md border", densityClassName)}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -980,16 +993,30 @@ function getColumnSampleValues<TData, TValue>(column: Column<TData, TValue>) {
 }
 
 function getTextFilterOptions<TData, TValue>(column: Column<TData, TValue>) {
-  const options = Array.from(column.getFacetedUniqueValues().entries())
-    .filter(([value]) => !isBlankValue(value))
-    .map(([value, count]) => ({
-      value: String(value),
-      label: String(value),
-      count,
-    }))
-    .sort((first, second) => first.label.localeCompare(second.label));
+  const uniqueValues = column.getFacetedUniqueValues();
+  const options =
+    uniqueValues.size <= 12
+      ? Array.from(uniqueValues.entries())
+          .filter(([value]) => !isBlankValue(value))
+          .map(([value, count]) => ({
+            value: String(value),
+            label: String(value),
+            count,
+          }))
+          .sort((first, second) => first.label.localeCompare(second.label))
+      : [];
 
-  return options.length <= 12 ? options : [];
+  return options;
+}
+
+function hasDataGridFilterMeta<TData>(column: ColumnDef<TData, unknown>): boolean {
+  if ("columns" in column && Array.isArray(column.columns)) {
+    return column.columns.some((childColumn) =>
+      hasDataGridFilterMeta(childColumn as ColumnDef<TData, unknown>),
+    );
+  }
+
+  return column.meta?.dataGridFilter !== false;
 }
 
 function getTextFilterValue(filterValue: unknown): DataGridTextFilterValue {

@@ -2,10 +2,9 @@
 
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { motion } from "motion/react";
 import { Slot } from "radix-ui";
 import { cn } from "../../lib/cn";
-import { glassMotionTransition } from "../../lib/motion";
+import type { LegacyMotionProps } from "../../lib/motion";
 
 const buttonVariants = cva(
   "inline-flex shrink-0 origin-bottom transform-gpu items-center justify-center gap-[var(--ui-control-gap)] whitespace-nowrap rounded-[var(--ui-button-radius,var(--ui-radius-control))] text-sm font-medium outline-none transition-[transform,box-shadow,background-color,color,border-color,filter] duration-150 ease-out will-change-transform hover:translate-y-[var(--ui-motion-hover-y)] hover:scale-[var(--ui-motion-hover-scale)] active:brightness-110 disabled:pointer-events-none disabled:opacity-50 aria-[pressed=true]:translate-y-[var(--ui-motion-hover-y)] aria-[pressed=true]:scale-[var(--ui-motion-hover-scale)] data-[selected=true]:translate-y-[var(--ui-motion-hover-y)] data-[selected=true]:scale-[var(--ui-motion-hover-scale)] data-[state=on]:translate-y-[var(--ui-motion-hover-y)] data-[state=on]:scale-[var(--ui-motion-hover-scale)] data-[keyboard-active=true]:scale-[0.98] data-[keyboard-active=true]:brightness-110 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 focus-visible:border-ring focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
@@ -52,7 +51,9 @@ type SharedProps = VariantProps<typeof buttonVariants> & {
   onDrag?: React.ComponentProps<"button">["onDrag"] | boolean;
 };
 
-export type ButtonProps = SharedProps & React.ComponentProps<"button">;
+export type ButtonProps = SharedProps &
+  Omit<React.ComponentProps<"button">, "onDrag"> &
+  LegacyMotionProps;
 
 function Button(props: ButtonProps) {
   const {
@@ -65,16 +66,40 @@ function Button(props: ButtonProps) {
     onBlur,
     onKeyDown,
     onKeyUp,
+    onPointerCancel,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
     disabled,
+    layout: _layout,
+    transition: _transition,
+    initial: _initial,
+    animate: _animate,
+    exit: _exit,
+    whileHover: _whileHover,
+    whileTap: _whileTap,
+    style,
     ...rest
   } = props;
 
   const [keyboardActive, setKeyboardActive] = React.useState(false);
+  const [dragOffset, setDragOffset] = React.useState(0);
+  const dragStateRef = React.useRef<{ pointerId: number; startX: number } | null>(null);
   const buttonClassName = cn(buttonVariants({ variant, size, className }));
   const legacyDragX = typeof onDrag === "boolean" ? onDrag : undefined;
   const enableDrag = Boolean(dragX ?? legacyDragX);
+  const resetDrag = React.useCallback((event?: React.PointerEvent<HTMLButtonElement>) => {
+    if (event && dragStateRef.current?.pointerId === event.pointerId) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    dragStateRef.current = null;
+    setDragOffset(0);
+  }, []);
   const handleBlur = (event: React.FocusEvent<HTMLButtonElement>) => {
     setKeyboardActive(false);
+    dragStateRef.current = null;
+    setDragOffset(0);
     onBlur?.(event);
   };
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -89,6 +114,49 @@ function Button(props: ButtonProps) {
     }
     onKeyUp?.(event);
   };
+  const handlePointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
+    onPointerDown?.(event);
+
+    if (
+      event.defaultPrevented ||
+      disabled ||
+      !enableDrag ||
+      event.button !== 0 ||
+      (event.pointerType === "mouse" && event.buttons !== 1)
+    ) {
+      return;
+    }
+
+    dragStateRef.current = { pointerId: event.pointerId, startX: event.clientX };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const handlePointerMove = (event: React.PointerEvent<HTMLButtonElement>) => {
+    onPointerMove?.(event);
+
+    const dragState = dragStateRef.current;
+
+    if (!dragState || dragState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    setDragOffset(event.clientX - dragState.startX);
+  };
+  const handlePointerUp = (event: React.PointerEvent<HTMLButtonElement>) => {
+    onPointerUp?.(event);
+    resetDrag(event);
+  };
+  const handlePointerCancel = (event: React.PointerEvent<HTMLButtonElement>) => {
+    onPointerCancel?.(event);
+    resetDrag(event);
+  };
+  const dragStyle =
+    dragOffset === 0
+      ? style
+      : {
+          ...style,
+          transform: `translateX(${dragOffset}px)`,
+        };
+  const nativeDragHandler = typeof onDrag === "function" ? onDrag : undefined;
 
   if (asChild) {
     return (
@@ -101,26 +169,35 @@ function Button(props: ButtonProps) {
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
+        onPointerCancel={handlePointerCancel}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        style={dragStyle}
         {...(rest as Record<string, unknown>)}
       />
     );
   }
 
   return (
-    <motion.button
+    <button
       data-slot="button"
       data-variant={variant}
       data-size={size}
+      data-dragging={dragOffset !== 0 ? true : undefined}
       data-keyboard-active={keyboardActive ? true : undefined}
       className={buttonClassName}
       disabled={disabled}
-      drag={enableDrag ? "x" : undefined}
+      draggable={enableDrag || undefined}
+      onDrag={nativeDragHandler}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
       onKeyUp={handleKeyUp}
-      transition={glassMotionTransition}
-      whileHover={{ y: "var(--ui-motion-hover-y)", scale: "var(--ui-motion-hover-scale)" }}
-      whileTap={{ scale: 0.98 }}
+      onPointerCancel={handlePointerCancel}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      style={dragStyle}
       {...(rest as Record<string, unknown>)}
     />
   );

@@ -2,26 +2,28 @@
 
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { motion, type HTMLMotionProps } from "motion/react";
 
 import { cn } from "../../lib/cn";
-import { glassSurfaceMotion } from "../../lib/motion";
+import type { LegacyMotionProps } from "../../lib/motion";
 
 function Empty({
   className,
-  layout = glassSurfaceMotion.layout,
-  transition = glassSurfaceMotion.transition,
+  layout: _layout,
+  transition: _transition,
+  initial: _initial,
+  animate: _animate,
+  exit: _exit,
+  whileHover: _whileHover,
+  whileTap: _whileTap,
   ...props
-}: HTMLMotionProps<"div">) {
+}: React.ComponentProps<"div"> & LegacyMotionProps) {
   return (
-    <motion.div
+    <div
       data-slot="empty"
       className={cn(
         "flex w-full min-w-0 flex-1 flex-col items-center justify-center gap-4 rounded-xl border-dashed p-6 text-center text-balance",
         className,
       )}
-      layout={layout}
-      transition={transition}
       {...props}
     />
   );

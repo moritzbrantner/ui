@@ -7,6 +7,8 @@ import { cn } from "../../lib/cn";
 import { Button, buttonVariants } from "./button";
 import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from "lucide-react";
 
+// TODO: consider a native date-grid implementation if react-day-picker remains a top audited chunk
+// after removing shared runtime costs.
 type CalendarIcsProperty = [
   name: string,
   parameters: Record<string, string | string[]>,

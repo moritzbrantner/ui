@@ -2,11 +2,10 @@
 
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { motion, type HTMLMotionProps } from "motion/react";
 import { Slot } from "radix-ui";
 
 import { cn } from "../../lib/cn";
-import { glassSurfaceMotion } from "../../lib/motion";
+import type { LegacyMotionProps } from "../../lib/motion";
 import { Separator } from "./separator";
 
 const buttonGroupVariants = cva(
@@ -29,18 +28,21 @@ const buttonGroupVariants = cva(
 function ButtonGroup({
   className,
   orientation,
-  layout = glassSurfaceMotion.layout,
-  transition = glassSurfaceMotion.transition,
+  layout: _layout,
+  transition: _transition,
+  initial: _initial,
+  animate: _animate,
+  exit: _exit,
+  whileHover: _whileHover,
+  whileTap: _whileTap,
   ...props
-}: HTMLMotionProps<"div"> & VariantProps<typeof buttonGroupVariants>) {
+}: React.ComponentProps<"div"> & LegacyMotionProps & VariantProps<typeof buttonGroupVariants>) {
   return (
-    <motion.div
+    <div
       role="group"
       data-slot="button-group"
       data-orientation={orientation}
       className={cn(buttonGroupVariants({ orientation }), className)}
-      layout={layout}
-      transition={transition}
       {...props}
     />
   );
@@ -49,10 +51,17 @@ function ButtonGroup({
 function ButtonGroupText({
   className,
   asChild = false,
+  layout: _layout,
+  transition: _transition,
+  initial: _initial,
+  animate: _animate,
+  exit: _exit,
+  whileHover: _whileHover,
+  whileTap: _whileTap,
   ...props
 }: React.ComponentProps<"div"> & {
   asChild?: boolean;
-}) {
+} & LegacyMotionProps) {
   if (asChild) {
     return (
       <Slot.Root
@@ -67,14 +76,13 @@ function ButtonGroupText({
   }
 
   return (
-    <motion.div
+    <div
       data-slot="button-group-text"
       className={cn(
         "flex items-center gap-2 rounded-lg border bg-muted px-2.5 text-sm font-medium [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
-      {...glassSurfaceMotion}
-      {...(props as HTMLMotionProps<"div">)}
+      {...props}
     />
   );
 }

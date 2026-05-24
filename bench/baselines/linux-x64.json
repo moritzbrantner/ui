@@ -3,50 +3,74 @@
     "logic.cnMerge": {
       "kind": "logic",
       "name": "logic.cnMerge",
-      "median": 0.00220400000000609,
-      "p95": 0.008577000000059343
+      "median": 0.0034359999999651336,
+      "p95": 0.012072999999986678
     },
     "logic.queryBuilderEvaluate1000": {
       "kind": "logic",
       "name": "logic.queryBuilderEvaluate1000",
-      "median": 0.5021759999999631,
-      "p95": 1.1933689999999615
+      "median": 0.3554339999999456,
+      "p95": 0.6170720000000074
     },
     "logic.workflowConnectionValidation": {
       "kind": "logic",
       "name": "logic.workflowConnectionValidation",
-      "median": 0.07816800000000512,
-      "p95": 0.09601099999997587
+      "median": 0.0884049999999661,
+      "p95": 0.10713999999995849
+    },
+    "logic.workflowBuilderConnectionValidity1000": {
+      "kind": "logic",
+      "name": "logic.workflowBuilderConnectionValidity1000",
+      "median": 2.6746129999999084,
+      "p95": 4.451720000000023
+    },
+    "logic.dataGridFilter1000Rows": {
+      "kind": "logic",
+      "name": "logic.dataGridFilter1000Rows",
+      "median": 1.4887990000000855,
+      "p95": 2.3885689999999613
     },
     "logic.timelineHelpers1000": {
       "kind": "logic",
       "name": "logic.timelineHelpers1000",
-      "median": 0.12597699999992074,
-      "p95": 0.23042399999997087
+      "median": 0.09336399999995137,
+      "p95": 0.10763100000008308
     },
     "render.dataGrid100": {
       "kind": "render",
       "name": "render.dataGrid100",
-      "median": 6.155462999999941,
-      "p95": 9.055098000000044
+      "median": 7.405754999999999,
+      "p95": 12.500195000000076
     },
     "render.dataGrid1000": {
       "kind": "render",
       "name": "render.dataGrid1000",
-      "median": 9.00331099999994,
-      "p95": 15.620844000000034
+      "median": 9.467554000000064,
+      "p95": 17.94678299999987
+    },
+    "render.dataGrid500Rows10Columns": {
+      "kind": "render",
+      "name": "render.dataGrid500Rows10Columns",
+      "median": 9.58063600000014,
+      "p95": 11.485652000000073
+    },
+    "render.workflowBuilder50Nodes80Edges": {
+      "kind": "render",
+      "name": "render.workflowBuilder50Nodes80Edges",
+      "median": 70.46237999999994,
+      "p95": 102.68124099999977
     },
     "render.calendar100Events": {
       "kind": "render",
       "name": "render.calendar100Events",
-      "median": 10.89917400000013,
-      "p95": 21.117784999999913
+      "median": 8.519526000000042,
+      "p95": 11.364266999999927
     },
     "render.documentViewer100Pages": {
       "kind": "render",
       "name": "render.documentViewer100Pages",
-      "median": 10.372451000000183,
-      "p95": 11.749065999999857
+      "median": 7.7535369999995964,
+      "p95": 8.750326999999743
     }
   }
 }
