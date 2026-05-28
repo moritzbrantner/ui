@@ -74,6 +74,10 @@ type WorkflowNodeSize = {
   height: number;
 };
 
+type WorkflowNodeLayoutOptions = {
+  showPortColumnHeaders?: boolean;
+};
+
 type WorkflowNodeMenuItem = {
   id: string;
   label: React.ReactNode;
@@ -91,6 +95,7 @@ type WorkflowNodeProps<
   readOnly?: boolean;
   inputDisabled?: boolean;
   outputDisabled?: boolean;
+  showPortColumnHeaders?: boolean;
   menuItems?: WorkflowNodeMenuItem[];
   menuLabel?: React.ReactNode;
   onNodeSelect?: (node: WorkflowNodeData) => void;
@@ -156,6 +161,7 @@ function WorkflowNode({
   readOnly = false,
   inputDisabled = false,
   outputDisabled = false,
+  showPortColumnHeaders = true,
   menuItems = [],
   menuLabel = "Actions",
   onNodeSelect,
@@ -183,8 +189,12 @@ function WorkflowNode({
     () => (node.minimized === minimized ? node : { ...node, minimized }),
     [minimized, node],
   );
+  const layoutOptions = React.useMemo(
+    () => ({ showPortColumnHeaders }),
+    [showPortColumnHeaders],
+  );
   const compact = workflowNodeUsesCompactVariant(resolvedNode);
-  const size = getWorkflowNodeSize(resolvedNode);
+  const size = getWorkflowNodeSize(resolvedNode, layoutOptions);
   const portLayout = getWorkflowNodePortLayout(resolvedNode);
 
   const changeMinimized = (nextMinimized: boolean) => {
@@ -339,6 +349,7 @@ function WorkflowNode({
               node={resolvedNode}
               ports={resolvedNode.inputs ?? []}
               disabled={inputDisabled}
+              showHeader={showPortColumnHeaders}
               onClick={onInputClick}
               onPointerUp={onInputPointerUp}
               getAriaLabel={getInputAriaLabel}
@@ -351,6 +362,7 @@ function WorkflowNode({
               node={resolvedNode}
               ports={resolvedNode.outputs ?? []}
               disabled={outputDisabled || readOnly}
+              showHeader={showPortColumnHeaders}
               onClick={onOutputClick}
               onPointerDown={onOutputPointerDown}
               onPointerUp={onOutputPointerUp}
@@ -429,6 +441,20 @@ function WorkflowNodeMenu({
   onItemSelect?: (item: WorkflowNodeMenuItem, node: WorkflowNodeData) => void;
 }) {
   const menuLabel = typeof label === "string" ? label : "Actions";
+
+  if (items.length === 0 && !onItemSelect) {
+    return (
+      <button
+        type="button"
+        data-slot="workflow-node-menu-trigger"
+        aria-label={`Open ${node.label} menu`}
+        className={workflowNodeControlButtonClassName}
+        disabled
+      >
+        <MoreHorizontalIcon className="size-3.5" aria-hidden="true" />
+      </button>
+    );
+  }
 
   return (
     <DropdownMenu>
@@ -773,6 +799,7 @@ function WorkflowNodePortColumn({
   node,
   ports,
   disabled,
+  showHeader,
   onClick,
   onPointerUp,
   onPointerDown,
@@ -783,6 +810,7 @@ function WorkflowNodePortColumn({
   node: WorkflowNodeData;
   ports: readonly WorkflowNodePort[];
   disabled: boolean;
+  showHeader: boolean;
   onClick?: (port: WorkflowNodePort, node: WorkflowNodeData) => void;
   onPointerUp?: (
     port: WorkflowNodePort,
@@ -798,7 +826,11 @@ function WorkflowNodePortColumn({
 }) {
   return (
     <div className="flex min-h-0 flex-col">
-      <div className="mb-2 shrink-0 text-[11px] font-semibold uppercase text-zinc-500">{title}</div>
+      {showHeader ? (
+        <div className="mb-2 shrink-0 text-[11px] font-semibold uppercase text-zinc-500">
+          {title}
+        </div>
+      ) : null}
       {ports.length === 0 ? (
         <div className="flex h-16 min-h-0 flex-1 items-center rounded-md border border-dashed border-zinc-200 px-2 py-1.5 text-xs text-zinc-700">
           none
@@ -983,7 +1015,8 @@ function getWorkflowNodePortTypeLabel(port: WorkflowNodePort) {
     return port.type.trim();
   }
 
-  return (port.type.label ?? port.type.source).trim();
+  const label = port.type.label ?? port.type.source;
+  return typeof label === "string" ? label.trim() : port.kind;
 }
 
 function getWorkflowNodePortTypeSource(port: WorkflowNodePort) {
@@ -991,7 +1024,8 @@ function getWorkflowNodePortTypeSource(port: WorkflowNodePort) {
     return undefined;
   }
 
-  return (typeof port.type === "string" ? port.type : port.type.source).trim();
+  const source = typeof port.type === "string" ? port.type : port.type.source;
+  return typeof source === "string" ? source.trim() : undefined;
 }
 
 function getWorkflowNodePortLayout(node: WorkflowNodeData) {
@@ -1017,7 +1051,10 @@ function workflowNodeUsesMinimizedVariant(node: WorkflowNodeData) {
   return node.minimized === true;
 }
 
-function getWorkflowNodeSize(node: WorkflowNodeData): WorkflowNodeSize {
+function getWorkflowNodeSize(
+  node: WorkflowNodeData,
+  options: WorkflowNodeLayoutOptions = {},
+): WorkflowNodeSize {
   if (workflowNodeUsesMinimizedVariant(node)) {
     return {
       width: workflowNodeMinimizedWidth,
@@ -1034,9 +1071,11 @@ function getWorkflowNodeSize(node: WorkflowNodeData): WorkflowNodeSize {
 
   const rows = Math.max(node.inputs?.length ?? 0, node.outputs?.length ?? 0, 1);
   const headerHeight = getWorkflowNodeHeaderHeight(node);
+  const portColumnLabelHeight =
+    options.showPortColumnHeaders === false ? 0 : workflowNodePortColumnLabelHeight;
   const portsHeight =
     workflowNodePortColumnsPaddingY +
-    workflowNodePortColumnLabelHeight +
+    portColumnLabelHeight +
     rows * workflowNodePortRowHeight +
     Math.max(rows - 1, 0) * workflowNodePortGap;
 
@@ -1046,9 +1085,13 @@ function getWorkflowNodeSize(node: WorkflowNodeData): WorkflowNodeSize {
   };
 }
 
-function getWorkflowNodePortCenterOffset(node: WorkflowNodeData, portIndex: number) {
+function getWorkflowNodePortCenterOffset(
+  node: WorkflowNodeData,
+  portIndex: number,
+  options: WorkflowNodeLayoutOptions = {},
+) {
   if (workflowNodeUsesCompactVariant(node)) {
-    return getWorkflowNodeSize(node).height / 2;
+    return getWorkflowNodeSize(node, options).height / 2;
   }
 
   if (workflowNodeUsesMinimizedVariant(node)) {
@@ -1059,11 +1102,13 @@ function getWorkflowNodePortCenterOffset(node: WorkflowNodeData, portIndex: numb
   }
 
   const headerHeight = getWorkflowNodeHeaderHeight(node);
+  const portColumnLabelHeight =
+    options.showPortColumnHeaders === false ? 0 : workflowNodePortColumnLabelHeight;
 
   return (
     headerHeight +
     workflowNodePortColumnsPaddingY / 2 +
-    workflowNodePortColumnLabelHeight +
+    portColumnLabelHeight +
     portIndex * (workflowNodePortRowHeight + workflowNodePortGap) +
     workflowNodePortRowHeight / 2
   );
@@ -1292,6 +1337,7 @@ export type {
   WorkflowInputOnlyNodeData,
   WorkflowInputOnlyNodeProps,
   WorkflowNodeData,
+  WorkflowNodeLayoutOptions,
   WorkflowNodeMenuItem,
   WorkflowNodePort,
   WorkflowNodeProps,

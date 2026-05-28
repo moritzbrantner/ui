@@ -28,6 +28,12 @@ type BenchmarkFailure = {
   name: string;
   result: BenchmarkResult;
 };
+type BenchmarkOrgChartNode = {
+  id: string;
+  label: string;
+  description: string;
+  children: BenchmarkOrgChartNode[];
+};
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const baselinePath = path.join(
@@ -203,7 +209,7 @@ const benchmarks: BenchmarkRunner[] = [
   benchmark("render.workflowBuilder50Nodes80Edges", "render", () => {
     renderUi(
       React.createElement(labs.WorkflowBuilder, {
-        nodes: createWorkflowNodes(50),
+        nodes: createWorkflowNodes(50).map((node) => ({ ...node, variant: "compact" })),
         edges: createWorkflowEdges(80, 50),
         showMiniMap: true,
       }),
@@ -229,6 +235,33 @@ const benchmarks: BenchmarkRunner[] = [
           height: 420,
           text: `Invoice page ${index + 1} includes revenue and exception details.`,
         })),
+      }),
+    );
+  }),
+  benchmark("render.assetBrowser500", "render", () => {
+    renderUi(
+      React.createElement(labs.AssetBrowser, {
+        items: createAssetBrowserItems(500),
+        selectionMode: "multiple",
+        virtualized: true,
+      }),
+    );
+  }),
+  benchmark("render.gantt250", "render", () => {
+    renderUi(
+      React.createElement(labs.Gantt, {
+        tasks: createGanttTasks(250),
+        showDependencyLines: true,
+        virtualized: true,
+      }),
+    );
+  }),
+  benchmark("render.orgChart340", "render", () => {
+    renderUi(
+      React.createElement(ui.OrgChart, {
+        nodes: createOrgChartNodes(4, 4),
+        defaultExpandedDepth: 1,
+        maxRenderedNodes: 120,
       }),
     );
   }),
@@ -458,6 +491,54 @@ function createWorkflowEdges(count: number, nodeCount: number) {
     targetNodeId: `node-${(index + 1) % nodeCount}`,
     targetPortId: "in",
   }));
+}
+
+function createAssetBrowserItems(count: number) {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `asset-${index}`,
+    name: `Asset ${index}`,
+    type: index % 2 === 0 ? "image" : "document",
+    mimeType: index % 2 === 0 ? "image/png" : "application/pdf",
+    description: `Asset ${index} package artifact`,
+    size: 1024 + index * 37,
+  }));
+}
+
+function createGanttTasks(count: number) {
+  return Array.from({ length: count }, (_, index) => {
+    const startDay = (index % 28) + 1;
+    const endDay = Math.min(startDay + 2, 28);
+
+    return {
+      id: `task-${index}`,
+      label: `Task ${index}`,
+      start: `2026-04-${String(startDay).padStart(2, "0")}`,
+      end: `2026-04-${String(endDay).padStart(2, "0")}`,
+      progress: index % 100,
+      dependencies: index > 0 ? [`task-${index - 1}`] : [],
+    };
+  });
+}
+
+function createOrgChartNodes(
+  depth: number,
+  breadth: number,
+  prefix = "node",
+): BenchmarkOrgChartNode[] {
+  if (depth === 0) {
+    return [];
+  }
+
+  return Array.from({ length: breadth }, (_, index) => {
+    const id = `${prefix}-${index}`;
+
+    return {
+      id,
+      label: `Node ${id}`,
+      description: "Team member",
+      children: createOrgChartNodes(depth - 1, breadth, id),
+    };
+  });
 }
 
 function percentile(samples: number[], value: number): number {

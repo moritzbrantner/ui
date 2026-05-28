@@ -12,6 +12,7 @@ import {
   getWorkflowNodePortCenterOffset,
   getWorkflowNodeSize,
   type WorkflowNodeData as WorkflowCanvasNodeData,
+  type WorkflowNodeLayoutOptions,
   type WorkflowNodePort as WorkflowCanvasNodePort,
 } from "../workflow-node";
 
@@ -31,6 +32,7 @@ type WorkflowBuilderEdge = {
   sourcePortId: string;
   targetNodeId: string;
   targetPortId: string;
+  color?: string;
   status?: "idle" | "running" | "success" | "error" | "warning" | string;
   metadata?: Record<string, unknown>;
 };
@@ -113,7 +115,9 @@ type WorkflowBuilderProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   surfaceHeight?: number | string;
   canvasSize?: { width: number; height: number };
   showMiniMap?: boolean;
+  showPortColumnHeaders?: boolean;
   toolbarLabel?: React.ReactNode;
+  measurePorts?: "auto" | "dom" | "deterministic";
 };
 
 export type WorkflowBuilderNodeProps = Omit<React.ComponentProps<"div">, "onSelect"> & {
@@ -122,6 +126,7 @@ export type WorkflowBuilderNodeProps = Omit<React.ComponentProps<"div">, "onSele
   readOnly?: boolean;
   pendingConnection?: PendingConnection | null;
   inputsConnectable?: boolean;
+  showPortColumnHeaders?: boolean;
   onNodeSelect?: (node: WorkflowBuilderNodeData) => void;
   onNodeMinimizedChange?: (nodeId: string, minimized: boolean) => void;
   onStartConnection?: (nodeId: string, portId: string) => void;
@@ -163,6 +168,7 @@ export type WorkflowBuilderMiniMapProps = React.ComponentProps<"div"> & {
   nodes: WorkflowBuilderNodeData[];
   edges?: WorkflowBuilderEdge[];
   selectedNodeId?: string | null;
+  showPortColumnHeaders?: boolean;
 };
 
 type PendingConnection = {
@@ -246,7 +252,9 @@ function WorkflowBuilder({
   surfaceHeight = "32rem",
   canvasSize,
   showMiniMap = true,
+  showPortColumnHeaders = true,
   toolbarLabel = "Workflow",
+  measurePorts = "auto",
   className,
   ...props
 }: WorkflowBuilderProps) {
@@ -278,6 +286,10 @@ function WorkflowBuilder({
     () => new Map(nodes.map((node) => [node.id, node] as const)),
     [nodes],
   );
+  const layoutOptions = React.useMemo(
+    () => ({ showPortColumnHeaders }),
+    [showPortColumnHeaders],
+  );
   const selectedNode = currentSelectedNodeId ? nodeById.get(currentSelectedNodeId) : undefined;
   const selectedEdge = React.useMemo(
     () => edges.find((edge) => edge.id === currentSelectedEdgeId),
@@ -289,13 +301,25 @@ function WorkflowBuilder({
         edges.map((edge) => [
           edge.id,
           {
-            line: getWorkflowEdgeLine(nodes, edge, portPoints),
-            sourcePoint: getWorkflowEdgeEndpointPoint(nodes, edge, "source", portPoints),
-            targetPoint: getWorkflowEdgeEndpointPoint(nodes, edge, "target", portPoints),
+            line: getWorkflowEdgeLine(nodeById, edge, portPoints, layoutOptions),
+            sourcePoint: getWorkflowEdgeEndpointPoint(
+              nodeById,
+              edge,
+              "source",
+              portPoints,
+              layoutOptions,
+            ),
+            targetPoint: getWorkflowEdgeEndpointPoint(
+              nodeById,
+              edge,
+              "target",
+              portPoints,
+              layoutOptions,
+            ),
           },
         ]),
       ),
-    [edges, nodes, portPoints],
+    [edges, layoutOptions, nodeById, portPoints],
   );
   const scheduleDraggedNodesChange = React.useCallback(
     (nextNodes: WorkflowBuilderNodeData[], immediate = false) => {
@@ -347,19 +371,28 @@ function WorkflowBuilder({
     commitViewport({ ...currentViewport, zoom: safeZoom });
   };
 
-  const commitSelection = (selection: WorkflowBuilderSelection) => {
-    setInternalSelectedNodeId(selection?.type === "node" ? selection.id : null);
-    setInternalSelectedEdgeId(selection?.type === "edge" ? selection.id : null);
-    onSelectionChange?.(selection);
-  };
+  const commitSelection = React.useCallback(
+    (selection: WorkflowBuilderSelection) => {
+      setInternalSelectedNodeId(selection?.type === "node" ? selection.id : null);
+      setInternalSelectedEdgeId(selection?.type === "edge" ? selection.id : null);
+      onSelectionChange?.(selection);
+    },
+    [onSelectionChange],
+  );
 
-  const selectNode = (node: WorkflowBuilderNodeData) => {
-    commitSelection({ type: "node", id: node.id, node });
-  };
+  const selectNode = React.useCallback(
+    (node: WorkflowBuilderNodeData) => {
+      commitSelection({ type: "node", id: node.id, node });
+    },
+    [commitSelection],
+  );
 
-  const selectEdge = (edge: WorkflowBuilderEdge) => {
-    commitSelection({ type: "edge", id: edge.id, edge });
-  };
+  const selectEdge = React.useCallback(
+    (edge: WorkflowBuilderEdge) => {
+      commitSelection({ type: "edge", id: edge.id, edge });
+    },
+    [commitSelection],
+  );
 
   const removeEdge = (edge: WorkflowBuilderEdge, reason: WorkflowBuilderDisconnectReason) => {
     onEdgesChange?.(edges.filter((currentEdge) => currentEdge.id !== edge.id));
@@ -369,48 +402,64 @@ function WorkflowBuilder({
     }
   };
 
-  const getConnectionValidity = (connection: WorkflowBuilderConnection, ignoreEdgeId?: string) =>
-    isConnectionValid({
-      nodes,
-      edges,
-      ...connection,
-      ignoreEdgeId,
-    });
-
-  const addConnection = (connection: WorkflowBuilderConnection) => {
-    const validity = getConnectionValidity(connection);
-
-    if (!validity.valid) {
-      return false;
-    }
-
-    onEdgesChange?.([
-      ...edges,
-      {
-        id: `edge-${connection.sourceNodeId}-${connection.sourcePortId}-${connection.targetNodeId}-${connection.targetPortId}`,
+  const getConnectionValidity = React.useCallback(
+    (connection: WorkflowBuilderConnection, ignoreEdgeId?: string) =>
+      isConnectionValid({
+        nodes,
+        edges,
         ...connection,
-      },
-    ]);
-    onConnectionComplete?.(connection);
-    return true;
-  };
+        ignoreEdgeId,
+      }),
+    [edges, isConnectionValid, nodes],
+  );
 
-  const rewireConnection = (edge: WorkflowBuilderEdge, connection: WorkflowBuilderConnection) => {
-    const validity = getConnectionValidity(connection, edge.id);
+  const addConnection = React.useCallback(
+    (connection: WorkflowBuilderConnection) => {
+      const validity = getConnectionValidity(connection);
 
-    if (!validity.valid) {
-      return false;
-    }
+      if (!validity.valid) {
+        return false;
+      }
 
-    const nextEdge = { ...edge, ...connection };
-    onEdgesChange?.(
-      edges.map((currentEdge) => (currentEdge.id === edge.id ? nextEdge : currentEdge)),
-    );
-    onConnectionDisconnect?.(edge, "rewire");
-    onConnectionComplete?.(connection);
-    commitSelection({ type: "edge", id: edge.id, edge: nextEdge });
-    return true;
-  };
+      onEdgesChange?.([
+        ...edges,
+        {
+          id: `edge-${connection.sourceNodeId}-${connection.sourcePortId}-${connection.targetNodeId}-${connection.targetPortId}`,
+          ...connection,
+        },
+      ]);
+      onConnectionComplete?.(connection);
+      return true;
+    },
+    [edges, getConnectionValidity, onConnectionComplete, onEdgesChange],
+  );
+
+  const rewireConnection = React.useCallback(
+    (edge: WorkflowBuilderEdge, connection: WorkflowBuilderConnection) => {
+      const validity = getConnectionValidity(connection, edge.id);
+
+      if (!validity.valid) {
+        return false;
+      }
+
+      const nextEdge = { ...edge, ...connection };
+      onEdgesChange?.(
+        edges.map((currentEdge) => (currentEdge.id === edge.id ? nextEdge : currentEdge)),
+      );
+      onConnectionDisconnect?.(edge, "rewire");
+      onConnectionComplete?.(connection);
+      commitSelection({ type: "edge", id: edge.id, edge: nextEdge });
+      return true;
+    },
+    [
+      commitSelection,
+      edges,
+      getConnectionValidity,
+      onConnectionComplete,
+      onConnectionDisconnect,
+      onEdgesChange,
+    ],
+  );
 
   const deleteSelection = () => {
     if (readOnly) {
@@ -542,7 +591,12 @@ function WorkflowBuilder({
       x: Math.round(dragState.originalX + (pointer.x - dragState.startX) / currentZoom),
       y: Math.round(dragState.originalY + (pointer.y - dragState.startY) / currentZoom),
     };
-    const nextPosition = getWorkflowBuilderSnappedNodePosition(draggedNode, nodes, rawPosition);
+    const nextPosition = getWorkflowBuilderSnappedNodePosition(
+      draggedNode,
+      nodes,
+      rawPosition,
+      layoutOptions,
+    );
     const shouldCommitImmediately =
       nextPosition.x !== rawPosition.x || nextPosition.y !== rawPosition.y;
     const nextNodes = nodes.map((node) =>
@@ -551,91 +605,96 @@ function WorkflowBuilder({
     scheduleDraggedNodesChange(nextNodes, shouldCommitImmediately);
   };
 
-  const handleNodePointerDown = (
-    event: React.PointerEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>,
-    node: WorkflowBuilderNodeData,
-  ) => {
-    selectNode(node);
-    if (
-      readOnly ||
-      (event.button !== 0 && event.button !== undefined) ||
-      isWorkflowNodeControlEvent(event.target)
-    ) {
-      return;
-    }
-    const pointer = getWorkflowPointer(event);
-    setDragState({
-      nodeId: node.id,
-      startX: pointer.x,
-      startY: pointer.y,
-      originalX: node.x,
-      originalY: node.y,
-    });
-  };
+  const handleNodePointerDown = React.useCallback(
+    (
+      event: React.PointerEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>,
+      node: WorkflowBuilderNodeData,
+    ) => {
+      selectNode(node);
+      if (
+        readOnly ||
+        (event.button !== 0 && event.button !== undefined) ||
+        isWorkflowNodeControlEvent(event.target)
+      ) {
+        return;
+      }
+      const pointer = getWorkflowPointer(event);
+      setDragState({
+        nodeId: node.id,
+        startX: pointer.x,
+        startY: pointer.y,
+        originalX: node.x,
+        originalY: node.y,
+      });
+    },
+    [readOnly, selectNode],
+  );
 
-  const completeConnection = (targetNodeId: string, targetPortId: string) => {
-    if (!pendingConnection || readOnly) {
-      return;
-    }
+  const completeConnection = React.useCallback(
+    (targetNodeId: string, targetPortId: string) => {
+      if (!pendingConnection || readOnly) {
+        return;
+      }
 
-    addConnection({
-      sourceNodeId: pendingConnection.sourceNodeId,
-      sourcePortId: pendingConnection.sourcePortId,
-      targetNodeId,
-      targetPortId,
-    });
+      addConnection({
+        sourceNodeId: pendingConnection.sourceNodeId,
+        sourcePortId: pendingConnection.sourcePortId,
+        targetNodeId,
+        targetPortId,
+      });
 
-    setPendingConnection(null);
-  };
+      setPendingConnection(null);
+    },
+    [addConnection, pendingConnection, readOnly],
+  );
 
-  const completeConnectionDragOnPort = (
-    direction: WorkflowBuilderPortDirection,
-    nodeId: string,
-    portId: string,
-  ) => {
-    if (!connectionDrag || readOnly) {
+  const completeConnectionDragOnPort = React.useCallback(
+    (direction: WorkflowBuilderPortDirection, nodeId: string, portId: string) => {
+      if (!connectionDrag || readOnly) {
+        return false;
+      }
+
+      if (connectionDrag.type === "new" && direction === "input") {
+        const completed = addConnection({
+          sourceNodeId: connectionDrag.sourceNodeId,
+          sourcePortId: connectionDrag.sourcePortId,
+          targetNodeId: nodeId,
+          targetPortId: portId,
+        });
+        setConnectionDrag(null);
+        setPendingConnection(null);
+        suppressNextPortClickRef.current = true;
+        return completed;
+      }
+
+      if (connectionDrag.type === "rewire-target" && direction === "input") {
+        const completed = rewireConnection(connectionDrag.edge, {
+          sourceNodeId: connectionDrag.edge.sourceNodeId,
+          sourcePortId: connectionDrag.edge.sourcePortId,
+          targetNodeId: nodeId,
+          targetPortId: portId,
+        });
+        setConnectionDrag(null);
+        setPendingConnection(null);
+        return completed;
+      }
+
+      if (connectionDrag.type === "rewire-source" && direction === "output") {
+        const completed = rewireConnection(connectionDrag.edge, {
+          sourceNodeId: nodeId,
+          sourcePortId: portId,
+          targetNodeId: connectionDrag.edge.targetNodeId,
+          targetPortId: connectionDrag.edge.targetPortId,
+        });
+        setConnectionDrag(null);
+        setPendingConnection(null);
+        return completed;
+      }
+
       return false;
-    }
-
-    if (connectionDrag.type === "new" && direction === "input") {
-      const completed = addConnection({
-        sourceNodeId: connectionDrag.sourceNodeId,
-        sourcePortId: connectionDrag.sourcePortId,
-        targetNodeId: nodeId,
-        targetPortId: portId,
-      });
-      setConnectionDrag(null);
-      setPendingConnection(null);
-      suppressNextPortClickRef.current = true;
-      return completed;
-    }
-
-    if (connectionDrag.type === "rewire-target" && direction === "input") {
-      const completed = rewireConnection(connectionDrag.edge, {
-        sourceNodeId: connectionDrag.edge.sourceNodeId,
-        sourcePortId: connectionDrag.edge.sourcePortId,
-        targetNodeId: nodeId,
-        targetPortId: portId,
-      });
-      setConnectionDrag(null);
-      setPendingConnection(null);
-      return completed;
-    }
-
-    if (connectionDrag.type === "rewire-source" && direction === "output") {
-      const completed = rewireConnection(connectionDrag.edge, {
-        sourceNodeId: nodeId,
-        sourcePortId: portId,
-        targetNodeId: connectionDrag.edge.targetNodeId,
-        targetPortId: connectionDrag.edge.targetPortId,
-      });
-      setConnectionDrag(null);
-      setPendingConnection(null);
-      return completed;
-    }
-
-    return false;
-  };
+    },
+    [addConnection, connectionDrag, readOnly, rewireConnection],
+  );
 
   const cancelOrDetachConnectionDrag = () => {
     if (!connectionDrag || readOnly) {
@@ -682,9 +741,12 @@ function WorkflowBuilder({
     cancelOrDetachConnectionDrag();
   };
 
-  const changeNodeMinimized = (nodeId: string, minimized: boolean) => {
-    onNodesChange?.(nodes.map((node) => (node.id === nodeId ? { ...node, minimized } : node)));
-  };
+  const changeNodeMinimized = React.useCallback(
+    (nodeId: string, minimized: boolean) => {
+      onNodesChange?.(nodes.map((node) => (node.id === nodeId ? { ...node, minimized } : node)));
+    },
+    [nodes, onNodesChange],
+  );
 
   const fitView = () => {
     if (!canvasSize || nodes.length === 0) {
@@ -692,7 +754,7 @@ function WorkflowBuilder({
       return;
     }
 
-    const bounds = getWorkflowBounds(nodes);
+    const bounds = getWorkflowBounds(nodes, layoutOptions);
     const padding = 48;
     const nextZoom = Math.min(
       maxZoom,
@@ -727,7 +789,70 @@ function WorkflowBuilder({
     }
   };
 
+  const handleStartConnection = React.useCallback(
+    (sourceNodeId: string, sourcePortId: string) => {
+      if (suppressNextPortClickRef.current) {
+        suppressNextPortClickRef.current = false;
+        return;
+      }
+      const nextConnection = { sourceNodeId, sourcePortId };
+      if (
+        pendingConnection?.sourceNodeId === sourceNodeId &&
+        pendingConnection.sourcePortId === sourcePortId
+      ) {
+        return;
+      }
+      setConnectionDrag(null);
+      setPendingConnection(nextConnection);
+      onConnectionStart?.(nextConnection);
+    },
+    [onConnectionStart, pendingConnection],
+  );
+
+  const handleInputPointerUp = React.useCallback(
+    (_event: React.PointerEvent<HTMLButtonElement>, nodeId: string, portId: string) => {
+      completeConnectionDragOnPort("input", nodeId, portId);
+    },
+    [completeConnectionDragOnPort],
+  );
+
+  const handleOutputPointerDown = React.useCallback(
+    (event: React.PointerEvent<HTMLButtonElement>, nodeId: string, portId: string) => {
+      if (readOnly || (event.button !== 0 && event.button !== undefined)) {
+        return;
+      }
+      const pointerPoint = getWorkflowBuilderPointerPoint(event, viewportRef.current, currentZoom);
+      const nextConnection = { sourceNodeId: nodeId, sourcePortId: portId };
+      setPendingConnection(null);
+      setPendingConnection(nextConnection);
+      onConnectionStart?.(nextConnection);
+      setConnectionDrag({
+        type: "new",
+        sourceNodeId: nodeId,
+        sourcePortId: portId,
+        startPoint: pointerPoint,
+        pointerPoint,
+        started: true,
+      });
+    },
+    [currentZoom, onConnectionStart, readOnly],
+  );
+
+  const handleOutputPointerUp = React.useCallback(
+    (_event: React.PointerEvent<HTMLButtonElement>, nodeId: string, portId: string) => {
+      completeConnectionDragOnPort("output", nodeId, portId);
+    },
+    [completeConnectionDragOnPort],
+  );
+
   React.useEffect(() => {
+    if (measurePorts !== "dom") {
+      setPortPoints((currentPortPoints) =>
+        Object.keys(currentPortPoints).length === 0 ? currentPortPoints : {},
+      );
+      return;
+    }
+
     const viewport = viewportRef.current;
 
     if (!viewport) {
@@ -748,7 +873,7 @@ function WorkflowBuilder({
         ? currentPortPoints
         : measuredPortPoints,
     );
-  }, [connectionDrag, currentZoom, edges, nodes, pendingConnection]);
+  }, [connectionDrag, currentZoom, edges, measurePorts, nodes, pendingConnection]);
 
   React.useEffect(() => {
     return () => {
@@ -814,15 +939,17 @@ function WorkflowBuilder({
           >
             {edges.map((edge) => {
               const geometry = edgeGeometry.get(edge.id);
-              const line = geometry?.line ?? getWorkflowEdgeLine(nodes, edge, portPoints);
+              const line =
+                geometry?.line ?? getWorkflowEdgeLine(nodeById, edge, portPoints, layoutOptions);
               const selected = edge.id === currentSelectedEdgeId;
               const showEndpointHandles = !readOnly && (selected || edge.id === hoveredEdgeId);
+              const edgeStroke = getWorkflowBuilderEdgeStatusColor(edge.status) ?? edge.color;
               const sourcePoint =
                 geometry?.sourcePoint ??
-                getWorkflowEdgeEndpointPoint(nodes, edge, "source", portPoints);
+                getWorkflowEdgeEndpointPoint(nodeById, edge, "source", portPoints, layoutOptions);
               const targetPoint =
                 geometry?.targetPoint ??
-                getWorkflowEdgeEndpointPoint(nodes, edge, "target", portPoints);
+                getWorkflowEdgeEndpointPoint(nodeById, edge, "target", portPoints, layoutOptions);
               return (
                 <g
                   key={edge.id}
@@ -868,6 +995,7 @@ function WorkflowBuilder({
                       edge.status === "running" && "stroke-blue-500",
                     )}
                     strokeWidth={selected ? 3 : 2}
+                    stroke={edgeStroke}
                   />
                   {showEndpointHandles ? (
                     <>
@@ -919,7 +1047,10 @@ function WorkflowBuilder({
             {connectionDrag ? (
               <path
                 data-slot="workflow-builder-connection-preview"
-                d={getWorkflowConnectionDragLine(nodes, connectionDrag, portPoints).path}
+                d={
+                  getWorkflowConnectionDragLine(nodeById, connectionDrag, portPoints, layoutOptions)
+                    .path
+                }
                 className={cn(
                   "fill-none stroke-muted-foreground",
                   connectionDrag.targetValid === true && "stroke-primary",
@@ -940,53 +1071,14 @@ function WorkflowBuilder({
               inputsConnectable={
                 connectionDrag?.type === "new" || connectionDrag?.type === "rewire-target"
               }
+              showPortColumnHeaders={showPortColumnHeaders}
               onNodeSelect={selectNode}
               onNodeMinimizedChange={onNodesChange ? changeNodeMinimized : undefined}
-              onStartConnection={(sourceNodeId, sourcePortId) => {
-                if (suppressNextPortClickRef.current) {
-                  suppressNextPortClickRef.current = false;
-                  return;
-                }
-                const nextConnection = { sourceNodeId, sourcePortId };
-                if (
-                  pendingConnection?.sourceNodeId === sourceNodeId &&
-                  pendingConnection.sourcePortId === sourcePortId
-                ) {
-                  return;
-                }
-                setConnectionDrag(null);
-                setPendingConnection(nextConnection);
-                onConnectionStart?.(nextConnection);
-              }}
+              onStartConnection={handleStartConnection}
               onCompleteConnection={completeConnection}
-              onInputPointerUp={(_, nodeId, portId) => {
-                completeConnectionDragOnPort("input", nodeId, portId);
-              }}
-              onOutputPointerDown={(event, nodeId, portId) => {
-                if (readOnly || (event.button !== 0 && event.button !== undefined)) {
-                  return;
-                }
-                const pointerPoint = getWorkflowBuilderPointerPoint(
-                  event,
-                  viewportRef.current,
-                  currentZoom,
-                );
-                const nextConnection = { sourceNodeId: nodeId, sourcePortId: portId };
-                setPendingConnection(null);
-                setPendingConnection(nextConnection);
-                onConnectionStart?.(nextConnection);
-                setConnectionDrag({
-                  type: "new",
-                  sourceNodeId: nodeId,
-                  sourcePortId: portId,
-                  startPoint: pointerPoint,
-                  pointerPoint,
-                  started: true,
-                });
-              }}
-              onOutputPointerUp={(_, nodeId, portId) => {
-                completeConnectionDragOnPort("output", nodeId, portId);
-              }}
+              onInputPointerUp={handleInputPointerUp}
+              onOutputPointerDown={handleOutputPointerDown}
+              onOutputPointerUp={handleOutputPointerUp}
               onNodePointerDown={handleNodePointerDown}
             />
           ))}
@@ -996,6 +1088,7 @@ function WorkflowBuilder({
             nodes={nodes}
             edges={edges}
             selectedNodeId={currentSelectedNodeId}
+            showPortColumnHeaders={showPortColumnHeaders}
             className="absolute right-3 bottom-3"
           />
         ) : null}
@@ -1010,6 +1103,7 @@ const WorkflowBuilderNode = React.memo(function WorkflowBuilderNode({
   readOnly,
   pendingConnection,
   inputsConnectable,
+  showPortColumnHeaders = true,
   onNodeSelect,
   onNodeMinimizedChange,
   onStartConnection,
@@ -1021,7 +1115,11 @@ const WorkflowBuilderNode = React.memo(function WorkflowBuilderNode({
   className,
   ...props
 }: WorkflowBuilderNodeProps) {
-  const nodeSize = getWorkflowNodeSize(node);
+  const layoutOptions = React.useMemo(
+    () => ({ showPortColumnHeaders }),
+    [showPortColumnHeaders],
+  );
+  const nodeSize = getWorkflowNodeSize(node, layoutOptions);
 
   return (
     <div
@@ -1041,6 +1139,7 @@ const WorkflowBuilderNode = React.memo(function WorkflowBuilderNode({
         readOnly={readOnly}
         inputDisabled={readOnly || !(pendingConnection || inputsConnectable)}
         outputDisabled={readOnly}
+        showPortColumnHeaders={showPortColumnHeaders}
         onNodeSelect={() => onNodeSelect?.(node)}
         onMinimizedChange={(_, minimized) => onNodeMinimizedChange?.(node.id, minimized)}
         onInputClick={(port) => onCompleteConnection?.(node.id, port.id)}
@@ -1134,11 +1233,19 @@ function WorkflowBuilderMiniMap({
   nodes,
   edges: _edges,
   selectedNodeId,
+  showPortColumnHeaders = true,
   className,
   ...props
 }: WorkflowBuilderMiniMapProps) {
   void _edges;
-  const bounds = React.useMemo(() => getWorkflowBounds(nodes), [nodes]);
+  const layoutOptions = React.useMemo(
+    () => ({ showPortColumnHeaders }),
+    [showPortColumnHeaders],
+  );
+  const bounds = React.useMemo(() => getWorkflowBounds(nodes, layoutOptions), [
+    layoutOptions,
+    nodes,
+  ]);
   const minimapNodes = React.useMemo(
     () =>
       nodes.map((node) => ({
@@ -1273,18 +1380,32 @@ function getWorkflowBuilderIncomingEdge(
   );
 }
 
+function getWorkflowBuilderEdgeStatusColor(status: WorkflowBuilderEdge["status"]) {
+  if (status === "error") {
+    return "var(--destructive)";
+  }
+  if (status === "success") {
+    return "#10b981";
+  }
+  if (status === "running") {
+    return "#3b82f6";
+  }
+  return undefined;
+}
+
 function getWorkflowEdgeLine(
-  nodes: WorkflowBuilderNodeData[],
+  nodeById: ReadonlyMap<string, WorkflowBuilderNodeData>,
   edge: WorkflowBuilderEdge,
   portPoints: WorkflowBuilderPortPointMap = {},
+  layoutOptions: WorkflowNodeLayoutOptions = {},
 ) {
-  const sourceNode = nodes.find((node) => node.id === edge.sourceNodeId);
-  const targetNode = nodes.find((node) => node.id === edge.targetNodeId);
+  const sourceNode = nodeById.get(edge.sourceNodeId);
+  const targetNode = nodeById.get(edge.targetNodeId);
   const source = sourceNode
-    ? getWorkflowNodePortPoint(sourceNode, "output", edge.sourcePortId, portPoints)
+    ? getWorkflowNodePortPoint(sourceNode, "output", edge.sourcePortId, portPoints, layoutOptions)
     : { x: 0, y: 0 };
   const target = targetNode
-    ? getWorkflowNodePortPoint(targetNode, "input", edge.targetPortId, portPoints)
+    ? getWorkflowNodePortPoint(targetNode, "input", edge.targetPortId, portPoints, layoutOptions)
     : { x: 0, y: 0 };
   const handle = Math.max(48, Math.abs(target.x - source.x) / 2);
 
@@ -1305,41 +1426,43 @@ function getWorkflowBuilderConnectionPreviewLine(
 }
 
 function getWorkflowConnectionDragLine(
-  nodes: WorkflowBuilderNodeData[],
+  nodeById: ReadonlyMap<string, WorkflowBuilderNodeData>,
   drag: WorkflowBuilderConnectionDrag,
   portPoints: WorkflowBuilderPortPointMap = {},
+  layoutOptions: WorkflowNodeLayoutOptions = {},
 ) {
   if (drag.type === "rewire-source") {
-    const targetNode = nodes.find((node) => node.id === drag.edge.targetNodeId);
+    const targetNode = nodeById.get(drag.edge.targetNodeId);
     const target = targetNode
-      ? getWorkflowNodePortPoint(targetNode, "input", drag.edge.targetPortId, portPoints)
+      ? getWorkflowNodePortPoint(
+          targetNode,
+          "input",
+          drag.edge.targetPortId,
+          portPoints,
+          layoutOptions,
+        )
       : drag.pointerPoint;
 
     return getWorkflowBuilderConnectionPreviewLine(drag.pointerPoint, target);
   }
 
-  const sourceNode = nodes.find((node) =>
-    drag.type === "new" ? node.id === drag.sourceNodeId : node.id === drag.edge.sourceNodeId,
-  );
+  const sourceNode = nodeById.get(drag.type === "new" ? drag.sourceNodeId : drag.edge.sourceNodeId);
   const sourcePortId = drag.type === "new" ? drag.sourcePortId : drag.edge.sourcePortId;
   const source = sourceNode
-    ? getWorkflowNodePortPoint(sourceNode, "output", sourcePortId, portPoints)
+    ? getWorkflowNodePortPoint(sourceNode, "output", sourcePortId, portPoints, layoutOptions)
     : drag.pointerPoint;
 
   return getWorkflowBuilderConnectionPreviewLine(source, drag.pointerPoint);
 }
 
 function getWorkflowEdgeEndpointPoint(
-  nodes: WorkflowBuilderNodeData[],
+  nodeById: ReadonlyMap<string, WorkflowBuilderNodeData>,
   edge: WorkflowBuilderEdge,
   endpoint: "source" | "target",
   portPoints: WorkflowBuilderPortPointMap = {},
+  layoutOptions: WorkflowNodeLayoutOptions = {},
 ) {
-  const node = nodes.find((currentNode) =>
-    endpoint === "source"
-      ? currentNode.id === edge.sourceNodeId
-      : currentNode.id === edge.targetNodeId,
-  );
+  const node = nodeById.get(endpoint === "source" ? edge.sourceNodeId : edge.targetNodeId);
 
   if (!node) {
     return { x: 0, y: 0 };
@@ -1350,6 +1473,7 @@ function getWorkflowEdgeEndpointPoint(
     endpoint === "source" ? "output" : "input",
     endpoint === "source" ? edge.sourcePortId : edge.targetPortId,
     portPoints,
+    layoutOptions,
   );
 }
 
@@ -1358,8 +1482,9 @@ function getWorkflowNodePortPoint(
   direction: WorkflowBuilderPortDirection,
   portId: string,
   portPoints: WorkflowBuilderPortPointMap = {},
+  layoutOptions: WorkflowNodeLayoutOptions = {},
 ): WorkflowBuilderPoint {
-  const size = getWorkflowNodeSize(node);
+  const size = getWorkflowNodeSize(node, layoutOptions);
   const compact = node.variant === "compact";
   const measuredPoint = portPoints[getWorkflowBuilderPortPointKey(node.id, direction, portId)];
 
@@ -1367,7 +1492,7 @@ function getWorkflowNodePortPoint(
     return measuredPoint;
   }
 
-  const x = node.x + getWorkflowNodePortDotXOffset(node, direction);
+  const x = node.x + getWorkflowNodePortDotXOffset(node, direction, layoutOptions);
 
   if (compact) {
     return {
@@ -1388,16 +1513,19 @@ function getWorkflowNodePortPoint(
 
   return {
     x,
-    y: node.y + getWorkflowNodePortCenterOffset(node, portIndex),
+    y: node.y + getWorkflowNodePortCenterOffset(node, portIndex, layoutOptions),
   };
 }
 
-function getWorkflowBounds(nodes: WorkflowBuilderNodeData[]) {
+function getWorkflowBounds(
+  nodes: WorkflowBuilderNodeData[],
+  layoutOptions: WorkflowNodeLayoutOptions = {},
+) {
   const xs = nodes.map((node) => node.x);
   const ys = nodes.map((node) => node.y);
   const minX = Math.min(...xs, 0);
   const minY = Math.min(...ys, 0);
-  const sizes = nodes.map((node) => getWorkflowNodeSize(node));
+  const sizes = nodes.map((node) => getWorkflowNodeSize(node, layoutOptions));
   const maxX = Math.max(
     ...xs.map((x, index) => x + sizes[index]!.width),
     workflowNodeSizeFallback().width,
@@ -1418,8 +1546,9 @@ function getWorkflowBounds(nodes: WorkflowBuilderNodeData[]) {
 function getWorkflowNodePortDotXOffset(
   node: WorkflowBuilderNodeData,
   direction: WorkflowBuilderPortDirection,
+  layoutOptions: WorkflowNodeLayoutOptions = {},
 ) {
-  const size = getWorkflowNodeSize(node);
+  const size = getWorkflowNodeSize(node, layoutOptions);
 
   return direction === "input" ? 0 : size.width;
 }
@@ -1428,24 +1557,25 @@ function getWorkflowBuilderSnappedNodePosition(
   node: WorkflowBuilderNodeData,
   nodes: WorkflowBuilderNodeData[],
   position: WorkflowBuilderPoint,
+  layoutOptions: WorkflowNodeLayoutOptions = {},
 ): WorkflowBuilderPoint {
   let closestSnap: (WorkflowBuilderPoint & { distance: number }) | null = null;
-  const nodeSize = getWorkflowNodeSize(node);
+  const nodeSize = getWorkflowNodeSize(node, layoutOptions);
 
   for (const otherNode of nodes) {
     if (otherNode.id === node.id) {
       continue;
     }
 
-    const otherSize = getWorkflowNodeSize(otherNode);
+    const otherSize = getWorkflowNodeSize(otherNode, layoutOptions);
 
     for (const inputMatch of getWorkflowBuilderPortMatches(node.inputs, otherNode.outputs)) {
       const snap = {
         x: otherNode.x + otherSize.width,
         y:
           otherNode.y +
-          getWorkflowNodePortCenterOffset(otherNode, inputMatch.otherIndex) -
-          getWorkflowNodePortCenterOffset(node, inputMatch.nodeIndex),
+          getWorkflowNodePortCenterOffset(otherNode, inputMatch.otherIndex, layoutOptions) -
+          getWorkflowNodePortCenterOffset(node, inputMatch.nodeIndex, layoutOptions),
       };
       const distance = getWorkflowPointDistance(position, snap);
 
@@ -1462,8 +1592,8 @@ function getWorkflowBuilderSnappedNodePosition(
         x: otherNode.x - nodeSize.width,
         y:
           otherNode.y +
-          getWorkflowNodePortCenterOffset(otherNode, outputMatch.otherIndex) -
-          getWorkflowNodePortCenterOffset(node, outputMatch.nodeIndex),
+          getWorkflowNodePortCenterOffset(otherNode, outputMatch.otherIndex, layoutOptions) -
+          getWorkflowNodePortCenterOffset(node, outputMatch.nodeIndex, layoutOptions),
       };
       const distance = getWorkflowPointDistance(position, snap);
 

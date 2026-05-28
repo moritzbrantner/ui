@@ -3,74 +3,92 @@
     "logic.cnMerge": {
       "kind": "logic",
       "name": "logic.cnMerge",
-      "median": 0.0034359999999651336,
-      "p95": 0.012072999999986678
+      "median": 0.00220400000000609,
+      "p95": 0.008546000000023923
     },
     "logic.queryBuilderEvaluate1000": {
       "kind": "logic",
       "name": "logic.queryBuilderEvaluate1000",
-      "median": 0.3554339999999456,
-      "p95": 0.6170720000000074
+      "median": 0.3240010000000666,
+      "p95": 0.40915099999995164
     },
     "logic.workflowConnectionValidation": {
       "kind": "logic",
       "name": "logic.workflowConnectionValidation",
-      "median": 0.0884049999999661,
-      "p95": 0.10713999999995849
+      "median": 0.08403799999996409,
+      "p95": 0.09593099999995047
     },
     "logic.workflowBuilderConnectionValidity1000": {
       "kind": "logic",
       "name": "logic.workflowBuilderConnectionValidity1000",
-      "median": 2.6746129999999084,
-      "p95": 4.451720000000023
+      "median": 2.5167050000000017,
+      "p95": 4.331014999999979
     },
     "logic.dataGridFilter1000Rows": {
       "kind": "logic",
       "name": "logic.dataGridFilter1000Rows",
-      "median": 1.4887990000000855,
-      "p95": 2.3885689999999613
+      "median": 1.4790179999999964,
+      "p95": 2.57311100000004
     },
     "logic.timelineHelpers1000": {
       "kind": "logic",
       "name": "logic.timelineHelpers1000",
-      "median": 0.09336399999995137,
-      "p95": 0.10763100000008308
+      "median": 0.07912899999996625,
+      "p95": 0.08689300000003186
     },
     "render.dataGrid100": {
       "kind": "render",
       "name": "render.dataGrid100",
-      "median": 7.405754999999999,
-      "p95": 12.500195000000076
+      "median": 6.927649999999858,
+      "p95": 9.546498000000156
     },
     "render.dataGrid1000": {
       "kind": "render",
       "name": "render.dataGrid1000",
-      "median": 9.467554000000064,
-      "p95": 17.94678299999987
+      "median": 9.464783000000125,
+      "p95": 18.838825999999926
     },
     "render.dataGrid500Rows10Columns": {
       "kind": "render",
       "name": "render.dataGrid500Rows10Columns",
-      "median": 9.58063600000014,
-      "p95": 11.485652000000073
+      "median": 10.698859999999968,
+      "p95": 13.885037999999895
     },
     "render.workflowBuilder50Nodes80Edges": {
       "kind": "render",
       "name": "render.workflowBuilder50Nodes80Edges",
-      "median": 70.46237999999994,
-      "p95": 102.68124099999977
+      "median": 28.64213800000016,
+      "p95": 37.85308399999985
     },
     "render.calendar100Events": {
       "kind": "render",
       "name": "render.calendar100Events",
-      "median": 8.519526000000042,
-      "p95": 11.364266999999927
+      "median": 10.450121000000308,
+      "p95": 15.217878999999812
     },
     "render.documentViewer100Pages": {
       "kind": "render",
       "name": "render.documentViewer100Pages",
-      "median": 7.7535369999995964,
-      "p95": 8.750326999999743
+      "median": 8.539859999999862,
+      "p95": 11.412695999999869
+    },
+    "render.assetBrowser500": {
+      "kind": "render",
+      "name": "render.assetBrowser500",
+      "median": 47.72959200000014,
+      "p95": 58.156299999999646
+    },
+    "render.gantt250": {
+      "kind": "render",
+      "name": "render.gantt250",
+      "median": 29.647954000000027,
+      "p95": 35.4836750000004
+    },
+    "render.orgChart340": {
+      "kind": "render",
+      "name": "render.orgChart340",
+      "median": 5.056833999999981,
+      "p95": 8.197413999999299
     }
   }
 }

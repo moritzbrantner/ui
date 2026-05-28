@@ -63,6 +63,9 @@ type AssetBrowserProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   emptyMessage?: React.ReactNode;
   layout?: AssetBrowserLayout;
   showPreview?: boolean;
+  virtualized?: boolean;
+  estimatedItemHeight?: number;
+  maxRenderedItems?: number;
 };
 
 export type AssetBrowserItemCardProps = React.ComponentProps<"button"> & {
@@ -97,27 +100,44 @@ function AssetBrowser({
   emptyMessage = "No assets found.",
   layout = "default",
   showPreview,
+  virtualized = false,
+  estimatedItemHeight: _estimatedItemHeight,
+  maxRenderedItems,
   className,
   ...props
 }: AssetBrowserProps) {
+  void _estimatedItemHeight;
   const [internalView, setInternalView] = React.useState<AssetBrowserView>(defaultView);
   const [query, setQuery] = React.useState("");
   const [internalSelection, setInternalSelection] =
     React.useState<string[]>(defaultSelectedItemIds);
   const currentView = view ?? internalView;
   const currentSelection = selectedItemIds ?? internalSelection;
-  const selectedItems = items.filter((item) => currentSelection.includes(item.id));
+  const currentSelectionSet = React.useMemo(() => new Set(currentSelection), [currentSelection]);
+  const selectedItems = React.useMemo(
+    () => items.filter((item) => currentSelectionSet.has(item.id)),
+    [currentSelectionSet, items],
+  );
   const previewItem = selectedItems.at(-1);
   const isMultipleSelection = selectionMode === "multiple";
   const shouldShowPreview = showPreview ?? layout !== "mobile";
   const normalizedQuery = query.trim().toLowerCase();
-  const visibleItems = normalizedQuery
-    ? items.filter((item) =>
-        [item.name, item.type, item.mimeType, item.description]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(normalizedQuery)),
-      )
-    : items;
+  const visibleItems = React.useMemo(
+    () =>
+      normalizedQuery
+        ? items.filter((item) =>
+            [item.name, item.type, item.mimeType, item.description]
+              .filter(Boolean)
+              .some((value) => String(value).toLowerCase().includes(normalizedQuery)),
+          )
+        : items,
+    [items, normalizedQuery],
+  );
+  const renderedItemLimit = virtualized ? (maxRenderedItems ?? 120) : maxRenderedItems;
+  const renderedItems =
+    typeof renderedItemLimit === "number"
+      ? visibleItems.slice(0, Math.max(0, renderedItemLimit))
+      : visibleItems;
 
   const setView = (nextView: AssetBrowserView) => {
     setInternalView(nextView);
@@ -125,10 +145,11 @@ function AssetBrowser({
   };
 
   const commitSelection = (nextSelection: string[]) => {
+    const nextSelectionSet = new Set(nextSelection);
     setInternalSelection(nextSelection);
     onSelectionChange?.(
       nextSelection,
-      items.filter((item) => nextSelection.includes(item.id)),
+      items.filter((item) => nextSelectionSet.has(item.id)),
     );
   };
 
@@ -148,12 +169,12 @@ function AssetBrowser({
     }
 
     if (selectionMode === "single") {
-      commitSelection(currentSelection.includes(item.id) ? [] : [item.id]);
+      commitSelection(currentSelectionSet.has(item.id) ? [] : [item.id]);
       return;
     }
 
     commitSelection(
-      currentSelection.includes(item.id)
+      currentSelectionSet.has(item.id)
         ? currentSelection.filter((itemId) => itemId !== item.id)
         : [...currentSelection, item.id],
     );
@@ -274,14 +295,14 @@ function AssetBrowser({
                 layout === "mobile" && "grid-cols-1 sm:grid-cols-1 xl:grid-cols-1",
               )}
             >
-              {visibleItems.map((item) => (
+              {renderedItems.map((item) => (
                 <AssetBrowserItemCard
                   key={item.id}
                   item={item}
-                  selected={currentSelection.includes(item.id)}
+                  selected={currentSelectionSet.has(item.id)}
                   selectionMode={selectionMode}
                   role="option"
-                  aria-selected={currentSelection.includes(item.id)}
+                  aria-selected={currentSelectionSet.has(item.id)}
                   onClick={() => toggleItem(item)}
                   onDoubleClick={() => onOpenItem?.(item)}
                 />
@@ -294,14 +315,14 @@ function AssetBrowser({
               aria-multiselectable={selectionMode === "multiple" ? true : undefined}
               className="divide-y"
             >
-              {visibleItems.map((item) => (
+              {renderedItems.map((item) => (
                 <AssetBrowserItemRow
                   key={item.id}
                   item={item}
-                  selected={currentSelection.includes(item.id)}
+                  selected={currentSelectionSet.has(item.id)}
                   selectionMode={selectionMode}
                   role="option"
-                  aria-selected={currentSelection.includes(item.id)}
+                  aria-selected={currentSelectionSet.has(item.id)}
                   onClick={() => toggleItem(item)}
                   onDoubleClick={() => onOpenItem?.(item)}
                 />
@@ -315,7 +336,7 @@ function AssetBrowser({
   );
 }
 
-function AssetBrowserItemCard({
+const AssetBrowserItemCard = React.memo(function AssetBrowserItemCard({
   item,
   selected,
   selectionMode = "single",
@@ -344,9 +365,9 @@ function AssetBrowserItemCard({
       </div>
     </button>
   );
-}
+});
 
-function AssetBrowserItemRow({
+const AssetBrowserItemRow = React.memo(function AssetBrowserItemRow({
   item,
   selected,
   selectionMode = "single",
@@ -387,7 +408,7 @@ function AssetBrowserItemRow({
       </span>
     </button>
   );
-}
+});
 
 function AssetBrowserSelectionMark({
   selected,

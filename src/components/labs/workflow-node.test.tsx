@@ -98,6 +98,32 @@ describe("WorkflowNode", () => {
     ).toBe("duplex");
   });
 
+  test("can hide port column headers without keeping their layout space", () => {
+    render(<WorkflowNode node={duplexNode} showPortColumnHeaders={false} />);
+
+    expect(screen.queryByText("Inputs")).toBeNull();
+    expect(screen.queryByText("Outputs")).toBeNull();
+    expect(getWorkflowNodeSize(duplexNode, { showPortColumnHeaders: false }).height).toBe(
+      getWorkflowNodeSize(duplexNode).height - 21,
+    );
+    expect(
+      getWorkflowNodePortCenterOffset(duplexNode, 0, { showPortColumnHeaders: false }),
+    ).toBe(getWorkflowNodePortCenterOffset(duplexNode, 0) - 21);
+  });
+
+  test("tints expanded port rows and connector dots from the port color", () => {
+    const { container } = render(<WorkflowNode node={duplexNode} />);
+    const pagePort = container.querySelector<HTMLElement>(
+      '[data-slot="workflow-node-port"][data-port-id="page"]',
+    )!;
+    const pageDot = pagePort.querySelector<HTMLElement>('[data-slot="workflow-node-port-dot"]')!;
+
+    expect(pagePort.style.backgroundColor).toBe("rgba(51, 65, 85, 0.08)");
+    expect(pagePort.style.borderColor).toBe("rgba(51, 65, 85, 0.32)");
+    expect(pagePort.style.boxShadow).toContain("#334155");
+    expect(pageDot.style.backgroundColor).toBe("rgb(51, 65, 85)");
+  });
+
   test("calls selection and port callbacks with the selected node and port", () => {
     const onNodeSelect = vi.fn();
     const onInputClick = vi.fn();

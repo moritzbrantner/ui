@@ -65,6 +65,8 @@ type OrgChartProps = React.ComponentProps<"div"> & {
     node: OrgChartNodeData,
     context: OrgChartRenderNodeContext,
   ) => void;
+  defaultExpandedDepth?: number;
+  maxRenderedNodes?: number;
 };
 
 type OrgChartVisibleNode = {
@@ -132,11 +134,16 @@ function OrgChart({
   nodeActions,
   onNodeSelect,
   onNodeActionSelect,
+  defaultExpandedDepth,
+  maxRenderedNodes,
   children,
   className,
   ...props
 }: OrgChartProps) {
-  const defaultExpandableIds = React.useMemo(() => collectExpandableNodeIds(nodes), [nodes]);
+  const defaultExpandableIds = React.useMemo(
+    () => collectExpandableNodeIds(nodes, defaultExpandedDepth),
+    [defaultExpandedDepth, nodes],
+  );
   const [internalExpandedIds, setInternalExpandedIds] = React.useState<string[] | undefined>(() =>
     defaultExpandedIds ? [...defaultExpandedIds] : undefined,
   );
@@ -147,6 +154,13 @@ function OrgChart({
   const visibleNodes = React.useMemo(
     () => getVisibleOrgChartNodes(nodes, currentExpandedIds),
     [currentExpandedIds, nodes],
+  );
+  const renderedNodeIds = React.useMemo(
+    () =>
+      typeof maxRenderedNodes === "number"
+        ? new Set(visibleNodes.slice(0, Math.max(0, maxRenderedNodes)).map((item) => item.node.id))
+        : undefined,
+    [maxRenderedNodes, visibleNodes],
   );
   const nodeRefs = React.useRef(new Map<string, HTMLDivElement>());
   const [internalFocusedNodeId, setInternalFocusedNodeId] = React.useState<string | null>(
@@ -382,6 +396,7 @@ function OrgChart({
               onNodeSelect={onNodeSelect}
               onNodeActionSelect={onNodeActionSelect}
               setNodeRef={setNodeRef}
+              renderedNodeIds={renderedNodeIds}
             />
           ))}
         </div>
@@ -396,7 +411,7 @@ function OrgChart({
   );
 }
 
-function OrgChartNode({
+const OrgChartNode = React.memo(function OrgChartNode({
   node,
   depth = 0,
   index = 0,
@@ -422,11 +437,17 @@ function OrgChartNode({
   onNodeSelect,
   onNodeActionSelect,
   setNodeRef,
+  renderedNodeIds,
   className,
   ...props
 }: OrgChartNodeProps & {
   setNodeRef?: (nodeId: string, element: HTMLDivElement | null) => void;
+  renderedNodeIds?: ReadonlySet<string>;
 }) {
+  if (renderedNodeIds && !renderedNodeIds.has(node.id)) {
+    return null;
+  }
+
   const hasChildren = Boolean(node.children?.length);
   const [internalExpanded, setInternalExpanded] = React.useState(defaultExpanded);
   const expanded = hasChildren
@@ -679,6 +700,7 @@ function OrgChartNode({
                 onNodeSelect={onNodeSelect}
                 onNodeActionSelect={onNodeActionSelect}
                 setNodeRef={setNodeRef}
+                renderedNodeIds={renderedNodeIds}
                 siblingCount={node.children?.length ?? 0}
               />
             ))}
@@ -687,15 +709,19 @@ function OrgChartNode({
       ) : null}
     </div>
   );
-}
+});
 
-function collectExpandableNodeIds(nodes: readonly OrgChartNodeData[]) {
+function collectExpandableNodeIds(
+  nodes: readonly OrgChartNodeData[],
+  maxDepth = Number.POSITIVE_INFINITY,
+  depth = 0,
+) {
   const expandedNodeIds: string[] = [];
 
   for (const node of nodes) {
-    if (node.children?.length) {
+    if (node.children?.length && depth < maxDepth) {
       expandedNodeIds.push(node.id);
-      expandedNodeIds.push(...collectExpandableNodeIds(node.children));
+      expandedNodeIds.push(...collectExpandableNodeIds(node.children, maxDepth, depth + 1));
     }
   }
 

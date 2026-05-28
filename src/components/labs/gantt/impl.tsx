@@ -65,6 +65,8 @@ type GanttProps = Omit<React.ComponentProps<"figure">, "onSelect"> & {
   ) => React.ReactNode;
   emptyLabel?: string;
   formatDate?: (date: Date, scale: GanttScale) => string;
+  virtualized?: boolean;
+  visibleTaskWindow?: { start: number; end: number };
 };
 
 type NormalizedGanttTask = GanttTask & {
@@ -130,6 +132,8 @@ function Gantt({
   taskRenderer,
   emptyLabel = "No tasks",
   formatDate = formatGanttDate,
+  virtualized = false,
+  visibleTaskWindow,
   className,
   ...props
 }: GanttProps) {
@@ -150,28 +154,57 @@ function Gantt({
     () => getVisibleGanttTasks(normalizedTasks, expandedTaskIdSet),
     [expandedTaskIdSet, normalizedTasks],
   );
-  const normalizedMarkers = markers.map((marker) => ({
-    ...marker,
-    dateValue: parseGanttDate(marker.date),
-  }));
-  const range = getGanttDateRange(normalizedTasks, {
-    markers: normalizedMarkers.map((marker) => marker.dateValue),
-    startDate,
-    endDate,
-  });
-  const ticks = getGanttTicks(range, scale, formatDate);
+  const normalizedMarkers = React.useMemo(
+    () =>
+      markers.map((marker) => ({
+        ...marker,
+        dateValue: parseGanttDate(marker.date),
+      })),
+    [markers],
+  );
+  const range = React.useMemo(
+    () =>
+      getGanttDateRange(normalizedTasks, {
+        markers: normalizedMarkers.map((marker) => marker.dateValue),
+        startDate,
+        endDate,
+      }),
+    [endDate, normalizedMarkers, normalizedTasks, startDate],
+  );
+  const ticks = React.useMemo(
+    () => getGanttTicks(range, scale, formatDate),
+    [formatDate, range, scale],
+  );
   const resolvedColumnWidth = columnWidth ?? scaleColumnWidth[scale];
   const dayWidth = resolvedColumnWidth / getScaleDaySpan(scale);
   const totalDays = getGanttDayDiff(range.start, addGanttDays(range.end, 1));
   const timelineWidth = Math.max(totalDays * dayWidth, 320);
   const timelineHeight = visibleTasks.length * rowHeight;
-  const metricsByTaskId = new Map<string, GanttTaskMetrics>();
+  const metricsByTaskId = React.useMemo(() => {
+    const metrics = new Map<string, GanttTaskMetrics>();
 
-  for (const task of visibleTasks) {
-    if (isGanttTaskVisible(task, range)) {
-      metricsByTaskId.set(task.id, getGanttTaskMetrics(task, range, dayWidth));
+    for (const task of visibleTasks) {
+      if (isGanttTaskVisible(task, range)) {
+        metrics.set(task.id, getGanttTaskMetrics(task, range, dayWidth));
+      }
     }
-  }
+
+    return metrics;
+  }, [dayWidth, range, visibleTasks]);
+  const visibleWindowStart = Math.max(0, visibleTaskWindow?.start ?? 0);
+  const visibleWindowEnd = Math.min(
+    visibleTasks.length,
+    visibleTaskWindow?.end ?? (virtualized ? visibleWindowStart + 80 : visibleTasks.length),
+  );
+  const renderedTasks =
+    virtualized || visibleTaskWindow
+      ? visibleTasks.slice(visibleWindowStart, Math.max(visibleWindowStart, visibleWindowEnd))
+      : visibleTasks;
+  const isWindowed = renderedTasks.length !== visibleTasks.length || visibleWindowStart > 0;
+  const taskIndexById = React.useMemo(
+    () => new Map(visibleTasks.map((task, index) => [task.id, index] as const)),
+    [visibleTasks],
+  );
 
   const commitExpandedTaskIds = (nextTaskIds: string[]) => {
     if (!expandedTaskIds) {
@@ -242,8 +275,13 @@ function Gantt({
               })}
             </div>
 
-            <div data-slot="gantt-labels" className="sticky left-0 z-20 border-r bg-card">
-              {visibleTasks.map((task) => {
+            <div
+              data-slot="gantt-labels"
+              className={cn("sticky left-0 z-20 border-r bg-card", isWindowed && "relative")}
+              style={isWindowed ? { height: timelineHeight } : undefined}
+            >
+              {renderedTasks.map((task) => {
+                const taskIndex = taskIndexById.get(task.id) ?? 0;
                 const groupLabel = task.groupLabel ?? task.group;
                 const expanded = expandedTaskIdSet.has(task.id);
 
@@ -253,7 +291,18 @@ function Gantt({
                     data-slot="gantt-row-label"
                     data-parent={task.hasChildren ? "true" : undefined}
                     className="flex items-center gap-2 border-b pr-3 data-[parent=true]:bg-muted/20"
-                    style={{ height: rowHeight, paddingLeft: 12 + task.depth * 18 }}
+                    style={{
+                      height: rowHeight,
+                      paddingLeft: 12 + task.depth * 18,
+                      ...(isWindowed
+                        ? {
+                            left: 0,
+                            position: "absolute",
+                            right: 0,
+                            top: taskIndex * rowHeight,
+                          }
+                        : {}),
+                    }}
                   >
                     {task.hasChildren ? (
                       <button
@@ -295,30 +344,37 @@ function Gantt({
                   backgroundSize: `${resolvedColumnWidth}px 100%`,
                 }}
               />
-              {visibleTasks.map((task, index) => (
-                <div
-                  key={task.id}
-                  aria-hidden="true"
-                  data-slot="gantt-row"
-                  data-parent={task.hasChildren ? "true" : undefined}
-                  className="absolute left-0 right-0 border-b data-[parent=true]:bg-muted/20"
-                  style={{ top: index * rowHeight, height: rowHeight }}
-                />
-              ))}
+              {renderedTasks.map((task) => {
+                const taskIndex = taskIndexById.get(task.id) ?? 0;
+
+                return (
+                  <div
+                    key={task.id}
+                    aria-hidden="true"
+                    data-slot="gantt-row"
+                    data-parent={task.hasChildren ? "true" : undefined}
+                    className="absolute left-0 right-0 border-b data-[parent=true]:bg-muted/20"
+                    style={{ top: taskIndex * rowHeight, height: rowHeight }}
+                  />
+                );
+              })}
               <GanttOverlay
-                tasks={visibleTasks}
+                tasks={renderedTasks}
                 markers={normalizedMarkers}
                 metricsByTaskId={metricsByTaskId}
+                taskIndexById={taskIndexById}
                 range={range}
                 dayWidth={dayWidth}
                 rowHeight={rowHeight}
                 timelineWidth={timelineWidth}
+                timelineHeight={timelineHeight}
                 showToday={showToday}
                 today={today}
                 showDependencyLines={showDependencyLines}
               />
-              {visibleTasks.map((task, index) => {
+              {renderedTasks.map((task) => {
                 const metrics = metricsByTaskId.get(task.id);
+                const taskIndex = taskIndexById.get(task.id) ?? 0;
 
                 if (!metrics) {
                   return null;
@@ -330,7 +386,7 @@ function Gantt({
                     task={task}
                     metrics={metrics}
                     rowHeight={rowHeight}
-                    topOffset={index * rowHeight}
+                    topOffset={taskIndex * rowHeight}
                     color={getGanttTaskColor(task)}
                     selected={selectedTaskId === task.id}
                     formatDate={formatDate}
@@ -357,7 +413,7 @@ function Gantt({
   );
 }
 
-function GanttTaskButton({
+const GanttTaskButton = React.memo(function GanttTaskButton({
   task,
   metrics,
   rowHeight,
@@ -444,16 +500,18 @@ function GanttTaskButton({
       </span>
     </button>
   );
-}
+});
 
 function GanttOverlay({
   tasks,
   markers,
   metricsByTaskId,
+  taskIndexById,
   range,
   dayWidth,
   rowHeight,
   timelineWidth,
+  timelineHeight,
   showToday,
   today,
   showDependencyLines,
@@ -461,15 +519,17 @@ function GanttOverlay({
   tasks: NormalizedGanttTask[];
   markers: Array<GanttMarker & { dateValue: Date }>;
   metricsByTaskId: Map<string, GanttTaskMetrics>;
+  taskIndexById: Map<string, number>;
   range: GanttDateRange;
   dayWidth: number;
   rowHeight: number;
   timelineWidth: number;
+  timelineHeight: number;
   showToday: boolean;
   today: GanttDateInput;
   showDependencyLines: boolean;
 }) {
-  const chartHeight = rowHeight * tasks.length;
+  const chartHeight = timelineHeight;
   const todayDate = parseGanttDate(today);
   const todayLeft = getGanttDayDiff(range.start, todayDate) * dayWidth;
 
@@ -483,13 +543,19 @@ function GanttOverlay({
           width={timelineWidth}
           height={chartHeight}
         >
-          {tasks.flatMap((task, taskIndex) =>
+          {tasks.flatMap((task) =>
             (task.dependencies ?? []).map((dependencyId) => {
-              const dependencyIndex = tasks.findIndex((item) => item.id === dependencyId);
+              const dependencyIndex = taskIndexById.get(dependencyId);
+              const taskIndex = taskIndexById.get(task.id);
               const dependencyMetrics = metricsByTaskId.get(dependencyId);
               const taskMetrics = metricsByTaskId.get(task.id);
 
-              if (!dependencyMetrics || !taskMetrics || dependencyIndex < 0) {
+              if (
+                !dependencyMetrics ||
+                !taskMetrics ||
+                dependencyIndex === undefined ||
+                taskIndex === undefined
+              ) {
                 return null;
               }
 

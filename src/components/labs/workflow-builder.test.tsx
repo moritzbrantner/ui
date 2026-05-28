@@ -165,6 +165,29 @@ describe("WorkflowBuilder", () => {
     ).toEqual({ valid: false, reason: "input-occupied" });
   });
 
+  test("colors edges from explicit edge color and lets status color override it", () => {
+    const { container } = render(
+      <WorkflowBuilder
+        nodes={nodes}
+        edges={[
+          { ...edges[0]!, color: "#db2777" },
+          {
+            ...edges[0]!,
+            id: "edge-error",
+            color: "#db2777",
+            status: "error",
+          },
+        ]}
+      />,
+    );
+    const renderedEdges = container.querySelectorAll<SVGPathElement>(
+      '[data-slot="workflow-builder-edge"]',
+    );
+
+    expect(renderedEdges[0]?.getAttribute("stroke")).toBe("#db2777");
+    expect(renderedEdges[1]?.getAttribute("stroke")).toBe("var(--destructive)");
+  });
+
   test("controlled viewport calls onViewportChange", () => {
     const onViewportChange = vi.fn();
 
