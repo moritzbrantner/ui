@@ -746,6 +746,9 @@ describe("@moritzbrantner/ui button-and-form", () => {
     expect(toggle.getAttribute("aria-describedby")).toBeTruthy();
     fireEvent.click(toggle);
     expect(onCheckedChange).toHaveBeenCalledWith(true);
+    expect(toggle.getAttribute("data-state")).toBe("checked");
+    expect(toggle.className).toContain("data-[state=checked]:bg-primary");
+    expect(toggle.className).not.toContain(`data-${"checked"}`);
   });
 
   test("renders chat thread, message bubbles, and composer controls", () => {

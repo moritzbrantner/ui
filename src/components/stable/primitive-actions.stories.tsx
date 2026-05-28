@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Grid2X2Icon, ListFilterIcon, StarIcon } from "lucide-react";
+import { expect, waitFor } from "storybook/test";
 
 import { Badge } from "./badge";
 import { Button } from "./button";
@@ -106,4 +107,24 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Overview: Story = {};
+export const Overview: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const settingSwitch = canvas.getByRole("switch", { name: "Notify reviewers" });
+    const switchThumb = settingSwitch.querySelector('[data-slot="switch-thumb"]');
+    const getSwitchThumbOffset = (element: Element) => {
+      const styles = window.getComputedStyle(element);
+
+      return styles.getPropertyValue("translate") || styles.transform;
+    };
+    const initialState = settingSwitch.getAttribute("data-state");
+    const initialSwitchThumbOffset = switchThumb ? getSwitchThumbOffset(switchThumb) : "";
+
+    await userEvent.click(settingSwitch);
+
+    await waitFor(() => {
+      expect(settingSwitch.getAttribute("data-state")).not.toBe(initialState);
+      expect(switchThumb).toBeTruthy();
+      expect(getSwitchThumbOffset(switchThumb as Element)).not.toBe(initialSwitchThumbOffset);
+    });
+  },
+};

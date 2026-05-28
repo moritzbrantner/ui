@@ -78,6 +78,56 @@ describe("stable form controls", () => {
     expect(onRadioChange).toHaveBeenCalledWith("compact");
   });
 
+  test("uses Radix data-state selectors for checked form-control styling", () => {
+    render(
+      <div>
+        <Checkbox aria-label="Accept terms" />
+        <Switch aria-label="Enable alerts" />
+        <RadioGroup aria-label="Density">
+          <RadioGroupItem value="compact" aria-label="Compact" />
+          <RadioGroupItem value="comfortable" aria-label="Comfortable" />
+        </RadioGroup>
+      </div>,
+    );
+
+    const checkbox = screen.getByRole("checkbox", { name: "Accept terms" });
+    const switchControl = screen.getByRole("switch", { name: "Enable alerts" });
+    const switchThumb = switchControl.querySelector<HTMLElement>('[data-slot="switch-thumb"]');
+    const compactRadio = screen.getByRole("radio", { name: "Compact" });
+    const comfortableRadio = screen.getByRole("radio", { name: "Comfortable" });
+
+    expect(checkbox.getAttribute("data-state")).toBe("unchecked");
+    expect(switchControl.getAttribute("data-state")).toBe("unchecked");
+    expect(compactRadio.getAttribute("data-state")).toBe("unchecked");
+
+    fireEvent.click(checkbox);
+    fireEvent.click(switchControl);
+    fireEvent.click(compactRadio);
+
+    expect(checkbox.getAttribute("data-state")).toBe("checked");
+    expect(switchControl.getAttribute("data-state")).toBe("checked");
+    expect(compactRadio.getAttribute("data-state")).toBe("checked");
+    expect(comfortableRadio.getAttribute("data-state")).toBe("unchecked");
+
+    expect(switchControl.className).toContain("data-[state=checked]:bg-primary");
+    expect(switchControl.className).toContain("data-[state=unchecked]:bg-input");
+    expect(switchThumb?.className).toContain(
+      "group-[[data-size=default][data-state=checked]]/switch:translate-x-5",
+    );
+    expect(checkbox.className).toContain("data-[state=checked]:bg-primary");
+    expect(compactRadio.className).toContain("data-[state=checked]:bg-primary");
+
+    const stateClassNames = [
+      checkbox.className,
+      switchControl.className,
+      switchThumb?.className ?? "",
+      compactRadio.className,
+    ].join(" ");
+
+    expect(stateClassNames).not.toContain(`data-${"checked"}`);
+    expect(stateClassNames).not.toContain(`data-${"unchecked"}`);
+  });
+
   test("does not call handlers for disabled binary controls", () => {
     const onCheckedChange = vi.fn();
     const onSwitchChange = vi.fn();
