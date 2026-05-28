@@ -103,9 +103,9 @@ describe("stable navigation and display components", () => {
             </PaginationItem>
           </PaginationContent>
         </Pagination>
-        <NavigationMenu>
+        <NavigationMenu defaultValue="products" viewport={false}>
           <NavigationMenuList>
-            <NavigationMenuItem>
+            <NavigationMenuItem value="products">
               <NavigationMenuTrigger>Products</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <NavigationMenuLink href="/ui">UI package</NavigationMenuLink>
@@ -120,11 +120,30 @@ describe("stable navigation and display components", () => {
       "contract-accordion",
     );
     fireEvent.click(screen.getByRole("button", { name: "Details" }));
-    expect(screen.getByText("Panel content")).toBeTruthy();
-    expect(screen.getByRole("tab", { name: "Overview" })).toBeTruthy();
+    const accordionContent = screen
+      .getByText("Panel content")
+      .closest('[data-slot="accordion-content"]');
+    expect(accordionContent?.getAttribute("data-state")).toBe("open");
+    expect(accordionContent?.className).toContain("data-[state=open]:animate-accordion-down");
+    expect(accordionContent?.className).not.toContain("data-open");
+
+    const activeTab = screen.getByRole("tab", { name: "Overview" });
+    expect(activeTab.getAttribute("data-state")).toBe("active");
+    expect(activeTab.className).toContain("data-[state=active]:bg-background");
+    expect(activeTab.className).not.toContain("data-active");
+
     expect(screen.getByRole("link", { name: "Home" })).toBeTruthy();
     expect(screen.getByRole("navigation", { name: "pagination" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Products" })).toBeTruthy();
+    const navigationTrigger = screen.getByRole("button", { name: "Products" });
+    expect(navigationTrigger.getAttribute("data-state")).toBe("open");
+    expect(navigationTrigger.className).toContain("data-[state=open]");
+    expect(navigationTrigger.className).not.toContain("data-popup-open");
+    expect(navigationTrigger.className).not.toContain("data-open");
+
+    const navigationContent = document.querySelector('[data-slot="navigation-menu-content"]');
+    expect(navigationContent?.getAttribute("data-state")).toBe("open");
+    expect(navigationContent?.className).toContain("data-[state=open]");
+    expect(navigationContent?.className).not.toContain("data-open");
   });
 
   test("renders structured data display primitives", () => {

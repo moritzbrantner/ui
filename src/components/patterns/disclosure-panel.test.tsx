@@ -42,6 +42,8 @@ describe("disclosure panel", () => {
 
     expect(trigger.getAttribute("data-state")).toBe("closed");
     expect(content?.getAttribute("data-state")).toBe("closed");
+    expect(content?.className).toContain("data-[state=open]:animate-accordion-down");
+    expect(content?.className).not.toContain("data-open");
 
     fireEvent.click(trigger);
 

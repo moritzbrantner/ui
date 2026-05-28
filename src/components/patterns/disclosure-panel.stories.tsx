@@ -46,10 +46,17 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement);
+    const trigger = canvas.getByRole("button", { name: "Applied filters 3" });
+    const content = canvasElement.querySelector(
+      '[data-slot="disclosure-panel-content"]',
+    ) as HTMLElement;
 
     await expect(canvas.getByText("Status is ready")).toBeVisible();
-    await userEvent.click(canvas.getByRole("button", { name: "Applied filters 3" }));
-    await expect(canvas.getByText("Status is ready")).not.toBeVisible();
+    await expect(content).toHaveAttribute("data-state", "open");
+    await expect(content.className).toContain("data-[state=open]:animate-accordion-down");
+    await userEvent.click(trigger);
+    await expect(trigger).toHaveAttribute("data-state", "closed");
+    await expect(content).toHaveAttribute("data-state", "closed");
   },
 };
 

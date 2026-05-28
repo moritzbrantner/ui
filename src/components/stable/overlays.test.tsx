@@ -63,6 +63,25 @@ beforeAll(() => {
   };
 });
 
+function expectOpenState(element: Element | null) {
+  expect(element?.getAttribute("data-state")).toBe("open");
+}
+
+function expectStateSelectorClass(element: Element | null, selector = "data-[state=open]") {
+  const className = element?.getAttribute("class") ?? "";
+
+  expect(className).toContain(selector);
+  expect(className).not.toContain("data-open");
+  expect(className).not.toContain("data-closed");
+}
+
+function expectNoStaleStateSelectors(element: Element | null) {
+  const className = element?.getAttribute("class") ?? "";
+
+  expect(className).not.toContain("data-open");
+  expect(className).not.toContain("data-closed");
+}
+
 describe("stable overlays", () => {
   test("renders dialog, alert dialog, sheet, and drawer content with accessible names", () => {
     render(
@@ -106,9 +125,42 @@ describe("stable overlays", () => {
       </div>,
     );
 
-    expect(document.querySelector('[data-slot="dialog-content"]')?.className).toContain(
-      "contract-dialog",
-    );
+    const dialogOverlay = document.querySelector('[data-slot="dialog-overlay"]');
+    const dialogContent = document.querySelector('[data-slot="dialog-content"]');
+    const alertDialogOverlay = document.querySelector('[data-slot="alert-dialog-overlay"]');
+    const alertDialogContent = document.querySelector('[data-slot="alert-dialog-content"]');
+    const sheetOverlay = document.querySelector('[data-slot="sheet-overlay"]');
+    const sheetContent = document.querySelector('[data-slot="sheet-content"]');
+    const drawerOverlay = document.querySelector('[data-slot="drawer-overlay"]');
+    const drawerContent = document.querySelector('[data-slot="drawer-content"]');
+
+    expect(dialogContent?.className).toContain("contract-dialog");
+    for (const element of [
+      dialogOverlay,
+      dialogContent,
+      alertDialogOverlay,
+      alertDialogContent,
+      sheetOverlay,
+      sheetContent,
+      drawerOverlay,
+      drawerContent,
+    ]) {
+      expectOpenState(element);
+      expectNoStaleStateSelectors(element);
+    }
+
+    for (const element of [
+      dialogOverlay,
+      dialogContent,
+      alertDialogOverlay,
+      alertDialogContent,
+      sheetOverlay,
+      sheetContent,
+      drawerOverlay,
+    ]) {
+      expectStateSelectorClass(element);
+    }
+
     expect(screen.getByText("Dialog title")).toBeTruthy();
     expect(screen.getByText("Delete item")).toBeTruthy();
     expect(screen.getByText("Sheet title")).toBeTruthy();
@@ -153,18 +205,30 @@ describe("stable overlays", () => {
       key: "Enter",
       code: "Enter",
     });
-    fireEvent.click(await screen.findByRole("menuitem", { name: "Archive" }));
+    const dropdownItem = await screen.findByRole("menuitem", { name: "Archive" });
+    const dropdownContent = document.querySelector('[data-slot="dropdown-menu-content"]');
+    expectOpenState(dropdownContent);
+    expectStateSelectorClass(dropdownContent);
+    fireEvent.click(dropdownItem);
     expect(onDropdownSelect).toHaveBeenCalledTimes(1);
 
     fireEvent.contextMenu(screen.getByRole("button", { name: "Context target" }));
-    fireEvent.click(await screen.findByRole("menuitem", { name: "Duplicate" }));
+    const contextItem = await screen.findByRole("menuitem", { name: "Duplicate" });
+    const contextContent = document.querySelector('[data-slot="context-menu-content"]');
+    expectOpenState(contextContent);
+    expectStateSelectorClass(contextContent);
+    fireEvent.click(contextItem);
     expect(onContextSelect).toHaveBeenCalledTimes(1);
 
     fireEvent.keyDown(screen.getByRole("menuitem", { name: "File" }), {
       key: "Enter",
       code: "Enter",
     });
-    fireEvent.click(await screen.findByRole("menuitem", { name: "New file" }));
+    const menubarItem = await screen.findByRole("menuitem", { name: "New file" });
+    const menubarContent = document.querySelector('[data-slot="menubar-content"]');
+    expectOpenState(menubarContent);
+    expectStateSelectorClass(menubarContent);
+    fireEvent.click(menubarItem);
     expect(onMenubarSelect).toHaveBeenCalledTimes(1);
   });
 
@@ -197,12 +261,23 @@ describe("stable overlays", () => {
       </TooltipProvider>,
     );
 
-    expect(
-      screen.getByText("Popover title").closest('[data-slot="popover-content"]')?.className,
-    ).toContain("contract-popover");
-    expect(screen.getByText("Hover preview").getAttribute("data-slot")).toBe("hover-card-content");
-    expect(document.querySelector('[data-slot="tooltip-content"]')?.textContent).toContain(
-      "Tooltip detail",
+    const popoverContent = screen
+      .getByText("Popover title")
+      .closest('[data-slot="popover-content"]');
+    const hoverCardContent = screen
+      .getByText("Hover preview")
+      .closest('[data-slot="hover-card-content"]');
+    const tooltipContent = document.querySelector('[data-slot="tooltip-content"]');
+
+    expect(popoverContent?.className).toContain("contract-popover");
+    expectOpenState(popoverContent);
+    expectStateSelectorClass(popoverContent);
+    expectOpenState(hoverCardContent);
+    expectStateSelectorClass(hoverCardContent);
+    expect(["delayed-open", "instant-open", "open"]).toContain(
+      tooltipContent?.getAttribute("data-state"),
     );
+    expectStateSelectorClass(tooltipContent, "data-[state=delayed-open]");
+    expect(tooltipContent?.textContent).toContain("Tooltip detail");
   });
 });

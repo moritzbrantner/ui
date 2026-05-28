@@ -46,6 +46,10 @@ export const Basic: Story = {
   ),
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Open menu" }));
+    const menu = screen.getByRole("menu");
+
+    await expect(menu).toHaveAttribute("data-state", "open");
+    await expect(menu.className).toContain("data-[state=open]");
     await expect(screen.getByRole("menuitem", { name: "Duplicate" })).toBeTruthy();
     await userEvent.keyboard("{Escape}");
   },

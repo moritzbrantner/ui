@@ -66,7 +66,10 @@ export const OpensOnInteraction: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Open dialog" }));
 
-    await expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
+    const dialog = screen.getByRole("dialog");
+
+    await expect(dialog).toHaveAttribute("data-state", "open");
+    await expect(dialog.className).toContain("data-[state=open]");
     await expect(screen.getByText("Review component changes")).toBeInTheDocument();
   },
 };

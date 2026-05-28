@@ -25,7 +25,12 @@ export const Basic: Story = {
     </Tabs>
   ),
   play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole("tab", { name: "Details" }));
+    const detailsTab = canvas.getByRole("tab", { name: "Details" });
+
+    await userEvent.click(detailsTab);
+
+    await expect(detailsTab).toHaveAttribute("data-state", "active");
+    await expect(detailsTab.className).toContain("data-[state=active]:bg-background");
     await expect(canvas.getByText("Details content")).toBeVisible();
   },
 };

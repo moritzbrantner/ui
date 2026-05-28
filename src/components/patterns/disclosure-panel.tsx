@@ -69,7 +69,7 @@ function DisclosurePanel({
       </div>
       <CollapsibleContent
         data-slot="disclosure-panel-content"
-        className="overflow-hidden data-open:animate-accordion-down data-closed:animate-accordion-up"
+        className="overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up"
       >
         <div className={cn("min-w-0 p-3 text-sm", contentClassName)}>{children}</div>
       </CollapsibleContent>

@@ -194,12 +194,10 @@ async function gotoStoryWithRetry(page: Page, url: string) {
 async function openOverlayStory(page: Page, storyId: string) {
   switch (storyId) {
     case "components-overlay-action-menu--basic":
-      await page.getByRole("button", { name: "Open row actions" }).click();
-      await page.getByRole("menuitem", { name: /Duplicate/ }).waitFor();
+      await openActionMenu(page, "Open row actions", /Duplicate/);
       break;
     case "components-overlay-action-menu--with-descriptions-and-shortcuts":
-      await page.getByRole("button", { name: "File actions" }).click();
-      await page.getByRole("menuitem", { name: /Copy link/ }).waitFor();
+      await openActionMenu(page, "File actions", /Copy link/);
       break;
     case "components-overlay-context-action-menu--right-click-target":
       await rightClickTarget(page, "Right-click row");
@@ -228,6 +226,36 @@ async function openOverlayStory(page: Page, storyId: string) {
       await page.getByText("Product lead for workspace quality.").waitFor();
       break;
   }
+}
+
+async function openActionMenu(page: Page, name: string, itemName: RegExp) {
+  const trigger = page.locator('[data-slot="action-menu-trigger"]').first();
+  const item = page.getByRole("menuitem", { name: itemName });
+
+  await trigger.waitFor({ state: "visible" });
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    if (await item.isVisible().catch(() => false)) {
+      return;
+    }
+
+    await trigger.focus();
+    await page.keyboard.press("Enter");
+
+    const opened = await item
+      .waitFor({ state: "visible", timeout: 2_500 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (opened) {
+      return;
+    }
+
+    await page.waitForTimeout(100);
+  }
+
+  await page.getByRole("button", { name }).click();
+  await item.waitFor({ state: "visible" });
 }
 
 async function openWithKeyboard(page: Page, name: string, slot?: string) {
