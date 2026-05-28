@@ -1052,6 +1052,17 @@ const componentRegistry = [
     reason: "Reusable state-light application pattern exported from the root API.",
   },
   {
+    name: "disclosure-panel",
+    fileName: "disclosure-panel",
+    tier: "patterns",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/patterns/disclosure-panel",
+    storyFiles: ["src/components/patterns/disclosure-panel.stories.tsx"],
+    testFiles: ["src/components/patterns/disclosure-panel.test.tsx"],
+    status: "pattern",
+    reason: "Reusable state-light application pattern exported from the root API.",
+  },
+  {
     name: "dropzone",
     fileName: "dropzone",
     tier: "patterns",

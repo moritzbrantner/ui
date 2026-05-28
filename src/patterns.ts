@@ -12,6 +12,7 @@ export * from "./components/patterns/confirm-action";
 export * from "./components/patterns/context-action-menu";
 export * from "./components/patterns/data-grid";
 export * from "./components/patterns/details-panel";
+export * from "./components/patterns/disclosure-panel";
 export * from "./components/patterns/dropzone";
 export * from "./components/patterns/filter-bar";
 export * from "./components/patterns/hover-preview";
