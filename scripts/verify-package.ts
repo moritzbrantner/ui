@@ -66,11 +66,15 @@ assert.equal(typeof data.FilterBar, "function", "data entry should expose Filter
 
 const shell = await importPackage("@moritzbrantner/ui/shell");
 assert.equal(typeof shell.PageShell, "function", "shell entry should expose PageShell");
-assert.equal(typeof shell.PlatformNavbar, "function", "shell entry should expose PlatformNavbar");
+assert.equal(typeof shell.Navbar, "function", "shell entry should expose Navbar");
 
 const social = await importPackage("@moritzbrantner/ui/social");
 assert.equal(typeof social.Chat, "function", "social entry should expose Chat");
-assert.equal(typeof social.SocialActionGroup, "function", "social entry should expose social actions");
+assert.equal(
+  typeof social.SocialActionGroup,
+  "function",
+  "social entry should expose social actions",
+);
 assert.equal(typeof social.SocialPost, "function", "social entry should expose social feed");
 assert.equal(typeof social.ProfileSummary, "function", "social entry should expose ProfileSummary");
 assert.equal(
@@ -183,11 +187,7 @@ const dialog = await importPackage("@moritzbrantner/ui/components/stable/dialog"
 assert.equal(typeof dialog.Dialog, "function", "dialog subpath should expose Dialog");
 
 const socialChat = await importPackage("@moritzbrantner/ui/components/social/chat");
-assert.equal(
-  typeof socialChat.Chat,
-  "function",
-  "social chat subpath should expose Chat",
-);
+assert.equal(typeof socialChat.Chat, "function", "social chat subpath should expose Chat");
 
 const imageCropper = await importPackage("@moritzbrantner/ui/components/media/image-cropper");
 assert.equal(
@@ -255,8 +255,8 @@ const requiredPackageFiles = [
   "dist/components/stable/dialog.d.ts",
   "dist/components/data/data-grid.js",
   "dist/components/data/data-grid.d.ts",
-  "dist/components/shell/platform-navbar.js",
-  "dist/components/shell/platform-navbar.d.ts",
+  "dist/components/shell/navbar.js",
+  "dist/components/shell/navbar.d.ts",
   "dist/components/social/chat.js",
   "dist/components/social/chat.d.ts",
   "dist/components/media/image-cropper.js",

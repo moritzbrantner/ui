@@ -266,8 +266,8 @@
     [data-slot="toast"],
     [data-slot="toolbar"],
     [data-slot="dropzone"],
-    [data-slot="platform-navbar"],
-    [data-slot="platform-navbar-submenu"]
+    [data-slot="navbar"],
+    [data-slot="navbar-submenu"]
   ) {
     background-image: none !important;
     backdrop-filter: none !important;
@@ -303,8 +303,8 @@
     [data-slot="toast"],
     [data-slot="toolbar"],
     [data-slot="dropzone"],
-    [data-slot="platform-navbar"],
-    [data-slot="platform-navbar-submenu"],
+    [data-slot="navbar"],
+    [data-slot="navbar-submenu"],
     [data-slot="table-container"]
   ) {
     border-radius: var(--ui-radius-surface) !important;
@@ -329,7 +329,7 @@
     [data-slot="select-content"],
     [data-slot="combobox-content"],
     [data-slot="command"],
-    [data-slot="platform-navbar-submenu"]
+    [data-slot="navbar-submenu"]
   ) {
     border-radius: var(--ui-radius-overlay) !important;
   }
@@ -343,7 +343,7 @@
     [data-slot="toast"],
     [data-slot="toolbar"],
     [data-slot="dropzone"],
-    [data-slot="platform-navbar"]
+    [data-slot="navbar"]
   ) {
     background-color: var(--card) !important;
   }
@@ -367,7 +367,7 @@
     [data-slot="select-content"],
     [data-slot="combobox-content"],
     [data-slot="command"],
-    [data-slot="platform-navbar-submenu"]
+    [data-slot="navbar-submenu"]
   ) {
     background-color: var(--popover) !important;
   }

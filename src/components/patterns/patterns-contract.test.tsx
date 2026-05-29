@@ -21,11 +21,11 @@ import { SearchField } from "../data/search-field";
 import { SelectionToolbar } from "../data/selection-toolbar";
 import { AccountMenu } from "../shell/account-menu";
 import { NotificationMenu } from "../shell/notification-menu";
-import { PlatformNavbar, type PlatformNavbarGroup } from "../shell/platform-navbar";
+import { Navbar, type NavbarGroup } from "../shell/navbar";
 
 const rows = [{ name: "Package" }];
 const columns = [{ accessorKey: "name", header: "Name" }];
-const navigationGroups: PlatformNavbarGroup[] = [
+const navigationGroups: NavbarGroup[] = [
   {
     id: "workspace",
     label: "Workspace",
@@ -105,7 +105,7 @@ describe("patterns component contract", () => {
         </SelectionToolbar>
         <AccountMenu user={{ name: "Ada Lovelace", initials: "AL" }} items={[]} />
         <NotificationMenu items={[{ id: "note", title: "Review", unread: true }]} />
-        <PlatformNavbar brand="Platform" groups={navigationGroups} />
+        <Navbar brand="Platform" groups={navigationGroups} />
         <CommandPalette open={false} groups={commandGroups} />
         <UploadQueue items={uploads} />
         <Dropzone htmlFor="contract-upload">

@@ -39,8 +39,8 @@ import {
   PageHeader,
   PageShell,
   PageTitle,
-  PlatformNavbar,
-  PlatformNavbarActions,
+  Navbar,
+  NavbarActions,
   Surface,
   SurfaceContent,
   SurfaceDescription,
@@ -127,12 +127,12 @@ export function App() {
 
   return (
     <PageShell background="muted" maxWidth="wide">
-      <PlatformNavbar
+      <Navbar
         brand={<strong>Consumer Fixture</strong>}
         groups={navigationGroups}
         activeItemId="overview"
         actionSlot={
-          <PlatformNavbarActions
+          <NavbarActions
             notificationMenu={{
               unreadCount: 2,
               items: [

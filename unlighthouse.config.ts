@@ -11,7 +11,7 @@ const storybookStoryIds = [
   "components-data-display-chart--business-dashboard",
   "components-forms-inputs-calendar--with-events",
   "components-forms-inputs-combobox--basic",
-  "components-navigation-platform-navbar--web",
+  "components-navigation-navbar--web",
 ];
 
 export default defineUnlighthouseConfig({

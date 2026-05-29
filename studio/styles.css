@@ -180,7 +180,7 @@
     [data-slot="surface"],
     [data-slot="toolbar"],
     [data-slot="dropzone"],
-    [data-slot="platform-navbar"]
+    [data-slot="navbar"]
   ) {
     border-color: color-mix(in oklch, var(--border) 82%, var(--primary) 18%) !important;
     box-shadow: var(--glass-shadow);

@@ -155,8 +155,9 @@ import {
   PageHeader,
   PageShell,
   PageTitle,
-  PlatformNavbar,
-  type PlatformNavbarGroup,
+  Navbar,
+  NavbarActions,
+  type NavbarGroup,
   SectionGrid,
   Surface,
   SurfaceContent,
@@ -168,10 +169,7 @@ import { AtlasTheme, atlasTheme, uiTheme as atlasUiTheme } from "./atlas";
 import { atlasTheme as atlasServerTheme, uiTheme as atlasServerUiTheme } from "./atlas-server";
 import { BobbaTheme, Button as BobbaButton, bobbaTheme, uiTheme as bobbaUiTheme } from "./bobba";
 import { bobbaTheme as bobbaServerTheme, uiTheme as bobbaServerUiTheme } from "./bobba-server";
-import {
-  Button as ClientButton,
-  Dialog as ClientDialog,
-} from "./client";
+import { Button as ClientButton, Dialog as ClientDialog } from "./client";
 import { Button as SubpathButton } from "./components/stable/button";
 import { ComparisonMatrix as SubpathComparisonMatrix } from "./components/stable/comparison-matrix";
 import { FunnelChart as SubpathFunnelChart } from "./components/stable/funnel-chart";
@@ -187,6 +185,8 @@ import { DataGrid as SubpathDataGrid } from "./components/data/data-grid";
 import { Dialog as SubpathDialog } from "./components/stable/dialog";
 import { FilterBar as SubpathFilterBar } from "./components/data/filter-bar";
 import { HoverPreview as SubpathHoverPreview } from "./components/patterns/hover-preview";
+import { Navbar as SubpathNavbar } from "./components/shell/navbar";
+import { NavbarActions as SubpathNavbarActions } from "./components/shell/navbar-actions";
 import { Chat as SubpathChat } from "./components/social/chat";
 import { getMenuActionItemText as subpathGetMenuActionItemText } from "./components/patterns/menu-actions";
 import { ResponsiveActionMenu as SubpathResponsiveActionMenu } from "./components/patterns/responsive-action-menu";
@@ -389,7 +389,7 @@ const navigationGroups = [
       },
     ],
   },
-] as const satisfies PlatformNavbarGroup[];
+] as const satisfies NavbarGroup[];
 
 function createRect({
   left,
@@ -480,18 +480,12 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./components/patterns/*"].import).toBe(
       "./dist/components/patterns/*.js",
     );
-    expect(packageJson.exports["./components/data/*"].import).toBe(
-      "./dist/components/data/*.js",
-    );
-    expect(packageJson.exports["./components/shell/*"].import).toBe(
-      "./dist/components/shell/*.js",
-    );
+    expect(packageJson.exports["./components/data/*"].import).toBe("./dist/components/data/*.js");
+    expect(packageJson.exports["./components/shell/*"].import).toBe("./dist/components/shell/*.js");
     expect(packageJson.exports["./components/social/*"].import).toBe(
       "./dist/components/social/*.js",
     );
-    expect(packageJson.exports["./components/media/*"].import).toBe(
-      "./dist/components/media/*.js",
-    );
+    expect(packageJson.exports["./components/media/*"].import).toBe("./dist/components/media/*.js");
     expect(packageJson.exports["./components/labs/*"].import).toBe("./dist/components/labs/*.js");
     expect(packageJson.exports["./components/legacy/*"]).toBeUndefined();
     expect(packageJson.exports["./lib/cn"].import).toBe("./dist/lib/cn.js");
@@ -524,7 +518,7 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(indexSource).not.toContain('export * from "./labs";');
     expect(Object.hasOwn(RootExports, "DataTable")).toBe(false);
     expect(Object.hasOwn(RootExports, "DataGrid")).toBe(false);
-    expect(Object.hasOwn(RootExports, "PlatformNavbar")).toBe(false);
+    expect(Object.hasOwn(RootExports, "Navbar")).toBe(false);
     expect(Object.hasOwn(RootExports, "ImageCropper")).toBe(false);
     expect(Object.hasOwn(RootExports, "WorkflowBuilder")).toBe(false);
     expect(Object.hasOwn(RootExports, "Chat")).toBe(false);
@@ -555,6 +549,8 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(SubpathDialog).toBe(Dialog);
     expect(SubpathFilterBar).toBe(FilterBar);
     expect(SubpathHoverPreview).toBe(HoverPreview);
+    expect(SubpathNavbar).toBe(Navbar);
+    expect(SubpathNavbarActions).toBe(NavbarActions);
     expect(SubpathResponsiveActionMenu).toBe(ResponsiveActionMenu);
     expect(SubpathChat).toBe(Chat);
     expect(subpathGetMenuActionItemText({ id: "contract", label: "Contract" })).toBe("Contract");

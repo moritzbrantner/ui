@@ -31,12 +31,12 @@ Component tiers:
 
 Migration examples:
 
-| Old                                              | New                                                   |
-| ------------------------------------------------ | ----------------------------------------------------- |
-| `@moritzbrantner/ui/components/button`           | `@moritzbrantner/ui/components/stable/button`         |
-| `@moritzbrantner/ui/components/data-grid`        | `@moritzbrantner/ui/components/data/data-grid`        |
-| `@moritzbrantner/ui/components/chat`             | `@moritzbrantner/ui/components/social/chat`           |
-| `@moritzbrantner/ui/components/image-cropper`    | `@moritzbrantner/ui/components/media/image-cropper`   |
+| Old                                           | New                                                 |
+| --------------------------------------------- | --------------------------------------------------- |
+| `@moritzbrantner/ui/components/button`        | `@moritzbrantner/ui/components/stable/button`       |
+| `@moritzbrantner/ui/components/data-grid`     | `@moritzbrantner/ui/components/data/data-grid`      |
+| `@moritzbrantner/ui/components/chat`          | `@moritzbrantner/ui/components/social/chat`         |
+| `@moritzbrantner/ui/components/image-cropper` | `@moritzbrantner/ui/components/media/image-cropper` |
 
 ## Styles And Themes
 
@@ -52,7 +52,7 @@ Existing theme subpaths such as `@moritzbrantner/ui/zleek` and `@moritzbrantner/
 
 ## App Recipes
 
-App shell: import `PlatformNavbar`, `PageShell`, `PageHeader`, `PageContent`, `Surface`, `NotificationMenu`, and `AccountMenu` from `@moritzbrantner/ui/shell`. Compose with `CommandPalette`, `LanguageSwitcher`, and `ThemeModeSwitch`. Apps provide route state, menu item content, account data, and callbacks.
+App shell: import `Navbar`, `PageShell`, `PageHeader`, `PageContent`, `Surface`, `NotificationMenu`, and `AccountMenu` from `@moritzbrantner/ui/shell`. Compose with `CommandPalette`, `LanguageSwitcher`, and `ThemeModeSwitch`. Apps provide route state, menu item content, account data, and callbacks.
 
 Data page: import `DataGrid`, `ResourceList`, `FilterBar`, `SearchField`, and `SelectionToolbar` from `@moritzbrantner/ui/data` for controlled server state, manual sorting/filtering/pagination, row selection, and loading/error/empty states. Apps own fetching, cache state, URL state, and backend contracts.
 

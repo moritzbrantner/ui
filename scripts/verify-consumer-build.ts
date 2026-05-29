@@ -127,7 +127,7 @@ function verifyConsumerSource(root: string): void {
 
   for (const expected of [
     'from "@moritzbrantner/ui"',
-    "PlatformNavbar",
+    "Navbar",
     "PageShell",
     "DataGrid",
     "CommandPalette",

@@ -5,9 +5,9 @@ import { beforeAll, describe, expect, test, vi } from "vitest";
 import {
   AccountMenu,
   NotificationMenu,
-  PlatformNavbar,
-  PlatformNavbarActions,
-  type PlatformNavbarGroup,
+  Navbar,
+  NavbarActions,
+  type NavbarGroup,
 } from "../../shell";
 import { ImageCropper, ImageFilterEditor } from "../../media";
 import {
@@ -128,9 +128,9 @@ describe("@moritzbrantner/ui release readiness composed components", () => {
     );
   });
 
-  test("platform navbar opens a group, navigates, and renders integrated action menus", async () => {
+  test("navbar opens a group, navigates, and renders integrated action menus", async () => {
     const onNavigate = vi.fn();
-    const groups: PlatformNavbarGroup[] = [
+    const groups: NavbarGroup[] = [
       {
         id: "workspace",
         label: "Workspace",
@@ -142,12 +142,12 @@ describe("@moritzbrantner/ui release readiness composed components", () => {
     ];
 
     render(
-      <PlatformNavbar
+      <Navbar
         brand="Platform"
         groups={groups}
         defaultOpenGroupId="workspace"
         actionSlot={
-          <PlatformNavbarActions
+          <NavbarActions
             notificationMenu={{
               unreadCount: 1,
               items: [{ id: "approval", title: "Approval needed", unread: true }],

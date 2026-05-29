@@ -21,8 +21,8 @@ import {
 import { Badge } from "../stable/badge";
 import { Button } from "../stable/button";
 import { CommandPalette } from "../patterns/command-palette";
-import { PlatformNavbar } from "./platform-navbar";
-import { PlatformNavbarActions } from "./platform-navbar-actions";
+import { Navbar } from "./navbar";
+import { NavbarActions } from "./navbar-actions";
 import { Stat, StatDelta, StatDescription, StatGroup, StatLabel, StatValue } from "../stable/stat";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../stable/table";
 
@@ -230,7 +230,7 @@ export const StickyActionBar: Story = {
 export const ComprehensiveAppShell: Story = {
   render: () => (
     <PageShell background="muted" maxWidth="wide" className="mx-auto max-w-[calc(100vw-2rem)]">
-      <PlatformNavbar
+      <Navbar
         brand="Platform"
         variant="mobile"
         groups={[
@@ -256,7 +256,7 @@ export const ComprehensiveAppShell: Story = {
         activeItemId="overview"
         defaultOpenGroupId={null}
         actionSlot={
-          <PlatformNavbarActions
+          <NavbarActions
             languageSwitcher
             themeModeSwitch
             notificationMenu={{

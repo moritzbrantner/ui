@@ -319,7 +319,6 @@ function verifyComponentRegistry() {
         errors.push(`${entry.name}: registry file ${relativeFile} does not exist`);
       }
     }
-
   }
 
   for (const forbiddenRootExport of [
@@ -426,7 +425,9 @@ function getComponentSourceTier(filePath: string): ComponentTier | "internal" | 
   const relativePath = path.relative(componentsDir, filePath);
   const tier = relativePath.split(path.sep)[0];
 
-  if (["stable", "patterns", "data", "shell", "social", "media", "labs", "internal"].includes(tier)) {
+  if (
+    ["stable", "patterns", "data", "shell", "social", "media", "labs", "internal"].includes(tier)
+  ) {
     return tier as ComponentTier | "internal";
   }
 
@@ -636,8 +637,8 @@ function componentTestMarkers(entry: ComponentRegistryEntry): string[] {
     "social-actions": ["SocialActionGroup", "LikeButton", "ShareButton"],
     "social-feed": ["SocialPost", "SocialComposer", "SocialComment"],
     "profile-summary": ["ProfileSummary"],
-    "platform-navbar": ["PlatformNavbar", "PlatformNavbarGroup"],
-    "platform-navbar-actions": ["PlatformNavbarActions"],
+    navbar: ["Navbar", "NavbarGroup"],
+    "navbar-actions": ["NavbarActions"],
     "resource-list": ["ResourceList"],
   };
 

@@ -5,10 +5,7 @@ import { describe, expect, test, vi } from "vitest";
 
 import { Calendar, CalendarCardDayButton, type CalendarIcsData } from "../../stable";
 import { DataGrid } from "../../data";
-import {
-  AnnotationCanvas,
-  DocumentViewer,
-} from "../../labs";
+import { AnnotationCanvas, DocumentViewer } from "../../labs";
 
 describe("@moritzbrantner/ui component edge cases", () => {
   test("renders cross-month calendar events in card layouts", () => {

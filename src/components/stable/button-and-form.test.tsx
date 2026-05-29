@@ -105,8 +105,8 @@ import {
   PageHeader,
   PageShell,
   PageTitle,
-  PlatformNavbar,
-  type PlatformNavbarGroup,
+  Navbar,
+  type NavbarGroup,
   SectionGrid,
   Surface,
   SurfaceContent,
@@ -315,7 +315,7 @@ const navigationGroups = [
       },
     ],
   },
-] as const satisfies PlatformNavbarGroup[];
+] as const satisfies NavbarGroup[];
 
 function createRect({
   left,

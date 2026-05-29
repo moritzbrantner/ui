@@ -160,7 +160,7 @@ function getLikelyOwner(fileName: string) {
   const ownerPatterns: Array<[RegExp, string]> = [
     [/primitive-components|primitive-/, "primitive stories"],
     [/data-grid/i, "DataGrid"],
-    [/platform-navbar/i, "PlatformNavbar"],
+    [/navbar/i, "Navbar"],
     [/chart|recharts/i, "Chart"],
     [/calendar|day-picker/i, "Calendar"],
     [/combobox|base-ui/i, "Combobox"],

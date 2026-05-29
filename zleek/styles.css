@@ -322,7 +322,7 @@
     background-image: none;
   }
 
-  :where([data-slot="platform-navbar"], [data-slot="platform-navbar-submenu"]) {
+  :where([data-slot="navbar"], [data-slot="navbar-submenu"]) {
     position: relative;
     isolation: isolate;
     border-color: color-mix(in oklch, var(--border) 90%, white 10%);

@@ -21,8 +21,9 @@ const storyIds = [
   "components-layout-app-shell--comprehensive-app-shell",
   "components-forms-inputs-form-layout--validated-interaction",
   "components-feedback-toaster--usage",
-  "components-navigation-platform-navbar--web",
-  "components-navigation-platform-navbar--mobile",
+  "components-navigation-navbar--web",
+  "components-navigation-navbar--mobile",
+  "components-navigation-navbar--mobile-many-groups",
   "components-actions-toolbar--default",
   "components-navigation-tabs--basic",
   "components-navigation-pagination--responsive",
@@ -69,7 +70,6 @@ const colorSchemes = ["light", "dark"] as const;
 const horizontallyScrollableStories = new Set([
   "components-stable-primitive-components--overview",
   "components-data-display-data-grid--default",
-  "components-navigation-platform-navbar--web",
   "components-overlay-action-menu--basic",
   "components-overlay-action-menu--with-descriptions-and-shortcuts",
   "components-overlay-context-action-menu--right-click-target",
@@ -400,4 +400,77 @@ async function verifyPageLayout(page: Page, storyId: string) {
   });
 
   expect(activeElementIsVisible, "keyboard focus target should be visible").toBe(true);
+
+  if (storyId.startsWith("components-navigation-navbar--")) {
+    await verifyNavbarLayout(page, storyId);
+  }
+}
+
+async function verifyNavbarLayout(page: Page, storyId: string) {
+  const nav = page.locator('[data-slot="navbar"]').first();
+
+  await expect(nav).toBeVisible();
+
+  const submenu = page.locator('[data-slot="navbar-submenu"]').first();
+
+  if ((await submenu.count()) > 0) {
+    const submenuLayout = await submenu.evaluate((element) => {
+      const box = element.getBoundingClientRect();
+      const style = window.getComputedStyle(element);
+      const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+      const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+
+      return {
+        isInViewport:
+          box.left >= -1 &&
+          box.top >= -1 &&
+          box.right <= viewportWidth + 1 &&
+          box.bottom <= viewportHeight + 1,
+        ownsVerticalScroll: style.overflowY === "auto" || style.overflowY === "scroll",
+      };
+    });
+
+    expect(submenuLayout.isInViewport, "navbar submenu should stay inside the viewport").toBe(true);
+    expect(submenuLayout.ownsVerticalScroll, "navbar submenu should scroll internally").toBe(true);
+  }
+
+  if (!storyId.startsWith("components-navigation-navbar--mobile")) {
+    return;
+  }
+
+  const mobileTargets = await nav.evaluate((element) => {
+    const visibleButtons = [...element.querySelectorAll<HTMLButtonElement>("button")].filter(
+      (button) => {
+        const style = window.getComputedStyle(button);
+        const box = button.getBoundingClientRect();
+
+        return (
+          style.display !== "none" &&
+          style.visibility !== "hidden" &&
+          box.width > 0 &&
+          box.height > 0
+        );
+      },
+    );
+
+    return visibleButtons.map((button) => {
+      const box = button.getBoundingClientRect();
+
+      return {
+        name: button.textContent?.trim() || button.getAttribute("aria-label") || "button",
+        isPrimaryTrigger: Boolean(button.getAttribute("aria-controls")?.startsWith("navbar-")),
+        width: box.width,
+        height: box.height,
+      };
+    });
+  });
+
+  for (const target of mobileTargets) {
+    const minimumSize = target.isPrimaryTrigger ? 44 : 40;
+
+    expect(
+      Math.min(target.width, target.height),
+      `${target.name} should keep a ${minimumSize}px mobile target`,
+    ).toBeGreaterThanOrEqual(minimumSize);
+  }
 }

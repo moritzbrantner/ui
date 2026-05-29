@@ -178,7 +178,7 @@
     [data-slot="surface"],
     [data-slot="toolbar"],
     [data-slot="dropzone"],
-    [data-slot="platform-navbar"]
+    [data-slot="navbar"]
   ) {
     border-color: var(--border) !important;
     box-shadow: var(--glass-shadow);

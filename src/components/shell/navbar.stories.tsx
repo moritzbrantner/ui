@@ -13,8 +13,9 @@ import {
   UserPlusIcon,
 } from "lucide-react";
 
-import { PlatformNavbarActions } from "./platform-navbar-actions";
-import { PlatformNavbar, type PlatformNavbarGroup } from "./platform-navbar";
+import { Button } from "../stable/button";
+import { NavbarActions } from "./navbar-actions";
+import { Navbar, type NavbarGroup } from "./navbar";
 
 const navigationGroups = [
   {
@@ -65,11 +66,63 @@ const navigationGroups = [
       },
     ],
   },
-] as const satisfies PlatformNavbarGroup[];
+] as const satisfies NavbarGroup[];
+
+const manyNavigationGroups = [
+  ...navigationGroups,
+  {
+    id: "learn",
+    label: "Learn",
+    eyebrow: "Guides",
+    description: "Reference material and examples.",
+    icon: <BookOpenIcon className="size-4" />,
+    items: [
+      {
+        id: "tutorials",
+        label: "Tutorials",
+        href: "#tutorials",
+        description: "Step-by-step implementation notes.",
+        icon: <BookOpenIcon className="size-4" />,
+      },
+    ],
+  },
+  {
+    id: "data",
+    label: "Data",
+    eyebrow: "Tables",
+    description: "Reusable data surfaces.",
+    icon: <DatabaseIcon className="size-4" />,
+    items: [
+      {
+        id: "grid",
+        label: "Data grid",
+        href: "#grid",
+        description: "Rows, columns, and selection.",
+        icon: <DatabaseIcon className="size-4" />,
+      },
+    ],
+  },
+  {
+    id: "profile",
+    label: "Profile",
+    eyebrow: "Account",
+    description: "Personal account surfaces.",
+    icon: <UserCircleIcon className="size-4" />,
+    items: [
+      {
+        id: "me",
+        label: "My profile",
+        href: "#me",
+        description: "Public profile and preferences.",
+        icon: <UserCircleIcon className="size-4" />,
+      },
+    ],
+  },
+] as const satisfies NavbarGroup[];
 
 const meta = {
-  title: "Components/Navigation/Platform Navbar",
-  component: PlatformNavbar,
+  title: "Components/Navigation/Navbar",
+  component: Navbar,
   tags: ["autodocs", "test"],
   parameters: {
     layout: "fullscreen",
@@ -84,10 +137,10 @@ const meta = {
   },
   render: (args) => (
     <div className="min-h-[420px] bg-background p-6 text-foreground">
-      <PlatformNavbar {...args} />
+      <Navbar {...args} />
     </div>
   ),
-} satisfies Meta<typeof PlatformNavbar>;
+} satisfies Meta<typeof Navbar>;
 
 export default meta;
 
@@ -98,7 +151,7 @@ export const Web: Story = {
     variant: "web",
     defaultOpenGroupId: "workspace",
     actionSlot: (
-      <PlatformNavbarActions
+      <NavbarActions
         languageSwitcher
         themeModeSwitch
         notificationMenu={{
@@ -175,7 +228,34 @@ export const PublicWithoutAuth: Story = {
   args: {
     variant: "web",
     defaultOpenGroupId: "discover",
-    actionSlot: <PlatformNavbarActions languageSwitcher themeModeSwitch />,
+    actionSlot: <NavbarActions languageSwitcher themeModeSwitch />,
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: /Language:/ })).toBeInTheDocument();
+    await expect(canvas.getByRole("switch", { name: "Color mode" })).toBeInTheDocument();
+    await expect(canvas.queryByRole("button", { name: "Open account menu" })).toBeNull();
+  },
+};
+
+export const LoggedOutWithLogin: Story = {
+  args: {
+    variant: "web",
+    defaultOpenGroupId: "discover",
+    actionSlot: (
+      <NavbarActions
+        languageSwitcher
+        themeModeSwitch
+        loginAction={<Button size="sm">Log in</Button>}
+      />
+    ),
+  },
+};
+
+export const Minimal: Story = {
+  args: {
+    variant: "web",
+    defaultOpenGroupId: null,
+    actionSlot: null,
   },
 };
 
@@ -190,6 +270,15 @@ export const Mobile: Story = {
   args: {
     variant: "mobile",
     defaultOpenGroupId: "workspace",
+  },
+};
+
+export const MobileManyGroups: Story = {
+  args: {
+    variant: "mobile",
+    groups: manyNavigationGroups,
+    defaultOpenGroupId: "workspace",
+    actionSlot: <NavbarActions loginAction={<Button>Log in</Button>} />,
   },
 };
 

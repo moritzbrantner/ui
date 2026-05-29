@@ -158,12 +158,12 @@ Data, shell, social, and media components are exposed through `@moritzbrantner/u
 
 Migration examples:
 
-| Old                                              | New                                                   |
-| ------------------------------------------------ | ----------------------------------------------------- |
-| `@moritzbrantner/ui/components/button`           | `@moritzbrantner/ui/components/stable/button`         |
-| `@moritzbrantner/ui/components/data-grid`        | `@moritzbrantner/ui/components/data/data-grid`        |
-| `@moritzbrantner/ui/components/chat`             | `@moritzbrantner/ui/components/social/chat`           |
-| `@moritzbrantner/ui/components/image-cropper`    | `@moritzbrantner/ui/components/media/image-cropper`   |
+| Old                                           | New                                                 |
+| --------------------------------------------- | --------------------------------------------------- |
+| `@moritzbrantner/ui/components/button`        | `@moritzbrantner/ui/components/stable/button`       |
+| `@moritzbrantner/ui/components/data-grid`     | `@moritzbrantner/ui/components/data/data-grid`      |
+| `@moritzbrantner/ui/components/chat`          | `@moritzbrantner/ui/components/social/chat`         |
+| `@moritzbrantner/ui/components/image-cropper` | `@moritzbrantner/ui/components/media/image-cropper` |
 
 ## Menu Patterns
 
@@ -225,7 +225,7 @@ Keep app-specific behavior in consuming packages:
 
 ## Recipes
 
-- App shell: combine `PlatformNavbar`, `PageShell`, `PageHeader`, `PageContent`, `Surface`, `CommandPalette`, `NotificationMenu`, `AccountMenu`, `LanguageSwitcher`, and `ThemeModeSwitch`.
+- App shell: combine `Navbar`, `PageShell`, `PageHeader`, `PageContent`, `Surface`, `CommandPalette`, `NotificationMenu`, `AccountMenu`, `LanguageSwitcher`, and `ThemeModeSwitch`.
 - Data page: use `SearchField`, `DataGrid`, `StateView`, and app-owned server state for sorting, filtering, pagination, loading, empty, and error states.
 - Filtered data page: use `FilterBar` for search and active filter display, `DataGrid` for rows, and `QueryBuilder` only when the app needs nested boolean filters; keep fetching, URL state, and backend query contracts in the app.
 - Validated form: use `FormSection`, `Field`, `FieldError`, `ValidationSummary`, and `FormActions`; keep validation rules and submit side effects in the app.
@@ -299,7 +299,7 @@ The package also includes reusable state-light patterns for common application s
 
 - `StateView`, `EmptyState`, `LoadingState`, `ErrorState`, and `OfflineState` for consistent non-happy-path panels.
 - `SearchField`, `SelectionToolbar`, `FilterBar`, `ResourceList`, and `DataGrid` through `@moritzbrantner/ui/data` for data-page composition.
-- `PageShell`, `PlatformNavbar`, `AccountMenu`, and `NotificationMenu` through `@moritzbrantner/ui/shell` for reusable app chrome.
+- `PageShell`, `Navbar`, `AccountMenu`, and `NotificationMenu` through `@moritzbrantner/ui/shell` for reusable app chrome.
 - `FormSection`, `FieldGrid`, `FormActions`, and `ValidationSummary` for repeated form structure.
 - `TagInput` for editable string lists with keyboard and remove affordances.
 - `QueryBuilder` for nested boolean filter editing while it remains in labs.

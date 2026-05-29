@@ -19,12 +19,7 @@ export default mergeConfig(baseConfig, {
         "src/components/media/**/*.{ts,tsx}",
         "src/components/internal/**/*.{ts,tsx}",
       ],
-      exclude: [
-        "**/*.test.ts",
-        "**/*.test.tsx",
-        "**/*.stories.tsx",
-        "src/components/labs/**",
-      ],
+      exclude: ["**/*.test.ts", "**/*.test.tsx", "**/*.stories.tsx", "src/components/labs/**"],
       thresholds: {
         branches: 30,
         functions: 45,

@@ -8,26 +8,31 @@ import { ThemeModeSwitch, type ThemeModeSwitchProps } from "../stable/theme-mode
 import { AccountMenu, type AccountMenuProps } from "./account-menu";
 import { NotificationMenu, type NotificationMenuProps } from "./notification-menu";
 
-export type PlatformNavbarActionsProps = React.ComponentPropsWithoutRef<"div"> & {
+export type NavbarActionsProps = React.ComponentPropsWithoutRef<"div"> & {
   accountMenu?: AccountMenuProps;
   notificationMenu?: NotificationMenuProps;
   languageSwitcher?: LanguageSwitcherProps | boolean;
   themeModeSwitch?: ThemeModeSwitchProps | boolean;
+  loginAction?: React.ReactNode;
 };
 
-export function PlatformNavbarActions({
+export function NavbarActions({
   children,
   accountMenu,
   notificationMenu,
   languageSwitcher,
   themeModeSwitch,
+  loginAction,
   className,
   ...props
-}: PlatformNavbarActionsProps) {
+}: NavbarActionsProps) {
   return (
     <div
-      data-slot="platform-navbar-actions"
-      className={cn("flex shrink-0 items-center justify-end gap-2", className)}
+      data-slot="navbar-actions"
+      className={cn(
+        "flex min-w-0 shrink-0 items-center justify-end gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>button]:min-h-10 [&>button]:shrink-0",
+        className,
+      )}
       {...props}
     >
       {children}
@@ -39,6 +44,7 @@ export function PlatformNavbarActions({
       ) : null}
       {notificationMenu ? <NotificationMenu {...notificationMenu} /> : null}
       {accountMenu ? <AccountMenu {...accountMenu} /> : null}
+      {loginAction}
     </div>
   );
 }

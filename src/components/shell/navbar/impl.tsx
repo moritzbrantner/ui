@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { useIsMobile } from "../../../hooks/use-mobile";
 import { cn } from "../../../lib/cn";
 
-export type PlatformNavbarItem = {
+export type NavbarItem = {
   id: string;
   label: React.ReactNode;
   href?: string;
@@ -19,46 +19,46 @@ export type PlatformNavbarItem = {
   onSelect?: () => void;
 };
 
-export type PlatformNavbarGroup = {
+export type NavbarGroup = {
   id: string;
   label: React.ReactNode;
   eyebrow?: React.ReactNode;
   description?: React.ReactNode;
   icon?: React.ReactNode;
-  items: PlatformNavbarItem[];
+  items: NavbarItem[];
 };
 
-export type PlatformNavbarVariant = "mobile" | "web" | "desktop";
-export type PlatformNavbarResponsiveVariant = PlatformNavbarVariant | "auto";
+export type NavbarVariant = "mobile" | "web" | "desktop";
+export type NavbarResponsiveVariant = NavbarVariant | "auto";
 
-export type PlatformNavbarRenderLinkProps = PlatformNavbarItem & {
+export type NavbarRenderLinkProps = NavbarItem & {
   className: string;
   children: React.ReactNode;
   "aria-current"?: "page";
   onClick: () => void;
 };
 
-export type PlatformNavbarProps = Omit<React.ComponentPropsWithoutRef<"nav">, "children"> & {
+export type NavbarProps = Omit<React.ComponentPropsWithoutRef<"nav">, "children"> & {
   brand: React.ReactNode;
-  groups: PlatformNavbarGroup[];
+  groups: NavbarGroup[];
   actions?: React.ReactNode;
   actionSlot?: React.ReactNode;
-  variant?: PlatformNavbarResponsiveVariant;
+  variant?: NavbarResponsiveVariant;
   activeItemId?: string;
   activeGroupId?: string;
   defaultOpenGroupId?: string | null;
   openGroupId?: string | null;
   onOpenGroupChange?: (groupId: string | null) => void;
-  onNavigate?: (item: PlatformNavbarItem, group: PlatformNavbarGroup) => void;
-  renderLink?: (props: PlatformNavbarRenderLinkProps) => React.ReactNode;
+  onNavigate?: (item: NavbarItem, group: NavbarGroup) => void;
+  renderLink?: (props: NavbarRenderLinkProps) => React.ReactNode;
 };
 
 const variantConfig = {
   mobile: {
     nav: "mx-auto w-full max-w-md rounded-xl p-2",
     chrome: "flex-col gap-2",
-    brand: "w-full justify-between px-3",
-    groups: "grid w-full grid-cols-3 gap-1",
+    brand: "w-full justify-between overflow-hidden px-3",
+    groups: "w-full gap-1",
     trigger: "min-h-14 flex-col px-2 py-2 text-xs",
     panel: "origin-top overflow-y-auto rounded-xl p-2",
     list: "grid gap-2",
@@ -82,7 +82,7 @@ const variantConfig = {
     list: "grid gap-1.5 sm:grid-cols-2",
   },
 } satisfies Record<
-  PlatformNavbarVariant,
+  NavbarVariant,
   {
     nav: string;
     chrome: string;
@@ -98,9 +98,9 @@ const submenuSizeConfig = {
   mobile: { gap: 8, margin: 8, maxWidth: 28 * 16 },
   web: { gap: 12, margin: 16, maxWidth: 58 * 16 },
   desktop: { gap: 10, margin: 16, maxWidth: 44 * 16 },
-} satisfies Record<PlatformNavbarVariant, { gap: number; margin: number; maxWidth: number }>;
+} satisfies Record<NavbarVariant, { gap: number; margin: number; maxWidth: number }>;
 
-const platformNavbarOpenEvent = "platform-navbar:open";
+const navbarOpenEvent = "navbar:open";
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -130,7 +130,7 @@ function DefaultLink({
   children,
   onClick,
   ...props
-}: PlatformNavbarRenderLinkProps) {
+}: NavbarRenderLinkProps) {
   if (disabled || !href) {
     return (
       <button
@@ -153,7 +153,7 @@ function DefaultLink({
 }
 
 function getInitialOpenGroupId(
-  groups: PlatformNavbarGroup[],
+  groups: NavbarGroup[],
   activeGroupId?: string,
   activeItemId?: string,
   defaultOpenGroupId?: string | null,
@@ -173,19 +173,22 @@ function getInitialOpenGroupId(
   return activeGroup?.id ?? null;
 }
 
-export type PlatformNavbarActionGroupProps = React.ComponentPropsWithoutRef<"div">;
+export type NavbarActionGroupProps = React.ComponentPropsWithoutRef<"div">;
 
-export function PlatformNavbarActionGroup({ className, ...props }: PlatformNavbarActionGroupProps) {
+export function NavbarActionGroup({ className, ...props }: NavbarActionGroupProps) {
   return (
     <div
-      data-slot="platform-navbar-actions"
-      className={cn("flex shrink-0 items-center justify-end gap-2", className)}
+      data-slot="navbar-actions"
+      className={cn(
+        "flex min-w-0 shrink-0 items-center justify-end gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>button]:min-h-10 [&>button]:shrink-0",
+        className,
+      )}
       {...props}
     />
   );
 }
 
-export function PlatformNavbar({
+export function Navbar({
   brand,
   groups,
   actions,
@@ -201,7 +204,7 @@ export function PlatformNavbar({
   className,
   "aria-label": ariaLabel = "Primary navigation",
   ...props
-}: PlatformNavbarProps) {
+}: NavbarProps) {
   const isMobile = useIsMobile();
   const instanceId = React.useId();
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -213,15 +216,27 @@ export function PlatformNavbar({
   const [uncontrolledOpenGroupId, setUncontrolledOpenGroupId] = React.useState<string | null>(() =>
     getInitialOpenGroupId(groups, activeGroupId, activeItemId, defaultOpenGroupId),
   );
-  const resolvedVariant: PlatformNavbarVariant =
+  const resolvedVariant: NavbarVariant =
     variant === "auto" ? (isMobile ? "mobile" : "web") : variant;
   const config = variantConfig[resolvedVariant];
+  const shouldScrollMobileGroups = resolvedVariant === "mobile" && groups.length > 3;
+  const groupListClassName = cn(
+    config.groups,
+    resolvedVariant === "mobile"
+      ? shouldScrollMobileGroups
+        ? "flex min-w-0 snap-x overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        : "grid"
+      : undefined,
+  );
+  const groupListStyle: React.CSSProperties | undefined =
+    resolvedVariant === "mobile" && !shouldScrollMobileGroups
+      ? { gridTemplateColumns: `repeat(${Math.max(groups.length, 1)}, minmax(0, 1fr))` }
+      : undefined;
   const currentOpenGroupId = openGroupId !== undefined ? openGroupId : uncontrolledOpenGroupId;
   const openGroup =
     groups.find((group) => group.id === currentOpenGroupId && group.items.length > 0) ?? null;
   const renderedActions =
-    actionSlot ??
-    (actions ? <PlatformNavbarActionGroup>{actions}</PlatformNavbarActionGroup> : null);
+    actionSlot ?? (actions ? <NavbarActionGroup>{actions}</NavbarActionGroup> : null);
 
   const resolvedActiveGroupId =
     activeGroupId ??
@@ -238,7 +253,7 @@ export function PlatformNavbar({
   );
 
   const getSubmenuId = React.useCallback(
-    (groupId: string) => `platform-navbar-${instanceId}-submenu-${groupId}`,
+    (groupId: string) => `navbar-${instanceId}-submenu-${groupId}`,
     [instanceId],
   );
 
@@ -329,10 +344,10 @@ export function PlatformNavbar({
       }
     }
 
-    window.addEventListener(platformNavbarOpenEvent, handleNavbarOpen);
+    window.addEventListener(navbarOpenEvent, handleNavbarOpen);
 
     return () => {
-      window.removeEventListener(platformNavbarOpenEvent, handleNavbarOpen);
+      window.removeEventListener(navbarOpenEvent, handleNavbarOpen);
     };
   }, [instanceId, setOpenGroupId]);
 
@@ -342,7 +357,7 @@ export function PlatformNavbar({
     }
 
     window.dispatchEvent(
-      new CustomEvent(platformNavbarOpenEvent, {
+      new CustomEvent(navbarOpenEvent, {
         detail: { instanceId },
       }),
     );
@@ -398,10 +413,10 @@ export function PlatformNavbar({
       key={openGroup.id}
       ref={submenuRef}
       id={getSubmenuId(openGroup.id)}
-      data-slot="platform-navbar-submenu"
+      data-slot="navbar-submenu"
       data-open
       className={cn(
-        "fixed z-[100] overflow-hidden border border-border/60 bg-popover/74 text-popover-foreground opacity-100 shadow-[var(--glass-shadow)] backdrop-blur-2xl transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
+        "fixed z-[100] overflow-x-hidden overflow-y-auto border border-border/60 bg-popover/74 text-popover-foreground opacity-100 shadow-[var(--glass-shadow)] backdrop-blur-2xl transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
         config.panel,
       )}
       style={submenuStyle}
@@ -499,7 +514,7 @@ export function PlatformNavbar({
         <nav
           ref={navRef}
           aria-label={ariaLabel}
-          data-slot="platform-navbar"
+          data-slot="navbar"
           data-variant={resolvedVariant}
           className={cn(
             "relative isolate overflow-hidden border border-border/60 bg-card/70 text-foreground shadow-[var(--glass-shadow)] backdrop-blur-2xl supports-backdrop-filter:backdrop-blur-2xl",
@@ -510,11 +525,11 @@ export function PlatformNavbar({
         >
           <div className={cn("flex min-w-0", config.chrome)}>
             <div className={cn("flex min-w-0 items-center gap-2", config.brand)}>
-              <div className="min-w-0 truncate text-sm font-semibold">{brand}</div>
+              <div className="min-w-0 flex-1 truncate text-sm font-semibold">{brand}</div>
               {resolvedVariant === "mobile" ? renderedActions : null}
             </div>
 
-            <div className={config.groups}>
+            <div className={groupListClassName} style={groupListStyle}>
               {groups.map((group) => {
                 const isOpen = group.id === openGroup?.id;
                 const isActive = group.id === resolvedActiveGroupId;
@@ -535,6 +550,11 @@ export function PlatformNavbar({
                     className={cn(
                       "relative inline-flex min-w-0 shrink-0 items-center justify-center gap-2 overflow-hidden rounded-md border text-center font-medium outline-none transition-[transform,background-color,border-color,color,box-shadow] focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none hover:-translate-y-px active:scale-[0.97]",
                       config.trigger,
+                      resolvedVariant === "mobile"
+                        ? shouldScrollMobileGroups
+                          ? "min-w-24 snap-start"
+                          : "w-full"
+                        : undefined,
                       isOpen || isActive
                         ? "border-primary/45 bg-primary text-primary-foreground shadow-[var(--glass-interactive-shadow)]"
                         : "border-border/55 bg-background/36 text-foreground/78 hover:border-border hover:bg-accent/45 hover:text-foreground",

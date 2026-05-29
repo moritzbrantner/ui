@@ -106,9 +106,9 @@ import {
   PageHeader,
   PageShell,
   PageTitle,
-  PlatformNavbar,
-  PlatformNavbarActions,
-  type PlatformNavbarGroup,
+  Navbar,
+  NavbarActions,
+  type NavbarGroup,
   SectionGrid,
   Surface,
   SurfaceContent,
@@ -317,7 +317,7 @@ const navigationGroups = [
       },
     ],
   },
-] as const satisfies PlatformNavbarGroup[];
+] as const satisfies NavbarGroup[];
 
 function createRect({
   left,
@@ -509,7 +509,7 @@ describe("@moritzbrantner/ui overlays-and-navigation", () => {
 
   test("renders an animated glass navbar with an open submenu", () => {
     render(
-      <PlatformNavbar
+      <Navbar
         brand="Platform"
         groups={navigationGroups}
         activeItemId="people"
@@ -522,7 +522,7 @@ describe("@moritzbrantner/ui overlays-and-navigation", () => {
     const trigger = screen.getByRole("button", { name: /Workspace/ });
     const submenu = screen
       .getByText("Directory and profiles.")
-      .closest('[data-slot="platform-navbar-submenu"]');
+      .closest('[data-slot="navbar-submenu"]');
 
     expect(trigger.getAttribute("aria-expanded")).toBe("true");
     expect(trigger.getAttribute("aria-controls")).toBe(submenu?.id);
@@ -534,13 +534,13 @@ describe("@moritzbrantner/ui overlays-and-navigation", () => {
 
   test("renders the composed theme, notification, and avatar actions", () => {
     render(
-      <PlatformNavbar
+      <Navbar
         brand="Platform"
         groups={navigationGroups}
         defaultOpenGroupId={null}
         variant="web"
         actionSlot={
-          <PlatformNavbarActions
+          <NavbarActions
             accountMenu={{
               user: { name: "Mira Brandt", email: "mira@example.com", initials: "MB" },
               items: [{ id: "profile", label: "Profile" }],
@@ -566,7 +566,7 @@ describe("@moritzbrantner/ui overlays-and-navigation", () => {
 
   test("anchors the mobile navbar submenu to the centered navbar", async () => {
     render(
-      <PlatformNavbar
+      <Navbar
         brand="Platform"
         groups={navigationGroups}
         defaultOpenGroupId={null}
@@ -594,7 +594,7 @@ describe("@moritzbrantner/ui overlays-and-navigation", () => {
     await waitFor(() => {
       const submenu = screen
         .getByText("Directory and profiles.")
-        .closest('[data-slot="platform-navbar-submenu"]') as HTMLElement | null;
+        .closest('[data-slot="navbar-submenu"]') as HTMLElement | null;
 
       expect(submenu?.style.left).toBe("184px");
       expect(submenu?.style.top).toBe("88px");
@@ -605,14 +605,14 @@ describe("@moritzbrantner/ui overlays-and-navigation", () => {
   test("keeps only the latest navbar submenu open across mounted navbars", async () => {
     render(
       <>
-        <PlatformNavbar
+        <Navbar
           aria-label="First navigation"
           brand="First"
           groups={navigationGroups}
           defaultOpenGroupId="discover"
           variant="web"
         />
-        <PlatformNavbar
+        <Navbar
           aria-label="Second navigation"
           brand="Second"
           groups={navigationGroups}
@@ -623,7 +623,7 @@ describe("@moritzbrantner/ui overlays-and-navigation", () => {
     );
 
     await waitFor(() => {
-      expect(document.querySelectorAll('[data-slot="platform-navbar-submenu"]').length).toBe(1);
+      expect(document.querySelectorAll('[data-slot="navbar-submenu"]').length).toBe(1);
     });
     expect(screen.queryByText("Open routes for visitors.")).toBeNull();
     expect(screen.getByText("Directory and profiles.")).toBeTruthy();
@@ -631,7 +631,7 @@ describe("@moritzbrantner/ui overlays-and-navigation", () => {
     fireEvent.click(screen.getAllByRole("button", { name: /Discover/ })[0]);
 
     await waitFor(() => {
-      expect(document.querySelectorAll('[data-slot="platform-navbar-submenu"]').length).toBe(1);
+      expect(document.querySelectorAll('[data-slot="navbar-submenu"]').length).toBe(1);
     });
     expect(screen.getByText("Open routes for visitors.")).toBeTruthy();
     expect(screen.queryByText("Directory and profiles.")).toBeNull();
@@ -641,7 +641,7 @@ describe("@moritzbrantner/ui overlays-and-navigation", () => {
     const onNavigate = vi.fn();
 
     render(
-      <PlatformNavbar
+      <Navbar
         brand="Platform"
         groups={navigationGroups}
         defaultOpenGroupId={null}
