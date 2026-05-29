@@ -106,9 +106,9 @@ describe("WorkflowNode", () => {
     expect(getWorkflowNodeSize(duplexNode, { showPortColumnHeaders: false }).height).toBe(
       getWorkflowNodeSize(duplexNode).height - 21,
     );
-    expect(
-      getWorkflowNodePortCenterOffset(duplexNode, 0, { showPortColumnHeaders: false }),
-    ).toBe(getWorkflowNodePortCenterOffset(duplexNode, 0) - 21);
+    expect(getWorkflowNodePortCenterOffset(duplexNode, 0, { showPortColumnHeaders: false })).toBe(
+      getWorkflowNodePortCenterOffset(duplexNode, 0) - 21,
+    );
   });
 
   test("tints expanded port rows and connector dots from the port color", () => {

@@ -52,6 +52,8 @@ Data page: prefer `DataGrid` over legacy `DataTable` for controlled server state
 
 Filtered data page: compose `FilterBar` for search and active filter display with `DataGrid` for rows. Use `QueryBuilder` only when the app needs nested boolean filters. Apps own fetching, URL state, backend query contracts, and persistence.
 
+List and detail views: compose `ViewHeader`, `ResourceList`, `DetailsPanel`, `DisclosurePanel`, and `ConfirmAction` for reusable view structure, list rows, detail drawers or panels, expandable sections, and destructive or irreversible confirmations. Apps own route changes, data loading, permissions, and mutation side effects.
+
 Validated form: compose `FormSection`, `Field`, `FieldError`, `ValidationSummary`, and `FormActions`. Apps own schema validation, submit behavior, persistence, and error mapping.
 
 Upload queue: compose `Dropzone` and `UploadQueue`. Apps own transport, file storage, retries, cancellation, and progress events.

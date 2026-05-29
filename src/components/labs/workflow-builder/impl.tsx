@@ -286,10 +286,7 @@ function WorkflowBuilder({
     () => new Map(nodes.map((node) => [node.id, node] as const)),
     [nodes],
   );
-  const layoutOptions = React.useMemo(
-    () => ({ showPortColumnHeaders }),
-    [showPortColumnHeaders],
-  );
+  const layoutOptions = React.useMemo(() => ({ showPortColumnHeaders }), [showPortColumnHeaders]);
   const selectedNode = currentSelectedNodeId ? nodeById.get(currentSelectedNodeId) : undefined;
   const selectedEdge = React.useMemo(
     () => edges.find((edge) => edge.id === currentSelectedEdgeId),
@@ -1115,10 +1112,7 @@ const WorkflowBuilderNode = React.memo(function WorkflowBuilderNode({
   className,
   ...props
 }: WorkflowBuilderNodeProps) {
-  const layoutOptions = React.useMemo(
-    () => ({ showPortColumnHeaders }),
-    [showPortColumnHeaders],
-  );
+  const layoutOptions = React.useMemo(() => ({ showPortColumnHeaders }), [showPortColumnHeaders]);
   const nodeSize = getWorkflowNodeSize(node, layoutOptions);
 
   return (
@@ -1238,14 +1232,11 @@ function WorkflowBuilderMiniMap({
   ...props
 }: WorkflowBuilderMiniMapProps) {
   void _edges;
-  const layoutOptions = React.useMemo(
-    () => ({ showPortColumnHeaders }),
-    [showPortColumnHeaders],
+  const layoutOptions = React.useMemo(() => ({ showPortColumnHeaders }), [showPortColumnHeaders]);
+  const bounds = React.useMemo(
+    () => getWorkflowBounds(nodes, layoutOptions),
+    [layoutOptions, nodes],
   );
-  const bounds = React.useMemo(() => getWorkflowBounds(nodes, layoutOptions), [
-    layoutOptions,
-    nodes,
-  ]);
   const minimapNodes = React.useMemo(
     () =>
       nodes.map((node) => ({

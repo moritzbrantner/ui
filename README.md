@@ -294,7 +294,9 @@ The package also includes reusable state-light patterns for common application s
 
 - `StateView`, `EmptyState`, `LoadingState`, `ErrorState`, and `OfflineState` for consistent non-happy-path panels.
 - `SearchField`, `SelectionToolbar`, `FormSection`, `FieldGrid`, `FormActions`, and `ValidationSummary` for repeated search, selection, and form structure.
+- `TagInput` for editable string lists with keyboard and remove affordances.
 - `FilterBar` and `QueryBuilder` for app-owned search/filter composition and nested boolean filter editing.
+- `ViewHeader`, `ResourceList`, `DetailsPanel`, `DisclosurePanel`, and `ConfirmAction` for reusable view, list, detail, disclosure, and confirmation surfaces.
 - `CommandPalette`, `UploadQueue`, `ShortcutList`, `ShortcutHelpDialog`, and `WorkbenchLayout` for generic tool surfaces.
 - `WorkflowBuilder` for reusable workflow graph editing surfaces without execution or persistence behavior.
 
@@ -349,7 +351,7 @@ In the repository settings, set **Pages > Build and deployment > Source** to **G
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) and [docs/design-system.md](./docs/design-system.md) for package boundaries, component requirements, and release checks.
+See [CONTRIBUTING.md](./CONTRIBUTING.md), [docs/design-system.md](./docs/design-system.md), and [docs/release.md](./docs/release.md) for package boundaries, component requirements, and release checks.
 
 ## Release Checks
 

@@ -189,10 +189,7 @@ function WorkflowNode({
     () => (node.minimized === minimized ? node : { ...node, minimized }),
     [minimized, node],
   );
-  const layoutOptions = React.useMemo(
-    () => ({ showPortColumnHeaders }),
-    [showPortColumnHeaders],
-  );
+  const layoutOptions = React.useMemo(() => ({ showPortColumnHeaders }), [showPortColumnHeaders]);
   const compact = workflowNodeUsesCompactVariant(resolvedNode);
   const size = getWorkflowNodeSize(resolvedNode, layoutOptions);
   const portLayout = getWorkflowNodePortLayout(resolvedNode);

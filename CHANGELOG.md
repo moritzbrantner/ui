@@ -1,5 +1,16 @@
 # @moritzbrantner/ui
 
+## 0.9.0
+
+### Minor Changes
+
+- Add public `TagInput`, `DisclosurePanel`, `ResourceList`, `ViewHeader`, `DetailsPanel`, and `ConfirmAction` components for reusable app surfaces.
+- Expand chart, org-chart, UML, workflow-node, and workflow-builder interactions with keyboard navigation, selection, node actions, snapping, rewire, and disconnect coverage.
+- Improve `Citation` support for ranged excerpts with omissions and additions.
+- Tighten responsive behavior across root-public stable and pattern components.
+- Replace stale selector styling with Radix `data-state` variants and add a package check to prevent regressions.
+- Add Unlighthouse audits to release verification, consolidate stable primitive Storybook coverage, and refine lab component performance benchmarks.
+
 ## 0.8.0
 
 ### Minor Changes

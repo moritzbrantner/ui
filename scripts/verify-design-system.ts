@@ -21,6 +21,7 @@ const labsPath = path.join(packageRoot, "src", "labs.ts");
 const legacyPath = path.join(packageRoot, "src", "legacy.ts");
 const errors: string[] = [];
 const publicTiers = ["stable", "patterns", "labs", "legacy"] as const;
+const expectedPackageVersion = "0.9.0";
 const rootExportTiers = new Set<ComponentTier>(["stable", "patterns"]);
 const releaseBlockingTiers = new Set<ComponentTier>(["stable", "patterns"]);
 const tierBarrelPaths = {
@@ -97,7 +98,11 @@ function verifyPackageMetadata() {
     "@moritzbrantner/ui",
     "package name must remain @moritzbrantner/ui",
   );
-  expectEqual(packageJson.version, "0.8.0", "package version must match tiered API release");
+  expectEqual(
+    packageJson.version,
+    expectedPackageVersion,
+    "package version must match the prepared release",
+  );
   expectEqual(packageJson.private, false, "package must stay publishable");
   expectArrayIncludes(packageJson.files, "dist", "package files must include dist");
   expectArrayIncludes(packageJson.files, "styles.css", "package files must include styles.css");

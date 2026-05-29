@@ -69,7 +69,7 @@ Cover these states when they apply:
 
 ## Release checklist
 
-Run these commands before release:
+For the full release flow, see [docs/release.md](./docs/release.md). At minimum, run these commands before release:
 
 ```sh
 bun run check-types
@@ -80,6 +80,8 @@ bun run test:storybook
 bun run test:package
 npm pack --dry-run --ignore-scripts --json
 ```
+
+`bun run publish:npm` runs the full local release contract and then publishes to the public npm registry. Use it only after the changelog and `package.json` version describe the intended release.
 
 ## Token metadata
 
