@@ -20,7 +20,7 @@ import {
   ChatSendButton,
   ChatThread,
   ChatTitle,
-} from "./chat";
+} from "../social/chat";
 import {
   MobileSlide,
   MobileSlideBody,

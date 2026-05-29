@@ -22,18 +22,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  Chat,
-  ChatBubble,
-  ChatComposer,
-  ChatComposerInput,
-  ChatHeader,
-  ChatMessage,
-  ChatMessageAvatar,
-  ChatMessageContent,
-  ChatMessageMeta,
-  ChatSendButton,
-  ChatThread,
-  ChatTitle,
   ActionBar,
   CodeBlock,
   CodeBlockCode,
@@ -197,7 +185,7 @@ import { Dialog as SubpathDialog } from "./components/stable/dialog";
 import { FilterBar as SubpathFilterBar } from "./components/patterns/filter-bar";
 import { HoverPreview as SubpathHoverPreview } from "./components/patterns/hover-preview";
 import { DataTable as LegacyDataTable } from "./components/legacy/data-table";
-import { WorkflowBuilder as SubpathWorkflowBuilder } from "./components/labs/workflow-builder";
+import { Chat as SubpathChat } from "./components/social/chat";
 import { getMenuActionItemText as subpathGetMenuActionItemText } from "./components/patterns/menu-actions";
 import { ResponsiveActionMenu as SubpathResponsiveActionMenu } from "./components/patterns/responsive-action-menu";
 import { componentRegistry } from "./component-registry";
@@ -210,8 +198,6 @@ import {
   DocumentViewer,
   type DocumentViewerHighlight,
   type DocumentViewerPageData,
-  InspectorPanel,
-  type InspectorPanelSectionData,
   QueryBuilder,
   createQueryBuilderGroup,
   evaluateQueryBuilderExpression,
@@ -222,30 +208,30 @@ import {
   Timeline,
   TimelineConnector,
   TimelineContent,
-  TimelineEditor,
   TimelineIndicator,
   TimelineItem,
   TimelineTitle,
-  WorkflowBuilder,
-  WorkflowInputOnlyNode,
-  WorkflowOutputOnlyNode,
-  getWorkflowBuilderConnectionValidity,
-  type WorkflowInputOnlyNodeData,
-  type WorkflowBuilderConnection,
-  type WorkflowBuilderEdge,
-  type WorkflowBuilderNodeData,
-  type WorkflowBuilderViewport,
-  type WorkflowNodeMenuItem,
-  type WorkflowNodePort,
-  type WorkflowNodeTypeScriptType,
-  type WorkflowOutputOnlyNodeData,
-  moveTimelineEditorClip,
-  resizeTimelineEditorClip,
-  type TimelineEditorTrack,
 } from "./labs";
 import { PaperTheme, paperTheme, uiTheme as paperUiTheme } from "./paper";
 import { paperTheme as paperServerTheme, uiTheme as paperServerUiTheme } from "./paper-server";
 import { cn as serverCn, themeConfig as serverThemeConfig } from "./server";
+import {
+  Chat,
+  ChatBubble,
+  ChatComposer,
+  ChatComposerInput,
+  ChatHeader,
+  ChatMessage,
+  ChatMessageAvatar,
+  ChatMessageContent,
+  ChatMessageMeta,
+  ChatSendButton,
+  ChatThread,
+  ChatTitle,
+  ProfileSummary,
+  SocialActionGroup,
+  SocialPost,
+} from "./social";
 import { StudioTheme, studioTheme, uiTheme as studioUiTheme } from "./studio";
 import { studioTheme as studioServerTheme, uiTheme as studioServerUiTheme } from "./studio-server";
 import { Button as ZleekButton, ZleekTheme, uiTheme as zleekUiTheme, zleekTheme } from "./zleek";
@@ -475,6 +461,8 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./client"].types).toBe("./dist/client.d.ts");
     expect(packageJson.exports["./stable"].import).toBe("./dist/stable.js");
     expect(packageJson.exports["./patterns"].import).toBe("./dist/patterns.js");
+    expect(packageJson.exports["./social"].import).toBe("./dist/social.js");
+    expect(packageJson.exports["./social"].types).toBe("./dist/social.d.ts");
     expect(packageJson.exports["./labs"].import).toBe("./dist/labs.js");
     expect(packageJson.exports["./legacy"].import).toBe("./dist/legacy.js");
     expect(packageJson.exports["./atlas/styles.css"]).toBe("./atlas/styles.css");
@@ -486,6 +474,9 @@ describe("@moritzbrantner/ui package-contract", () => {
     );
     expect(packageJson.exports["./components/patterns/*"].import).toBe(
       "./dist/components/patterns/*.js",
+    );
+    expect(packageJson.exports["./components/social/*"].import).toBe(
+      "./dist/components/social/*.js",
     );
     expect(packageJson.exports["./components/labs/*"].import).toBe("./dist/components/labs/*.js");
     expect(packageJson.exports["./components/legacy/*"].import).toBe(
@@ -519,6 +510,8 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(indexSource).not.toContain('export * from "./legacy";');
     expect(Object.hasOwn(RootExports, "DataTable")).toBe(false);
     expect(Object.hasOwn(RootExports, "WorkflowBuilder")).toBe(false);
+    expect(Object.hasOwn(RootExports, "Chat")).toBe(false);
+    expect(Object.hasOwn(RootExports, "Chat" + "Box")).toBe(false);
   });
 
   test("merges class names", () => {
@@ -547,7 +540,7 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(SubpathFilterBar).toBe(FilterBar);
     expect(SubpathHoverPreview).toBe(HoverPreview);
     expect(SubpathResponsiveActionMenu).toBe(ResponsiveActionMenu);
-    expect(SubpathWorkflowBuilder).toBe(WorkflowBuilder);
+    expect(SubpathChat).toBe(Chat);
     expect(typeof LegacyDataTable).toBe("function");
     expect(subpathGetMenuActionItemText({ id: "contract", label: "Contract" })).toBe("Contract");
     expect(typeof FilterChip).toBe("function");
@@ -563,6 +556,9 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(typeof OrgChart).toBe("function");
     expect(typeof RelationshipMap).toBe("function");
     expect(typeof Infographic).toBe("function");
+    expect(typeof SocialActionGroup).toBe("function");
+    expect(typeof SocialPost).toBe("function");
+    expect(typeof ProfileSummary).toBe("function");
     const rootMenuActionItem: MenuActionItem = { id: "contract-action", label: "Contract action" };
     const rootCommandItem: MenuActionCommandItem = {
       id: "contract-command",
@@ -655,43 +651,6 @@ describe("@moritzbrantner/ui package-contract", () => {
     const queryBuilderIdFactory: QueryBuilderIdFactory = (kind) => `contract-${kind}`;
     const queryBuilderGroup = createQueryBuilderGroup([], queryBuilderIdFactory);
     expect(queryBuilderGroup.id).toBe("contract-group");
-    const workflowViewport: WorkflowBuilderViewport = { x: 0, y: 0, zoom: 1 };
-    const workflowConnection: WorkflowBuilderConnection = {
-      sourceNodeId: "source",
-      sourcePortId: "out",
-      targetNodeId: "target",
-      targetPortId: "in",
-    };
-    const workflowNodeMenuItem: WorkflowNodeMenuItem = {
-      id: "contract-menu-item",
-      label: "Contract menu item",
-    };
-    const workflowPortType: WorkflowNodeTypeScriptType<{ id: string }> = {
-      label: "ContractPayload",
-      source: "{ id: string }",
-    };
-    const workflowTypedPort: WorkflowNodePort<{ id: string }> = {
-      id: "payload",
-      label: "Payload",
-      type: workflowPortType,
-    };
-    const workflowInputOnlyNode: WorkflowInputOnlyNodeData<[typeof workflowTypedPort]> = {
-      id: "contract-input-only",
-      label: "Contract input only",
-      inputs: [workflowTypedPort],
-    };
-    const workflowOutputOnlyNode: WorkflowOutputOnlyNodeData<[typeof workflowTypedPort]> = {
-      id: "contract-output-only",
-      label: "Contract output only",
-      outputs: [workflowTypedPort],
-    };
-    expect(workflowViewport.zoom).toBe(1);
-    expect(workflowConnection.sourceNodeId).toBe("source");
-    expect(workflowNodeMenuItem.id).toBe("contract-menu-item");
-    expect(workflowInputOnlyNode.inputs[0]?.type).toBe(workflowPortType);
-    expect(workflowOutputOnlyNode.outputs[0]?.type).toBe(workflowPortType);
-    expect(typeof WorkflowInputOnlyNode).toBe("function");
-    expect(typeof WorkflowOutputOnlyNode).toBe("function");
   });
 
   test("exposes metadata-only theme server entrypoints", () => {

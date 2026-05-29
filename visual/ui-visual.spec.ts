@@ -47,25 +47,17 @@ const storyIds = [
   "components-data-display-calendar-card-days--default",
   "components-data-display-document-viewer--ocr-report-viewer",
   "components-data-display-resource-list--default",
-  "components-editors-timeline-editor--default",
   "components-editors-annotation-canvas--default",
-  "components-editors-workflow-builder--ai-workflow-graph",
-  "components-editors-workflow-builder--controlled-viewport",
   "components-social-overview--social-feed",
-  "components-social-overview--chat-box-thread",
+  "components-social-overview--chat-thread-preview",
   "components-layout-workbench-layout--full-workbench",
   "patterns-release-readiness--consumer-dashboard-shell-story",
-  "patterns-release-readiness--editor-workspace-story",
   "patterns-release-readiness--forms-settings-story",
 ];
 const releaseReadinessThemeStories = [
   {
     storyId: "patterns-release-readiness--consumer-dashboard-shell-story",
     designSystem: "atlas",
-  },
-  {
-    storyId: "patterns-release-readiness--editor-workspace-story",
-    designSystem: "studio",
   },
   {
     storyId: "patterns-release-readiness--forms-settings-story",
@@ -91,18 +83,12 @@ const horizontallyScrollableStories = new Set([
   "components-data-display-org-chart--team-structure",
   "components-data-display-relationship-map--stakeholder-map",
   "components-data-display-process-map--release-lifecycle",
-  "components-editors-timeline-editor--default",
-  "components-editors-workflow-builder--ai-workflow-graph",
-  "components-editors-workflow-builder--controlled-viewport",
   "patterns-release-readiness--consumer-dashboard-shell-story",
-  "patterns-release-readiness--editor-workspace-story",
 ]);
 const denseControlStories = new Set([
   "components-data-display-calendar-card-days--default",
   "components-forms-inputs-form-controls--basic",
   "components-stable-primitive-components--overview",
-  "components-editors-workflow-builder--ai-workflow-graph",
-  "components-editors-workflow-builder--controlled-viewport",
 ]);
 const internalScrollStories = new Map([
   ["components-data-display-data-grid--default", '[data-slot="table-container"]'],

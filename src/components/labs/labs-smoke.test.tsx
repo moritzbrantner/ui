@@ -7,26 +7,24 @@ import {
   DocumentViewer,
   ImageCropper,
   ImageFilterEditor,
+  Timeline,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDescription,
+  TimelineIndicator,
+  TimelineItem,
+  TimelineTime,
+  TimelineTitle,
+  type AnnotationCanvasAnnotation,
+  type DocumentViewerPageData,
+} from "../../labs";
+import {
   ProfileSummary,
   ProfileSummaryAvatar,
   ProfileSummaryContent,
   ProfileSummaryDescription,
   ProfileSummaryTitle,
-  Timeline,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDescription,
-  TimelineEditor,
-  TimelineIndicator,
-  TimelineItem,
-  TimelineTime,
-  TimelineTitle,
-  WorkflowNode,
-  type AnnotationCanvasAnnotation,
-  type DocumentViewerPageData,
-  type TimelineEditorTrack,
-  type WorkflowNodeData,
-} from "../../labs";
+} from "../../social";
 
 beforeAll(() => {
   globalThis.ResizeObserver ??= class ResizeObserver {
@@ -61,23 +59,6 @@ const pages: DocumentViewerPageData[] = [
   },
 ];
 
-const tracks: TimelineEditorTrack[] = [
-  {
-    id: "video",
-    label: "Video",
-    clips: [{ id: "intro", label: "Intro clip", start: 0, end: 3 }],
-  },
-];
-
-const node: WorkflowNodeData = {
-  id: "normalize",
-  label: "Normalize image",
-  description: "Prepares image input.",
-  status: "running",
-  inputs: [{ id: "image", label: "Image" }],
-  outputs: [{ id: "result", label: "Result" }],
-};
-
 describe("labs smoke coverage", () => {
   test("renders annotation, document, cropper, and filter editor surfaces", () => {
     render(
@@ -101,7 +82,7 @@ describe("labs smoke coverage", () => {
     expect(screen.getByAltText("Filter target")).toBeTruthy();
   });
 
-  test("renders timeline, timeline editor, workflow node, and profile summary", () => {
+  test("renders timeline and profile summary", () => {
     render(
       <div>
         <Timeline>
@@ -115,8 +96,6 @@ describe("labs smoke coverage", () => {
             </TimelineContent>
           </TimelineItem>
         </Timeline>
-        <TimelineEditor tracks={tracks} duration={5} />
-        <WorkflowNode node={node} />
         <ProfileSummary>
           <ProfileSummaryAvatar name="Ada Lovelace" />
           <ProfileSummaryContent>
@@ -128,8 +107,6 @@ describe("labs smoke coverage", () => {
     );
 
     expect(screen.getByText("Coverage planned")).toBeTruthy();
-    expect(screen.getByText("Intro clip")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Normalize image" })).toBeTruthy();
     expect(screen.getByText("Ada Lovelace")).toBeTruthy();
   });
 });

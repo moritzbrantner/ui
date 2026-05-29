@@ -5,7 +5,10 @@
 ### Minor Changes
 
 - Add public `TagInput`, `DisclosurePanel`, `ResourceList`, `ViewHeader`, `DetailsPanel`, and `ConfirmAction` components for reusable app surfaces.
-- Expand chart, org-chart, UML, workflow-node, and workflow-builder interactions with keyboard navigation, selection, node actions, snapping, rewire, and disconnect coverage.
+- Add `@moritzbrantner/ui/social` for chat, social actions, social feed, and profile summary components, and remove the old chat box API.
+- Remove UI labs workflow editor surfaces; use `@moritzbrantner/workflow-editor/react` for workflow editing UI.
+- Remove the UI labs timeline editor; use `@moritzbrantner/timeline-editor/react` for timeline editing UI.
+- Expand chart, org-chart, and UML interactions with keyboard navigation and selection coverage.
 - Improve `Citation` support for ranged excerpts with omissions and additions.
 - Tighten responsive behavior across root-public stable and pattern components.
 - Replace stale selector styling with Radix `data-state` variants and add a package check to prevent regressions.

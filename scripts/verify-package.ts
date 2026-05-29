@@ -47,9 +47,30 @@ assert.equal(typeof stable.Dialog, "function", "stable entry should expose Dialo
 const patterns = await importPackage("@moritzbrantner/ui/patterns");
 assert.equal(typeof patterns.DataGrid, "function", "patterns entry should expose DataGrid");
 assert.equal(typeof patterns.ActionMenu, "function", "patterns entry should expose ActionMenu");
+assert.equal(
+  Object.hasOwn(patterns, "Chat"),
+  false,
+  "patterns entry should not expose social components",
+);
+
+const social = await importPackage("@moritzbrantner/ui/social");
+assert.equal(typeof social.Chat, "function", "social entry should expose Chat");
+assert.equal(typeof social.SocialActionGroup, "function", "social entry should expose social actions");
+assert.equal(typeof social.SocialPost, "function", "social entry should expose social feed");
+assert.equal(typeof social.ProfileSummary, "function", "social entry should expose ProfileSummary");
+assert.equal(
+  Object.hasOwn(social, "Chat" + "Box"),
+  false,
+  "social entry should not expose the removed chat box API",
+);
 
 const labs = await importPackage("@moritzbrantner/ui/labs");
-assert.equal(typeof labs.WorkflowBuilder, "function", "labs entry should expose WorkflowBuilder");
+assert.equal(typeof labs.Timeline, "function", "labs entry should expose Timeline");
+assert.equal(
+  Object.hasOwn(labs, "WorkflowBuilder"),
+  false,
+  "labs entry should not expose workflow editor components",
+);
 
 const legacy = await importPackage("@moritzbrantner/ui/legacy");
 assert.equal(typeof legacy.DataTable, "function", "legacy entry should expose DataTable");
@@ -141,11 +162,11 @@ assert.equal(typeof dataGrid.DataGrid, "function", "data-grid subpath should exp
 const dialog = await importPackage("@moritzbrantner/ui/components/stable/dialog");
 assert.equal(typeof dialog.Dialog, "function", "dialog subpath should expose Dialog");
 
-const workflowBuilder = await importPackage("@moritzbrantner/ui/components/labs/workflow-builder");
+const socialChat = await importPackage("@moritzbrantner/ui/components/social/chat");
 assert.equal(
-  typeof workflowBuilder.WorkflowBuilder,
+  typeof socialChat.Chat,
   "function",
-  "labs workflow-builder subpath should expose WorkflowBuilder",
+  "social chat subpath should expose Chat",
 );
 
 const dataTable = await importPackage("@moritzbrantner/ui/components/legacy/data-table");
@@ -188,6 +209,8 @@ const requiredPackageFiles = [
   "dist/stable.d.ts",
   "dist/patterns.js",
   "dist/patterns.d.ts",
+  "dist/social.js",
+  "dist/social.d.ts",
   "dist/labs.js",
   "dist/labs.d.ts",
   "dist/legacy.js",
@@ -208,8 +231,8 @@ const requiredPackageFiles = [
   "dist/components/stable/dialog.d.ts",
   "dist/components/patterns/data-grid.js",
   "dist/components/patterns/data-grid.d.ts",
-  "dist/components/labs/workflow-builder.js",
-  "dist/components/labs/workflow-builder.d.ts",
+  "dist/components/social/chat.js",
+  "dist/components/social/chat.d.ts",
   "dist/components/legacy/data-table.js",
   "dist/components/legacy/data-table.d.ts",
   "dist/lib/cn.js",

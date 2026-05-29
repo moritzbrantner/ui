@@ -95,73 +95,12 @@ const benchmarks: BenchmarkRunner[] = [
       labs.evaluateQueryBuilderExpression(expression, row, fields);
     }
   }),
-  benchmark("logic.workflowConnectionValidation", "logic", () => {
-    const nodes = Array.from({ length: 200 }, (_, index) => ({
-      id: `node-${index}`,
-      label: `Node ${index}`,
-      x: index * 12,
-      y: index * 6,
-      inputs: [{ id: "in", label: "Input", kind: "text" }],
-      outputs: [{ id: "out", label: "Output", kind: "text" }],
-    }));
-    const edges = Array.from({ length: 400 }, (_, index) => ({
-      id: `edge-${index}`,
-      sourceNodeId: `node-${index % 199}`,
-      sourcePortId: "out",
-      targetNodeId: `node-${(index + 1) % 199}`,
-      targetPortId: "in",
-    }));
-
-    labs.getWorkflowBuilderConnectionValidity({
-      nodes,
-      edges,
-      sourceNodeId: "node-10",
-      sourcePortId: "out",
-      targetNodeId: "node-150",
-      targetPortId: "in",
-    });
-  }),
-  benchmark("logic.workflowBuilderConnectionValidity1000", "logic", () => {
-    const nodes = createWorkflowNodes(150);
-    const edges = createWorkflowEdges(250, 150);
-
-    for (let index = 0; index < 1000; index += 1) {
-      labs.getWorkflowBuilderConnectionValidity({
-        nodes,
-        edges,
-        sourceNodeId: `node-${index % 75}`,
-        sourcePortId: "out",
-        targetNodeId: `node-${(index % 75) + 75}`,
-        targetPortId: "in",
-      });
-    }
-  }),
   benchmark("logic.dataGridFilter1000Rows", "logic", () => {
     const rows = createRows(1000);
 
     rows.filter((row) =>
       [row.name, row.amount, row.status].join(" ").toLocaleLowerCase().includes("paid"),
     );
-  }),
-  benchmark("logic.timelineHelpers1000", "logic", () => {
-    const tracks = [
-      {
-        id: "main",
-        label: "Main",
-        clips: Array.from({ length: 1000 }, (_, index) => ({
-          id: `clip-${index}`,
-          label: `Clip ${index}`,
-          start: index * 1.25,
-          end: index * 1.25 + 0.75,
-        })),
-      },
-    ];
-
-    labs.moveTimelineEditorClip(tracks, "clip-250", 375, { duration: 2000, snapInterval: 0.25 });
-    labs.resizeTimelineEditorClip(tracks, "clip-500", "end", 630, {
-      duration: 2000,
-      snapInterval: 0.25,
-    });
   }),
   benchmark("render.dataGrid100", "render", () => {
     renderUi(
@@ -203,15 +142,6 @@ const benchmarks: BenchmarkRunner[] = [
             ]),
           ),
         ),
-      }),
-    );
-  }),
-  benchmark("render.workflowBuilder50Nodes80Edges", "render", () => {
-    renderUi(
-      React.createElement(labs.WorkflowBuilder, {
-        nodes: createWorkflowNodes(50).map((node) => ({ ...node, variant: "compact" })),
-        edges: createWorkflowEdges(80, 50),
-        showMiniMap: true,
       }),
     );
   }),

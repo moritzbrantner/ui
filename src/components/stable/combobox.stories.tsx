@@ -36,7 +36,7 @@ export const Basic: Story = {
           <ComboboxGroup>
             <ComboboxLabel>Packages</ComboboxLabel>
             <ComboboxItem value="ui">@moritzbrantner/ui</ComboboxItem>
-            <ComboboxItem value="frontend-ui">@moritzbrantner/frontend-ui</ComboboxItem>
+            <ComboboxItem value="social">@moritzbrantner/ui/social</ComboboxItem>
           </ComboboxGroup>
           <ComboboxEmpty>No package found.</ComboboxEmpty>
         </ComboboxList>

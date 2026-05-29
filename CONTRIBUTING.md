@@ -21,7 +21,7 @@ Belongs outside `@moritzbrantner/ui`:
 - Data-entry workflows.
 - Product-specific empty states or onboarding flows.
 
-Use `@moritzbrantner/frontend-ui` for product patterns that compose the design system with contracts, runtime data, roles, pages, or application behavior. Generic menus can live in `@moritzbrantner/ui` only when they remain state-free and contract-free.
+Use consuming app packages for product patterns that compose the design system with contracts, runtime data, roles, pages, or application behavior. Generic menus can live in `@moritzbrantner/ui` only when they remain state-free and contract-free.
 
 See [docs/design-system.md](./docs/design-system.md) for app-scale usage recipes, import boundaries, and package ownership rules.
 

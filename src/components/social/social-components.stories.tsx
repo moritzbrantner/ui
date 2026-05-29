@@ -8,16 +8,16 @@ import { expect } from "storybook/test";
 import { Avatar } from "../stable/avatar";
 import { Button } from "../stable/button";
 import {
-  ChatBox,
-  ChatBoxBody,
-  ChatBoxBubble,
-  ChatBoxDescription,
-  ChatBoxFooter,
-  ChatBoxHeader,
-  ChatBoxMessage,
-  ChatBoxMeta,
-  ChatBoxTitle,
-} from "./chat-box";
+  Chat,
+  ChatBubble,
+  ChatDescription,
+  ChatHeader,
+  ChatMessage,
+  ChatMessageContent,
+  ChatMessageMeta,
+  ChatThread,
+  ChatTitle,
+} from "./chat";
 import {
   ProfileSummary,
   ProfileSummaryActions,
@@ -32,7 +32,7 @@ import {
   ProfileSummaryStats,
   ProfileSummarySubtitle,
   ProfileSummaryTitle,
-} from "../labs/profile-summary";
+} from "./profile-summary";
 import {
   CommentButton,
   FollowButton,
@@ -262,26 +262,28 @@ function SocialComponentsPreview() {
           </SocialPostBody>
         </SocialPost>
 
-        <ChatBox variant="compact">
-          <ChatBoxHeader>
+        <Chat>
+          <ChatHeader>
             <div className="min-w-0">
-              <ChatBoxTitle>Direct thread</ChatBoxTitle>
-              <ChatBoxDescription>Mira is active now</ChatBoxDescription>
+              <ChatTitle>Direct thread</ChatTitle>
+              <ChatDescription>Mira is active now</ChatDescription>
             </div>
-          </ChatBoxHeader>
-          <ChatBoxBody className="max-h-64">
-            <ChatBoxMessage>
-              <ChatBoxMeta>Mira, 09:30</ChatBoxMeta>
-              <ChatBoxBubble>The feed update looks ready for review.</ChatBoxBubble>
-            </ChatBoxMessage>
-            <ChatBoxMessage align="end">
-              <ChatBoxMeta>You, now</ChatBoxMeta>
-              <ChatBoxBubble>
-                I’m posting the final cut after the last analytics pass.
-              </ChatBoxBubble>
-            </ChatBoxMessage>
-          </ChatBoxBody>
-          <ChatBoxFooter>
+          </ChatHeader>
+          <ChatThread className="max-h-64">
+            <ChatMessage>
+              <ChatMessageContent>
+                <ChatMessageMeta>Mira, 09:30</ChatMessageMeta>
+                <ChatBubble>The feed update looks ready for review.</ChatBubble>
+              </ChatMessageContent>
+            </ChatMessage>
+            <ChatMessage align="end">
+              <ChatMessageContent>
+                <ChatMessageMeta>You, now</ChatMessageMeta>
+                <ChatBubble>I’m posting the final cut after the last analytics pass.</ChatBubble>
+              </ChatMessageContent>
+            </ChatMessage>
+          </ChatThread>
+          <div className="border-t border-border/60 p-3">
             <SocialActionGroup>
               <LikeButton
                 liked={liked}
@@ -291,8 +293,8 @@ function SocialComponentsPreview() {
               />
               <ShareButton count={16} size="sm" />
             </SocialActionGroup>
-          </ChatBoxFooter>
-        </ChatBox>
+          </div>
+        </Chat>
       </div>
     </div>
   );
@@ -380,33 +382,37 @@ export const SocialFeed: Story = {
   },
 };
 
-export const ChatBoxThread: Story = {
+export const ChatThreadPreview: Story = {
   render: () => (
     <div className="max-w-lg">
-      <ChatBox variant="compact">
-        <ChatBoxHeader>
+      <Chat>
+        <ChatHeader>
           <div className="min-w-0">
-            <ChatBoxTitle>Direct thread</ChatBoxTitle>
-            <ChatBoxDescription>Mira is active now</ChatBoxDescription>
+            <ChatTitle>Direct thread</ChatTitle>
+            <ChatDescription>Mira is active now</ChatDescription>
           </div>
-        </ChatBoxHeader>
-        <ChatBoxBody className="max-h-72">
-          <ChatBoxMessage>
-            <ChatBoxMeta>Mira, 09:30</ChatBoxMeta>
-            <ChatBoxBubble>The feed update looks ready for review.</ChatBoxBubble>
-          </ChatBoxMessage>
-          <ChatBoxMessage align="end">
-            <ChatBoxMeta>You, now</ChatBoxMeta>
-            <ChatBoxBubble>I’m posting the final cut after the last analytics pass.</ChatBoxBubble>
-          </ChatBoxMessage>
-        </ChatBoxBody>
-        <ChatBoxFooter>
+        </ChatHeader>
+        <ChatThread className="max-h-72">
+          <ChatMessage>
+            <ChatMessageContent>
+              <ChatMessageMeta>Mira, 09:30</ChatMessageMeta>
+              <ChatBubble>The feed update looks ready for review.</ChatBubble>
+            </ChatMessageContent>
+          </ChatMessage>
+          <ChatMessage align="end">
+            <ChatMessageContent>
+              <ChatMessageMeta>You, now</ChatMessageMeta>
+              <ChatBubble>I’m posting the final cut after the last analytics pass.</ChatBubble>
+            </ChatMessageContent>
+          </ChatMessage>
+        </ChatThread>
+        <div className="border-t border-border/60 p-3">
           <SocialActionGroup>
             <LikeButton liked count={128} size="sm" />
             <ShareButton count={16} size="sm" />
           </SocialActionGroup>
-        </ChatBoxFooter>
-      </ChatBox>
+        </div>
+      </Chat>
     </div>
   ),
   play: async ({ canvas }) => {

@@ -2,15 +2,16 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, test, vi } from "vitest";
 
+import { Button } from "../stable/button";
 import {
-  Button,
-  ChatBox,
-  ChatBoxBody,
-  ChatBoxBubble,
-  ChatBoxHeader,
-  ChatBoxMessage,
-  ChatBoxMeta,
-  ChatBoxTitle,
+  Chat,
+  ChatBubble,
+  ChatHeader,
+  ChatMessage,
+  ChatMessageContent,
+  ChatMessageMeta,
+  ChatThread,
+  ChatTitle,
   CommentButton,
   FollowButton,
   LikeButton,
@@ -39,9 +40,15 @@ import {
   SocialPostTitle,
   ShareButton,
   SocialActionGroup,
-} from "../../index";
+} from "../../social";
 import {
   ImageFilterEditor,
+  getImageFilterStyle,
+  imageFilterPresets,
+  normalizeImageFilterValue,
+  type ImageFilterValue,
+} from "../../labs";
+import {
   ProfileSummary,
   ProfileSummaryActions,
   ProfileSummaryAvatar,
@@ -53,11 +60,7 @@ import {
   ProfileSummaryStatValue,
   ProfileSummaryStats,
   ProfileSummaryTitle,
-  getImageFilterStyle,
-  imageFilterPresets,
-  normalizeImageFilterValue,
-  type ImageFilterValue,
-} from "../../labs";
+} from "../../social";
 
 const filteredValue: ImageFilterValue = {
   brightness: 120,
@@ -199,23 +202,27 @@ describe("social components", () => {
     expect(screen.getByRole("button", { name: "Follow Ada Lovelace" })).toBeTruthy();
   });
 
-  test("renders a chat box as a live log with aligned messages", () => {
+  test("renders a chat thread as a live log with aligned messages", () => {
     const { container } = render(
-      <ChatBox>
-        <ChatBoxHeader>
-          <ChatBoxTitle>Project chat</ChatBoxTitle>
-        </ChatBoxHeader>
-        <ChatBoxBody>
-          <ChatBoxMessage>
-            <ChatBoxMeta>Mira, 09:30</ChatBoxMeta>
-            <ChatBoxBubble>Ready for review.</ChatBoxBubble>
-          </ChatBoxMessage>
-          <ChatBoxMessage align="end">
-            <ChatBoxMeta>You, now</ChatBoxMeta>
-            <ChatBoxBubble>Looks good.</ChatBoxBubble>
-          </ChatBoxMessage>
-        </ChatBoxBody>
-      </ChatBox>,
+      <Chat>
+        <ChatHeader>
+          <ChatTitle>Project chat</ChatTitle>
+        </ChatHeader>
+        <ChatThread>
+          <ChatMessage>
+            <ChatMessageContent>
+              <ChatMessageMeta>Mira, 09:30</ChatMessageMeta>
+              <ChatBubble>Ready for review.</ChatBubble>
+            </ChatMessageContent>
+          </ChatMessage>
+          <ChatMessage align="end">
+            <ChatMessageContent>
+              <ChatMessageMeta>You, now</ChatMessageMeta>
+              <ChatBubble>Looks good.</ChatBubble>
+            </ChatMessageContent>
+          </ChatMessage>
+        </ChatThread>
+      </Chat>,
     );
 
     expect(screen.getByRole("log")).toBeTruthy();

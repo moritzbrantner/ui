@@ -13,17 +13,9 @@ import {
   DocumentViewer,
   ImageCropper,
   ImageFilterEditor,
-  InspectorPanel,
   QueryBuilder,
-  TimelineEditor,
-  WorkflowBuilder,
-  WorkflowNode,
-  type InspectorPanelSectionData,
   type QueryBuilderExpression,
   type QueryBuilderField,
-  type TimelineEditorTrack,
-  type WorkflowBuilderEdge,
-  type WorkflowBuilderNodeData,
 } from "../../labs";
 
 const imageSrc =
@@ -55,33 +47,6 @@ beforeAll(() => {
 function openMenu(trigger: HTMLElement) {
   fireEvent.keyDown(trigger, { key: "Enter", code: "Enter" });
 }
-
-const workflowNodes: WorkflowBuilderNodeData[] = [
-  {
-    id: "source",
-    label: "Source",
-    x: 24,
-    y: 40,
-    outputs: [{ id: "records", label: "Records", kind: "record" }],
-  },
-  {
-    id: "review",
-    label: "Review",
-    x: 320,
-    y: 72,
-    inputs: [{ id: "records", label: "Records", kind: "record" }],
-  },
-];
-
-const workflowEdges: WorkflowBuilderEdge[] = [
-  {
-    id: "source-review",
-    sourceNodeId: "source",
-    sourcePortId: "records",
-    targetNodeId: "review",
-    targetPortId: "records",
-  },
-];
 
 describe("@moritzbrantner/ui release readiness composed components", () => {
   test("document viewer changes pages, searches text, and selects highlights", async () => {
@@ -164,48 +129,6 @@ describe("@moritzbrantner/ui release readiness composed components", () => {
     );
   });
 
-  test("inspector panel tracks dirty values, validation text, reset, and apply callbacks", () => {
-    const onValuesChange = vi.fn();
-    const onApply = vi.fn();
-    const sections: InspectorPanelSectionData[] = [
-      {
-        id: "content",
-        title: "Content",
-        fields: [
-          { id: "title", label: "Title", type: "text", value: "Draft release" },
-          { id: "published", label: "Published", type: "boolean", value: false },
-        ],
-      },
-    ];
-
-    render(
-      <InspectorPanel
-        sections={sections}
-        validationMessages={{ title: "Title needs review." }}
-        onApply={onApply}
-        onValuesChange={onValuesChange}
-      />,
-    );
-
-    fireEvent.change(screen.getByLabelText("Title"), { target: { value: "Release 0.5.4" } });
-
-    expect(screen.getByText("Unsaved")).toBeTruthy();
-    expect(screen.getByText("Title needs review.")).toBeTruthy();
-    expect(onValuesChange).toHaveBeenCalledWith(
-      expect.objectContaining({ title: "Release 0.5.4" }),
-      true,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
-    expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ title: "Release 0.5.4" }));
-
-    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
-    expect(onValuesChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ title: "Draft release" }),
-      false,
-    );
-  });
-
   test("platform navbar opens a group, navigates, and renders integrated action menus", async () => {
     const onNavigate = vi.fn();
     const groups: PlatformNavbarGroup[] = [
@@ -271,99 +194,6 @@ describe("@moritzbrantner/ui release readiness composed components", () => {
         rules: expect.arrayContaining([expect.objectContaining({ fieldId: "title" })]),
       }),
     );
-  });
-
-  test("timeline editor selects clips, nudges selected clips, deletes, and moves playhead", () => {
-    const onTracksChange = vi.fn();
-    const onClipDelete = vi.fn();
-    const onCurrentTimeChange = vi.fn();
-    const tracks: TimelineEditorTrack[] = [
-      {
-        id: "main",
-        label: "Main",
-        clips: [{ id: "intro", label: "Intro", start: 1, end: 3 }],
-      },
-    ];
-
-    render(
-      <TimelineEditor
-        tracks={tracks}
-        duration={10}
-        selectedClipId="intro"
-        onClipDelete={onClipDelete}
-        onCurrentTimeChange={onCurrentTimeChange}
-        onTracksChange={onTracksChange}
-      />,
-    );
-
-    const editor = screen
-      .getByText("Intro")
-      .closest('[data-slot="timeline-editor"]') as HTMLElement;
-
-    fireEvent.keyDown(editor, { key: "ArrowRight" });
-    expect(onTracksChange).toHaveBeenCalledWith([
-      expect.objectContaining({
-        clips: [expect.objectContaining({ id: "intro", start: 1.25, end: 3.25 })],
-      }),
-    ]);
-
-    fireEvent.keyDown(editor, { key: "Delete" });
-    expect(onClipDelete).toHaveBeenCalledWith("intro");
-
-    fireEvent.pointerDown(document.querySelector('[data-slot="timeline-editor-ruler"]')!);
-    expect(onCurrentTimeChange).toHaveBeenCalledWith(0);
-  });
-
-  test("workflow builder selects nodes and deletes the selected graph item", () => {
-    const onNodesChange = vi.fn();
-    const onEdgesChange = vi.fn();
-    const onSelectionChange = vi.fn();
-
-    render(
-      <WorkflowBuilder
-        nodes={workflowNodes}
-        edges={workflowEdges}
-        onEdgesChange={onEdgesChange}
-        onNodesChange={onNodesChange}
-        onSelectionChange={onSelectionChange}
-      />,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Source" }));
-    expect(onSelectionChange).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "node", id: "source" }),
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Delete selected" }));
-    expect(onNodesChange).toHaveBeenCalledWith([expect.objectContaining({ id: "review" })]);
-    expect(onEdgesChange).toHaveBeenCalledWith([]);
-  });
-
-  test("workflow node exposes selection, port, and minimized callbacks", () => {
-    const onNodeSelect = vi.fn();
-    const onOutputClick = vi.fn();
-    const onMinimizedChange = vi.fn();
-
-    render(
-      <WorkflowNode
-        node={workflowNodes[0]}
-        onMinimizedChange={onMinimizedChange}
-        onNodeSelect={onNodeSelect}
-        onOutputClick={onOutputClick}
-      />,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Source" }));
-    expect(onNodeSelect).toHaveBeenCalledWith(expect.objectContaining({ id: "source" }));
-
-    fireEvent.click(screen.getByRole("button", { name: "Source Records" }));
-    expect(onOutputClick).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "records" }),
-      expect.objectContaining({ id: "source" }),
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Minimize Source" }));
-    expect(onMinimizedChange).toHaveBeenCalledWith(expect.objectContaining({ id: "source" }), true);
   });
 
   test("account and notification menus preserve state-light callbacks and disabled states", async () => {

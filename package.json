@@ -46,6 +46,10 @@
       "types": "./dist/patterns.d.ts",
       "import": "./dist/patterns.js"
     },
+    "./social": {
+      "types": "./dist/social.d.ts",
+      "import": "./dist/social.js"
+    },
     "./labs": {
       "types": "./dist/labs.d.ts",
       "import": "./dist/labs.js"
@@ -109,6 +113,10 @@
     "./components/patterns/*": {
       "types": "./dist/components/patterns/*.d.ts",
       "import": "./dist/components/patterns/*.js"
+    },
+    "./components/social/*": {
+      "types": "./dist/components/social/*.d.ts",
+      "import": "./dist/components/social/*.js"
     },
     "./components/labs/*": {
       "types": "./dist/components/labs/*.d.ts",

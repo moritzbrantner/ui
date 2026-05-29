@@ -6,7 +6,7 @@ const storybookStoryIds = [
   "components-forms-inputs-form-controls--basic",
   "components-data-display-data-grid--default",
   "components-layout-app-shell--comprehensive-app-shell",
-  "components-editors-workflow-builder--controlled-viewport",
+  "components-social-overview--social-feed",
   "patterns-release-readiness--consumer-dashboard-shell-story",
   "components-data-display-chart--business-dashboard",
   "components-forms-inputs-calendar--with-events",

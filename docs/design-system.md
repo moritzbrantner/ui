@@ -11,7 +11,8 @@ Use tiered component subpaths for bundle-sensitive comprehensive apps. Use `@mor
 ```tsx
 import { Button } from "@moritzbrantner/ui/components/stable/button";
 import { DataGrid } from "@moritzbrantner/ui/components/patterns/data-grid";
-import { WorkflowBuilder } from "@moritzbrantner/ui/components/labs/workflow-builder";
+import { Chat } from "@moritzbrantner/ui/components/social/chat";
+import { Timeline } from "@moritzbrantner/ui/components/labs/timeline";
 import { uiTheme } from "@moritzbrantner/ui/atlas/server";
 import { cn, themeConfig } from "@moritzbrantner/ui/server";
 ```
@@ -20,6 +21,7 @@ Component tiers:
 
 - `stable`: primitives and low-level controls with the strongest support and contract checks.
 - `patterns`: state-light composed UI for common app workflows.
+- `social`: state-light chat, social actions, social feed, and profile summary UI.
 - `labs`: experimental public components. They are not root-exported and may change faster.
 - `legacy`: deprecated public components. They are not root-exported and require migration metadata.
 
@@ -29,7 +31,7 @@ Migration examples:
 | ------------------------------------------------ | ----------------------------------------------------- |
 | `@moritzbrantner/ui/components/button`           | `@moritzbrantner/ui/components/stable/button`         |
 | `@moritzbrantner/ui/components/data-grid`        | `@moritzbrantner/ui/components/patterns/data-grid`    |
-| `@moritzbrantner/ui/components/workflow-builder` | `@moritzbrantner/ui/components/labs/workflow-builder` |
+| `@moritzbrantner/ui/components/chat`             | `@moritzbrantner/ui/components/social/chat`           |
 | `@moritzbrantner/ui/components/data-table`       | `@moritzbrantner/ui/components/legacy/data-table`     |
 
 ## Styles And Themes
@@ -60,7 +62,7 @@ Upload queue: compose `Dropzone` and `UploadQueue`. Apps own transport, file sto
 
 Command palette: pass app-owned command groups to `CommandPalette`. Apps own routing, permissions, and side effects.
 
-Workflow editor: use `WorkflowBuilder` for graph layout, viewport control, selection, and connection interaction. Apps own execution, persistence, permissions, run state, and backend workflow contracts.
+Workflow editor: use `@moritzbrantner/workflow-editor/react` for graph editing surfaces. Apps own execution, persistence, permissions, run state, and backend workflow contracts.
 
 Theme switching: wire `ThemeModeSwitch` to the app theme provider or controlled state. `Toaster` accepts an optional `theme` prop and otherwise follows `next-themes`.
 

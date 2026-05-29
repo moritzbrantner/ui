@@ -10,7 +10,7 @@ import {
   type InspectorFieldDefinition,
   type InspectorFieldValue,
   type InspectorPanelSectionData,
-} from "./inspector-panel";
+} from "../internal/inspector-panel";
 import { ScrollArea } from "../stable/scroll-area";
 import { Separator } from "../stable/separator";
 

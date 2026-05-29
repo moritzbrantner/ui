@@ -3,17 +3,11 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
   BellIcon,
   CommandIcon,
-  DatabaseIcon,
   FileTextIcon,
-  ImageIcon,
-  LayersIcon,
   SearchIcon,
-  SettingsIcon,
-  WorkflowIcon,
 } from "lucide-react";
 import { expect, fn } from "storybook/test";
 
-import { AnnotationCanvas, type AnnotationCanvasAnnotation } from "../labs/annotation-canvas";
 import { Badge } from "../stable/badge";
 import { Button } from "../stable/button";
 import { CommandPalette, type CommandPaletteGroup } from "./command-palette";
@@ -31,25 +25,17 @@ import {
   ValidationSummary,
 } from "../stable/form-layout";
 import { Input } from "../stable/input";
-import { InspectorPanel, type InspectorPanelSectionData } from "../labs/inspector-panel";
 import { NotificationMenu } from "./notification-menu";
 import { PageContent, PageHeader, PageShell, PageTitle, Surface } from "./app-layout";
 import { PlatformNavbar, type PlatformNavbarGroup } from "./platform-navbar";
 import { PlatformNavbarActions } from "./platform-navbar-actions";
 import { SelectDropdown } from "../stable/select";
 import { Switch } from "../stable/switch";
-import { TimelineEditor, type TimelineEditorTrack } from "../labs/timeline-editor";
 import { Toaster } from "../stable/sonner";
-import {
-  WorkflowBuilder,
-  type WorkflowBuilderEdge,
-  type WorkflowBuilderNodeData,
-} from "../labs/workflow-builder";
-import { WorkbenchLayout } from "./workbench-layout";
 
 const dashboardRows = [
   { package: "@moritzbrantner/ui", status: "Ready", coverage: "CI only", owner: "Design" },
-  { package: "@moritzbrantner/frontend-ui", status: "Watching", coverage: "Smoke", owner: "App" },
+  { package: "@moritzbrantner/social", status: "Watching", coverage: "Smoke", owner: "App" },
   { package: "@moritzbrantner/api", status: "Queued", coverage: "Contract", owner: "Core" },
 ];
 
@@ -94,73 +80,6 @@ const commandGroups = [
     ],
   },
 ] satisfies CommandPaletteGroup[];
-
-const annotations: AnnotationCanvasAnnotation[] = [
-  {
-    id: "hero",
-    label: "Preview crop",
-    shape: "rectangle",
-    color: "#2563eb",
-    points: [
-      { x: 90, y: 80 },
-      { x: 260, y: 160 },
-    ],
-  },
-];
-
-const editorTracks: TimelineEditorTrack[] = [
-  {
-    id: "main",
-    label: "Main",
-    clips: [
-      { id: "intro", label: "Intro", start: 0.5, end: 2.5, color: "#2563eb" },
-      { id: "review", label: "Review", start: 3, end: 5.5, color: "#166534" },
-    ],
-  },
-];
-
-const workflowNodes: WorkflowBuilderNodeData[] = [
-  {
-    id: "source",
-    label: "Source",
-    category: "Input",
-    variant: "compact",
-    x: 32,
-    y: 48,
-    outputs: [{ id: "asset", label: "Asset", kind: "image" }],
-  },
-  {
-    id: "review",
-    label: "Review",
-    category: "Human",
-    variant: "compact",
-    x: 340,
-    y: 72,
-    inputs: [{ id: "asset", label: "Asset", kind: "image" }],
-    outputs: [{ id: "decision", label: "Decision", kind: "state" }],
-  },
-];
-
-const workflowEdges: WorkflowBuilderEdge[] = [
-  {
-    id: "source-review",
-    sourceNodeId: "source",
-    sourcePortId: "asset",
-    targetNodeId: "review",
-    targetPortId: "asset",
-  },
-];
-
-const inspectorSections: InspectorPanelSectionData[] = [
-  {
-    id: "release",
-    title: "Release Item",
-    fields: [
-      { id: "title", label: "Title", type: "text", value: "Release preview" },
-      { id: "enabled", label: "Enabled", type: "boolean", value: true },
-    ],
-  },
-];
 
 function ConsumerDashboardShell({
   onOpenCommand = () => undefined,
@@ -247,59 +166,6 @@ function ConsumerDashboardShell({
       />
       <Toaster />
     </PageShell>
-  );
-}
-
-function EditorWorkspace({ onSelectNode = () => undefined }: { onSelectNode?: () => void }) {
-  const [nodes, setNodes] = React.useState(workflowNodes);
-  const [edges, setEdges] = React.useState(workflowEdges);
-
-  return (
-    <WorkbenchLayout
-      className="h-[760px] w-[min(1180px,calc(100vw-2rem))]"
-      toolbar={
-        <>
-          <Button size="sm">
-            <WorkflowIcon />
-            Run
-          </Button>
-          <Button size="sm" variant="outline">
-            <SettingsIcon />
-            Settings
-          </Button>
-        </>
-      }
-      leftPanel={
-        <div className="grid gap-3">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <LayersIcon className="size-4 text-muted-foreground" />
-            Assets
-          </div>
-          <AnnotationCanvas annotations={annotations} width={360} height={220} />
-        </div>
-      }
-      rightPanel={
-        <InspectorPanel
-          className="min-h-0"
-          sections={inspectorSections}
-          title="Inspector"
-          description="State-light metadata controls."
-        />
-      }
-      bottomPanel={<TimelineEditor duration={8} tracks={editorTracks} selectedClipId="intro" />}
-    >
-      <WorkflowBuilder
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={setNodes}
-        onEdgesChange={setEdges}
-        onSelectionChange={(selection) => {
-          if (selection?.type === "node") {
-            onSelectNode();
-          }
-        }}
-      />
-    </WorkbenchLayout>
   );
 }
 
@@ -401,18 +267,6 @@ export const ConsumerDashboardShellStory: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Commands" }));
     await expect(args.onOpenCommand).toHaveBeenCalled();
     await expect(canvasElement.ownerDocument.body).toHaveTextContent("Open release checks");
-  },
-};
-
-export const EditorWorkspaceStory: StoryObj<typeof EditorWorkspace> = {
-  name: "Editor Workspace",
-  render: (args) => <EditorWorkspace {...args} />,
-  args: {
-    onSelectNode: fn(),
-  },
-  play: async ({ args, canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: "Source" }));
-    await expect(args.onSelectNode).toHaveBeenCalled();
   },
 };
 

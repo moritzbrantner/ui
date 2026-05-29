@@ -2,8 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, test, vi } from "vitest";
 
+import { Button } from "../stable/button";
 import {
-  Button,
   Chat,
   ChatBubble,
   ChatComposer,
@@ -16,14 +16,6 @@ import {
   ChatSendButton,
   ChatThread,
   ChatTitle,
-  ChatBox,
-  ChatBoxBody,
-  ChatBoxBubble,
-  ChatBoxFooter,
-  ChatBoxHeader,
-  ChatBoxMessage,
-  ChatBoxMeta,
-  ChatBoxTitle,
   CommentButton,
   FollowButton,
   LikeButton,
@@ -51,9 +43,9 @@ import {
   SocialPostMetrics,
   SocialPostText,
   SocialPostTitle,
-} from "../../index";
+} from "../../social";
 
-describe("pattern chat and social surfaces", () => {
+describe("social chat and feed surfaces", () => {
   test("renders chat and submits composer through local callback only", () => {
     const onSubmit = vi.fn((event: React.FormEvent<HTMLFormElement>) => event.preventDefault());
 
@@ -86,31 +78,34 @@ describe("pattern chat and social surfaces", () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
-  test("renders chat box with aligned messages", () => {
+  test("renders chat with aligned messages", () => {
     render(
-      <ChatBox variant="compact">
-        <ChatBoxHeader>
-          <ChatBoxTitle>Direct thread</ChatBoxTitle>
-        </ChatBoxHeader>
-        <ChatBoxBody>
-          <ChatBoxMessage>
-            <ChatBoxMeta>Mira</ChatBoxMeta>
-            <ChatBoxBubble>Looks ready.</ChatBoxBubble>
-          </ChatBoxMessage>
-          <ChatBoxMessage align="end">
-            <ChatBoxMeta>You</ChatBoxMeta>
-            <ChatBoxBubble>Publishing now.</ChatBoxBubble>
-          </ChatBoxMessage>
-        </ChatBoxBody>
-        <ChatBoxFooter>2 messages</ChatBoxFooter>
-      </ChatBox>,
+      <Chat>
+        <ChatHeader>
+          <ChatTitle>Direct thread</ChatTitle>
+        </ChatHeader>
+        <ChatThread>
+          <ChatMessage>
+            <ChatMessageContent>
+              <ChatMessageMeta>Mira</ChatMessageMeta>
+              <ChatBubble>Looks ready.</ChatBubble>
+            </ChatMessageContent>
+          </ChatMessage>
+          <ChatMessage align="end">
+            <ChatMessageContent>
+              <ChatMessageMeta>You</ChatMessageMeta>
+              <ChatBubble>Publishing now.</ChatBubble>
+            </ChatMessageContent>
+          </ChatMessage>
+        </ChatThread>
+      </Chat>,
     );
 
     expect(screen.getByRole("log")).toBeTruthy();
     expect(
       screen
         .getByText("Publishing now.")
-        .closest('[data-slot="chat-box-message"]')
+        .closest('[data-slot="chat-message"]')
         ?.getAttribute("data-align"),
     ).toBe("end");
   });

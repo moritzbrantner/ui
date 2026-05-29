@@ -6,9 +6,9 @@ Shared Tailwind 4 React UI primitives, layout components, and global theme style
 
 `@moritzbrantner/ui` is the low-level design-system package. It owns shared tokens, primitives, composed components, theme metadata, Storybook coverage, and package-consumption guarantees.
 
-Keep product workflows in higher-level packages such as `@moritzbrantner/frontend-ui`. Complete frontend surfaces, pages, navigation composition, roles, auth/session state, admin/account/settings/profile workflows, and other app-specific behavior should compose `@moritzbrantner/ui` instead of living in it.
+Keep product workflows in higher-level app packages. Complete frontend surfaces, pages, navigation composition, roles, auth/session state, admin/account/settings/profile workflows, and other app-specific behavior should compose `@moritzbrantner/ui` instead of living in it.
 
-Generic visual affordances such as `AccountMenu` and `NotificationMenu` live in this package only when they stay state-free and contract-free. Apps and `@moritzbrantner/frontend-ui` own the menu content, routing, auth/session state, notification state, and backend behavior.
+Generic visual affordances such as `AccountMenu` and `NotificationMenu` live in this package only when they stay state-free and contract-free. Apps own the menu content, routing, auth/session state, notification state, and backend behavior.
 
 ## Install
 
@@ -115,6 +115,7 @@ Components are organized into support tiers:
 
 - `stable`: primitives and low-level controls with the strongest API expectations.
 - `patterns`: state-light composed components for common app layouts and workflows.
+- `social`: state-light social, chat, feed, action, and profile summary components.
 - `labs`: experimental components that are public only through explicit labs paths and can change faster.
 - `legacy`: retained compatibility components that should not be used for new work.
 
@@ -139,17 +140,19 @@ Component subpaths are preferred for bundle-sensitive comprehensive apps:
 ```tsx
 import { Button } from "@moritzbrantner/ui/components/stable/button";
 import { DataGrid } from "@moritzbrantner/ui/components/patterns/data-grid";
+import { Chat } from "@moritzbrantner/ui/components/social/chat";
 import { cn } from "@moritzbrantner/ui/server";
 ```
 
 Labs and legacy are not root-exported. Import them deliberately:
 
 ```tsx
-import { WorkflowBuilder } from "@moritzbrantner/ui/components/labs/workflow-builder";
+import { Timeline } from "@moritzbrantner/ui/components/labs/timeline";
 import { DataTable } from "@moritzbrantner/ui/components/legacy/data-table";
 ```
 
 `DataTable` is legacy as of `0.8.0`; use `DataGrid` for app data pages.
+Social components are exposed through `@moritzbrantner/ui/social` and `@moritzbrantner/ui/components/social/*`; they are not root-exported.
 
 Migration examples:
 
@@ -157,7 +160,7 @@ Migration examples:
 | ------------------------------------------------ | ----------------------------------------------------- |
 | `@moritzbrantner/ui/components/button`           | `@moritzbrantner/ui/components/stable/button`         |
 | `@moritzbrantner/ui/components/data-grid`        | `@moritzbrantner/ui/components/patterns/data-grid`    |
-| `@moritzbrantner/ui/components/workflow-builder` | `@moritzbrantner/ui/components/labs/workflow-builder` |
+| `@moritzbrantner/ui/components/chat`             | `@moritzbrantner/ui/components/social/chat`           |
 | `@moritzbrantner/ui/components/data-table`       | `@moritzbrantner/ui/components/legacy/data-table`     |
 
 ## Menu Patterns
@@ -230,7 +233,7 @@ Keep app-specific behavior in consuming packages:
 - Responsive overflow menu: use `ResponsiveActionMenu` with a shared `items` array, and reserve forced `mode` values for tests and stories.
 - Hover preview: use `HoverPreview` for read-only summaries; keep required commands available through click, focus, context, or touch surfaces.
 - Command palette: pass app-owned actions to `CommandPalette`; keep routing and permissions outside this package.
-- Workflow editor: use `WorkflowBuilder` for graph layout, selection, viewport, and connection interaction; keep execution, persistence, permissions, and run state in the app.
+- Workflow editor: use `@moritzbrantner/workflow-editor/react` for graph editing surfaces; keep execution, persistence, permissions, and run state in the app.
 - Theme switching: wire `ThemeModeSwitch` to the app theme provider and import exactly one UI stylesheet.
 - Non-happy paths: compose `EmptyState`, `LoadingState`, `ErrorState`, and `OfflineState` with app-owned messages and retry callbacks.
 
@@ -298,7 +301,7 @@ The package also includes reusable state-light patterns for common application s
 - `FilterBar` and `QueryBuilder` for app-owned search/filter composition and nested boolean filter editing.
 - `ViewHeader`, `ResourceList`, `DetailsPanel`, `DisclosurePanel`, and `ConfirmAction` for reusable view, list, detail, disclosure, and confirmation surfaces.
 - `CommandPalette`, `UploadQueue`, `ShortcutList`, `ShortcutHelpDialog`, and `WorkbenchLayout` for generic tool surfaces.
-- `WorkflowBuilder` for reusable workflow graph editing surfaces without execution or persistence behavior.
+- `Chat`, `SocialActionGroup`, `SocialPost`, and `ProfileSummary` through `@moritzbrantner/ui/social` for reusable social surfaces.
 
 These components render UI state and slots only. Keep fetching, routing, upload execution, auth/session state, and product-specific workflows in consuming packages.
 

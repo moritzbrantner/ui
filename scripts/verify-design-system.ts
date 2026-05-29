@@ -17,16 +17,18 @@ const serverPath = path.join(packageRoot, "src", "server.ts");
 const clientPath = path.join(packageRoot, "src", "client.ts");
 const stablePath = path.join(packageRoot, "src", "stable.ts");
 const patternsPath = path.join(packageRoot, "src", "patterns.ts");
+const socialPath = path.join(packageRoot, "src", "social.ts");
 const labsPath = path.join(packageRoot, "src", "labs.ts");
 const legacyPath = path.join(packageRoot, "src", "legacy.ts");
 const errors: string[] = [];
-const publicTiers = ["stable", "patterns", "labs", "legacy"] as const;
+const publicTiers = ["stable", "patterns", "social", "labs", "legacy"] as const;
 const expectedPackageVersion = "0.9.0";
 const rootExportTiers = new Set<ComponentTier>(["stable", "patterns"]);
-const releaseBlockingTiers = new Set<ComponentTier>(["stable", "patterns"]);
+const releaseBlockingTiers = new Set<ComponentTier>(["stable", "patterns", "social"]);
 const tierBarrelPaths = {
   stable: stablePath,
   patterns: patternsPath,
+  social: socialPath,
   labs: labsPath,
   legacy: legacyPath,
 } as const;
@@ -127,6 +129,7 @@ function verifyPackageMetadata() {
   expectExport("./client", "./dist/client.js", "./dist/client.d.ts");
   expectExport("./stable", "./dist/stable.js", "./dist/stable.d.ts");
   expectExport("./patterns", "./dist/patterns.js", "./dist/patterns.d.ts");
+  expectExport("./social", "./dist/social.js", "./dist/social.d.ts");
   expectExport("./labs", "./dist/labs.js", "./dist/labs.d.ts");
   expectExport("./legacy", "./dist/legacy.js", "./dist/legacy.d.ts");
   expectExport("./themes", "./dist/themes.js", "./dist/themes.d.ts");
@@ -140,6 +143,11 @@ function verifyPackageMetadata() {
     "./components/patterns/*",
     "./dist/components/patterns/*.js",
     "./dist/components/patterns/*.d.ts",
+  );
+  expectExport(
+    "./components/social/*",
+    "./dist/components/social/*.js",
+    "./dist/components/social/*.d.ts",
   );
   expectExport(
     "./components/labs/*",
@@ -273,7 +281,7 @@ function verifyComponentRegistry() {
       errors.push(`${entry.name}: ${entry.tier} components must not be root-exported`);
     }
 
-    if (entry.tier === "stable" || entry.tier === "patterns") {
+    if (entry.tier === "stable" || entry.tier === "patterns" || entry.tier === "social") {
       if (entry.storyFiles.length === 0) {
         errors.push(`${entry.name}: ${entry.tier} entries must list Storybook coverage`);
       }
@@ -347,6 +355,7 @@ function verifyComponentDependencyBoundaries() {
   const allowedTierImports: Record<ComponentTier | "internal", Set<ComponentTier | "internal">> = {
     stable: new Set(["stable", "internal"]),
     patterns: new Set(["patterns", "stable", "internal"]),
+    social: new Set(["social", "patterns", "stable", "internal"]),
     labs: new Set(["labs", "patterns", "stable", "internal"]),
     legacy: new Set(["legacy", "patterns", "stable", "internal"]),
     internal: new Set(["internal", "patterns", "stable"]),
@@ -395,7 +404,7 @@ function getComponentSourceTier(filePath: string): ComponentTier | "internal" | 
   const relativePath = path.relative(componentsDir, filePath);
   const tier = relativePath.split(path.sep)[0];
 
-  if (["stable", "patterns", "labs", "legacy", "internal"].includes(tier)) {
+  if (["stable", "patterns", "social", "labs", "legacy", "internal"].includes(tier)) {
     return tier as ComponentTier | "internal";
   }
 
@@ -596,7 +605,7 @@ function componentTestMarkers(entry: ComponentRegistryEntry): string[] {
 
   const overrides: Record<string, string[]> = {
     "app-layout": ["PageShell", "PageHeader", "PageContent", "Surface", "SectionGrid"],
-    "chat-box": ["ChatBox"],
+    chat: ["Chat", "ChatThread", "ChatMessage"],
     "connection-status": ["ConnectionStatus"],
     "form-layout": ["Fieldset", "FieldLegend", "FieldGrid", "ValidationSummary"],
     "input-otp": ["InputOTP"],
@@ -604,6 +613,7 @@ function componentTestMarkers(entry: ComponentRegistryEntry): string[] {
     "menu-actions": ["getMenuActionItemText", "isMenuActionItemDisabled", "MenuAction"],
     "social-actions": ["SocialActionGroup", "LikeButton", "ShareButton"],
     "social-feed": ["SocialPost", "SocialComposer", "SocialComment"],
+    "profile-summary": ["ProfileSummary"],
   };
 
   return [entry.fileName, pascalName, ...(overrides[entry.fileName] ?? [])];
