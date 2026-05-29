@@ -3,8 +3,10 @@ import * as React from "react";
 import { describe, expect, test } from "vitest";
 
 import {
-  ActionBar,
   Button,
+} from "../../index";
+import {
+  ActionBar,
   PageActions,
   PageContent,
   PageDescription,
@@ -18,7 +20,7 @@ import {
   SurfaceFooter,
   SurfaceHeader,
   SurfaceTitle,
-} from "../../index";
+} from "../../shell";
 
 describe("@moritzbrantner/ui app layout", () => {
   test("renders the canonical page shell and surface scaffold", () => {

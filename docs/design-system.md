@@ -4,14 +4,16 @@
 
 ## Import Boundaries
 
-Use `@moritzbrantner/ui` for `stable` and `patterns` components, `cn`, and theme client APIs. Use `@moritzbrantner/ui/client` as the matching client convenience barrel. Neither root nor client exports `labs` or `legacy`.
+Use `@moritzbrantner/ui` for `stable` and generic `patterns` components, `cn`, and theme client APIs. Use `@moritzbrantner/ui/client` as the matching client convenience barrel. Neither root nor client exports focused tiers or `labs`.
 
 Use tiered component subpaths for bundle-sensitive comprehensive apps. Use `@moritzbrantner/ui/server` for server-safe helpers and theme metadata such as `cn`, `themeConfig`, `uiThemeNames`, and `createUiTheme`.
 
 ```tsx
 import { Button } from "@moritzbrantner/ui/components/stable/button";
-import { DataGrid } from "@moritzbrantner/ui/components/patterns/data-grid";
+import { DataGrid } from "@moritzbrantner/ui/components/data/data-grid";
+import { PageShell } from "@moritzbrantner/ui/components/shell/app-layout";
 import { Chat } from "@moritzbrantner/ui/components/social/chat";
+import { ImageCropper } from "@moritzbrantner/ui/components/media/image-cropper";
 import { Timeline } from "@moritzbrantner/ui/components/labs/timeline";
 import { uiTheme } from "@moritzbrantner/ui/atlas/server";
 import { cn, themeConfig } from "@moritzbrantner/ui/server";
@@ -21,18 +23,20 @@ Component tiers:
 
 - `stable`: primitives and low-level controls with the strongest support and contract checks.
 - `patterns`: state-light composed UI for common app workflows.
+- `data`: state-light data grid, resource list, filter, search, and selection UI.
+- `shell`: state-light app chrome, page shell, account, notification, and navigation UI.
 - `social`: state-light chat, social actions, social feed, and profile summary UI.
+- `media`: state-light image cropper and image filter editing UI.
 - `labs`: experimental public components. They are not root-exported and may change faster.
-- `legacy`: deprecated public components. They are not root-exported and require migration metadata.
 
 Migration examples:
 
 | Old                                              | New                                                   |
 | ------------------------------------------------ | ----------------------------------------------------- |
 | `@moritzbrantner/ui/components/button`           | `@moritzbrantner/ui/components/stable/button`         |
-| `@moritzbrantner/ui/components/data-grid`        | `@moritzbrantner/ui/components/patterns/data-grid`    |
+| `@moritzbrantner/ui/components/data-grid`        | `@moritzbrantner/ui/components/data/data-grid`        |
 | `@moritzbrantner/ui/components/chat`             | `@moritzbrantner/ui/components/social/chat`           |
-| `@moritzbrantner/ui/components/data-table`       | `@moritzbrantner/ui/components/legacy/data-table`     |
+| `@moritzbrantner/ui/components/image-cropper`    | `@moritzbrantner/ui/components/media/image-cropper`   |
 
 ## Styles And Themes
 
@@ -48,9 +52,9 @@ Existing theme subpaths such as `@moritzbrantner/ui/zleek` and `@moritzbrantner/
 
 ## App Recipes
 
-App shell: compose `PlatformNavbar`, `PageShell`, `PageHeader`, `PageContent`, `Surface`, `CommandPalette`, `NotificationMenu`, `AccountMenu`, `LanguageSwitcher`, and `ThemeModeSwitch`. Apps provide route state, menu item content, account data, and callbacks.
+App shell: import `PlatformNavbar`, `PageShell`, `PageHeader`, `PageContent`, `Surface`, `NotificationMenu`, and `AccountMenu` from `@moritzbrantner/ui/shell`. Compose with `CommandPalette`, `LanguageSwitcher`, and `ThemeModeSwitch`. Apps provide route state, menu item content, account data, and callbacks.
 
-Data page: prefer `DataGrid` over legacy `DataTable` for controlled server state, manual sorting/filtering/pagination, row selection, and loading/error/empty states. Apps own fetching, cache state, URL state, and backend contracts. `DataTable` is legacy as of `0.8.0` and is available only from `@moritzbrantner/ui/components/legacy/data-table` or `@moritzbrantner/ui/legacy`.
+Data page: import `DataGrid`, `ResourceList`, `FilterBar`, `SearchField`, and `SelectionToolbar` from `@moritzbrantner/ui/data` for controlled server state, manual sorting/filtering/pagination, row selection, and loading/error/empty states. Apps own fetching, cache state, URL state, and backend contracts.
 
 Filtered data page: compose `FilterBar` for search and active filter display with `DataGrid` for rows. Use `QueryBuilder` only when the app needs nested boolean filters. Apps own fetching, URL state, backend query contracts, and persistence.
 
@@ -82,7 +86,7 @@ Non-happy paths: compose `EmptyState`, `LoadingState`, `ErrorState`, `OfflineSta
 
 Public components should accept `className`, forward DOM props where they render DOM, expose stable `data-slot` values, use semantic tokens from the published stylesheets, and avoid arbitrary visual knobs. If a wrapper cannot satisfy a rule because it delegates to a third-party primitive or provider, the verifier allowlist must include a reason.
 
-The typed component registry in `src/component-registry.ts` records the tier, public subpath, root-export policy, Storybook files, test files, and deprecation metadata for every public component. `stable` and `patterns` entries must list story and test coverage. `labs` entries may use catalog or family coverage while the APIs settle. `legacy` entries require `deprecatedSince` and `migration`.
+The typed component registry in `src/component-registry.ts` records the tier, public subpath, root-export policy, Storybook files, and test files for every public component. `stable`, `patterns`, `data`, `shell`, `social`, and `media` entries must list story and test coverage. `labs` entries may use catalog or family coverage while the APIs settle.
 
 ## Token Source Status
 

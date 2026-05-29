@@ -17,20 +17,31 @@ const serverPath = path.join(packageRoot, "src", "server.ts");
 const clientPath = path.join(packageRoot, "src", "client.ts");
 const stablePath = path.join(packageRoot, "src", "stable.ts");
 const patternsPath = path.join(packageRoot, "src", "patterns.ts");
+const dataPath = path.join(packageRoot, "src", "data.ts");
+const shellPath = path.join(packageRoot, "src", "shell.ts");
 const socialPath = path.join(packageRoot, "src", "social.ts");
+const mediaPath = path.join(packageRoot, "src", "media.ts");
 const labsPath = path.join(packageRoot, "src", "labs.ts");
-const legacyPath = path.join(packageRoot, "src", "legacy.ts");
 const errors: string[] = [];
-const publicTiers = ["stable", "patterns", "social", "labs", "legacy"] as const;
+const publicTiers = ["stable", "patterns", "data", "shell", "social", "media", "labs"] as const;
 const expectedPackageVersion = "0.9.0";
 const rootExportTiers = new Set<ComponentTier>(["stable", "patterns"]);
-const releaseBlockingTiers = new Set<ComponentTier>(["stable", "patterns", "social"]);
+const releaseBlockingTiers = new Set<ComponentTier>([
+  "stable",
+  "patterns",
+  "data",
+  "shell",
+  "social",
+  "media",
+]);
 const tierBarrelPaths = {
   stable: stablePath,
   patterns: patternsPath,
+  data: dataPath,
+  shell: shellPath,
   social: socialPath,
+  media: mediaPath,
   labs: labsPath,
-  legacy: legacyPath,
 } as const;
 const approvedGroupedContractSuites = new Set([
   "src/components/stable/stable-contract.test.tsx",
@@ -129,9 +140,11 @@ function verifyPackageMetadata() {
   expectExport("./client", "./dist/client.js", "./dist/client.d.ts");
   expectExport("./stable", "./dist/stable.js", "./dist/stable.d.ts");
   expectExport("./patterns", "./dist/patterns.js", "./dist/patterns.d.ts");
+  expectExport("./data", "./dist/data.js", "./dist/data.d.ts");
+  expectExport("./shell", "./dist/shell.js", "./dist/shell.d.ts");
   expectExport("./social", "./dist/social.js", "./dist/social.d.ts");
+  expectExport("./media", "./dist/media.js", "./dist/media.d.ts");
   expectExport("./labs", "./dist/labs.js", "./dist/labs.d.ts");
-  expectExport("./legacy", "./dist/legacy.js", "./dist/legacy.d.ts");
   expectExport("./themes", "./dist/themes.js", "./dist/themes.d.ts");
   expectExport("./lib/cn", "./dist/lib/cn.js", "./dist/lib/cn.d.ts");
   expectExport(
@@ -145,19 +158,29 @@ function verifyPackageMetadata() {
     "./dist/components/patterns/*.d.ts",
   );
   expectExport(
+    "./components/data/*",
+    "./dist/components/data/*.js",
+    "./dist/components/data/*.d.ts",
+  );
+  expectExport(
+    "./components/shell/*",
+    "./dist/components/shell/*.js",
+    "./dist/components/shell/*.d.ts",
+  );
+  expectExport(
     "./components/social/*",
     "./dist/components/social/*.js",
     "./dist/components/social/*.d.ts",
   );
   expectExport(
+    "./components/media/*",
+    "./dist/components/media/*.js",
+    "./dist/components/media/*.d.ts",
+  );
+  expectExport(
     "./components/labs/*",
     "./dist/components/labs/*.js",
     "./dist/components/labs/*.d.ts",
-  );
-  expectExport(
-    "./components/legacy/*",
-    "./dist/components/legacy/*.js",
-    "./dist/components/legacy/*.d.ts",
   );
 
   if (packageJson.exports?.["./components/*"]) {
@@ -281,7 +304,7 @@ function verifyComponentRegistry() {
       errors.push(`${entry.name}: ${entry.tier} components must not be root-exported`);
     }
 
-    if (entry.tier === "stable" || entry.tier === "patterns" || entry.tier === "social") {
+    if (releaseBlockingTiers.has(entry.tier)) {
       if (entry.storyFiles.length === 0) {
         errors.push(`${entry.name}: ${entry.tier} entries must list Storybook coverage`);
       }
@@ -297,18 +320,15 @@ function verifyComponentRegistry() {
       }
     }
 
-    if (entry.tier === "legacy") {
-      if (!entry.deprecatedSince || !entry.migration) {
-        errors.push(`${entry.name}: legacy entries require deprecatedSince and migration`);
-      }
-
-      if (entry.rootExport) {
-        errors.push(`${entry.name}: legacy entries must not be root-exported`);
-      }
-    }
   }
 
-  for (const forbiddenRootExport of ['export * from "./labs";', 'export * from "./legacy";']) {
+  for (const forbiddenRootExport of [
+    'export * from "./data";',
+    'export * from "./shell";',
+    'export * from "./social";',
+    'export * from "./media";',
+    'export * from "./labs";',
+  ]) {
     if (indexSource.includes(forbiddenRootExport)) {
       errors.push(`src/index.ts must not contain ${forbiddenRootExport}`);
     }
@@ -355,9 +375,11 @@ function verifyComponentDependencyBoundaries() {
   const allowedTierImports: Record<ComponentTier | "internal", Set<ComponentTier | "internal">> = {
     stable: new Set(["stable", "internal"]),
     patterns: new Set(["patterns", "stable", "internal"]),
+    data: new Set(["data", "patterns", "stable", "internal"]),
+    shell: new Set(["shell", "patterns", "stable", "internal"]),
     social: new Set(["social", "patterns", "stable", "internal"]),
-    labs: new Set(["labs", "patterns", "stable", "internal"]),
-    legacy: new Set(["legacy", "patterns", "stable", "internal"]),
+    media: new Set(["media", "stable", "internal"]),
+    labs: new Set(["labs", "data", "patterns", "stable", "internal"]),
     internal: new Set(["internal", "patterns", "stable"]),
   };
   const sourceFiles = listFiles(componentsDir).filter(
@@ -404,7 +426,7 @@ function getComponentSourceTier(filePath: string): ComponentTier | "internal" | 
   const relativePath = path.relative(componentsDir, filePath);
   const tier = relativePath.split(path.sep)[0];
 
-  if (["stable", "patterns", "social", "labs", "legacy", "internal"].includes(tier)) {
+  if (["stable", "patterns", "data", "shell", "social", "media", "labs", "internal"].includes(tier)) {
     return tier as ComponentTier | "internal";
   }
 
@@ -614,6 +636,9 @@ function componentTestMarkers(entry: ComponentRegistryEntry): string[] {
     "social-actions": ["SocialActionGroup", "LikeButton", "ShareButton"],
     "social-feed": ["SocialPost", "SocialComposer", "SocialComment"],
     "profile-summary": ["ProfileSummary"],
+    "platform-navbar": ["PlatformNavbar", "PlatformNavbarGroup"],
+    "platform-navbar-actions": ["PlatformNavbarActions"],
+    "resource-list": ["ResourceList"],
   };
 
   return [entry.fileName, pascalName, ...(overrides[entry.fileName] ?? [])];
@@ -692,7 +717,7 @@ function verifyConsumerExample() {
   for (const expectedImport of [
     'from "@moritzbrantner/ui/components/stable/button"',
     'from "@moritzbrantner/ui/components/stable/dialog"',
-    'from "@moritzbrantner/ui/components/patterns/data-grid"',
+    'from "@moritzbrantner/ui/components/data/data-grid"',
   ]) {
     if (!subpathSource.includes(expectedImport)) {
       errors.push(`consumer subpath example must exercise ${expectedImport}`);

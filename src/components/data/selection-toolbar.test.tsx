@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { SelectionToolbar } from "../../index";
+import { SelectionToolbar } from "./selection-toolbar";
 
 describe("selection toolbar", () => {
   test("does not render when nothing is selected", () => {

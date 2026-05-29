@@ -13,6 +13,10 @@ export default mergeConfig(baseConfig, {
       include: [
         "src/components/stable/**/*.{ts,tsx}",
         "src/components/patterns/**/*.{ts,tsx}",
+        "src/components/data/**/*.{ts,tsx}",
+        "src/components/shell/**/*.{ts,tsx}",
+        "src/components/social/**/*.{ts,tsx}",
+        "src/components/media/**/*.{ts,tsx}",
         "src/components/internal/**/*.{ts,tsx}",
       ],
       exclude: [
@@ -20,7 +24,6 @@ export default mergeConfig(baseConfig, {
         "**/*.test.tsx",
         "**/*.stories.tsx",
         "src/components/labs/**",
-        "src/components/legacy/**",
       ],
       thresholds: {
         branches: 30,

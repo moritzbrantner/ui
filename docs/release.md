@@ -14,7 +14,7 @@ This package publishes directly to the public npm registry as `@moritzbrantner/u
 
 3. Add a matching top entry in `CHANGELOG.md` that calls out public component/API changes, verification changes, and migration notes.
 
-4. Keep `DataTable` legacy metadata at its original `deprecatedSince` version unless the deprecation itself changes.
+4. Check `src/component-registry.ts` for any public API moves and make sure new focused tiers have story and test coverage.
 
 ## Verify
 

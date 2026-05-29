@@ -4,6 +4,8 @@ import { beforeAll, describe, expect, test, vi } from "vitest";
 
 import {
   Button,
+} from "../../index";
+import {
   PageActions,
   PageContent,
   PageDescription,
@@ -11,6 +13,7 @@ import {
   PageShell,
   PageTitle,
   PlatformNavbar,
+  PlatformNavbarActions,
   SectionGrid,
   Surface,
   SurfaceContent,
@@ -18,7 +21,7 @@ import {
   SurfaceHeader,
   SurfaceTitle,
   type PlatformNavbarGroup,
-} from "../../index";
+} from "../../shell";
 
 beforeAll(() => {
   globalThis.ResizeObserver ??= class ResizeObserver {
@@ -90,6 +93,7 @@ describe("pattern layout and navigation", () => {
         brand="Platform"
         groups={groups}
         defaultOpenGroupId="workspace"
+        actionSlot={<PlatformNavbarActions themeModeSwitch />}
         onNavigate={onNavigate}
         renderLink={renderLink}
       />,

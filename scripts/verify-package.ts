@@ -11,10 +11,13 @@ type PackageMetadata = {
 
 const root = await importPackage("@moritzbrantner/ui");
 assert.equal(typeof root.Button, "function", "root export should include Button");
-assert.equal(typeof root.DataGrid, "function", "root export should include DataGrid");
+assert.equal(
+  Object.hasOwn(root, "DataGrid"),
+  false,
+  "root export should not include data components",
+);
 assert.equal(typeof root.cn, "function", "root export should include cn");
 assert.equal(typeof root.UiTheme, "function", "root export should include UiTheme");
-assert.equal(Object.hasOwn(root, "DataTable"), false, "root export should not include DataTable");
 assert.equal(
   Object.hasOwn(root, "WorkflowBuilder"),
   false,
@@ -32,26 +35,38 @@ assert.equal(
 
 const client = await importPackage("@moritzbrantner/ui/client");
 assert.equal(typeof client.Button, "function", "client export should include Button");
-assert.equal(typeof client.DataGrid, "function", "client export should include DataGrid");
-assert.equal(typeof client.Dialog, "function", "client export should include Dialog");
 assert.equal(
-  Object.hasOwn(client, "DataTable"),
+  Object.hasOwn(client, "DataGrid"),
   false,
-  "client export should not expose legacy components",
+  "client export should not include data components",
 );
+assert.equal(typeof client.Dialog, "function", "client export should include Dialog");
 
 const stable = await importPackage("@moritzbrantner/ui/stable");
 assert.equal(typeof stable.Button, "function", "stable entry should expose Button");
 assert.equal(typeof stable.Dialog, "function", "stable entry should expose Dialog");
 
 const patterns = await importPackage("@moritzbrantner/ui/patterns");
-assert.equal(typeof patterns.DataGrid, "function", "patterns entry should expose DataGrid");
 assert.equal(typeof patterns.ActionMenu, "function", "patterns entry should expose ActionMenu");
 assert.equal(
   Object.hasOwn(patterns, "Chat"),
   false,
   "patterns entry should not expose social components",
 );
+assert.equal(
+  Object.hasOwn(patterns, "DataGrid"),
+  false,
+  "patterns entry should not expose data components",
+);
+
+const data = await importPackage("@moritzbrantner/ui/data");
+assert.equal(typeof data.DataGrid, "function", "data entry should expose DataGrid");
+assert.equal(typeof data.ResourceList, "function", "data entry should expose ResourceList");
+assert.equal(typeof data.FilterBar, "function", "data entry should expose FilterBar");
+
+const shell = await importPackage("@moritzbrantner/ui/shell");
+assert.equal(typeof shell.PageShell, "function", "shell entry should expose PageShell");
+assert.equal(typeof shell.PlatformNavbar, "function", "shell entry should expose PlatformNavbar");
 
 const social = await importPackage("@moritzbrantner/ui/social");
 assert.equal(typeof social.Chat, "function", "social entry should expose Chat");
@@ -72,8 +87,13 @@ assert.equal(
   "labs entry should not expose workflow editor components",
 );
 
-const legacy = await importPackage("@moritzbrantner/ui/legacy");
-assert.equal(typeof legacy.DataTable, "function", "legacy entry should expose DataTable");
+const media = await importPackage("@moritzbrantner/ui/media");
+assert.equal(typeof media.ImageCropper, "function", "media entry should expose ImageCropper");
+assert.equal(
+  typeof media.ImageFilterEditor,
+  "function",
+  "media entry should expose ImageFilterEditor",
+);
 
 const zleek = await importPackage("@moritzbrantner/ui/zleek");
 assert.equal(zleek.uiTheme.name, "zleek", "zleek entry should expose zleek uiTheme");
@@ -156,7 +176,7 @@ await assert.rejects(
 const button = await importPackage("@moritzbrantner/ui/components/stable/button");
 assert.equal(typeof button.Button, "function", "button subpath should expose Button");
 
-const dataGrid = await importPackage("@moritzbrantner/ui/components/patterns/data-grid");
+const dataGrid = await importPackage("@moritzbrantner/ui/components/data/data-grid");
 assert.equal(typeof dataGrid.DataGrid, "function", "data-grid subpath should expose DataGrid");
 
 const dialog = await importPackage("@moritzbrantner/ui/components/stable/dialog");
@@ -169,11 +189,11 @@ assert.equal(
   "social chat subpath should expose Chat",
 );
 
-const dataTable = await importPackage("@moritzbrantner/ui/components/legacy/data-table");
+const imageCropper = await importPackage("@moritzbrantner/ui/components/media/image-cropper");
 assert.equal(
-  typeof dataTable.DataTable,
+  typeof imageCropper.ImageCropper,
   "function",
-  "legacy data-table subpath should expose DataTable",
+  "media image-cropper subpath should expose ImageCropper",
 );
 
 const cn = await importPackage("@moritzbrantner/ui/lib/cn");
@@ -209,12 +229,16 @@ const requiredPackageFiles = [
   "dist/stable.d.ts",
   "dist/patterns.js",
   "dist/patterns.d.ts",
+  "dist/data.js",
+  "dist/data.d.ts",
+  "dist/shell.js",
+  "dist/shell.d.ts",
   "dist/social.js",
   "dist/social.d.ts",
+  "dist/media.js",
+  "dist/media.d.ts",
   "dist/labs.js",
   "dist/labs.d.ts",
-  "dist/legacy.js",
-  "dist/legacy.d.ts",
   "dist/zleek/server.js",
   "dist/zleek/server.d.ts",
   "dist/bobba/server.js",
@@ -229,12 +253,14 @@ const requiredPackageFiles = [
   "dist/components/stable/button.d.ts",
   "dist/components/stable/dialog.js",
   "dist/components/stable/dialog.d.ts",
-  "dist/components/patterns/data-grid.js",
-  "dist/components/patterns/data-grid.d.ts",
+  "dist/components/data/data-grid.js",
+  "dist/components/data/data-grid.d.ts",
+  "dist/components/shell/platform-navbar.js",
+  "dist/components/shell/platform-navbar.d.ts",
   "dist/components/social/chat.js",
   "dist/components/social/chat.d.ts",
-  "dist/components/legacy/data-table.js",
-  "dist/components/legacy/data-table.d.ts",
+  "dist/components/media/image-cropper.js",
+  "dist/components/media/image-cropper.d.ts",
   "dist/lib/cn.js",
   "dist/themes.js",
   "styles.css",

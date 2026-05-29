@@ -47,7 +47,7 @@ import {
   imageFilterPresets,
   normalizeImageFilterValue,
   type ImageFilterValue,
-} from "../../labs";
+} from "../../media";
 import {
   ProfileSummary,
   ProfileSummaryActions,

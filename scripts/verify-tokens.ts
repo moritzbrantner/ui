@@ -25,7 +25,7 @@ const tokenBackedComponents = [
   ["src/components/stable/dialog.tsx", "--ui-overlay-radius"],
   ["src/components/stable/popover.tsx", "--ui-overlay-radius"],
   ["src/components/stable/dropdown-menu.tsx", "--ui-menu-item-radius"],
-  ["src/components/patterns/app-layout.tsx", "--ui-radius-surface"],
+  ["src/components/shell/app-layout.tsx", "--ui-radius-surface"],
   ["src/components/stable/toolbar.tsx", "--ui-toolbar-min-height"],
 ];
 const errors: string[] = [];

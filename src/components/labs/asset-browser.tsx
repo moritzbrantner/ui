@@ -20,7 +20,7 @@ import { Badge } from "../stable/badge";
 import { Button } from "../stable/button";
 import { Input } from "../stable/input";
 import { ScrollArea } from "../stable/scroll-area";
-import { SelectionToolbar } from "../patterns/selection-toolbar";
+import { SelectionToolbar } from "../data/selection-toolbar";
 
 type AssetBrowserView = "grid" | "list";
 type AssetBrowserSelectionMode = "none" | "single" | "multiple";

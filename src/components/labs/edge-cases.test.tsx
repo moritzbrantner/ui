@@ -4,7 +4,7 @@ import * as React from "react";
 import { describe, expect, test, vi } from "vitest";
 
 import { Calendar, CalendarCardDayButton, type CalendarIcsData } from "../../stable";
-import { DataGrid } from "../../patterns";
+import { DataGrid } from "../../data";
 import {
   AnnotationCanvas,
   DocumentViewer,

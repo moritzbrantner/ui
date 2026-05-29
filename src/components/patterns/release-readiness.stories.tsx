@@ -11,7 +11,7 @@ import { expect, fn } from "storybook/test";
 import { Badge } from "../stable/badge";
 import { Button } from "../stable/button";
 import { CommandPalette, type CommandPaletteGroup } from "./command-palette";
-import { DataGrid } from "./data-grid";
+import { DataGrid } from "../data/data-grid";
 import { Field, FieldDescription, FieldError, FieldLabel, FieldLegend } from "../stable/field";
 import {
   FieldGrid,
@@ -25,10 +25,10 @@ import {
   ValidationSummary,
 } from "../stable/form-layout";
 import { Input } from "../stable/input";
-import { NotificationMenu } from "./notification-menu";
-import { PageContent, PageHeader, PageShell, PageTitle, Surface } from "./app-layout";
-import { PlatformNavbar, type PlatformNavbarGroup } from "./platform-navbar";
-import { PlatformNavbarActions } from "./platform-navbar-actions";
+import { NotificationMenu } from "../shell/notification-menu";
+import { PageContent, PageHeader, PageShell, PageTitle, Surface } from "../shell/app-layout";
+import { PlatformNavbar, type PlatformNavbarGroup } from "../shell/platform-navbar";
+import { PlatformNavbarActions } from "../shell/platform-navbar-actions";
 import { SelectDropdown } from "../stable/select";
 import { Switch } from "../stable/switch";
 import { Toaster } from "../stable/sonner";

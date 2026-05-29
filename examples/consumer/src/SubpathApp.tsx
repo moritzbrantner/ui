@@ -1,7 +1,7 @@
 import { uiTheme as atlasTheme } from "@moritzbrantner/ui/atlas/server";
 import { Button } from "@moritzbrantner/ui/components/stable/button";
 import { FunnelChart } from "@moritzbrantner/ui/components/stable/funnel-chart";
-import { DataGrid } from "@moritzbrantner/ui/components/patterns/data-grid";
+import { DataGrid } from "@moritzbrantner/ui/components/data/data-grid";
 import { Dialog, DialogContent, DialogTrigger } from "@moritzbrantner/ui/components/stable/dialog";
 import { cn, themeConfig } from "@moritzbrantner/ui/server";
 

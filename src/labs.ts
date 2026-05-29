@@ -5,8 +5,6 @@ export * from "./components/labs/asset-browser";
 export * from "./components/labs/component-editor";
 export * from "./components/labs/document-viewer";
 export * from "./components/labs/gantt";
-export * from "./components/labs/image-cropper";
-export * from "./components/labs/image-filter-editor";
 export * from "./components/labs/logical-argument";
 export * from "./components/labs/query-builder";
 export * from "./components/labs/terminal";

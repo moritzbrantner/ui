@@ -8,11 +8,10 @@ import {
   PlatformNavbar,
   PlatformNavbarActions,
   type PlatformNavbarGroup,
-} from "../../index";
+} from "../../shell";
+import { ImageCropper, ImageFilterEditor } from "../../media";
 import {
   DocumentViewer,
-  ImageCropper,
-  ImageFilterEditor,
   QueryBuilder,
   type QueryBuilderExpression,
   type QueryBuilderField,

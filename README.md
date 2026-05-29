@@ -115,14 +115,16 @@ Components are organized into support tiers:
 
 - `stable`: primitives and low-level controls with the strongest API expectations.
 - `patterns`: state-light composed components for common app layouts and workflows.
+- `data`: data grids, resource lists, filters, search fields, and selection toolbars.
+- `shell`: app chrome, page shell, navigation, account, and notification surfaces.
 - `social`: state-light social, chat, feed, action, and profile summary components.
+- `media`: image cropper and filter editing surfaces.
 - `labs`: experimental components that are public only through explicit labs paths and can change faster.
-- `legacy`: retained compatibility components that should not be used for new work.
 
 Root imports expose only `stable` and `patterns` components, plus `cn` and theme client APIs:
 
 ```tsx
-import { Button, Card, CardContent, DataGrid } from "@moritzbrantner/ui";
+import { Button, Card, CardContent } from "@moritzbrantner/ui";
 
 export function Example() {
   return (
@@ -139,29 +141,29 @@ Component subpaths are preferred for bundle-sensitive comprehensive apps:
 
 ```tsx
 import { Button } from "@moritzbrantner/ui/components/stable/button";
-import { DataGrid } from "@moritzbrantner/ui/components/patterns/data-grid";
+import { DataGrid } from "@moritzbrantner/ui/components/data/data-grid";
 import { Chat } from "@moritzbrantner/ui/components/social/chat";
 import { cn } from "@moritzbrantner/ui/server";
 ```
 
-Labs and legacy are not root-exported. Import them deliberately:
+Focused component tiers are not root-exported. Import them deliberately:
 
 ```tsx
+import { PageShell } from "@moritzbrantner/ui/components/shell/app-layout";
+import { ImageCropper } from "@moritzbrantner/ui/components/media/image-cropper";
 import { Timeline } from "@moritzbrantner/ui/components/labs/timeline";
-import { DataTable } from "@moritzbrantner/ui/components/legacy/data-table";
 ```
 
-`DataTable` is legacy as of `0.8.0`; use `DataGrid` for app data pages.
-Social components are exposed through `@moritzbrantner/ui/social` and `@moritzbrantner/ui/components/social/*`; they are not root-exported.
+Data, shell, social, and media components are exposed through `@moritzbrantner/ui/<tier>` and `@moritzbrantner/ui/components/<tier>/*`; they are not root-exported.
 
 Migration examples:
 
 | Old                                              | New                                                   |
 | ------------------------------------------------ | ----------------------------------------------------- |
 | `@moritzbrantner/ui/components/button`           | `@moritzbrantner/ui/components/stable/button`         |
-| `@moritzbrantner/ui/components/data-grid`        | `@moritzbrantner/ui/components/patterns/data-grid`    |
+| `@moritzbrantner/ui/components/data-grid`        | `@moritzbrantner/ui/components/data/data-grid`        |
 | `@moritzbrantner/ui/components/chat`             | `@moritzbrantner/ui/components/social/chat`           |
-| `@moritzbrantner/ui/components/data-table`       | `@moritzbrantner/ui/components/legacy/data-table`     |
+| `@moritzbrantner/ui/components/image-cropper`    | `@moritzbrantner/ui/components/media/image-cropper`   |
 
 ## Menu Patterns
 
@@ -185,7 +187,7 @@ Use the root import for compatibility and examples:
 import { Button, PageShell, DataGrid } from "@moritzbrantner/ui";
 ```
 
-Use the explicit client entrypoint as a convenience client barrel. It mirrors the root component policy, so labs and legacy remain excluded:
+Use the explicit client entrypoint as a convenience client barrel. It mirrors the root component policy, so focused tiers and labs remain excluded:
 
 ```tsx
 import { Button, CommandPalette, Dialog } from "@moritzbrantner/ui/client";
@@ -197,7 +199,7 @@ Use component subpaths for bundle-sensitive app surfaces:
 import "@moritzbrantner/ui/atlas/styles.css";
 
 import { Button } from "@moritzbrantner/ui/components/stable/button";
-import { DataGrid } from "@moritzbrantner/ui/components/patterns/data-grid";
+import { DataGrid } from "@moritzbrantner/ui/components/data/data-grid";
 import { uiTheme } from "@moritzbrantner/ui/atlas/server";
 import { cn } from "@moritzbrantner/ui/server";
 ```
@@ -296,16 +298,17 @@ export function IntegrationGallery() {
 The package also includes reusable state-light patterns for common application surfaces:
 
 - `StateView`, `EmptyState`, `LoadingState`, `ErrorState`, and `OfflineState` for consistent non-happy-path panels.
-- `SearchField`, `SelectionToolbar`, `FormSection`, `FieldGrid`, `FormActions`, and `ValidationSummary` for repeated search, selection, and form structure.
+- `SearchField`, `SelectionToolbar`, `FilterBar`, `ResourceList`, and `DataGrid` through `@moritzbrantner/ui/data` for data-page composition.
+- `PageShell`, `PlatformNavbar`, `AccountMenu`, and `NotificationMenu` through `@moritzbrantner/ui/shell` for reusable app chrome.
+- `FormSection`, `FieldGrid`, `FormActions`, and `ValidationSummary` for repeated form structure.
 - `TagInput` for editable string lists with keyboard and remove affordances.
-- `FilterBar` and `QueryBuilder` for app-owned search/filter composition and nested boolean filter editing.
-- `ViewHeader`, `ResourceList`, `DetailsPanel`, `DisclosurePanel`, and `ConfirmAction` for reusable view, list, detail, disclosure, and confirmation surfaces.
+- `QueryBuilder` for nested boolean filter editing while it remains in labs.
+- `ViewHeader`, `DetailsPanel`, `DisclosurePanel`, and `ConfirmAction` for reusable view, detail, disclosure, and confirmation surfaces.
 - `CommandPalette`, `UploadQueue`, `ShortcutList`, `ShortcutHelpDialog`, and `WorkbenchLayout` for generic tool surfaces.
 - `Chat`, `SocialActionGroup`, `SocialPost`, and `ProfileSummary` through `@moritzbrantner/ui/social` for reusable social surfaces.
+- `ImageCropper` and `ImageFilterEditor` through `@moritzbrantner/ui/media` for reusable media editing surfaces.
 
 These components render UI state and slots only. Keep fetching, routing, upload execution, auth/session state, and product-specific workflows in consuming packages.
-
-`DataTable` remains available as a legacy/simple table helper. Prefer `DataGrid` for app data pages that need controlled server state, manual sorting/filtering/pagination, row selection, and loading/error/empty states.
 
 ## Theme Metadata
 

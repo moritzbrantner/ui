@@ -20,7 +20,7 @@ import {
 } from "./app-layout";
 import { Badge } from "../stable/badge";
 import { Button } from "../stable/button";
-import { CommandPalette } from "./command-palette";
+import { CommandPalette } from "../patterns/command-palette";
 import { PlatformNavbar } from "./platform-navbar";
 import { PlatformNavbarActions } from "./platform-navbar-actions";
 import { Stat, StatDelta, StatDescription, StatGroup, StatLabel, StatValue } from "../stable/stat";

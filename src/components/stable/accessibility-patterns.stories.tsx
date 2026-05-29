@@ -10,8 +10,8 @@ import {
 import { Button } from "./button";
 import { CommandPalette, type CommandPaletteGroup } from "../patterns/command-palette";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./dialog";
-import { SearchField } from "../patterns/search-field";
-import { SelectionToolbar } from "../patterns/selection-toolbar";
+import { SearchField } from "../data/search-field";
+import { SelectionToolbar } from "../data/selection-toolbar";
 import { EmptyState, StateViewDescription, StateViewTitle } from "../patterns/state-view";
 import { WorkbenchLayout } from "../patterns/workbench-layout";
 

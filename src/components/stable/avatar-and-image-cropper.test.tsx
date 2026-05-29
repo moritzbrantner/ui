@@ -3,7 +3,7 @@ import * as React from "react";
 import { describe, expect, test, vi } from "vitest";
 
 import { Avatar, AvatarCollection, avatarCollectionVariants, getAvatarInitials } from "../../index";
-import { ImageCropper, getImageCropArea, type ImageCropperCrop } from "../../labs";
+import { ImageCropper, getImageCropArea, type ImageCropperCrop } from "../../media";
 
 describe("avatar", () => {
   test("renders single-user avatars and avatar collections with shape variants", () => {

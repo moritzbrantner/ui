@@ -3,10 +3,8 @@ import "@moritzbrantner/ui/styles.css";
 import * as React from "react";
 
 import {
-  AccountMenu,
   Button,
   CommandPalette,
-  DataGrid,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -26,6 +24,14 @@ import {
   FormSectionTitle,
   FunnelChart,
   MetricStrip,
+  ProcessMap,
+  ThemeModeSwitch,
+  Toaster,
+  ValidationSummary,
+} from "@moritzbrantner/ui";
+import { DataGrid, SearchField } from "@moritzbrantner/ui/data";
+import {
+  AccountMenu,
   NotificationMenu,
   PageActions,
   PageContent,
@@ -35,17 +41,12 @@ import {
   PageTitle,
   PlatformNavbar,
   PlatformNavbarActions,
-  ProcessMap,
-  SearchField,
   Surface,
   SurfaceContent,
   SurfaceDescription,
   SurfaceHeader,
   SurfaceTitle,
-  ThemeModeSwitch,
-  Toaster,
-  ValidationSummary,
-} from "@moritzbrantner/ui";
+} from "@moritzbrantner/ui/shell";
 
 const rows = [
   { id: "pkg-ui", name: "UI package", status: "Ready", owner: "Design system" },

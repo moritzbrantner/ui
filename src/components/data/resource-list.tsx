@@ -11,7 +11,7 @@ import {
   StateViewActions,
   StateViewDescription,
   StateViewTitle,
-} from "./state-view";
+} from "../patterns/state-view";
 import { FilterBar, type FilterBarFilter } from "./filter-bar";
 import { SelectionToolbar } from "./selection-toolbar";
 

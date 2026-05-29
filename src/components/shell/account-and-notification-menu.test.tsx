@@ -2,7 +2,8 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, test, vi } from "vitest";
 
-import { AccountMenu, NotificationMenu } from "../../index";
+import { AccountMenu } from "./account-menu";
+import { NotificationMenu } from "./notification-menu";
 
 function openMenu(trigger: HTMLElement) {
   fireEvent.keyDown(trigger, { key: "Enter", code: "Enter" });

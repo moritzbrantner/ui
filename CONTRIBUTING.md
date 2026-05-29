@@ -37,7 +37,7 @@ Before exporting a component:
 - It does not expose arbitrary visual knobs.
 - It has Storybook coverage.
 - It has focused tests for rendering and important accessibility behavior.
-- It lives in the correct tier under `src/components/stable`, `src/components/patterns`, `src/components/labs`, or `src/components/legacy`.
+- It lives in the correct tier under `src/components/stable`, `src/components/patterns`, `src/components/data`, `src/components/shell`, `src/components/social`, `src/components/media`, or `src/components/labs`.
 - It is listed in `src/component-registry.ts` with the correct public subpath, Storybook files, and test files.
 - It is exported from its tier barrel. Only `stable` and `patterns` components are root-exported through `src/index.ts`.
 
@@ -45,14 +45,17 @@ Tier policy:
 
 - `stable`: primitives and low-level controls with strict contract checks.
 - `patterns`: state-light composed components for reusable app workflows.
+- `data`: shared table, filter, search, list, and bulk-selection surfaces; not root-exported.
+- `shell`: app chrome and navigation surfaces; not root-exported.
+- `social`: chat, feed, social-action, and profile-summary surfaces; not root-exported.
+- `media`: image editing and media manipulation surfaces; not root-exported.
 - `labs`: experimental public components; not root-exported.
-- `legacy`: deprecated public components; not root-exported and must include `deprecatedSince` plus `migration`.
 
-New component subpaths must be tiered, for example `@moritzbrantner/ui/components/stable/button` or `@moritzbrantner/ui/components/patterns/data-grid`. Do not add compatibility wrappers for the removed flat `@moritzbrantner/ui/components/*` paths.
+New component subpaths must be tiered, for example `@moritzbrantner/ui/components/stable/button` or `@moritzbrantner/ui/components/data/data-grid`. Do not add compatibility wrappers for the removed flat `@moritzbrantner/ui/components/*` paths.
 
 ## Storybook checklist
 
-Every `stable` and `patterns` component must appear in Storybook through a registry-listed file.
+Every release-blocking public tier component must appear in Storybook through a registry-listed file.
 
 Dedicated `*.stories.tsx` files are preferred for components that should be directly discoverable in the sidebar. Aggregate catalog stories can supplement coverage, but they should not be the only place a component is demonstrated when the component stands on its own.
 

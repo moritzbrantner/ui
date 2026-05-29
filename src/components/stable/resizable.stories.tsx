@@ -20,7 +20,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "./resizabl
 
 const files = [
   "app/dashboard/page.tsx",
-  "components/data-table.tsx",
+  "components/data-grid.tsx",
   "components/filters.tsx",
   "lib/query-client.ts",
 ];

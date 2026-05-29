@@ -6,6 +6,8 @@
 
 - Add public `TagInput`, `DisclosurePanel`, `ResourceList`, `ViewHeader`, `DetailsPanel`, and `ConfirmAction` components for reusable app surfaces.
 - Add `@moritzbrantner/ui/social` for chat, social actions, social feed, and profile summary components, and remove the old chat box API.
+- Add focused `@moritzbrantner/ui/data`, `@moritzbrantner/ui/shell`, and `@moritzbrantner/ui/media` entrypoints; data-page, app-shell, and media-editing components are no longer exported from root or patterns/labs barrels.
+- Remove the legacy `DataTable` API; use `DataGrid` from `@moritzbrantner/ui/data` or `@moritzbrantner/ui/components/data/data-grid`.
 - Remove UI labs workflow editor surfaces; use `@moritzbrantner/workflow-editor/react` for workflow editing UI.
 - Remove the UI labs timeline editor; use `@moritzbrantner/timeline-editor/react` for timeline editing UI.
 - Expand chart, org-chart, and UML interactions with keyboard navigation and selection coverage.
@@ -18,10 +20,8 @@
 
 ### Minor Changes
 
-- Breaking: component subpaths are now tiered under `components/stable`, `components/patterns`, `components/labs`, and `components/legacy`.
-- Breaking: `labs` and `legacy` components are no longer root-exported; root and client exports contain only stable and pattern components plus shared helpers and theme client APIs.
-- Migration: replace flat component subpaths with tiered paths, such as `@moritzbrantner/ui/components/stable/button` and `@moritzbrantner/ui/components/patterns/data-grid`.
-- Legacy: `DataTable` is deprecated for app data pages and remains available only from legacy paths; use `DataGrid` for new data-page work.
+- Breaking: component subpaths are tiered; later releases move data, shell, social, and media surfaces to focused public entrypoints.
+- Migration: replace flat component subpaths with tiered paths, such as `@moritzbrantner/ui/components/stable/button`.
 - Add a typed component registry, tier barrels, tier-aware package checks, token metadata centralization, and migration documentation.
 
 ## 0.7.0

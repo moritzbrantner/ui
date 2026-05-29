@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
-import { SearchField } from "../../index";
+import { SearchField } from "./search-field";
 
 describe("search field", () => {
   afterEach(() => {

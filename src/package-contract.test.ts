@@ -22,7 +22,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  ActionBar,
   CodeBlock,
   CodeBlockCode,
   CodeBlockContent,
@@ -43,8 +42,6 @@ import {
   ComparisonMatrix,
   type ComparisonMatrixColumn,
   type ComparisonMatrixRowData,
-  DataGrid,
-  DataGridColumnHeader,
   DescriptionList,
   DescriptionListDetail,
   DescriptionListItem,
@@ -70,8 +67,6 @@ import {
   EmptyTitle,
   EmptyState,
   ErrorState,
-  FilterBar,
-  FilterChip,
   FunnelChart,
   type FunnelChartSegmentData,
   HoverPreview,
@@ -98,17 +93,6 @@ import {
   MobileSlideHeader,
   MobileSlideTitle,
   MobileSlideTrigger,
-  PlatformNavbar,
-  type PlatformNavbarGroup,
-  PageActions,
-  PageContent,
-  PageDescription,
-  PageHeader,
-  PageShell,
-  PageTitle,
-  SectionGrid,
-  SearchField,
-  SelectionToolbar,
   ResponsiveActionMenu,
   type ResponsiveActionMenuProps,
   ShortcutList,
@@ -133,11 +117,6 @@ import {
   StepperIndicator,
   StepperItem,
   StepperTitle,
-  Surface,
-  SurfaceContent,
-  SurfaceDescription,
-  SurfaceHeader,
-  SurfaceTitle,
   Switch,
   ThemeModeSwitch,
   type ThemeMode,
@@ -160,13 +139,37 @@ import {
   type UiThemeName,
 } from ".";
 import * as RootExports from ".";
+import {
+  DataGrid,
+  DataGridColumnHeader,
+  FilterBar,
+  FilterChip,
+  SearchField,
+  SelectionToolbar,
+} from "./data";
+import {
+  ActionBar,
+  PageActions,
+  PageContent,
+  PageDescription,
+  PageHeader,
+  PageShell,
+  PageTitle,
+  PlatformNavbar,
+  type PlatformNavbarGroup,
+  SectionGrid,
+  Surface,
+  SurfaceContent,
+  SurfaceDescription,
+  SurfaceHeader,
+  SurfaceTitle,
+} from "./shell";
 import { AtlasTheme, atlasTheme, uiTheme as atlasUiTheme } from "./atlas";
 import { atlasTheme as atlasServerTheme, uiTheme as atlasServerUiTheme } from "./atlas-server";
 import { BobbaTheme, Button as BobbaButton, bobbaTheme, uiTheme as bobbaUiTheme } from "./bobba";
 import { bobbaTheme as bobbaServerTheme, uiTheme as bobbaServerUiTheme } from "./bobba-server";
 import {
   Button as ClientButton,
-  DataGrid as ClientDataGrid,
   Dialog as ClientDialog,
 } from "./client";
 import { Button as SubpathButton } from "./components/stable/button";
@@ -180,11 +183,10 @@ import { RelationshipMap as SubpathRelationshipMap } from "./components/stable/r
 import { ActionMenu as SubpathActionMenu } from "./components/patterns/action-menu";
 import { ActionSheet as SubpathActionSheet } from "./components/patterns/action-sheet";
 import { ContextActionMenu as SubpathContextActionMenu } from "./components/patterns/context-action-menu";
-import { DataGrid as SubpathDataGrid } from "./components/patterns/data-grid";
+import { DataGrid as SubpathDataGrid } from "./components/data/data-grid";
 import { Dialog as SubpathDialog } from "./components/stable/dialog";
-import { FilterBar as SubpathFilterBar } from "./components/patterns/filter-bar";
+import { FilterBar as SubpathFilterBar } from "./components/data/filter-bar";
 import { HoverPreview as SubpathHoverPreview } from "./components/patterns/hover-preview";
-import { DataTable as LegacyDataTable } from "./components/legacy/data-table";
 import { Chat as SubpathChat } from "./components/social/chat";
 import { getMenuActionItemText as subpathGetMenuActionItemText } from "./components/patterns/menu-actions";
 import { ResponsiveActionMenu as SubpathResponsiveActionMenu } from "./components/patterns/responsive-action-menu";
@@ -256,7 +258,6 @@ const shadcnBasicComponentFiles = [
   "combobox",
   "command",
   "context-menu",
-  "data-table",
   "date-picker",
   "dialog",
   "direction",
@@ -461,10 +462,14 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./client"].types).toBe("./dist/client.d.ts");
     expect(packageJson.exports["./stable"].import).toBe("./dist/stable.js");
     expect(packageJson.exports["./patterns"].import).toBe("./dist/patterns.js");
+    expect(packageJson.exports["./data"].import).toBe("./dist/data.js");
+    expect(packageJson.exports["./shell"].import).toBe("./dist/shell.js");
     expect(packageJson.exports["./social"].import).toBe("./dist/social.js");
     expect(packageJson.exports["./social"].types).toBe("./dist/social.d.ts");
+    expect(packageJson.exports["./media"].import).toBe("./dist/media.js");
+    expect(packageJson.exports["./media"].types).toBe("./dist/media.d.ts");
     expect(packageJson.exports["./labs"].import).toBe("./dist/labs.js");
-    expect(packageJson.exports["./legacy"].import).toBe("./dist/legacy.js");
+    expect(packageJson.exports["./legacy"]).toBeUndefined();
     expect(packageJson.exports["./atlas/styles.css"]).toBe("./atlas/styles.css");
     expect(packageJson.exports["./studio/styles.css"]).toBe("./studio/styles.css");
     expect(packageJson.exports["./paper/styles.css"]).toBe("./paper/styles.css");
@@ -475,13 +480,20 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./components/patterns/*"].import).toBe(
       "./dist/components/patterns/*.js",
     );
+    expect(packageJson.exports["./components/data/*"].import).toBe(
+      "./dist/components/data/*.js",
+    );
+    expect(packageJson.exports["./components/shell/*"].import).toBe(
+      "./dist/components/shell/*.js",
+    );
     expect(packageJson.exports["./components/social/*"].import).toBe(
       "./dist/components/social/*.js",
     );
-    expect(packageJson.exports["./components/labs/*"].import).toBe("./dist/components/labs/*.js");
-    expect(packageJson.exports["./components/legacy/*"].import).toBe(
-      "./dist/components/legacy/*.js",
+    expect(packageJson.exports["./components/media/*"].import).toBe(
+      "./dist/components/media/*.js",
     );
+    expect(packageJson.exports["./components/labs/*"].import).toBe("./dist/components/labs/*.js");
+    expect(packageJson.exports["./components/legacy/*"]).toBeUndefined();
     expect(packageJson.exports["./lib/cn"].import).toBe("./dist/lib/cn.js");
     expect(consumerExample).toContain('import "@moritzbrantner/ui/styles.css";');
     expect(consumerExample).toContain('from "@moritzbrantner/ui"');
@@ -506,9 +518,14 @@ describe("@moritzbrantner/ui package-contract", () => {
 
     expect(indexSource).toContain('export * from "./stable";');
     expect(indexSource).toContain('export * from "./patterns";');
+    expect(indexSource).not.toContain('export * from "./data";');
+    expect(indexSource).not.toContain('export * from "./shell";');
+    expect(indexSource).not.toContain('export * from "./media";');
     expect(indexSource).not.toContain('export * from "./labs";');
-    expect(indexSource).not.toContain('export * from "./legacy";');
     expect(Object.hasOwn(RootExports, "DataTable")).toBe(false);
+    expect(Object.hasOwn(RootExports, "DataGrid")).toBe(false);
+    expect(Object.hasOwn(RootExports, "PlatformNavbar")).toBe(false);
+    expect(Object.hasOwn(RootExports, "ImageCropper")).toBe(false);
     expect(Object.hasOwn(RootExports, "WorkflowBuilder")).toBe(false);
     expect(Object.hasOwn(RootExports, "Chat")).toBe(false);
     expect(Object.hasOwn(RootExports, "Chat" + "Box")).toBe(false);
@@ -522,7 +539,6 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(serverCn("px-4", "px-2")).toBe("px-2");
     expect(serverThemeConfig.bobba.name).toBe("bobba");
     expect(ClientButton).toBe(Button);
-    expect(ClientDataGrid).toBe(DataGrid);
     expect(ClientDialog).toBe(Dialog);
     expect(SubpathButton).toBe(Button);
     expect(SubpathComparisonMatrix).toBe(ComparisonMatrix);
@@ -541,7 +557,6 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(SubpathHoverPreview).toBe(HoverPreview);
     expect(SubpathResponsiveActionMenu).toBe(ResponsiveActionMenu);
     expect(SubpathChat).toBe(Chat);
-    expect(typeof LegacyDataTable).toBe("function");
     expect(subpathGetMenuActionItemText({ id: "contract", label: "Contract" })).toBe("Contract");
     expect(typeof FilterChip).toBe("function");
     expect(typeof ActionMenu).toBe("function");

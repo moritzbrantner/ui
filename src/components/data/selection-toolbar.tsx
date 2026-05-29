@@ -4,7 +4,7 @@ import * as React from "react";
 import { XIcon } from "lucide-react";
 
 import { cn } from "../../lib/cn";
-import { ActionBar } from "./app-layout";
+import { ActionBar } from "../internal/action-bar";
 import { Button } from "../stable/button";
 
 export type SelectionToolbarProps = React.ComponentProps<"div"> & {

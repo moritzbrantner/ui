@@ -46,17 +46,25 @@
       "types": "./dist/patterns.d.ts",
       "import": "./dist/patterns.js"
     },
+    "./data": {
+      "types": "./dist/data.d.ts",
+      "import": "./dist/data.js"
+    },
+    "./shell": {
+      "types": "./dist/shell.d.ts",
+      "import": "./dist/shell.js"
+    },
     "./social": {
       "types": "./dist/social.d.ts",
       "import": "./dist/social.js"
     },
+    "./media": {
+      "types": "./dist/media.d.ts",
+      "import": "./dist/media.js"
+    },
     "./labs": {
       "types": "./dist/labs.d.ts",
       "import": "./dist/labs.js"
-    },
-    "./legacy": {
-      "types": "./dist/legacy.d.ts",
-      "import": "./dist/legacy.js"
     },
     "./zleek": {
       "types": "./dist/zleek.d.ts",
@@ -114,17 +122,25 @@
       "types": "./dist/components/patterns/*.d.ts",
       "import": "./dist/components/patterns/*.js"
     },
+    "./components/data/*": {
+      "types": "./dist/components/data/*.d.ts",
+      "import": "./dist/components/data/*.js"
+    },
+    "./components/shell/*": {
+      "types": "./dist/components/shell/*.d.ts",
+      "import": "./dist/components/shell/*.js"
+    },
     "./components/social/*": {
       "types": "./dist/components/social/*.d.ts",
       "import": "./dist/components/social/*.js"
     },
+    "./components/media/*": {
+      "types": "./dist/components/media/*.d.ts",
+      "import": "./dist/components/media/*.js"
+    },
     "./components/labs/*": {
       "types": "./dist/components/labs/*.d.ts",
       "import": "./dist/components/labs/*.js"
-    },
-    "./components/legacy/*": {
-      "types": "./dist/components/legacy/*.d.ts",
-      "import": "./dist/components/legacy/*.js"
     },
     "./styles.css": "./styles.css",
     "./theme-scopes.css": "./theme-scopes.css",

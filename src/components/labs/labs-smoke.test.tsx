@@ -5,8 +5,6 @@ import { beforeAll, describe, expect, test } from "vitest";
 import {
   AnnotationCanvas,
   DocumentViewer,
-  ImageCropper,
-  ImageFilterEditor,
   Timeline,
   TimelineConnector,
   TimelineContent,
@@ -18,6 +16,7 @@ import {
   type AnnotationCanvasAnnotation,
   type DocumentViewerPageData,
 } from "../../labs";
+import { ImageCropper, ImageFilterEditor } from "../../media";
 import {
   ProfileSummary,
   ProfileSummaryAvatar,

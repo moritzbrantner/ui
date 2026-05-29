@@ -1,6 +1,6 @@
 # Responsive Public Component Audit
 
-This matrix covers the root-public `stable` and `patterns` exports. Labs and legacy components are intentionally excluded from this pass unless a public Storybook fixture already exercises them indirectly.
+This matrix covers root-public `stable` and `patterns` exports plus the focused `data`, `shell`, `social`, and `media` public tiers. Labs components are intentionally excluded unless a public Storybook fixture already exercises them indirectly.
 
 ## Responsive Categories
 

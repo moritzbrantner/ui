@@ -140,7 +140,7 @@ function verifyConsumerSource(root: string): void {
 
   for (const expected of [
     'from "@moritzbrantner/ui/components/stable/button"',
-    'from "@moritzbrantner/ui/components/patterns/data-grid"',
+    'from "@moritzbrantner/ui/components/data/data-grid"',
     'from "@moritzbrantner/ui/components/stable/dialog"',
     'from "@moritzbrantner/ui/atlas/server"',
     'from "@moritzbrantner/ui/server"',
