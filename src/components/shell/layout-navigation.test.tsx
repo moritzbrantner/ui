@@ -11,6 +11,7 @@ import {
   PageHeader,
   PageShell,
   PageTitle,
+  MobileAppNavigation,
   Navbar,
   NavbarActions,
   SectionGrid,
@@ -206,5 +207,184 @@ describe("pattern layout and navigation", () => {
     expect(groupList?.className).toContain("overflow-x-auto");
     expect(groupList?.className).toContain("snap-x");
     expect(trigger.className).toContain("min-w-24");
+  });
+
+  test("mobile app navigation renders derived tabs and active state", () => {
+    render(<MobileAppNavigation brand="Platform" groups={manyGroups} activeItemId="guides" />);
+
+    const nav = screen.getByRole("navigation", { name: "Mobile app navigation" });
+
+    expect(nav.getAttribute("data-slot")).toBe("mobile-app-navigation");
+    expect(nav.querySelectorAll('[data-slot="mobile-app-navigation-tab"]').length).toBe(4);
+    expect(screen.getByRole("link", { name: "Guides" }).getAttribute("aria-current")).toBe("page");
+  });
+
+  test("mobile app navigation caps default tabs with maxTabs", () => {
+    render(<MobileAppNavigation brand="Platform" groups={manyGroups} maxTabs={3} />);
+
+    expect(
+      screen
+        .getByRole("navigation", { name: "Mobile app navigation" })
+        .querySelectorAll('[data-slot="mobile-app-navigation-tab"]').length,
+    ).toBe(3);
+  });
+
+  test("mobile app navigation drawer opens and navigates without owning routing", async () => {
+    const onNavigate = vi.fn();
+    const onSelect = vi.fn();
+    const drawerGroups: NavbarGroup[] = [
+      {
+        id: "workspace",
+        label: "Workspace",
+        items: [
+          { id: "overview", label: "Overview", href: "#overview" },
+          { id: "settings", label: "Settings", href: "#settings", onSelect },
+        ],
+      },
+    ];
+
+    render(
+      <MobileAppNavigation
+        brand="Platform"
+        groups={drawerGroups}
+        onNavigate={onNavigate}
+        menuDescription="All destinations"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Open navigation menu" }));
+
+    expect(await screen.findByText("All destinations")).toBeTruthy();
+    fireEvent.click(await screen.findByRole("link", { name: /Settings/ }));
+
+    await waitFor(() => expect(onSelect).toHaveBeenCalledTimes(1));
+    expect(onNavigate).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "settings" }),
+      expect.objectContaining({ id: "workspace" }),
+    );
+    await waitFor(() => {
+      expect(
+        document
+          .querySelector('[data-slot="mobile-app-navigation-drawer"]')
+          ?.getAttribute("data-state"),
+      ).toBe("closed");
+    });
+  });
+
+  test("mobile app navigation passes tab and drawer placements to renderLink", async () => {
+    const renderLink = vi.fn(
+      ({ children, className, href, onClick, placement, "aria-current": ariaCurrent }) => (
+        <a
+          aria-current={ariaCurrent}
+          data-placement={placement}
+          className={className}
+          href={href ?? "#test"}
+          onClick={onClick}
+        >
+          {children}
+        </a>
+      ),
+    );
+
+    render(
+      <MobileAppNavigation
+        brand="Platform"
+        groups={groups}
+        defaultDrawerOpen
+        renderLink={renderLink}
+      />,
+    );
+
+    await screen.findByText("Workspace");
+
+    expect(renderLink).toHaveBeenCalledWith(expect.objectContaining({ placement: "tab" }));
+    expect(renderLink).toHaveBeenCalledWith(expect.objectContaining({ placement: "drawer" }));
+    expect(
+      Array.from(document.querySelectorAll("a[data-placement]"))
+        .filter((link) => link.textContent?.includes("Overview"))
+        .map((link) => link.getAttribute("data-placement"))
+        .sort(),
+    ).toEqual(["drawer", "tab"]);
+  });
+
+  test("mobile app navigation keeps disabled items from navigating", async () => {
+    const onNavigate = vi.fn();
+    const disabledGroups: NavbarGroup[] = [
+      {
+        id: "workspace",
+        label: "Workspace",
+        items: [
+          { id: "overview", label: "Overview", href: "/overview" },
+          { id: "settings", label: "Settings", href: "/settings", disabled: true },
+        ],
+      },
+    ];
+
+    render(
+      <MobileAppNavigation
+        brand="Platform"
+        groups={disabledGroups}
+        defaultDrawerOpen
+        onNavigate={onNavigate}
+      />,
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: /Settings/ }));
+
+    expect(onNavigate).not.toHaveBeenCalled();
+  });
+
+  test("mobile app navigation renders action and footer slots", async () => {
+    render(
+      <MobileAppNavigation
+        brand="Platform"
+        groups={groups}
+        defaultDrawerOpen
+        actionSlot={<Button>Theme</Button>}
+        footerSlot={<Button>Sign out</Button>}
+      />,
+    );
+
+    expect(await screen.findByRole("button", { name: "Theme" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Sign out" })).toBeTruthy();
+    expect(
+      screen
+        .getByRole("button", { name: "Theme" })
+        .closest('[data-slot="mobile-app-navigation-actions"]'),
+    ).toBeTruthy();
+    expect(
+      screen
+        .getByRole("button", { name: "Sign out" })
+        .closest('[data-slot="mobile-app-navigation-footer"]'),
+    ).toBeTruthy();
+  });
+
+  test("mobile app navigation supports controlled drawer state", async () => {
+    const onDrawerOpenChange = vi.fn();
+
+    const { rerender } = render(
+      <MobileAppNavigation
+        brand="Platform"
+        groups={groups}
+        drawerOpen={false}
+        onDrawerOpenChange={onDrawerOpenChange}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Open navigation menu" }));
+
+    expect(onDrawerOpenChange).toHaveBeenCalledWith(true);
+    expect(screen.queryByText("Workspace")).toBeNull();
+
+    rerender(
+      <MobileAppNavigation
+        brand="Platform"
+        groups={groups}
+        drawerOpen
+        onDrawerOpenChange={onDrawerOpenChange}
+      />,
+    );
+
+    expect(await screen.findByText("Workspace")).toBeTruthy();
   });
 });
