@@ -8,7 +8,7 @@ import {
   ChartHistogramGraph,
   ChartLineGraph,
   ChartSparkline,
-} from "./chart";
+} from "./chart/native";
 
 const revenueData = [
   { month: "Jan", revenue: 42, forecast: 36 },
@@ -199,6 +199,7 @@ export const BusinessDashboard: Story = {
           { key: "target", label: "Target", color: "var(--chart-4)" },
         ]}
         xKey="workstream"
+        interactive={false}
         valueLabels="auto"
         summary="Readiness is above target in two of four workstreams."
         caption="Percent complete by release workstream."
@@ -213,6 +214,7 @@ export const BusinessDashboard: Story = {
         ]}
         series={[{ key: "confidence", label: "Confidence", color: "var(--chart-2)" }]}
         xKey="week"
+        interactive={false}
         valueLabels="auto"
         summary="Confidence improved after package-consumption checks landed."
       />

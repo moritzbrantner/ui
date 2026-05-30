@@ -44,15 +44,23 @@ const baselinePath = path.join(
 );
 const updateBaseline = process.argv.includes("--update");
 const distEntry = path.join(packageRoot, "dist", "index.js");
+const dataEntry = path.join(packageRoot, "dist", "data.js");
 const labsEntry = path.join(packageRoot, "dist", "labs.js");
 const runningInCi = process.env.CI === "true";
 
-if (!existsSync(distEntry)) {
-  console.error("@moritzbrantner/ui benchmark requires dist/. Run `bun run build` first.");
+const missingDistEntries = [distEntry, dataEntry, labsEntry].filter((entry) => !existsSync(entry));
+
+if (missingDistEntries.length > 0) {
+  console.error(
+    `@moritzbrantner/ui benchmark requires built dist entrypoints. Missing: ${missingDistEntries
+      .map((entry) => path.relative(packageRoot, entry))
+      .join(", ")}. Run \`bun run build\` first.`,
+  );
   process.exit(1);
 }
 
 const ui = (await import(distEntry)) as UiModule;
+const data = (await import(dataEntry)) as UiModule;
 const labs = (await import(labsEntry)) as UiModule;
 const benchmarks: BenchmarkRunner[] = [
   benchmark("logic.cnMerge", "logic", () => {
@@ -104,7 +112,7 @@ const benchmarks: BenchmarkRunner[] = [
   }),
   benchmark("render.dataGrid100", "render", () => {
     renderUi(
-      React.createElement(ui.DataGrid, {
+      React.createElement(data.DataGrid, {
         columns: [
           { accessorKey: "name", header: "Name" },
           { accessorKey: "amount", header: "Amount" },
@@ -116,7 +124,7 @@ const benchmarks: BenchmarkRunner[] = [
   }),
   benchmark("render.dataGrid1000", "render", () => {
     renderUi(
-      React.createElement(ui.DataGrid, {
+      React.createElement(data.DataGrid, {
         columns: [
           { accessorKey: "name", header: "Name" },
           { accessorKey: "amount", header: "Amount" },
@@ -128,7 +136,7 @@ const benchmarks: BenchmarkRunner[] = [
   }),
   benchmark("render.dataGrid500Rows10Columns", "render", () => {
     renderUi(
-      React.createElement(ui.DataGrid, {
+      React.createElement(data.DataGrid, {
         columns: Array.from({ length: 10 }, (_, index) => ({
           accessorKey: `field${index}`,
           header: `Field ${index}`,

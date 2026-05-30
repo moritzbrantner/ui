@@ -385,25 +385,81 @@ async function verifyPageLayout(page: Page, storyId: string) {
     expect(hasScrollContainer, `${storyId} should own its scroll region`).toBe(true);
   }
 
-  await page.keyboard.press("Tab");
-
-  const activeElementIsVisible = await page.evaluate(() => {
-    const element = document.activeElement;
-
-    if (!(element instanceof HTMLElement) || element === document.body) {
-      return true;
-    }
-
-    const box = element.getBoundingClientRect();
-
-    return box.width > 0 && box.height > 0;
-  });
-
-  expect(activeElementIsVisible, "keyboard focus target should be visible").toBe(true);
+  await verifyPostTabFocusTarget(page);
 
   if (storyId.startsWith("components-navigation-navbar--")) {
     await verifyNavbarLayout(page, storyId);
   }
+}
+
+async function verifyPostTabFocusTarget(page: Page) {
+  let lastFocusDebug = "no active element";
+
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    await page.keyboard.press("Tab");
+
+    const focusState = await page.evaluate(() => {
+      const element = document.activeElement;
+
+      if (!(element instanceof HTMLElement) || element === document.body) {
+        return {
+          isBody: true,
+          isRadixFocusGuard: false,
+          isVisible: true,
+          debug: "body",
+        };
+      }
+
+      const box = element.getBoundingClientRect();
+      const style = window.getComputedStyle(element);
+      const isVisible =
+        box.width > 0 &&
+        box.height > 0 &&
+        style.display !== "none" &&
+        style.visibility !== "hidden";
+      const debug = JSON.stringify({
+        tag: element.tagName.toLowerCase(),
+        role: element.getAttribute("role"),
+        dataSlot: element.getAttribute("data-slot"),
+        ariaLabel: element.getAttribute("aria-label"),
+        tabindex: element.getAttribute("tabindex"),
+        box: {
+          x: Math.round(box.x),
+          y: Math.round(box.y),
+          width: Math.round(box.width),
+          height: Math.round(box.height),
+        },
+      });
+
+      return {
+        isBody: false,
+        isRadixFocusGuard: element.matches("[data-radix-focus-guard]"),
+        isVisible,
+        debug,
+      };
+    });
+
+    lastFocusDebug = focusState.debug;
+
+    if (focusState.isBody || focusState.isVisible) {
+      expect(true, `keyboard focus target should be visible: ${focusState.debug}`).toBe(true);
+      return;
+    }
+
+    if (focusState.isRadixFocusGuard) {
+      continue;
+    }
+
+    expect(
+      focusState.isVisible,
+      `keyboard focus target should be visible: ${focusState.debug}`,
+    ).toBe(true);
+    return;
+  }
+
+  expect(false, `keyboard focus target should leave Radix focus guards: ${lastFocusDebug}`).toBe(
+    true,
+  );
 }
 
 async function verifyNavbarLayout(page: Page, storyId: string) {

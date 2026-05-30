@@ -111,6 +111,7 @@ function ImageThumbnailStrip({
         <div
           data-slot="image-thumbnail-strip-list"
           role="listbox"
+          aria-label={ariaLabel}
           aria-orientation={orientation}
           className={cn(
             "flex gap-2 p-0.5",

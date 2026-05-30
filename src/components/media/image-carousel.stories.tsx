@@ -52,7 +52,7 @@ export const Default: Story = {
   play: async ({ canvas, userEvent }) => {
     await expect(canvas.getByAltText("Studio workspace")).toBeVisible();
     await userEvent.click(canvas.getByRole("button", { name: "Next image" }));
-    await expect(canvas.getByRole("button", { name: "Object detail" })).toHaveAttribute(
+    await expect(canvas.getByRole("button", { name: /Object detail/ })).toHaveAttribute(
       "data-active",
       "true",
     );

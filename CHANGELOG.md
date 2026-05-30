@@ -1,5 +1,11 @@
 # @moritzbrantner/ui
 
+## 0.9.1
+
+### Patch Changes
+
+- Fix release verification blockers for Storybook accessibility checks, package benchmarks, visual overlay focus handling, and Unlighthouse chart dashboard performance.
+
 ## 0.9.0
 
 ### Minor Changes

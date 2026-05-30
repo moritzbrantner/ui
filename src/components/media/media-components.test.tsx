@@ -218,6 +218,7 @@ describe("media components", () => {
     render(<ImageThumbnailStrip items={galleryItems} onSelect={onSelect} showCount />);
 
     expect(screen.getByText("3 images")).toBeTruthy();
+    expect(screen.getByRole("listbox", { name: "Image thumbnails" })).toBeTruthy();
 
     const detailThumbnail = screen.getByRole("option", { name: "Detail" });
 

@@ -24,7 +24,7 @@ const mediaPath = path.join(packageRoot, "src", "media.ts");
 const labsPath = path.join(packageRoot, "src", "labs.ts");
 const errors: string[] = [];
 const publicTiers = ["stable", "patterns", "data", "shell", "social", "media", "labs"] as const;
-const expectedPackageVersion = "0.9.0";
+const expectedPackageVersion = "0.9.1";
 const rootExportTiers = new Set<ComponentTier>(["stable", "patterns"]);
 const releaseBlockingTiers = new Set<ComponentTier>([
   "stable",
@@ -459,7 +459,13 @@ function verifyComponentContracts() {
   }
 }
 
-function readComponentContractSource(componentPath: string): string {
+function readComponentContractSource(componentPath: string, seen = new Set<string>()): string {
+  if (seen.has(componentPath)) {
+    return "";
+  }
+
+  seen.add(componentPath);
+
   const componentSource = readFileSync(componentPath, "utf8");
   const reExportMatches = [...componentSource.matchAll(/export\s+\*\s+from\s+["'](.+)["']/g)];
 
@@ -471,7 +477,7 @@ function readComponentContractSource(componentPath: string): string {
   const nestedSources = reExportMatches
     .map((match) => resolveTypeScriptModulePath(componentDir, match[1]))
     .filter((resolvedPath): resolvedPath is string => Boolean(resolvedPath))
-    .map((resolvedPath) => readFileSync(resolvedPath, "utf8"));
+    .map((resolvedPath) => readComponentContractSource(resolvedPath, seen));
 
   return [componentSource, ...nestedSources].join("\n");
 }
