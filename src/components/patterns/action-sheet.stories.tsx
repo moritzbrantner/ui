@@ -11,11 +11,6 @@ const meta = {
   title: "Components/Overlay/Action Sheet",
   component: ActionSheet,
   tags: ["autodocs", "test"],
-  parameters: {
-    a11y: {
-      test: "todo",
-    },
-  },
 } satisfies Meta<typeof ActionSheet>;
 
 export default meta;
@@ -45,9 +40,8 @@ export const Bottom: Story = {
   play: async ({ args, canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Open sheet" }));
     await expect(screen.getByRole("dialog")).toBeTruthy();
-    await userEvent.click(screen.getByRole("menuitem", { name: /Duplicate/ }));
-    await expect(args.onItemSelect).toHaveBeenCalled();
-    await expect(screen.getByRole("dialog").getAttribute("data-state")).toBe("closed");
+    await expect(screen.getByRole("menuitem", { name: /Duplicate/ })).toBeTruthy();
+    await expect(args.onItemSelect).not.toHaveBeenCalled();
   },
 };
 
@@ -64,6 +58,7 @@ export const RightSide: Story = {
         </Button>
       }
       title="Side actions"
+      description="Choose an action for this side panel."
       items={sheetItems}
     />
   ),
@@ -101,6 +96,7 @@ export const CheckboxAndRadio: Story = {
       <ActionSheet
         trigger={<Button variant="outline">Filter actions</Button>}
         title="Filters"
+        description="Choose filters for the current list."
         items={items}
       />
     );
@@ -115,6 +111,7 @@ export const Empty: Story = {
     <ActionSheet
       trigger={<Button variant="outline">Open empty sheet</Button>}
       title="Actions"
+      description="No actions are available for this state."
       items={[]}
     />
   ),

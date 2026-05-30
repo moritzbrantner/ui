@@ -85,7 +85,9 @@ describe("account menu", () => {
 
     openMenu(trigger);
 
-    expect(await screen.findByTestId("account-content")).toBeTruthy();
+    const content = await screen.findByTestId("account-content");
+    expect(content).toBeTruthy();
+    expect(content.getAttribute("aria-label")).toBe("Open account menu");
   });
 
   test("applies destructive item variant without owning logout behavior", async () => {
@@ -145,9 +147,10 @@ describe("notification menu", () => {
 
     openMenu(screen.getByRole("button", { name: "Notifications" }));
 
-    const link = await screen.findByRole("link", { name: "Notifications" });
-    expect(link.getAttribute("href")).toBe("/notifications");
-    expect(link.getAttribute("target")).toBe("_self");
+    const linkItem = await screen.findByRole("menuitem", { name: "Notifications" });
+    expect(linkItem.tagName).toBe("A");
+    expect(linkItem.getAttribute("href")).toBe("/notifications");
+    expect(linkItem.getAttribute("target")).toBe("_self");
   });
 
   test("forwards notification trigger and content props", async () => {
@@ -163,7 +166,9 @@ describe("notification menu", () => {
 
     openMenu(trigger);
 
-    expect(await screen.findByTestId("notification-content")).toBeTruthy();
+    const content = await screen.findByTestId("notification-content");
+    expect(content).toBeTruthy();
+    expect(content.getAttribute("aria-label")).toBe("Notifications");
   });
 
   test("marks an individual notification as read without selecting it", async () => {
@@ -187,7 +192,7 @@ describe("notification menu", () => {
     );
 
     openMenu(screen.getByRole("button", { name: "Notifications, 1 unread" }));
-    fireEvent.click(await screen.findByRole("button", { name: "Mark Jules followed you as read" }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Mark read" }));
 
     await waitFor(() => expect(onMarkRead).toHaveBeenCalledTimes(1));
     expect(onMarkRead).toHaveBeenCalledWith(
@@ -212,14 +217,12 @@ describe("notification menu", () => {
     );
 
     openMenu(screen.getByRole("button", { name: "Notifications, 2 unread" }));
-    expect(
-      await screen.findByRole("button", { name: "Mark Jules followed you as read" }),
-    ).toBeTruthy();
+    expect(await screen.findByRole("menuitem", { name: "Mark read" })).toBeTruthy();
     expect(
       document.body.querySelector('[data-slot="notification-menu-unread-indicator"]'),
     ).toBeTruthy();
 
-    fireEvent.click(screen.getByRole("button", { name: "Mark Jules followed you as read" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Mark read" }));
 
     await waitFor(() =>
       expect(document.body.querySelector('[aria-label="Notifications, 1 unread"]')).toBeTruthy(),
@@ -227,7 +230,7 @@ describe("notification menu", () => {
     expect(
       document.body.querySelector('[data-slot="notification-menu-unread-indicator"]'),
     ).toBeNull();
-    expect(screen.queryByRole("button", { name: "Mark Jules followed you as read" })).toBeNull();
+    expect(screen.queryByRole("menuitem", { name: "Mark read" })).toBeNull();
   });
 
   test("calls onMarkAllRead when the action is present", async () => {

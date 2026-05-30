@@ -32,6 +32,7 @@ describe("ActionMenu", () => {
     render(
       <ActionMenu
         trigger={<button type="button">Open actions</button>}
+        label="Row actions"
         items={[
           {
             id: "duplicate",
@@ -46,6 +47,7 @@ describe("ActionMenu", () => {
     openMenu(screen.getByRole("button", { name: "Open actions" }));
 
     expect(await screen.findByRole("menuitem", { name: /Duplicate/ })).toBeTruthy();
+    expect(screen.getByRole("menu").getAttribute("aria-label")).toBe("Row actions");
     expect(screen.getByText("Create another copy.")).toBeTruthy();
     expect(screen.getByText("D")).toBeTruthy();
   });

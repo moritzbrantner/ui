@@ -126,9 +126,6 @@ const meta = {
   tags: ["autodocs", "test"],
   parameters: {
     layout: "fullscreen",
-    a11y: {
-      test: "todo",
-    },
   },
   args: {
     brand: "Platform",
@@ -155,6 +152,7 @@ export const Web: Story = {
         languageSwitcher
         themeModeSwitch
         notificationMenu={{
+          modal: false,
           unreadCount: 2,
           items: [
             {
@@ -177,6 +175,7 @@ export const Web: Story = {
           onMarkAllRead: () => {},
         }}
         accountMenu={{
+          modal: false,
           user: {
             name: "Mira Brandt",
             email: "mira@example.com",

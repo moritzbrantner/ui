@@ -1107,6 +1107,17 @@ const componentRegistry = [
     reason: "Reusable state-light application shell surface available through the shell API.",
   },
   {
+    name: "mobile-app-navigation",
+    fileName: "mobile-app-navigation",
+    tier: "shell",
+    rootExport: false,
+    publicSubpath: "@moritzbrantner/ui/components/shell/mobile-app-navigation",
+    storyFiles: ["src/components/shell/mobile-app-navigation.stories.tsx"],
+    testFiles: ["src/components/shell/layout-navigation.test.tsx"],
+    status: "shell",
+    reason: "Reusable state-light application shell surface available through the shell API.",
+  },
+  {
     name: "navbar",
     fileName: "navbar",
     tier: "shell",

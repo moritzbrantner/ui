@@ -21,6 +21,7 @@ type DataAttributes = {
 export type ContextActionMenuProps = Omit<React.ComponentProps<typeof ContextMenu>, "children"> & {
   children: React.ReactElement;
   items: MenuActionItem[];
+  label?: string;
   emptyMessage?: React.ReactNode;
   header?: React.ReactNode;
   footer?: React.ReactNode;
@@ -40,6 +41,7 @@ const contextActionMenuSlots = {
 function ContextActionMenu({
   children,
   items,
+  label,
   emptyMessage = "No actions available",
   header,
   footer,
@@ -63,6 +65,7 @@ function ContextActionMenu({
       <ContextMenuContent
         {...restContentProps}
         data-slot="context-action-menu-content"
+        aria-label={restContentProps["aria-label"] ?? label}
         className={cn("min-w-44 max-w-[min(22rem,calc(100vw-2rem))]", contentClassName)}
       >
         {header}

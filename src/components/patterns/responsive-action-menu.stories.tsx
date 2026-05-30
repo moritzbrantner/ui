@@ -9,11 +9,6 @@ const meta = {
   title: "Components/Overlay/Responsive Action Menu",
   component: ResponsiveActionMenu,
   tags: ["autodocs", "test"],
-  parameters: {
-    a11y: {
-      test: "todo",
-    },
-  },
 } satisfies Meta<typeof ResponsiveActionMenu>;
 
 export default meta;
@@ -40,6 +35,7 @@ export const DesktopMode: Story = {
         </Button>
       }
       label="Desktop actions"
+      desktopProps={{ modal: false }}
       items={items}
     />
   ),

@@ -256,6 +256,10 @@ export function Navbar({
     (groupId: string) => `navbar-${instanceId}-submenu-${groupId}`,
     [instanceId],
   );
+  const getTriggerId = React.useCallback(
+    (groupId: string) => `navbar-${instanceId}-trigger-${groupId}`,
+    [instanceId],
+  );
 
   const containsNavbarTarget = React.useCallback((target: EventTarget | null) => {
     if (!(target instanceof Node)) {
@@ -415,6 +419,7 @@ export function Navbar({
       id={getSubmenuId(openGroup.id)}
       data-slot="navbar-submenu"
       data-open
+      aria-labelledby={getTriggerId(openGroup.id)}
       className={cn(
         "fixed z-[100] overflow-x-hidden overflow-y-auto border border-border/60 bg-popover/74 text-popover-foreground opacity-100 shadow-[var(--glass-shadow)] backdrop-blur-2xl transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
         config.panel,
@@ -545,7 +550,8 @@ export function Navbar({
                       }
                     }}
                     type="button"
-                    aria-controls={getSubmenuId(group.id)}
+                    id={getTriggerId(group.id)}
+                    aria-controls={isOpen ? getSubmenuId(group.id) : undefined}
                     aria-expanded={isOpen}
                     className={cn(
                       "relative inline-flex min-w-0 shrink-0 items-center justify-center gap-2 overflow-hidden rounded-md border text-center font-medium outline-none transition-[transform,background-color,border-color,color,box-shadow] focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none hover:-translate-y-px active:scale-[0.97]",

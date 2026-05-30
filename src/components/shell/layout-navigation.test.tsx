@@ -162,6 +162,24 @@ describe("pattern layout and navigation", () => {
     expect(nav.getAttribute("data-variant")).toBe("web");
   });
 
+  test("navbar submenu controls only reference mounted submenu content", async () => {
+    render(<Navbar brand="Platform" groups={groups} defaultOpenGroupId={null} />);
+
+    const trigger = screen.getByRole("button", { name: "Workspace" });
+
+    expect(trigger.getAttribute("aria-controls")).toBeNull();
+
+    fireEvent.click(trigger);
+
+    await screen.findByRole("link", { name: /Overview/ });
+
+    const submenuId = trigger.getAttribute("aria-controls");
+    const submenu = submenuId ? document.getElementById(submenuId) : null;
+
+    expect(submenu).not.toBeNull();
+    expect(submenu?.getAttribute("aria-labelledby")).toBe(trigger.id);
+  });
+
   test("auto variant resolves to mobile below the shared breakpoint", () => {
     setViewportWidth(MOBILE_BREAKPOINT - 1);
 
@@ -227,6 +245,49 @@ describe("pattern layout and navigation", () => {
         .getByRole("navigation", { name: "Mobile app navigation" })
         .querySelectorAll('[data-slot="mobile-app-navigation-tab"]').length,
     ).toBe(3);
+  });
+
+  test("mobile app navigation switches dense icon tabs to icon-only labels on narrow screens", () => {
+    const icon = <span aria-hidden="true" className="size-4" />;
+    const denseGroups: NavbarGroup[] = [
+      {
+        id: "home",
+        label: "Home",
+        items: [{ id: "overview", label: "Overview", href: "/overview", icon }],
+      },
+      {
+        id: "workspace",
+        label: "Workspace",
+        items: [{ id: "dashboard", label: "Dashboard", href: "/dashboard", icon }],
+      },
+      {
+        id: "docs",
+        label: "Docs",
+        items: [{ id: "guides", label: "Guides", href: "/guides", icon }],
+      },
+      {
+        id: "team",
+        label: "Team",
+        items: [{ id: "members", label: "Members", href: "/members", icon }],
+      },
+      {
+        id: "account",
+        label: "Account",
+        items: [{ id: "profile", label: "Profile", href: "/profile", icon }],
+      },
+    ];
+
+    render(<MobileAppNavigation brand="Platform" groups={denseGroups} />);
+
+    expect(screen.getByText("Dashboard").className).toContain("max-[430px]:sr-only");
+    expect(screen.getByText("Menu").className).toContain("max-[430px]:sr-only");
+  });
+
+  test("mobile app navigation keeps iconless dense tab labels visible", () => {
+    render(<MobileAppNavigation brand="Platform" groups={manyGroups} />);
+
+    expect(screen.getByText("Overview").className).not.toContain("sr-only");
+    expect(screen.getByText("Menu").className).toContain("max-[360px]:sr-only");
   });
 
   test("mobile app navigation drawer opens and navigates without owning routing", async () => {

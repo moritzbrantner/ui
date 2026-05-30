@@ -29,9 +29,6 @@ const meta = {
   tags: ["autodocs", "test"],
   parameters: {
     layout: "centered",
-    a11y: {
-      test: "todo",
-    },
   },
   args: {
     user: {
@@ -40,6 +37,7 @@ const meta = {
       initials: "AL",
       meta: "Workspace owner",
     },
+    modal: false,
     items: defaultItems,
   },
 } satisfies Meta<typeof AccountMenu>;
@@ -92,7 +90,5 @@ export const OpensMenu: Story = {
 
     await expect(profileItem).toBeInTheDocument();
     await expect(await screen.findByText("ada@example.com")).toBeInTheDocument();
-
-    await userEvent.keyboard("{Escape}");
   },
 };

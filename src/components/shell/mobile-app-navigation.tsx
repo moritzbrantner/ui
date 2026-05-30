@@ -53,6 +53,18 @@ export type MobileAppNavigationTabProps = MobileAppNavigationRenderLinkProps;
 export type MobileAppNavigationMenuButtonProps = React.ComponentPropsWithoutRef<"button">;
 export type MobileAppNavigationDrawerProps = React.ComponentProps<typeof MobileSlideContent>;
 
+function getCompactLabelClass(visibleItemCount: number) {
+  if (visibleItemCount >= 6) {
+    return "max-[430px]:sr-only";
+  }
+
+  if (visibleItemCount >= 5) {
+    return "max-[360px]:sr-only";
+  }
+
+  return undefined;
+}
+
 function getInitialTabs(groups: NavbarGroup[], maxTabs: 3 | 4 | 5): MobileAppNavigationTabItem[] {
   const derivedTabs: MobileAppNavigationTabItem[] = [];
 
@@ -245,6 +257,7 @@ function MobileAppNavigation({
   const resolvedTabs = tabs ?? getInitialTabs(groups, maxTabs);
   const resolvedMenuTitle = menuTitle ?? brand ?? "Navigation";
   const renderNavigationLink = renderLink ?? DefaultMobileAppNavigationLink;
+  const compactLabelClass = getCompactLabelClass(resolvedTabs.length + 1);
 
   const handleSelect = React.useCallback(
     (item: NavbarItem, group?: NavbarGroup, closeDrawer = false) => {
@@ -283,7 +296,9 @@ function MobileAppNavigation({
             const content = (
               <>
                 {item.icon ? <span className="shrink-0 text-current">{item.icon}</span> : null}
-                <span className="max-w-full truncate">{item.label}</span>
+                <span className={cn("max-w-full truncate", item.icon && compactLabelClass)}>
+                  {item.label}
+                </span>
                 {item.badge ? (
                   <span className="absolute top-1 right-2 rounded-full bg-destructive px-1.5 py-0.5 text-[0.625rem] leading-none text-destructive-foreground">
                     {item.badge}
@@ -312,7 +327,10 @@ function MobileAppNavigation({
             );
           })}
           <MobileSlideTrigger asChild>
-            <MobileAppNavigationMenuButton aria-label={menuLabel} />
+            <MobileAppNavigationMenuButton aria-label={menuLabel}>
+              <MenuIcon className="size-5" aria-hidden="true" />
+              <span className={cn("max-w-full truncate", compactLabelClass)}>Menu</span>
+            </MobileAppNavigationMenuButton>
           </MobileSlideTrigger>
         </MobileAppNavigationBar>
       </nav>

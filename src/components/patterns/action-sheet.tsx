@@ -84,6 +84,7 @@ function ActionSheet({
   const { className: contentClassName, ...restContentProps } = contentProps ?? {};
   const { className: bodyClassName, ...restBodyProps } = bodyProps ?? {};
   const hasHeader = title || description || header;
+  const shouldRenderFallbackDescription = title && !description;
   const mobileSlideProps = props as React.ComponentProps<typeof MobileSlide>;
 
   return (
@@ -109,6 +110,11 @@ function ActionSheet({
           <MobileSlideHeader data-slot="action-sheet-header">
             {title ? <MobileSlideTitle>{title}</MobileSlideTitle> : null}
             {description ? <MobileSlideDescription>{description}</MobileSlideDescription> : null}
+            {shouldRenderFallbackDescription ? (
+              <MobileSlideDescription className="sr-only">
+                Choose an action from the list.
+              </MobileSlideDescription>
+            ) : null}
             {header}
           </MobileSlideHeader>
         ) : null}

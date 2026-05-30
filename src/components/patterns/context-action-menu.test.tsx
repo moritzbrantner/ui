@@ -109,6 +109,7 @@ describe("ContextActionMenu", () => {
     render(
       <ContextActionMenu
         items={[]}
+        label="Row actions"
         emptyMessage="No row actions"
         contentProps={{ className: "contract-class", "data-testid": "context-content" }}
       >
@@ -121,6 +122,7 @@ describe("ContextActionMenu", () => {
 
     expect(content.className).toContain("contract-class");
     expect(content.getAttribute("data-slot")).toBe("context-action-menu-content");
+    expect(content.getAttribute("aria-label")).toBe("Row actions");
     expect(screen.getByText("No row actions")).toBeTruthy();
   });
 });

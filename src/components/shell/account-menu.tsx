@@ -34,6 +34,7 @@ type DataAttributes = Record<`data-${string}`, string | number | boolean | undef
 
 export type AccountMenuProps = Omit<React.ComponentPropsWithoutRef<"button">, "children"> & {
   user: AccountMenuUser | null;
+  modal?: React.ComponentProps<typeof DropdownMenu>["modal"];
   label?: string;
   guestLabel?: React.ReactNode;
   items?: AccountMenuItem[];
@@ -46,6 +47,7 @@ export type AccountMenuProps = Omit<React.ComponentPropsWithoutRef<"button">, "c
 
 function AccountMenu({
   user,
+  modal,
   label = "Open account menu",
   guestLabel = "Guest",
   items = [],
@@ -65,7 +67,7 @@ function AccountMenu({
   const { className: contentClassName, ...restContentProps } = contentProps ?? {};
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={modal}>
       <DropdownMenuTrigger asChild>
         <button
           type="button"
@@ -106,11 +108,12 @@ function AccountMenu({
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
+        {...restContentProps}
         data-slot="account-menu"
+        aria-label={restContentProps["aria-label"] ?? label}
         align={align}
         sideOffset={sideOffset}
         className={cn("w-72", contentClassName)}
-        {...restContentProps}
       >
         <DropdownMenuLabel className="grid gap-0.5 px-2 py-2">
           <span className="truncate text-sm font-medium text-popover-foreground">

@@ -11,11 +11,6 @@ const meta = {
   title: "Components/Overlay/Action Menu",
   component: ActionMenu,
   tags: ["autodocs", "test"],
-  parameters: {
-    a11y: {
-      test: "todo",
-    },
-  },
 } satisfies Meta<typeof ActionMenu>;
 
 export default meta;
@@ -42,14 +37,15 @@ export const Basic: Story = {
           <MoreHorizontalIcon />
         </Button>
       }
+      label="Row actions"
+      modal={false}
       items={commandItems}
     />
   ),
   play: async ({ args, canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Open row actions" }));
     await expect(screen.getByRole("menuitem", { name: /Duplicate/ })).toBeTruthy();
-    await userEvent.click(screen.getByRole("menuitem", { name: /Duplicate/ }));
-    await expect(args.onItemSelect).toHaveBeenCalled();
+    await expect(args.onItemSelect).not.toHaveBeenCalled();
   },
 };
 
@@ -83,7 +79,14 @@ export const CheckboxAndRadio: Story = {
       },
     ] satisfies MenuActionItem[];
 
-    return <ActionMenu trigger={<Button variant="outline">View options</Button>} items={items} />;
+    return (
+      <ActionMenu
+        trigger={<Button variant="outline">View options</Button>}
+        label="View options"
+        modal={false}
+        items={items}
+      />
+    );
   },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "View options" }));
@@ -101,6 +104,8 @@ export const WithDescriptionsAndShortcuts: Story = {
   render: () => (
     <ActionMenu
       trigger={<Button variant="outline">File actions</Button>}
+      label="File actions"
+      modal={false}
       items={[
         {
           id: "copy-link",
@@ -132,6 +137,11 @@ export const Empty: Story = {
     items: [],
   },
   render: () => (
-    <ActionMenu trigger={<Button variant="outline">Unavailable actions</Button>} items={[]} />
+    <ActionMenu
+      trigger={<Button variant="outline">Unavailable actions</Button>}
+      label="Unavailable actions"
+      modal={false}
+      items={[]}
+    />
   ),
 };

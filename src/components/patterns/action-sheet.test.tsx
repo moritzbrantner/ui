@@ -175,4 +175,12 @@ describe("ActionSheet", () => {
     expect(body.className).toContain("body-contract");
     expect(screen.getByText("No sheet actions")).toBeTruthy();
   });
+
+  test("renders an sr-only dialog description when a titled sheet has no description", async () => {
+    render(<ActionSheet defaultOpen title="Actions" items={[{ id: "copy", label: "Copy" }]} />);
+
+    const description = await screen.findByText("Choose an action from the list.");
+
+    expect(description.className).toContain("sr-only");
+  });
 });

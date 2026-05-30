@@ -37,11 +37,9 @@ const meta = {
   tags: ["autodocs", "test"],
   parameters: {
     layout: "centered",
-    a11y: {
-      test: "todo",
-    },
   },
   args: {
+    modal: false,
     unreadCount: 2,
     titleHref: "/notifications",
     items: notifications,
@@ -89,7 +87,5 @@ export const OpensMenu: Story = {
     await expect(
       await screen.findByRole("menuitem", { name: /Mark all read/ }),
     ).toBeInTheDocument();
-
-    await userEvent.keyboard("{Escape}");
   },
 };

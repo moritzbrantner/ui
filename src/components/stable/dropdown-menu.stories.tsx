@@ -16,11 +16,6 @@ const meta = {
   title: "Components/Overlay/Dropdown Menu",
   component: DropdownMenu,
   tags: ["autodocs", "test"],
-  parameters: {
-    a11y: {
-      test: "todo",
-    },
-  },
 } satisfies Meta<typeof DropdownMenu>;
 
 export default meta;
@@ -29,13 +24,13 @@ type Story = StoryObj<typeof meta>;
 
 export const Basic: Story = {
   render: () => (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button type="button" variant="outline" size="icon-sm" aria-label="Open menu">
           <MoreHorizontalIcon />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent aria-label="Actions">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuItem>Duplicate</DropdownMenuItem>
         <DropdownMenuItem>Archive</DropdownMenuItem>
@@ -51,6 +46,5 @@ export const Basic: Story = {
     await expect(menu).toHaveAttribute("data-state", "open");
     await expect(menu.className).toContain("data-[state=open]");
     await expect(screen.getByRole("menuitem", { name: "Duplicate" })).toBeTruthy();
-    await userEvent.keyboard("{Escape}");
   },
 };

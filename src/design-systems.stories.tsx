@@ -150,11 +150,6 @@ export const Studio: Story = {
 
 export const Paper: Story = {
   globals: { designSystem: "paper" },
-  parameters: {
-    a11y: {
-      test: "todo",
-    },
-  },
   render: () => <DesignSystemShowcase systemId="paper" />,
 };
 

@@ -30,6 +30,7 @@ export type NotificationMenuItem = {
 type DataAttributes = Record<`data-${string}`, string | number | boolean | undefined>;
 
 export type NotificationMenuProps = {
+  modal?: React.ComponentProps<typeof DropdownMenu>["modal"];
   label?: string;
   titleHref?: string;
   titleLinkProps?: Omit<React.ComponentPropsWithoutRef<"a">, "children" | "href">;
@@ -50,6 +51,7 @@ export type NotificationMenuProps = {
 };
 
 function NotificationMenu({
+  modal,
   label = "Notifications",
   titleHref,
   titleLinkProps,
@@ -71,6 +73,7 @@ function NotificationMenu({
   const [readItemIds, setReadItemIds] = React.useState<ReadonlySet<string>>(() => new Set());
   const [localUnreadAdjustment, setLocalUnreadAdjustment] = React.useState(0);
   const previousUnreadCountRef = React.useRef(unreadCount);
+  const instanceId = React.useId();
   const unreadItemIds = React.useMemo(
     () => new Set(items.filter((item) => item.unread).map((item) => item.id)),
     [items],
@@ -94,6 +97,11 @@ function NotificationMenu({
     effectiveUnreadCount > 0 ? `${label}, ${effectiveUnreadCount} unread` : label;
   const { className: triggerClassName, ...restTriggerProps } = triggerProps ?? {};
   const { className: contentClassName, ...restContentProps } = contentProps ?? {};
+  const markReadText = getNotificationMenuText(markReadLabel) ?? "Mark read";
+  const getItemTitleId = React.useCallback(
+    (itemId: string) => `${instanceId}-notification-${itemId}-title`,
+    [instanceId],
+  );
 
   React.useEffect(() => {
     setReadItemIds((currentReadItemIds) => {
@@ -117,7 +125,7 @@ function NotificationMenu({
   }, [unreadCount]);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={modal}>
       <DropdownMenuTrigger asChild>
         <Button
           type="button"
@@ -138,31 +146,39 @@ function NotificationMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
+        {...restContentProps}
         data-slot="notification-menu"
+        aria-label={restContentProps["aria-label"] ?? label}
         align={align}
         sideOffset={sideOffset}
         className={cn("w-80", contentClassName)}
-        {...restContentProps}
       >
-        <DropdownMenuLabel className="flex items-center justify-between gap-3 px-2 py-2">
-          {titleHref ? (
+        {titleHref ? (
+          <DropdownMenuItem asChild className="justify-between gap-3 px-2 py-2">
             <a
               {...titleLinkProps}
               href={titleHref}
               className={cn(
-                "min-w-0 truncate rounded-sm text-sm font-medium text-popover-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                "min-w-0 rounded-sm text-sm font-medium text-popover-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50",
                 titleLinkProps?.className,
               )}
             >
-              {label}
+              <span className="truncate">{label}</span>
+              {effectiveUnreadCount > 0 ? (
+                <span className="shrink-0 text-xs font-normal text-muted-foreground">
+                  {effectiveUnreadCount} unread
+                </span>
+              ) : null}
             </a>
-          ) : (
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuLabel className="flex items-center justify-between gap-3 px-2 py-2">
             <span className="truncate text-sm font-medium text-popover-foreground">{label}</span>
-          )}
-          {effectiveUnreadCount > 0 ? (
-            <span className="shrink-0 text-xs">{effectiveUnreadCount} unread</span>
-          ) : null}
-        </DropdownMenuLabel>
+            {effectiveUnreadCount > 0 ? (
+              <span className="shrink-0 text-xs">{effectiveUnreadCount} unread</span>
+            ) : null}
+          </DropdownMenuLabel>
+        )}
         <DropdownMenuSeparator />
         {visibleItems.length === 0 ? (
           <DropdownMenuLabel className="px-2 py-3 text-sm">{emptyLabel}</DropdownMenuLabel>
@@ -171,73 +187,71 @@ function NotificationMenu({
             const itemMarkRead = item.onMarkRead ?? onMarkRead;
             const canMarkRead = Boolean(item.unread && !item.disabled);
             const itemTitle = getNotificationMenuText(item.title);
-            const markReadActionLabel = itemTitle
-              ? `Mark ${itemTitle} as read`
-              : (getNotificationMenuText(markReadLabel) ?? "Mark notification as read");
+            const markReadActionTitle = itemTitle ? `Mark ${itemTitle} as read` : markReadText;
 
             return (
-              <DropdownMenuItem
-                key={item.id}
-                disabled={item.disabled}
-                onSelect={item.onSelect}
-                className="items-start gap-2 py-2 pr-1"
-              >
-                {item.icon ? <span className="mt-0.5 shrink-0">{item.icon}</span> : null}
-                <span className="grid min-w-0 flex-1 gap-0.5">
-                  <span className="flex min-w-0 items-center gap-2">
-                    <span className="min-w-0 truncate font-medium">{item.title}</span>
-                    {item.unread ? (
-                      <span
-                        aria-hidden="true"
-                        data-slot="notification-menu-unread-indicator"
-                        className="size-2 shrink-0 rounded-full bg-primary"
-                      />
+              <React.Fragment key={item.id}>
+                <DropdownMenuItem
+                  disabled={item.disabled}
+                  onSelect={item.onSelect}
+                  className="items-start gap-2 py-2 pr-1"
+                >
+                  {item.icon ? <span className="mt-0.5 shrink-0">{item.icon}</span> : null}
+                  <span className="grid min-w-0 flex-1 gap-0.5">
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span id={getItemTitleId(item.id)} className="min-w-0 truncate font-medium">
+                        {item.title}
+                      </span>
+                      {item.unread ? (
+                        <span
+                          aria-hidden="true"
+                          data-slot="notification-menu-unread-indicator"
+                          className="size-2 shrink-0 rounded-full bg-primary"
+                        />
+                      ) : null}
+                    </span>
+                    {item.description ? (
+                      <span className="line-clamp-2 text-xs text-muted-foreground">
+                        {item.description}
+                      </span>
                     ) : null}
                   </span>
-                  {item.description ? (
-                    <span className="line-clamp-2 text-xs text-muted-foreground">
-                      {item.description}
+                  {item.meta ? (
+                    <span className="mt-0.5 shrink-0 text-xs text-muted-foreground">
+                      {item.meta}
                     </span>
                   ) : null}
-                </span>
-                {item.meta || canMarkRead ? (
-                  <span className="mt-0.5 flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
-                    {item.meta ? <span>{item.meta}</span> : null}
-                    {canMarkRead ? (
-                      <button
-                        type="button"
-                        aria-label={markReadActionLabel}
-                        title={markReadActionLabel}
-                        className="inline-flex size-6 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        onClick={(event) => {
-                          event.preventDefault();
-                          event.stopPropagation();
+                </DropdownMenuItem>
+                {canMarkRead ? (
+                  <DropdownMenuItem
+                    aria-label={markReadText}
+                    aria-describedby={itemTitle ? getItemTitleId(item.id) : undefined}
+                    title={markReadActionTitle}
+                    onSelect={() => {
+                      if (!readItemIds.has(item.id)) {
+                        setReadItemIds((currentReadItemIds) => {
+                          const nextReadItemIds = new Set(currentReadItemIds);
+                          nextReadItemIds.add(item.id);
 
-                          if (!readItemIds.has(item.id)) {
-                            setReadItemIds((currentReadItemIds) => {
-                              const nextReadItemIds = new Set(currentReadItemIds);
-                              nextReadItemIds.add(item.id);
+                          return nextReadItemIds;
+                        });
+                        setLocalUnreadAdjustment((currentAdjustment) => currentAdjustment + 1);
+                      }
 
-                              return nextReadItemIds;
-                            });
-                            setLocalUnreadAdjustment((currentAdjustment) => currentAdjustment + 1);
-                          }
+                      if (item.onMarkRead) {
+                        item.onMarkRead(item.id, item);
+                        return;
+                      }
 
-                          if (item.onMarkRead) {
-                            item.onMarkRead(item.id, item);
-                            return;
-                          }
-
-                          itemMarkRead?.(item.id, item);
-                        }}
-                      >
-                        <CheckIcon className="size-3.5" />
-                        <span className="sr-only">{markReadLabel}</span>
-                      </button>
-                    ) : null}
-                  </span>
+                      itemMarkRead?.(item.id, item);
+                    }}
+                    className="pl-8 text-xs text-muted-foreground"
+                  >
+                    <CheckIcon className="size-3.5" />
+                    {markReadLabel}
+                  </DropdownMenuItem>
                 ) : null}
-              </DropdownMenuItem>
+              </React.Fragment>
             );
           })
         )}

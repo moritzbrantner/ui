@@ -9,11 +9,6 @@ const meta = {
   title: "Components/Overlay/Context Action Menu",
   component: ContextActionMenu,
   tags: ["autodocs", "test"],
-  parameters: {
-    a11y: {
-      test: "todo",
-    },
-  },
 } satisfies Meta<typeof ContextActionMenu>;
 
 export default meta;
@@ -27,6 +22,8 @@ export const RightClickTarget: Story = {
   },
   render: () => (
     <ContextActionMenu
+      label="Row actions"
+      modal={false}
       items={[
         { id: "duplicate", label: "Duplicate", icon: <CopyIcon /> },
         { id: "archive", label: "Archive", icon: <ArchiveIcon /> },
@@ -53,6 +50,8 @@ export const WithDisabledAndDestructiveItems: Story = {
   },
   render: () => (
     <ContextActionMenu
+      label="Asset actions"
+      modal={false}
       items={[
         { id: "copy", label: "Copy", icon: <CopyIcon /> },
         { id: "archive", label: "Archive", icon: <ArchiveIcon />, disabled: true },
