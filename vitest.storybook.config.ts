@@ -18,7 +18,7 @@ export default defineConfig({
             configDir: path.join(packageRoot, ".storybook"),
             storybookScript: `${storybookBin} dev -p 6006 --no-open`,
             tags: {
-              include: ["test"],
+              include: ["test", "ai-generated"],
             },
           }),
         ],
