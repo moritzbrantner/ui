@@ -191,6 +191,11 @@ import { Chat as SubpathChat } from "./components/social/chat";
 import { getMenuActionItemText as subpathGetMenuActionItemText } from "./components/patterns/menu-actions";
 import { ResponsiveActionMenu as SubpathResponsiveActionMenu } from "./components/patterns/responsive-action-menu";
 import { componentRegistry } from "./component-registry";
+import { AnimatedImage, ImageCarousel, ImageGallery, ImageThumbnailStrip } from "./media";
+import { AnimatedImage as SubpathAnimatedImage } from "./components/media/animated-image";
+import { ImageCarousel as SubpathImageCarousel } from "./components/media/image-carousel";
+import { ImageGallery as SubpathImageGallery } from "./components/media/image-gallery";
+import { ImageThumbnailStrip as SubpathImageThumbnailStrip } from "./components/media/image-thumbnail-strip";
 import {
   AnnotationCanvas,
   type AnnotationCanvasAnnotation,
@@ -519,7 +524,11 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(Object.hasOwn(RootExports, "DataTable")).toBe(false);
     expect(Object.hasOwn(RootExports, "DataGrid")).toBe(false);
     expect(Object.hasOwn(RootExports, "Navbar")).toBe(false);
+    expect(Object.hasOwn(RootExports, "AnimatedImage")).toBe(false);
+    expect(Object.hasOwn(RootExports, "ImageCarousel")).toBe(false);
     expect(Object.hasOwn(RootExports, "ImageCropper")).toBe(false);
+    expect(Object.hasOwn(RootExports, "ImageGallery")).toBe(false);
+    expect(Object.hasOwn(RootExports, "ImageThumbnailStrip")).toBe(false);
     expect(Object.hasOwn(RootExports, "WorkflowBuilder")).toBe(false);
     expect(Object.hasOwn(RootExports, "Chat")).toBe(false);
     expect(Object.hasOwn(RootExports, "Chat" + "Box")).toBe(false);
@@ -553,6 +562,10 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(SubpathNavbarActions).toBe(NavbarActions);
     expect(SubpathResponsiveActionMenu).toBe(ResponsiveActionMenu);
     expect(SubpathChat).toBe(Chat);
+    expect(SubpathAnimatedImage).toBe(AnimatedImage);
+    expect(SubpathImageCarousel).toBe(ImageCarousel);
+    expect(SubpathImageGallery).toBe(ImageGallery);
+    expect(SubpathImageThumbnailStrip).toBe(ImageThumbnailStrip);
     expect(subpathGetMenuActionItemText({ id: "contract", label: "Contract" })).toBe("Contract");
     expect(typeof FilterChip).toBe("function");
     expect(typeof ActionMenu).toBe("function");
@@ -570,6 +583,10 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(typeof SocialActionGroup).toBe("function");
     expect(typeof SocialPost).toBe("function");
     expect(typeof ProfileSummary).toBe("function");
+    expect(typeof AnimatedImage).toBe("function");
+    expect(typeof ImageCarousel).toBe("function");
+    expect(typeof ImageGallery).toBe("function");
+    expect(typeof ImageThumbnailStrip).toBe("function");
     const rootMenuActionItem: MenuActionItem = { id: "contract-action", label: "Contract action" };
     const rootCommandItem: MenuActionCommandItem = {
       id: "contract-command",

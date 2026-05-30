@@ -92,11 +92,19 @@ assert.equal(
 );
 
 const media = await importPackage("@moritzbrantner/ui/media");
+assert.equal(typeof media.AnimatedImage, "function", "media entry should expose AnimatedImage");
+assert.equal(typeof media.ImageCarousel, "function", "media entry should expose ImageCarousel");
 assert.equal(typeof media.ImageCropper, "function", "media entry should expose ImageCropper");
 assert.equal(
   typeof media.ImageFilterEditor,
   "function",
   "media entry should expose ImageFilterEditor",
+);
+assert.equal(typeof media.ImageGallery, "function", "media entry should expose ImageGallery");
+assert.equal(
+  typeof media.ImageThumbnailStrip,
+  "function",
+  "media entry should expose ImageThumbnailStrip",
 );
 
 const zleek = await importPackage("@moritzbrantner/ui/zleek");
@@ -196,6 +204,36 @@ assert.equal(
   "media image-cropper subpath should expose ImageCropper",
 );
 
+const animatedImage = await importPackage("@moritzbrantner/ui/components/media/animated-image");
+assert.equal(
+  typeof animatedImage.AnimatedImage,
+  "function",
+  "media animated-image subpath should expose AnimatedImage",
+);
+
+const imageCarousel = await importPackage("@moritzbrantner/ui/components/media/image-carousel");
+assert.equal(
+  typeof imageCarousel.ImageCarousel,
+  "function",
+  "media image-carousel subpath should expose ImageCarousel",
+);
+
+const imageGallery = await importPackage("@moritzbrantner/ui/components/media/image-gallery");
+assert.equal(
+  typeof imageGallery.ImageGallery,
+  "function",
+  "media image-gallery subpath should expose ImageGallery",
+);
+
+const imageThumbnailStrip = await importPackage(
+  "@moritzbrantner/ui/components/media/image-thumbnail-strip",
+);
+assert.equal(
+  typeof imageThumbnailStrip.ImageThumbnailStrip,
+  "function",
+  "media image-thumbnail-strip subpath should expose ImageThumbnailStrip",
+);
+
 const cn = await importPackage("@moritzbrantner/ui/lib/cn");
 assert.equal(typeof cn.cn, "function", "cn subpath should expose cn");
 
@@ -259,8 +297,18 @@ const requiredPackageFiles = [
   "dist/components/shell/navbar.d.ts",
   "dist/components/social/chat.js",
   "dist/components/social/chat.d.ts",
+  "dist/components/media/animated-image.js",
+  "dist/components/media/animated-image.d.ts",
+  "dist/components/media/image-carousel.js",
+  "dist/components/media/image-carousel.d.ts",
   "dist/components/media/image-cropper.js",
   "dist/components/media/image-cropper.d.ts",
+  "dist/components/media/image-gallery.js",
+  "dist/components/media/image-gallery.d.ts",
+  "dist/components/media/image-thumbnail-strip.js",
+  "dist/components/media/image-thumbnail-strip.d.ts",
+  "dist/components/media/media-gallery-types.js",
+  "dist/components/media/media-gallery-types.d.ts",
   "dist/lib/cn.js",
   "dist/themes.js",
   "styles.css",
