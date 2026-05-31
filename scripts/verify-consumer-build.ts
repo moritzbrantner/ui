@@ -77,8 +77,8 @@ console.log("@moritzbrantner/ui consumer example verified");
 
 function packPackage(destination: string): string {
   const result = spawnSync(
-    "npm",
-    ["pack", "--ignore-scripts", "--pack-destination", destination, "--json"],
+    "bun",
+    ["pm", "pack", "--ignore-scripts", "--destination", destination],
     {
       cwd: packageRoot,
       shell: false,
@@ -97,9 +97,21 @@ function packPackage(destination: string): string {
     process.exit(result.status ?? 1);
   }
 
-  const [packResult] = JSON.parse(result.stdout) as Array<{ filename: string }>;
+  const tarballFilename = result.stdout
+    .trim()
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .reverse()
+    .find((line) => line.endsWith(".tgz"));
 
-  return path.join(destination, packResult.filename);
+  if (!tarballFilename) {
+    process.stdout.write(result.stdout);
+    throw new Error("bun pm pack did not report a tarball filename");
+  }
+
+  return path.isAbsolute(tarballFilename)
+    ? tarballFilename
+    : path.join(destination, tarballFilename);
 }
 
 function run(command: string, args: string[], cwd: string): void {

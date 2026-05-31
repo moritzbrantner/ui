@@ -2,12 +2,6 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 
 type PackageModule = Record<string, any>;
-type PackageFile = {
-  path: string;
-};
-type PackageMetadata = {
-  files: PackageFile[];
-};
 
 const root = await importPackage("@moritzbrantner/ui");
 assert.equal(typeof root.Button, "function", "root export should include Button");
@@ -244,7 +238,7 @@ assert.equal(themes.themeConfig.atlas.name, "atlas", "themes subpath should expo
 assert.equal(themes.themeConfig.studio.name, "studio", "themes subpath should expose themeConfig");
 assert.equal(themes.themeConfig.paper.name, "paper", "themes subpath should expose themeConfig");
 
-const pack = spawnSync("npm", ["pack", "--dry-run", "--ignore-scripts", "--json"], {
+const pack = spawnSync("bun", ["pm", "pack", "--dry-run", "--ignore-scripts"], {
   encoding: "utf8",
 });
 
@@ -254,8 +248,12 @@ if (pack.error) {
 
 assert.equal(pack.status, 0, pack.stderr);
 
-const [packageMetadata] = JSON.parse(pack.stdout) as PackageMetadata[];
-const packageFiles = new Set(packageMetadata.files.map((file) => file.path));
+const packageFiles = new Set(
+  pack.stdout
+    .split(/\r?\n/)
+    .map((line) => /^packed\s+\S+\s+(.+)$/.exec(line)?.[1])
+    .filter((file): file is string => Boolean(file)),
+);
 const requiredPackageFiles = [
   "dist/index.js",
   "dist/index.d.ts",
@@ -337,7 +335,7 @@ for (const filePath of packageFiles) {
   );
 }
 
-console.log("@moritzbrantner/ui package exports and npm package contents verified");
+console.log("@moritzbrantner/ui package exports and package contents verified");
 
 function importPackage(specifier: string): Promise<PackageModule> {
   return import(specifier) as Promise<PackageModule>;

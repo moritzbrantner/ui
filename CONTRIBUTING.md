@@ -81,10 +81,10 @@ bun run test
 bun run build
 bun run test:storybook
 bun run test:package
-npm pack --dry-run --ignore-scripts --json
+bun pm pack --dry-run --ignore-scripts
 ```
 
-`bun run publish:npm` runs the full local release contract and then publishes to the public npm registry. Use it only after the changelog and `package.json` version describe the intended release.
+`bun run publish:registry` runs the full local release contract and then publishes to the public package registry. Use it only after the changelog and `package.json` version describe the intended release.
 
 ## Token metadata
 

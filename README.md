@@ -16,7 +16,7 @@ Generic visual affordances such as `AccountMenu` and `NotificationMenu` live in 
 bun add @moritzbrantner/ui
 ```
 
-The package is published to the public npm registry for the `@moritzbrantner` scope, so consumers can install it with their normal npm/Bun registry configuration.
+The package is published to the public package registry for the `@moritzbrantner` scope, so consumers can install it with their normal Bun registry configuration.
 
 ## Development Workflow
 
@@ -59,7 +59,7 @@ Full local confidence check:
 bun run verify
 ```
 
-`bun run verify` reports repository hygiene first, then runs the release verification contract. The heavy checks include Storybook tests, coverage, Playwright visual tests, Unlighthouse performance and usability audits, the consumer example build, benchmarks, build-size checks, and an npm pack dry run. Install the local Playwright browser before running visual or Unlighthouse tests for the first time:
+`bun run verify` reports repository hygiene first, then runs the release verification contract. The heavy checks include Storybook tests, coverage, Playwright visual tests, Unlighthouse performance and usability audits, the consumer example build, benchmarks, build-size checks, and a Bun package dry run. Install the local Playwright browser before running visual or Unlighthouse tests for the first time:
 
 ```sh
 bunx playwright install chromium
@@ -73,7 +73,7 @@ bun run test:unlighthouse
 
 The audit builds Storybook, serves the static output locally, checks representative component stories, and writes the generated report to `unlighthouse-report/`.
 
-`bun run test:coverage` is a local fallback when Bun's `node` shim cannot expose V8 coverage APIs. It runs the unit suite and reports that coverage was not measured. Release coverage must use `npm run test:coverage:real` with a real Node runtime, which CI gets from `actions/setup-node`.
+`bun run test:coverage` is a local fallback when Bun's `node` shim cannot expose V8 coverage APIs. It runs the unit suite and reports that coverage was not measured. Release coverage must use `bun run test:coverage:real` with a real Node runtime, which CI gets from `actions/setup-node`.
 
 Run `bun run bench` by itself, not in parallel with Storybook, Playwright, or other browser-heavy checks. The benchmark verifier retries failed samples once to filter transient host load, but repeat failures should be treated as release signals.
 
@@ -361,10 +361,10 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md), [docs/design-system.md](./docs/design-
 
 ## Release Checks
 
-Publishing goes directly to the public npm registry. For a local publish, authenticate with npm, run the release checks, then publish:
+Publishing goes directly to the public package registry. For a local publish, authenticate for the registry, run the release checks, then publish:
 
 ```sh
-bun run publish:npm
+bun run publish:registry
 ```
 
 The `.github/workflows/publish.yml` workflow can also publish on `v*` tags or manual dispatch when the repository has an `NPM_TOKEN` secret with publish access.

@@ -49,13 +49,13 @@ if (process.versions.bun) {
       "`bun run test:coverage` runs the UI unit suite as a local fallback only.",
       "Unit tests passed, but coverage was not measured.",
       "",
-      "Use `npm run test:coverage:real` in an environment with real Node to enforce",
+      "Use `bun run test:coverage:real` in an environment with real Node to enforce",
       "`vitest --coverage` with `vitest.coverage.config.ts`.",
       "",
     ].join("\n"),
   );
   console.warn(
-    "@moritzbrantner/ui coverage fallback: unit tests passed, but coverage was not measured. Use `npm run test:coverage:real` with real Node for release coverage.",
+    "@moritzbrantner/ui coverage fallback: unit tests passed, but coverage was not measured. Use `bun run test:coverage:real` with real Node for release coverage.",
   );
   process.exit(0);
 }

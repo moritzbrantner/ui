@@ -1,13 +1,13 @@
 # Release Runbook
 
-This package publishes directly to the public npm registry as `@moritzbrantner/ui`.
+This package publishes directly to the public package registry as `@moritzbrantner/ui`.
 
 ## Prepare
 
-1. Confirm the npm version that is already published:
+1. Confirm the registry version that is already published:
 
    ```sh
-   npm view @moritzbrantner/ui version dist-tags --json
+   bun pm view @moritzbrantner/ui version dist-tags
    ```
 
 2. Bump `package.json` to the next semver version and update `expectedPackageVersion` in `scripts/verify-design-system.ts`.
@@ -38,10 +38,10 @@ bun run pack:dry
 
 ## Publish
 
-After `bun run verify:release` and `bun run pack:dry` pass, authenticate with npm and publish:
+After `bun run verify:release` and `bun run pack:dry` pass, authenticate for the registry and publish:
 
 ```sh
-bun run publish:npm
+bun run publish:registry
 ```
 
-The GitHub publish workflow can also publish on a `v*` tag or manual dispatch when `NPM_TOKEN` is configured. CI uses `npm run verify:release:ci`, which measures coverage with a real Node runtime instead of the local Bun coverage fallback.
+The GitHub publish workflow can also publish on a `v*` tag or manual dispatch when `NPM_TOKEN` is configured. CI uses `bun run verify:release:ci`, which measures coverage with a real Node runtime instead of the local Bun coverage fallback.
