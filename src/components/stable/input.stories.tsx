@@ -6,7 +6,6 @@ import { Label } from "./label";
 
 const meta = {
   component: Input,
-  tags: ["ai-generated"],
 } satisfies Meta<typeof Input>;
 
 export default meta;

@@ -6,7 +6,6 @@ import { Textarea } from "./textarea";
 
 const meta = {
   component: Textarea,
-  tags: ["ai-generated"],
 } satisfies Meta<typeof Textarea>;
 
 export default meta;

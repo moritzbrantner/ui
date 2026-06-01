@@ -1,6 +1,5 @@
 import React from "react";
 import type { Preview } from "@storybook/react-vite";
-import { initialize, mswLoader } from "msw-storybook-addon";
 
 import {
   defaultUiThemeName,
@@ -16,9 +15,6 @@ import studioStyles from "../studio/styles.css?inline";
 import themeScopesStyles from "../theme-scopes.css?inline";
 import zleekStyles from "../zleek/styles.css?inline";
 import "../styles.css";
-import { mswHandlers } from "./msw-handlers";
-
-initialize({ onUnhandledRequest: "bypass" });
 
 const designSystemStyles = {
   bobba: bobbaStyles,
@@ -188,7 +184,6 @@ const preview: Preview = {
       },
     },
   },
-  loaders: [mswLoader],
   decorators: [
     (Story, context) => {
       const selectedDesignSystem = isDesignSystemName(context.globals.designSystem)
@@ -225,9 +220,6 @@ const preview: Preview = {
     },
   ],
   parameters: {
-    msw: {
-      handlers: mswHandlers,
-    },
     layout: "centered",
     options: {
       storySort: {

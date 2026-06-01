@@ -6,7 +6,6 @@ import { Label } from "./label";
 
 const meta = {
   component: Checkbox,
-  tags: ["ai-generated"],
 } satisfies Meta<typeof Checkbox>;
 
 export default meta;

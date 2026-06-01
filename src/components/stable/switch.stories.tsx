@@ -6,7 +6,6 @@ import { Switch } from "./switch";
 
 const meta = {
   component: Switch,
-  tags: ["ai-generated"],
 } satisfies Meta<typeof Switch>;
 
 export default meta;

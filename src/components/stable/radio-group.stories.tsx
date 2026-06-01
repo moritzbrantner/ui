@@ -6,7 +6,6 @@ import { RadioGroup, RadioGroupItem } from "./radio-group";
 
 const meta = {
   component: RadioGroup,
-  tags: ["ai-generated"],
 } satisfies Meta<typeof RadioGroup>;
 
 export default meta;
