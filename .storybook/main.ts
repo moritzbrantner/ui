@@ -9,7 +9,6 @@ const packageRoot = fileURLToPath(new URL("../", import.meta.url));
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.stories.@(ts|tsx)"],
-  staticDirs: ["../public"],
   addons: ["@storybook/addon-docs", "@storybook/addon-a11y", "@storybook/addon-vitest"],
   core: {
     builder: "@storybook/builder-vite",
