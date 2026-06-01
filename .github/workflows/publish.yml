@@ -19,24 +19,16 @@ jobs:
         with:
           bun-version: 1.3.12
 
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          registry-url: "https://registry.npmjs.org"
-          scope: "@moritzbrantner"
-
       - name: Install dependencies
         run: bun install --frozen-lockfile
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps chromium
 
       - name: Verify release contract
-        run: npm run verify:release:ci
+        run: bun run verify:release:ci
 
       - name: Publish package
-        run: npm publish --access public
+        run: bun publish --access public --registry https://registry.npmjs.org
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}

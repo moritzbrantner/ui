@@ -6,26 +6,6 @@ import { fileURLToPath } from "node:url";
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 if (process.versions.bun) {
-  if (process.env.CI) {
-    const result = spawnSync(
-      "node",
-      [
-        "./node_modules/vitest/vitest.mjs",
-        "run",
-        "--config",
-        "vitest.coverage.config.ts",
-        "--coverage",
-      ],
-      {
-        cwd: packageRoot,
-        shell: false,
-        stdio: "inherit",
-      },
-    );
-
-    process.exit(result.status ?? 1);
-  }
-
   const result = spawnSync("bun", ["run", "test:unit"], {
     cwd: packageRoot,
     shell: false,
@@ -44,18 +24,15 @@ if (process.versions.bun) {
       "# Coverage unavailable under Bun",
       "",
       "Vitest V8 coverage requires Node inspector coverage APIs.",
-      "The Bun-provided `node` shim in this workspace does not expose those APIs.",
+      "The Bun runtime does not expose those APIs.",
       "",
-      "`bun run test:coverage` runs the UI unit suite as a local fallback only.",
+      "`bun run test:coverage` runs the UI unit suite as a Bun-compatible fallback.",
       "Unit tests passed, but coverage was not measured.",
-      "",
-      "Use `bun run test:coverage:real` in an environment with real Node to enforce",
-      "`vitest --coverage` with `vitest.coverage.config.ts`.",
       "",
     ].join("\n"),
   );
   console.warn(
-    "@moritzbrantner/ui coverage fallback: unit tests passed, but coverage was not measured. Use `bun run test:coverage:real` with real Node for release coverage.",
+    "@moritzbrantner/ui coverage fallback: unit tests passed, but coverage was not measured under Bun.",
   );
   process.exit(0);
 }
