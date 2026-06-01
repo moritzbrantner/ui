@@ -1,5 +1,11 @@
 import { defineUnlighthouseConfig } from "unlighthouse/config";
 
+const chromeExecutablePath = process.env.CHROME_PATH;
+const chromiumSandboxArgs =
+  process.platform === "linux" &&
+  (process.env.CI === "true" || process.env.UNLIGHTHOUSE_NO_SANDBOX === "true")
+    ? ["--no-sandbox", "--disable-setuid-sandbox"]
+    : [];
 const storybookGlobals = encodeURIComponent("designSystem:bobba;theme:light");
 const storybookStoryIds = [
   "components-stable-primitive-components--overview",
@@ -31,6 +37,10 @@ export default defineUnlighthouseConfig({
   },
   lighthouseOptions: {
     onlyCategories: ["performance", "accessibility", "best-practices"],
+  },
+  puppeteerOptions: {
+    ...(chromeExecutablePath ? { executablePath: chromeExecutablePath } : {}),
+    ...(chromiumSandboxArgs.length > 0 ? { args: chromiumSandboxArgs } : {}),
   },
   puppeteerClusterOptions: {
     maxConcurrency: 1,
