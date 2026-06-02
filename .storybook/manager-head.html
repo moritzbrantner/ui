@@ -1,0 +1,74 @@
+<script>
+  (() => {
+    const reloadKey = "moritzbrantner-ui-storybook-cache-reload-at";
+    const reloadWindowMs = 30000;
+    const loadErrorPattern =
+      /failed to fetch dynamically imported module|importing a module script failed|failed to load module script|loading chunk [\w-]+ failed|unable to preload css/i;
+
+    function getEventMessage(event) {
+      const reason = event.reason ?? event.error;
+
+      return String(reason?.message ?? reason ?? event.message ?? "");
+    }
+
+    function getFailedResourceUrl(event) {
+      const target = event.target;
+
+      if (target instanceof HTMLScriptElement) {
+        return target.src;
+      }
+
+      if (target instanceof HTMLLinkElement) {
+        return target.href;
+      }
+
+      return "";
+    }
+
+    function isStorybookBuildResource(url) {
+      return (
+        /\/(?:assets|sb-addons|sb-manager|sb-preview)\//.test(url) &&
+        /\.(?:css|js)(?:$|\?)/.test(url)
+      );
+    }
+
+    function shouldReload(event) {
+      const resourceUrl = getFailedResourceUrl(event);
+
+      return isStorybookBuildResource(resourceUrl) || loadErrorPattern.test(getEventMessage(event));
+    }
+
+    function reloadWithFreshBuild() {
+      try {
+        const lastReloadAt = Number(sessionStorage.getItem(reloadKey) ?? "0");
+
+        if (Date.now() - lastReloadAt < reloadWindowMs) {
+          return;
+        }
+
+        sessionStorage.setItem(reloadKey, String(Date.now()));
+      } catch {
+        // Storage can be unavailable in restricted browser modes. Reloading once is still useful.
+      }
+
+      const url = new URL(window.location.href);
+      url.searchParams.set("sb-cache-bust", Date.now().toString(36));
+      window.location.replace(url.toString());
+    }
+
+    window.addEventListener(
+      "error",
+      (event) => {
+        if (shouldReload(event)) {
+          reloadWithFreshBuild();
+        }
+      },
+      true,
+    );
+    window.addEventListener("unhandledrejection", (event) => {
+      if (shouldReload(event)) {
+        reloadWithFreshBuild();
+      }
+    });
+  })();
+</script>
