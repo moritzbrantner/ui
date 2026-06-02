@@ -55,7 +55,7 @@ function ProcessMap({
       data-orientation={orientation}
       role={isDataDriven ? "list" : props.role}
       className={cn(
-        "min-w-0 overflow-x-auto rounded-md border bg-card/60 p-3 text-card-foreground",
+        "w-full max-w-full min-w-0 overflow-x-auto rounded-md border bg-card/60 p-3 text-card-foreground",
         className,
       )}
       {...props}

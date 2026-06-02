@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { BellIcon, CommandIcon, FileTextIcon, SearchIcon } from "lucide-react";
-import { expect, fn } from "storybook/test";
+import { expect, fn, screen } from "storybook/test";
 
 import { Badge } from "../stable/badge";
 import { Button } from "../stable/button";
@@ -259,7 +259,8 @@ export const ConsumerDashboardShellStory: Story = {
     onOpenCommand: fn(),
   },
   play: async ({ args, canvas, canvasElement, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: "Commands" }));
+    await userEvent.click(canvas.getByRole("button", { name: "More navigation actions" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Commands" }));
     await expect(args.onOpenCommand).toHaveBeenCalled();
     await expect(canvasElement.ownerDocument.body).toHaveTextContent("Open release checks");
   },

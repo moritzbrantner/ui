@@ -46,7 +46,7 @@ function ResizableTabsDemo() {
     <ResizableTabs
       items={items}
       defaultValue="preview"
-      className="w-[min(48rem,calc(100vw-2rem))]"
+      className="w-full max-w-3xl min-w-0"
     />
   );
 }
@@ -72,7 +72,7 @@ export const LineVariant: Story = {
       items={items}
       defaultValue="preview"
       listVariant="line"
-      className="w-[min(48rem,calc(100vw-2rem))]"
+      className="w-full max-w-3xl min-w-0"
       triggerMinSize={16}
     />
   ),

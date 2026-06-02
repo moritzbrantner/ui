@@ -96,7 +96,10 @@ function ImageCarousel({
   return (
     <div
       data-slot="image-carousel"
-      className={cn("grid gap-3 rounded-lg border border-border/70 bg-card p-3", className)}
+      className={cn(
+        "grid max-w-full min-w-0 gap-3 overflow-hidden rounded-lg border border-border/70 bg-card p-3",
+        className,
+      )}
       {...props}
     >
       {items.length === 0 ? (
@@ -113,18 +116,20 @@ function ImageCarousel({
             data-slot="image-carousel-viewport"
             opts={{ align: "start", loop: items.length > 1 }}
             setApi={setApi}
-            className="px-10"
+            className="min-w-0 px-10"
           >
-            <CarouselContent>
+            <CarouselContent className="ml-0">
               {items.map((item, index) => {
                 const isActive = index === selectedIndex;
 
                 return (
-                  <CarouselItem key={item.id}>
+                  <CarouselItem key={item.id} className="pl-0">
                     <button
                       data-slot="image-carousel-slide"
                       data-active={isActive ? true : undefined}
                       type="button"
+                      aria-hidden={isActive ? undefined : true}
+                      tabIndex={isActive ? 0 : -1}
                       className="grid w-full overflow-hidden rounded-md border border-border/70 bg-background text-left outline-none transition-[border-color,box-shadow] focus-visible:ring-[3px] focus-visible:ring-ring/50"
                       onClick={() => onSlideActivate?.(index, item)}
                     >

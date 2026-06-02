@@ -129,7 +129,10 @@ function QueryBuilder({
     <div
       data-slot="query-builder"
       data-read-only={readOnly ? "true" : undefined}
-      className={cn("space-y-3 rounded-md border bg-card p-3 text-card-foreground", className)}
+      className={cn(
+        "max-w-full min-w-0 space-y-3 overflow-hidden rounded-md border bg-card p-3 text-card-foreground",
+        className,
+      )}
       {...props}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -195,13 +198,13 @@ function QueryBuilderGroup({
       data-slot="query-builder-group"
       data-depth={depth}
       className={cn(
-        "space-y-3 rounded-md border bg-background p-3",
+        "max-w-full min-w-0 space-y-3 rounded-md border bg-background p-3",
         depth > 0 && "border-dashed bg-muted/20",
         className,
       )}
       {...props}
     >
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
         <SelectDropdown
           aria-label={root ? "Root combinator" : "Group combinator"}
           value={group.combinator}
@@ -215,7 +218,7 @@ function QueryBuilderGroup({
           ]}
         />
         <span className="text-xs text-muted-foreground">match in this group</span>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex w-full min-w-0 flex-wrap items-center gap-2 sm:ml-auto sm:w-auto sm:justify-end">
           <Button
             type="button"
             variant="outline"
@@ -333,10 +336,10 @@ function QueryBuilderRule({
   return (
     <div
       data-slot="query-builder-rule"
-      className={cn("rounded-md border bg-card p-2", className)}
+      className={cn("max-w-full min-w-0 rounded-md border bg-card p-2", className)}
       {...props}
     >
-      <div className="grid gap-2 md:grid-cols-[minmax(9rem,1fr)_minmax(8rem,0.8fr)_minmax(10rem,1fr)_auto] md:items-center">
+      <div className="grid min-w-0 gap-2 md:grid-cols-[minmax(9rem,1fr)_minmax(8rem,0.8fr)_minmax(10rem,1fr)_auto] md:items-center">
         <SelectDropdown
           aria-label="Rule field"
           value={field?.id ?? ""}
@@ -398,7 +401,7 @@ function QueryBuilderValueEditor({
 
   if (field.type === "boolean") {
     return (
-      <label className="flex h-8 items-center gap-2 rounded-md border px-2 text-sm">
+      <label className="flex min-h-10 min-w-0 items-center gap-2 rounded-md border px-2 text-sm">
         <Checkbox
           aria-label="Rule value"
           checked={Boolean(rule.value)}

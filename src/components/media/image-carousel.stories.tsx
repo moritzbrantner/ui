@@ -37,7 +37,7 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className="w-[520px]">
+      <div className="w-[calc(100vw-2rem)] max-w-[520px] min-w-0 overflow-hidden">
         <Story />
       </div>
     ),

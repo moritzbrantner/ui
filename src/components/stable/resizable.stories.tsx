@@ -49,13 +49,7 @@ function PanelSurface({
         {icon ? <span className="text-muted-foreground [&>svg]:size-4">{icon}</span> : null}
         <span className="truncate">{title}</span>
       </header>
-      <div
-        aria-label={`${title} content`}
-        tabIndex={0}
-        className="min-h-0 flex-1 overflow-auto p-3"
-      >
-        {children}
-      </div>
+      <div className="min-h-0 flex-1 overflow-auto p-3">{children}</div>
     </section>
   );
 }
@@ -102,7 +96,6 @@ function TerminalOutput() {
   return (
     <pre
       aria-label="Console output"
-      tabIndex={0}
       className="h-full min-h-32 overflow-auto rounded-sm bg-background p-3 text-xs leading-6 text-muted-foreground"
     >
       {logs.join("\n")}
@@ -127,7 +120,7 @@ export const HorizontalSplit: Story = {
   render: () => (
     <ResizablePanelGroup
       orientation="horizontal"
-      className="h-72 w-[min(56rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-border/60"
+      className="h-72 w-[calc(100vw-2rem)] max-w-4xl min-w-0 overflow-hidden rounded-md border border-border/60"
     >
       <ResizablePanel defaultSize="35%" minSize="22%">
         <PanelSurface title="Explorer" icon={<PanelLeftIcon />}>
@@ -148,7 +141,7 @@ export const VerticalSplit: Story = {
   render: () => (
     <ResizablePanelGroup
       orientation="vertical"
-      className="h-80 w-[min(56rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-border/60"
+      className="h-80 w-[calc(100vw-2rem)] max-w-4xl min-w-0 overflow-hidden rounded-md border border-border/60"
     >
       <ResizablePanel defaultSize="68%" minSize="42%">
         <PanelSurface title="Query results" icon={<DatabaseIcon />}>
@@ -169,7 +162,7 @@ export const NestedGroups: Story = {
   render: () => (
     <ResizablePanelGroup
       orientation="horizontal"
-      className="h-[30rem] w-[min(64rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-border/60"
+      className="h-[30rem] w-[calc(100vw-2rem)] max-w-5xl min-w-0 overflow-hidden rounded-md border border-border/60"
     >
       <ResizablePanel defaultSize="24%" minSize="18%">
         <PanelSurface title="Files" icon={<FolderIcon />}>
@@ -201,13 +194,17 @@ export const NestedGroups: Story = {
             <label className="grid gap-1">
               <span className="text-muted-foreground">Title</span>
               <input
+                disabled
                 className="h-9 rounded-md border border-input bg-background px-3 outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                 defaultValue="Quarterly report"
               />
             </label>
             <label className="grid gap-1">
               <span className="text-muted-foreground">Status</span>
-              <select className="h-9 rounded-md border border-input bg-background px-3 outline-hidden focus-visible:ring-2 focus-visible:ring-ring">
+              <select
+                disabled
+                className="h-9 rounded-md border border-input bg-background px-3 outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+              >
                 <option>Draft</option>
                 <option>Reviewed</option>
                 <option>Published</option>
@@ -224,7 +221,7 @@ export const CollapsiblePanels: Story = {
   render: () => (
     <ResizablePanelGroup
       orientation="horizontal"
-      className="h-80 w-[min(60rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-border/60"
+      className="h-80 w-[calc(100vw-2rem)] max-w-5xl min-w-0 overflow-hidden rounded-md border border-border/60"
     >
       <ResizablePanel defaultSize="22%" minSize="16%" collapsedSize="6%" collapsible>
         <PanelSurface title="Navigator" icon={<LayoutPanelLeftIcon />}>
@@ -243,6 +240,7 @@ export const CollapsiblePanels: Story = {
           <div className="grid gap-3">
             <input
               aria-label="Search project"
+              disabled
               className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
               defaultValue="metadata"
             />
@@ -258,7 +256,7 @@ export const ConstrainedPanels: Story = {
   render: () => (
     <ResizablePanelGroup
       orientation="horizontal"
-      className="h-72 w-[min(58rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-border/60"
+      className="h-72 w-[calc(100vw-2rem)] max-w-5xl min-w-0 overflow-hidden rounded-md border border-border/60"
     >
       <ResizablePanel defaultSize="28%" minSize="18%" maxSize="36%">
         <PanelSurface title="Fixed range" icon={<PanelLeftIcon />}>
@@ -289,7 +287,7 @@ export const ConstrainedPanels: Story = {
 
 export const WorkbenchLayout: Story = {
   render: () => (
-    <div className="grid w-[min(68rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-border/60 bg-background">
+    <div className="grid w-[calc(100vw-2rem)] max-w-6xl min-w-0 overflow-hidden rounded-md border border-border/60 bg-background">
       <div className="flex min-h-11 flex-wrap items-center gap-2 border-b border-border/60 bg-card/70 px-3 py-2">
         <Button size="sm" variant="outline">
           <FileIcon />
@@ -313,7 +311,6 @@ export const WorkbenchLayout: Story = {
               <PanelSurface title="Editor" icon={<FileIcon />}>
                 <pre
                   aria-label="Editor source"
-                  tabIndex={0}
                   className="h-full overflow-auto rounded-sm bg-background p-3 text-xs leading-6 text-muted-foreground"
                 >
                   {`export function RevenuePanel() {

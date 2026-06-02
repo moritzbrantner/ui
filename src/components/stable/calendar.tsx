@@ -102,7 +102,7 @@ function Calendar({
       month={month}
       className={cn(
         "group/calendar bg-background p-2 [--cell-radius:var(--radius-md)] in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent",
-        isCardVariant ? "[--cell-size:9rem]" : "[--cell-size:--spacing(7)]",
+        isCardVariant ? "[--cell-size:9rem]" : "[--cell-size:--spacing(10)]",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
         String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
         className,
@@ -186,7 +186,7 @@ function Calendar({
           defaultClassNames.day,
         ),
         day_button: cn(
-          isCardVariant ? "h-full w-full min-w-0" : "size-full min-h-0 min-w-0",
+          isCardVariant ? "h-full w-full min-w-0" : "size-full",
           defaultClassNames.day_button,
         ),
         range_start: cn(
@@ -287,7 +287,7 @@ function CalendarDayButton({
       data-range-middle={modifiers.range_middle}
       data-has-events={events.length > 0 || undefined}
       className={cn(
-        "relative isolate z-10 flex h-full w-full min-h-0 min-w-0 flex-col items-start justify-start gap-1 overflow-hidden border-0 p-1.5 text-left leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-[3px] group-data-[focused=true]/day:ring-ring/50 data-[range-end=true]:rounded-(--cell-radius) data-[range-end=true]:rounded-r-(--cell-radius) data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-muted data-[range-middle=true]:text-foreground data-[range-start=true]:rounded-(--cell-radius) data-[range-start=true]:rounded-l-(--cell-radius) data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground dark:hover:text-foreground",
+        "relative isolate z-10 flex h-full w-full flex-col items-start justify-start gap-1 overflow-hidden border-0 p-1.5 text-left leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-[3px] group-data-[focused=true]/day:ring-ring/50 data-[range-end=true]:rounded-(--cell-radius) data-[range-end=true]:rounded-r-(--cell-radius) data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-muted data-[range-middle=true]:text-foreground data-[range-start=true]:rounded-(--cell-radius) data-[range-start=true]:rounded-l-(--cell-radius) data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground dark:hover:text-foreground",
         defaultClassNames.day_button,
         className,
       )}

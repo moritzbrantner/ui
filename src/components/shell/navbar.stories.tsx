@@ -229,6 +229,12 @@ export const PublicWithoutAuth: Story = {
     defaultOpenGroupId: "discover",
     actionSlot: <NavbarActions languageSwitcher themeModeSwitch />,
   },
+  parameters: {
+    mobileUsability: {
+      skip: true,
+      reason: "Web-only navbar action composition is covered by dedicated mobile navbar stories.",
+    },
+  },
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("button", { name: /Language:/ })).toBeInTheDocument();
     await expect(canvas.getByRole("switch", { name: "Color mode" })).toBeInTheDocument();
@@ -248,6 +254,12 @@ export const LoggedOutWithLogin: Story = {
       />
     ),
   },
+  parameters: {
+    mobileUsability: {
+      skip: true,
+      reason: "Web-only navbar login composition is covered by dedicated mobile navbar stories.",
+    },
+  },
 };
 
 export const Minimal: Story = {
@@ -255,6 +267,12 @@ export const Minimal: Story = {
     variant: "web",
     defaultOpenGroupId: null,
     actionSlot: null,
+  },
+  parameters: {
+    mobileUsability: {
+      skip: true,
+      reason: "Web-only minimal navbar composition is covered by dedicated mobile navbar stories.",
+    },
   },
 };
 
@@ -277,7 +295,9 @@ export const MobileManyGroups: Story = {
     variant: "mobile",
     groups: manyNavigationGroups,
     defaultOpenGroupId: "workspace",
-    actionSlot: <NavbarActions loginAction={<Button>Log in</Button>} />,
+    actionSlot: (
+      <NavbarActions languageSwitcher themeModeSwitch loginAction={<Button>Log in</Button>} />
+    ),
   },
 };
 
@@ -285,6 +305,12 @@ export const OpensSubmenu: Story = {
   args: {
     variant: "desktop",
     defaultOpenGroupId: null,
+  },
+  parameters: {
+    mobileUsability: {
+      skip: true,
+      reason: "Desktop-only submenu interaction is covered by dedicated mobile navbar stories.",
+    },
   },
   play: async ({ canvas, userEvent }) => {
     const trigger = canvas.getByRole("button", { name: /Discover/ });

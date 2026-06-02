@@ -25,7 +25,7 @@ function ButtonInteractionDemo({ onSave = () => undefined }: ButtonInteractionDe
   }
 
   return (
-    <div className="flex w-[440px] max-w-[calc(100vw-2rem)] flex-wrap items-center gap-3 rounded-md border border-border/60 bg-card/70 p-4">
+    <div className="flex w-full max-w-[440px] min-w-0 flex-wrap items-center gap-3 rounded-md border border-border/60 bg-card/70 p-4">
       <Button disabled={saveState === "saving"} aria-live="polite" onClick={save}>
         <Icon className={saveState === "saving" ? "animate-spin" : undefined} />
         {label}

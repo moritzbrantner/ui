@@ -90,8 +90,15 @@ const meta = {
   args: {
     rows: keyboardRows,
   },
+  decorators: [
+    (Story) => (
+      <div className="w-full max-w-full min-w-0 overflow-x-auto p-1">
+        <Story />
+      </div>
+    ),
+  ],
   parameters: {
-    layout: "centered",
+    layout: "padded",
   },
 } satisfies Meta<typeof Keyboard>;
 

@@ -277,7 +277,7 @@ describe("chart graph components", () => {
     expect(screen.getByText("Code")).toBeTruthy();
     expect(screen.getByText("20")).toBeTruthy();
     expect(screen.getByRole("group", { name: "Folder sizes" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Design: 10. Enter folder" })).toBeTruthy();
+    expect(screen.getByRole("graphics-symbol", { name: "Design: 10. Enter folder" })).toBeTruthy();
 
     const [designSegment] = container.querySelectorAll('[data-slot="chart-donut-graph-segment"]');
     fireEvent.click(designSegment);
@@ -320,7 +320,7 @@ describe("chart graph components", () => {
     expect(screen.getByText("Icons")).toBeTruthy();
     expect(screen.queryByText("Code")).toBeNull();
 
-    fireEvent.click(screen.getByRole("button", { name: "Icons: 8" }));
+    fireEvent.click(screen.getByRole("graphics-symbol", { name: "Icons: 8" }));
     fireEvent.click(screen.getByRole("button", { name: "Go one folder up" }));
 
     expect(onSegmentSelect).toHaveBeenCalledWith(
@@ -405,7 +405,7 @@ describe("chart graph components", () => {
       />,
     );
 
-    fireEvent.keyDown(screen.getByRole("button", { name: "Icons: 8" }), { key: "Escape" });
+    fireEvent.keyDown(screen.getByRole("group", { name: "Folder sizes" }), { key: "Escape" });
 
     expect(onActivePathChange).toHaveBeenCalledWith([], null);
     expect(onDrillUp).toHaveBeenCalledWith([], null);
@@ -434,10 +434,14 @@ describe("chart graph components", () => {
       />,
     );
 
-    fireEvent.keyDown(screen.getByRole("button", { name: "Icons: 8" }), { key: "ArrowRight" });
+    fireEvent.keyDown(screen.getByRole("group", { name: "Folder sizes" }), { key: "ArrowRight" });
 
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Illustrations: 2" })).toBe(document.activeElement),
+      expect(
+        screen.getByRole("graphics-symbol", { name: "Illustrations: 2" }).getAttribute(
+          "data-focused",
+        ),
+      ).toBe("true"),
     );
     expect(onFocusedSegmentPathChange).toHaveBeenLastCalledWith(
       [0, 1],
@@ -467,10 +471,10 @@ describe("chart graph components", () => {
       />,
     );
 
-    fireEvent.focus(screen.getByRole("button", { name: "Design: 10. Enter folder" }));
-    fireEvent.keyDown(screen.getByRole("button", { name: "Design: 10. Enter folder" }), {
-      key: "Enter",
-    });
+    const graph = screen.getByRole("group", { name: "Folder sizes" });
+
+    fireEvent.focus(graph);
+    fireEvent.keyDown(graph, { key: "Enter" });
 
     expect(onFocusedSegmentPathChange).toHaveBeenCalledWith(
       [0],

@@ -52,16 +52,17 @@ function DataGridDemo({
   error?: React.ReactNode;
 }) {
   return (
-    <DataGrid
-      columns={columns}
-      data={loading || error ? [] : invoices}
-      enableRowSelection
-      pageSize={2}
-      loading={loading}
-      error={error}
-      onSelectedRowsChange={onSelectedRowsChange}
-      className="max-w-4xl"
-    />
+    <div className="w-[calc(100vw-2rem)] max-w-4xl min-w-0">
+      <DataGrid
+        columns={columns}
+        data={loading || error ? [] : invoices}
+        enableRowSelection
+        pageSize={2}
+        loading={loading}
+        error={error}
+        onSelectedRowsChange={onSelectedRowsChange}
+      />
+    </div>
   );
 }
 

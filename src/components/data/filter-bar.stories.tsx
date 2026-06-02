@@ -59,7 +59,7 @@ function InteractiveFilterBar({
   }
 
   return (
-    <div className="w-[720px] max-w-[calc(100vw-2rem)]">
+    <div className="w-full max-w-[720px] min-w-0">
       <FilterBar
         searchValue={searchValue}
         searchPlaceholder="Search rows"

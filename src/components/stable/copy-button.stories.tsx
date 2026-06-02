@@ -12,7 +12,7 @@ function CopyErrorDemo({ onCopyError = () => undefined }: CopyErrorDemoProps) {
   const [status, setStatus] = useState("Ready to copy");
 
   return (
-    <div className="grid w-[360px] max-w-[calc(100vw-2rem)] gap-3 rounded-md border border-border/60 bg-card/70 p-4">
+    <div className="grid w-full max-w-[360px] min-w-0 gap-3 rounded-md border border-border/60 bg-card/70 p-4">
       <CopyButton
         value="restricted-token"
         idleLabel="Copy restricted token"

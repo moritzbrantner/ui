@@ -2,9 +2,16 @@
 
 import * as React from "react";
 import { createPortal } from "react-dom";
+import { MenuIcon, MoreHorizontalIcon } from "lucide-react";
 
 import { useIsMobile } from "../../../hooks/use-mobile";
 import { cn } from "../../../lib/cn";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "../../stable/dropdown-menu";
 
 export type NavbarItem = {
   id: string;
@@ -57,9 +64,9 @@ const variantConfig = {
   mobile: {
     nav: "mx-auto w-full max-w-md rounded-xl p-2",
     chrome: "flex-col gap-2",
-    brand: "w-full justify-between overflow-hidden px-3",
+    brand: "w-full px-3",
     groups: "w-full gap-1",
-    trigger: "min-h-14 flex-col px-2 py-2 text-xs",
+    trigger: "min-h-12 flex-col px-2 py-1.5 text-xs",
     panel: "origin-top overflow-y-auto rounded-xl p-2",
     list: "grid gap-2",
   },
@@ -152,6 +159,34 @@ function DefaultLink({
   );
 }
 
+function NavbarMobileActionsMenu({ children }: { children: React.ReactNode }) {
+  return (
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          data-slot="navbar-mobile-actions-trigger"
+          aria-label="More navigation actions"
+          className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-md border border-border/55 bg-background/36 px-2.5 text-foreground/78 outline-none transition-[background-color,border-color,color,box-shadow,transform] hover:-translate-y-px hover:border-border hover:bg-accent/45 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-[0.97] motion-reduce:transition-none"
+        >
+          <MoreHorizontalIcon className="size-5" aria-hidden="true" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        sideOffset={8}
+        data-slot="navbar-mobile-actions-menu"
+        className="w-auto max-w-[calc(100vw-1rem)] min-w-0 p-2 [&>[data-slot=navbar-actions]]:flex-wrap [&>[data-slot=navbar-actions]]:justify-start [&>[data-slot=navbar-actions]]:overflow-visible"
+      >
+        <DropdownMenuLabel>Navigation actions</DropdownMenuLabel>
+        <div data-slot="navbar-mobile-actions" className="min-w-0">
+          {children}
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 function getInitialOpenGroupId(
   groups: NavbarGroup[],
   activeGroupId?: string,
@@ -219,22 +254,20 @@ export function Navbar({
   const resolvedVariant: NavbarVariant =
     variant === "auto" ? (isMobile ? "mobile" : "web") : variant;
   const config = variantConfig[resolvedVariant];
-  const shouldScrollMobileGroups = resolvedVariant === "mobile" && groups.length > 3;
+  const shouldCollapseMobileGroups = resolvedVariant === "mobile" && groups.length > 3;
   const groupListClassName = cn(
     config.groups,
-    resolvedVariant === "mobile"
-      ? shouldScrollMobileGroups
-        ? "flex min-w-0 snap-x overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        : "grid"
-      : undefined,
+    resolvedVariant === "mobile" ? (shouldCollapseMobileGroups ? "grid" : "grid") : undefined,
   );
   const groupListStyle: React.CSSProperties | undefined =
-    resolvedVariant === "mobile" && !shouldScrollMobileGroups
+    resolvedVariant === "mobile" && !shouldCollapseMobileGroups
       ? { gridTemplateColumns: `repeat(${Math.max(groups.length, 1)}, minmax(0, 1fr))` }
       : undefined;
   const currentOpenGroupId = openGroupId !== undefined ? openGroupId : uncontrolledOpenGroupId;
-  const openGroup =
-    groups.find((group) => group.id === currentOpenGroupId && group.items.length > 0) ?? null;
+  const openGroup = shouldCollapseMobileGroups
+    ? null
+    : (groups.find((group) => group.id === currentOpenGroupId && group.items.length > 0) ?? null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const renderedActions =
     actionSlot ?? (actions ? <NavbarActionGroup>{actions}</NavbarActionGroup> : null);
 
@@ -256,6 +289,8 @@ export function Navbar({
     (groupId: string) => `navbar-${instanceId}-submenu-${groupId}`,
     [instanceId],
   );
+  const mobileMenuId = `navbar-${instanceId}-mobile-menu`;
+  const mobileMenuTriggerId = `navbar-${instanceId}-mobile-menu-trigger`;
   const getTriggerId = React.useCallback(
     (groupId: string) => `navbar-${instanceId}-trigger-${groupId}`,
     [instanceId],
@@ -273,19 +308,20 @@ export function Navbar({
     (event: React.FocusEvent) => {
       if (!containsNavbarTarget(event.relatedTarget)) {
         setOpenGroupId(null);
+        setIsMobileMenuOpen(false);
       }
     },
     [containsNavbarTarget, setOpenGroupId],
   );
 
   const updateSubmenuPosition = React.useCallback(() => {
-    if (!openGroup || typeof window === "undefined") {
+    if ((!openGroup && !isMobileMenuOpen) || typeof window === "undefined") {
       setSubmenuStyle(undefined);
       return;
     }
 
     const container = containerRef.current;
-    const trigger = triggerRefs.current.get(openGroup.id);
+    const trigger = openGroup ? triggerRefs.current.get(openGroup.id) : undefined;
 
     if (!container) {
       return;
@@ -333,7 +369,7 @@ export function Navbar({
       transformOrigin: shouldOpenAbove ? "bottom center" : "top center",
       width,
     });
-  }, [openGroup, resolvedVariant]);
+  }, [isMobileMenuOpen, openGroup, resolvedVariant]);
 
   React.useEffect(() => {
     setPortalContainer(document.body);
@@ -345,6 +381,7 @@ export function Navbar({
 
       if (openedInstanceId && openedInstanceId !== instanceId) {
         setOpenGroupId(null);
+        setIsMobileMenuOpen(false);
       }
     }
 
@@ -356,7 +393,7 @@ export function Navbar({
   }, [instanceId, setOpenGroupId]);
 
   React.useEffect(() => {
-    if (!openGroup) {
+    if (!openGroup && !isMobileMenuOpen) {
       return;
     }
 
@@ -365,10 +402,10 @@ export function Navbar({
         detail: { instanceId },
       }),
     );
-  }, [instanceId, openGroup]);
+  }, [instanceId, isMobileMenuOpen, openGroup]);
 
   React.useLayoutEffect(() => {
-    if (!openGroup) {
+    if (!openGroup && !isMobileMenuOpen) {
       setSubmenuStyle(undefined);
       return;
     }
@@ -384,22 +421,24 @@ export function Navbar({
       window.removeEventListener("resize", updateSubmenuPosition);
       window.removeEventListener("scroll", updateSubmenuPosition, true);
     };
-  }, [openGroup, portalContainer, updateSubmenuPosition]);
+  }, [isMobileMenuOpen, openGroup, portalContainer, updateSubmenuPosition]);
 
   React.useEffect(() => {
-    if (!openGroup) {
+    if (!openGroup && !isMobileMenuOpen) {
       return;
     }
 
     function handlePointerDown(event: PointerEvent) {
       if (!containsNavbarTarget(event.target)) {
         setOpenGroupId(null);
+        setIsMobileMenuOpen(false);
       }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setOpenGroupId(null);
+        setIsMobileMenuOpen(false);
       }
     }
 
@@ -410,7 +449,7 @@ export function Navbar({
       document.removeEventListener("pointerdown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [containsNavbarTarget, openGroup, setOpenGroupId]);
+  }, [containsNavbarTarget, isMobileMenuOpen, openGroup, setOpenGroupId]);
 
   const submenu = openGroup ? (
     <div
@@ -489,6 +528,7 @@ export function Navbar({
             item.onSelect?.();
             onNavigate?.(item, openGroup);
             setOpenGroupId(null);
+            setIsMobileMenuOpen(false);
           };
 
           return (
@@ -509,6 +549,141 @@ export function Navbar({
       </div>
     </div>
   ) : null;
+  const mobileMenu =
+    isMobileMenuOpen && shouldCollapseMobileGroups ? (
+      <div
+        ref={submenuRef}
+        id={mobileMenuId}
+        data-slot="navbar-mobile-menu"
+        data-open
+        aria-labelledby={mobileMenuTriggerId}
+        className={cn(
+          "fixed z-[100] overflow-x-hidden overflow-y-auto border border-border/60 bg-popover/74 text-popover-foreground opacity-100 shadow-[var(--glass-shadow)] backdrop-blur-2xl transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
+          config.panel,
+        )}
+        style={submenuStyle}
+        onBlurCapture={handleBlurCapture}
+      >
+        <div className="mb-2 px-2 py-1">
+          <p className="text-xs font-medium uppercase text-muted-foreground">Navigation</p>
+        </div>
+
+        <div className="grid gap-3">
+          {groups.map((group) => (
+            <section key={group.id} data-slot="navbar-mobile-menu-group" className="grid gap-2">
+              <div className="flex min-w-0 items-center gap-2 px-2">
+                {group.icon ? (
+                  <span className="shrink-0 text-muted-foreground">{group.icon}</span>
+                ) : null}
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">{group.label}</p>
+                  {group.description ? (
+                    <p className="truncate text-xs text-muted-foreground">{group.description}</p>
+                  ) : null}
+                </div>
+              </div>
+              <div className="grid gap-2">
+                {group.items.map((item) => {
+                  const isCurrent = item.id === activeItemId || item.active;
+                  const itemClassName = cn(
+                    "group flex min-h-12 min-w-0 items-center gap-3 rounded-lg border px-3 py-2 text-left text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50",
+                    isCurrent
+                      ? "border-primary/45 bg-primary text-primary-foreground"
+                      : "border-border/45 bg-background/36 text-foreground hover:border-border hover:bg-accent/45",
+                    item.disabled ? "pointer-events-none opacity-50" : undefined,
+                  );
+                  const content = (
+                    <>
+                      {item.icon ? (
+                        <span className="shrink-0 text-current">{item.icon}</span>
+                      ) : null}
+                      <span className="min-w-0 flex-1">
+                        <span className="flex min-w-0 items-center gap-2">
+                          <span className="truncate font-medium">{item.label}</span>
+                          {item.badge ? (
+                            <span className="shrink-0 rounded-full border border-current/20 px-2 py-0.5 text-[0.68rem]">
+                              {item.badge}
+                            </span>
+                          ) : null}
+                        </span>
+                        {item.description ? (
+                          <span
+                            className={cn(
+                              "mt-1 block text-xs leading-5",
+                              isCurrent ? "text-primary-foreground/75" : "text-muted-foreground",
+                            )}
+                          >
+                            {item.description}
+                          </span>
+                        ) : null}
+                      </span>
+                      {item.meta ? (
+                        <span
+                          className={cn(
+                            "shrink-0 text-xs",
+                            isCurrent ? "text-primary-foreground/75" : "text-muted-foreground",
+                          )}
+                        >
+                          {item.meta}
+                        </span>
+                      ) : null}
+                    </>
+                  );
+                  const handleItemClick = () => {
+                    item.onSelect?.();
+                    onNavigate?.(item, group);
+                    setOpenGroupId(null);
+                    setIsMobileMenuOpen(false);
+                  };
+
+                  return (
+                    <div
+                      key={item.id}
+                      data-slot="navbar-mobile-menu-item"
+                      className="transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none"
+                    >
+                      {(renderLink ?? DefaultLink)({
+                        ...item,
+                        className: itemClassName,
+                        children: content,
+                        "aria-current": isCurrent ? "page" : undefined,
+                        onClick: handleItemClick,
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
+    ) : null;
+
+  const floatingContent = mobileMenu ?? submenu;
+  const mobileMenuTrigger = shouldCollapseMobileGroups ? (
+    <button
+      type="button"
+      id={mobileMenuTriggerId}
+      data-slot="navbar-mobile-menu-trigger"
+      aria-controls={isMobileMenuOpen ? mobileMenuId : undefined}
+      aria-expanded={isMobileMenuOpen}
+      className={cn(
+        "relative inline-flex min-h-11 shrink-0 items-center justify-center gap-2 overflow-hidden rounded-md border px-3 text-sm font-medium outline-none transition-[transform,background-color,border-color,color,box-shadow] focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none hover:-translate-y-px active:scale-[0.97]",
+        isMobileMenuOpen
+          ? "border-primary/45 bg-primary text-primary-foreground shadow-[var(--glass-interactive-shadow)]"
+          : "border-border/55 bg-background/36 text-foreground/78 hover:border-border hover:bg-accent/45 hover:text-foreground",
+      )}
+      onClick={() => {
+        setOpenGroupId(null);
+        setIsMobileMenuOpen((isOpen) => !isOpen);
+      }}
+    >
+      {isMobileMenuOpen ? <span className="absolute inset-0 -z-10 rounded-md bg-primary" /> : null}
+      <MenuIcon className="size-4 shrink-0" aria-hidden="true" />
+      <span>Menu</span>
+    </button>
+  ) : null;
+
   return (
     <>
       <div
@@ -531,65 +706,70 @@ export function Navbar({
           <div className={cn("flex min-w-0", config.chrome)}>
             <div className={cn("flex min-w-0 items-center gap-2", config.brand)}>
               <div className="min-w-0 flex-1 truncate text-sm font-semibold">{brand}</div>
-              {resolvedVariant === "mobile" ? renderedActions : null}
+              {mobileMenuTrigger}
+              {resolvedVariant === "mobile" && renderedActions ? (
+                <NavbarMobileActionsMenu>{renderedActions}</NavbarMobileActionsMenu>
+              ) : null}
             </div>
 
-            <div className={groupListClassName} style={groupListStyle}>
-              {groups.map((group) => {
-                const isOpen = group.id === openGroup?.id;
-                const isActive = group.id === resolvedActiveGroupId;
+            {!shouldCollapseMobileGroups ? (
+              <div data-slot="navbar-groups" className={groupListClassName} style={groupListStyle}>
+                {groups.map((group) => {
+                  const isOpen = group.id === openGroup?.id;
+                  const isActive = group.id === resolvedActiveGroupId;
 
-                return (
-                  <button
-                    key={group.id}
-                    ref={(node) => {
-                      if (node) {
-                        triggerRefs.current.set(group.id, node);
-                      } else {
-                        triggerRefs.current.delete(group.id);
-                      }
-                    }}
-                    type="button"
-                    id={getTriggerId(group.id)}
-                    aria-controls={isOpen ? getSubmenuId(group.id) : undefined}
-                    aria-expanded={isOpen}
-                    className={cn(
-                      "relative inline-flex min-w-0 shrink-0 items-center justify-center gap-2 overflow-hidden rounded-md border text-center font-medium outline-none transition-[transform,background-color,border-color,color,box-shadow] focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none hover:-translate-y-px active:scale-[0.97]",
-                      config.trigger,
-                      resolvedVariant === "mobile"
-                        ? shouldScrollMobileGroups
-                          ? "min-w-24 snap-start"
-                          : "w-full"
-                        : undefined,
-                      isOpen || isActive
-                        ? "border-primary/45 bg-primary text-primary-foreground shadow-[var(--glass-interactive-shadow)]"
-                        : "border-border/55 bg-background/36 text-foreground/78 hover:border-border hover:bg-accent/45 hover:text-foreground",
-                    )}
-                    onClick={() => setOpenGroupId(group.id)}
-                  >
-                    {isOpen ? (
-                      <span className="absolute inset-0 -z-10 rounded-md bg-primary" />
-                    ) : null}
-                    {group.icon ? (
-                      <span className="shrink-0 text-current">{group.icon}</span>
-                    ) : null}
-                    <span className="min-w-0 truncate">{group.label}</span>
-                    <ChevronIcon
+                  return (
+                    <button
+                      key={group.id}
+                      data-slot="navbar-trigger"
+                      ref={(node) => {
+                        if (node) {
+                          triggerRefs.current.set(group.id, node);
+                        } else {
+                          triggerRefs.current.delete(group.id);
+                        }
+                      }}
+                      type="button"
+                      id={getTriggerId(group.id)}
+                      aria-controls={isOpen ? getSubmenuId(group.id) : undefined}
+                      aria-expanded={isOpen}
                       className={cn(
-                        "size-3.5 shrink-0 transition-transform duration-200",
-                        isOpen ? "rotate-180" : undefined,
+                        "relative inline-flex min-w-0 shrink-0 items-center justify-center gap-2 overflow-hidden rounded-md border text-center font-medium outline-none transition-[transform,background-color,border-color,color,box-shadow] focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none hover:-translate-y-px active:scale-[0.97]",
+                        config.trigger,
+                        resolvedVariant === "mobile" ? "w-full" : undefined,
+                        isOpen || isActive
+                          ? "border-primary/45 bg-primary text-primary-foreground shadow-[var(--glass-interactive-shadow)]"
+                          : "border-border/55 bg-background/36 text-foreground/78 hover:border-border hover:bg-accent/45 hover:text-foreground",
                       )}
-                    />
-                  </button>
-                );
-              })}
-            </div>
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        setOpenGroupId(group.id);
+                      }}
+                    >
+                      {isOpen ? (
+                        <span className="absolute inset-0 -z-10 rounded-md bg-primary" />
+                      ) : null}
+                      {group.icon ? (
+                        <span className="shrink-0 text-current">{group.icon}</span>
+                      ) : null}
+                      <span className="min-w-0 truncate">{group.label}</span>
+                      <ChevronIcon
+                        className={cn(
+                          "size-3.5 shrink-0 transition-transform duration-200",
+                          isOpen ? "rotate-180" : undefined,
+                        )}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
 
             {resolvedVariant !== "mobile" ? renderedActions : null}
           </div>
         </nav>
       </div>
-      {portalContainer ? createPortal(submenu, portalContainer) : submenu}
+      {portalContainer ? createPortal(floatingContent, portalContainer) : floatingContent}
     </>
   );
 }

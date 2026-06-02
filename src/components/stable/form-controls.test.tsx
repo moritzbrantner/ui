@@ -109,13 +109,13 @@ describe("stable form controls", () => {
     expect(compactRadio.getAttribute("data-state")).toBe("checked");
     expect(comfortableRadio.getAttribute("data-state")).toBe("unchecked");
 
-    expect(switchControl.className).toContain("data-[state=checked]:bg-primary");
-    expect(switchControl.className).toContain("data-[state=unchecked]:bg-input");
+    expect(switchControl.className).toContain("data-[state=checked]:before:bg-primary");
+    expect(switchControl.className).toContain("data-[state=unchecked]:before:bg-input");
     expect(switchThumb?.className).toContain(
-      "group-[[data-size=default][data-state=checked]]/switch:translate-x-5",
+      "group-[[data-size=default][data-state=checked]]/switch:translate-x-8",
     );
-    expect(checkbox.className).toContain("data-[state=checked]:bg-primary");
-    expect(compactRadio.className).toContain("data-[state=checked]:bg-primary");
+    expect(checkbox.className).toContain("data-[state=checked]:before:bg-primary");
+    expect(compactRadio.className).toContain("data-[state=checked]:before:bg-primary");
 
     const stateClassNames = [
       checkbox.className,

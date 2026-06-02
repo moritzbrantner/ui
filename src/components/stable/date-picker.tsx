@@ -36,6 +36,7 @@ type DateRangePickerProps = SharedDatePickerProps &
   > & {
     value?: DateRange;
     defaultValue?: DateRange;
+    numberOfMonths?: React.ComponentProps<typeof Calendar>["numberOfMonths"];
     onChange?: (value: DateRange | undefined) => void;
   };
 
@@ -116,6 +117,7 @@ function DateRangePicker({
   disabled,
   triggerProps,
   contentProps,
+  numberOfMonths,
   ...calendarProps
 }: DateRangePickerProps) {
   const [internalValue, setInternalValue] = React.useState<DateRange | undefined>(defaultValue);
@@ -168,7 +170,7 @@ function DateRangePicker({
       >
         <Calendar
           mode="range"
-          numberOfMonths={2}
+          numberOfMonths={numberOfMonths ?? 1}
           selected={selected}
           onSelect={handleSelect}
           disabled={disabled}

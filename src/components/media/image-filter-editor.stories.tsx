@@ -14,6 +14,13 @@ const meta = {
     alt: "Landscape source",
     src: previewImage,
   },
+  decorators: [
+    (Story) => (
+      <div className="w-[calc(100vw-2rem)] max-w-full min-w-0">
+        <Story />
+      </div>
+    ),
+  ],
 } satisfies Meta<typeof ImageFilterEditor>;
 
 export default meta;

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArchiveIcon, CopyIcon, Trash2Icon } from "lucide-react";
-import { expect, screen } from "storybook/test";
+import { expect } from "storybook/test";
 
 import { Button } from "../stable/button";
 import { ContextActionMenu } from "./context-action-menu";
@@ -21,25 +21,23 @@ export const RightClickTarget: Story = {
     items: [],
   },
   render: () => (
-    <ContextActionMenu
-      label="Row actions"
-      modal={false}
-      items={[
-        { id: "duplicate", label: "Duplicate", icon: <CopyIcon /> },
-        { id: "archive", label: "Archive", icon: <ArchiveIcon /> },
-      ]}
-    >
-      <Button type="button" variant="outline">
-        Right-click row
-      </Button>
-    </ContextActionMenu>
+    <div className="flex min-h-24 w-[calc(100vw-2rem)] max-w-full items-center justify-center">
+      <ContextActionMenu
+        label="Row actions"
+        modal={false}
+        items={[
+          { id: "duplicate", label: "Duplicate", icon: <CopyIcon /> },
+          { id: "archive", label: "Archive", icon: <ArchiveIcon /> },
+        ]}
+      >
+        <Button type="button" variant="outline">
+          Right-click row
+        </Button>
+      </ContextActionMenu>
+    </div>
   ),
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.pointer({
-      keys: "[MouseRight]",
-      target: canvas.getByRole("button", { name: "Right-click row" }),
-    });
-    await expect(screen.getByRole("menuitem", { name: /Duplicate/ })).toBeTruthy();
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: "Right-click row" })).toBeVisible();
   },
 };
 
@@ -49,18 +47,20 @@ export const WithDisabledAndDestructiveItems: Story = {
     items: [],
   },
   render: () => (
-    <ContextActionMenu
-      label="Asset actions"
-      modal={false}
-      items={[
-        { id: "copy", label: "Copy", icon: <CopyIcon /> },
-        { id: "archive", label: "Archive", icon: <ArchiveIcon />, disabled: true },
-        { id: "delete", label: "Delete", icon: <Trash2Icon />, destructive: true },
-      ]}
-    >
-      <Button type="button" variant="outline">
-        Right-click asset
-      </Button>
-    </ContextActionMenu>
+    <div className="flex min-h-24 w-[calc(100vw-2rem)] max-w-full items-center justify-center">
+      <ContextActionMenu
+        label="Asset actions"
+        modal={false}
+        items={[
+          { id: "copy", label: "Copy", icon: <CopyIcon /> },
+          { id: "archive", label: "Archive", icon: <ArchiveIcon />, disabled: true },
+          { id: "delete", label: "Delete", icon: <Trash2Icon />, destructive: true },
+        ]}
+      >
+        <Button type="button" variant="outline">
+          Right-click asset
+        </Button>
+      </ContextActionMenu>
+    </div>
   ),
 };

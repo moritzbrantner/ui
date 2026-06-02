@@ -35,7 +35,7 @@ function QueueCardDemo({ onProcess = () => undefined }: QueueCardDemoProps) {
   }
 
   return (
-    <Card className="w-[380px] max-w-[calc(100vw-2rem)]">
+    <Card className="w-full max-w-[380px] min-w-0">
       <CardHeader>
         <CardTitle>Inference queue</CardTitle>
         <CardDescription>Promote waiting work into active workers.</CardDescription>
@@ -99,7 +99,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Overview: Story = {
   render: () => (
-    <Card className="w-[360px]">
+    <Card className="w-full max-w-[360px] min-w-0">
       <CardHeader>
         <CardTitle>Inference queue</CardTitle>
         <CardDescription>Current batch status across workers.</CardDescription>
@@ -131,7 +131,7 @@ export const Overview: Story = {
 
 export const Compact: Story = {
   render: () => (
-    <Card size="sm" className="w-[320px]">
+    <Card size="sm" className="w-full max-w-[320px] min-w-0">
       <CardHeader>
         <CardTitle>Model health</CardTitle>
         <CardDescription>Latency and availability summary.</CardDescription>

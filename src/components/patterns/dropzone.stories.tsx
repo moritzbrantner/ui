@@ -19,7 +19,7 @@ type DropzoneDemoProps = {
 
 function DropzoneDemo({ disabled = false, onChange }: DropzoneDemoProps) {
   return (
-    <Dropzone htmlFor="artifact-upload" className="w-[360px]">
+    <Dropzone htmlFor="artifact-upload" className="w-full max-w-[360px] min-w-0">
       <DropzoneInput
         id="artifact-upload"
         disabled={disabled}

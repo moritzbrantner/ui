@@ -216,15 +216,66 @@ describe("pattern layout and navigation", () => {
     expect(screen.getByRole("button", { name: "Log in" })).toBeTruthy();
   });
 
-  test("mobile navbars with more than three groups use a scrollable trigger row", () => {
+  test("mobile navbars with more than three groups use a full navigation menu", async () => {
     render(<Navbar brand="Platform" groups={manyGroups} variant="mobile" />);
 
-    const trigger = screen.getByRole("button", { name: "Workspace" });
-    const groupList = trigger.parentElement;
+    const trigger = screen.getByRole("button", { name: "Menu" });
+    const nav = screen.getByRole("navigation", { name: "Primary navigation" });
 
-    expect(groupList?.className).toContain("overflow-x-auto");
-    expect(groupList?.className).toContain("snap-x");
-    expect(trigger.className).toContain("min-w-24");
+    expect(trigger.getAttribute("data-slot")).toBe("navbar-mobile-menu-trigger");
+    expect(nav.querySelector('[data-slot="navbar-groups"]')).toBeNull();
+    expect(screen.queryByRole("button", { name: "Workspace" })).toBeNull();
+
+    fireEvent.click(trigger);
+
+    await waitFor(() => {
+      expect(document.body.querySelector('[data-slot="navbar-mobile-menu"]')).not.toBeNull();
+    });
+    expect(screen.getByText("Workspace")).toBeTruthy();
+    expect(screen.getByText("Docs")).toBeTruthy();
+    expect(screen.getByText("Data")).toBeTruthy();
+    expect(screen.getByText("Account")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Profile" })).toBeTruthy();
+  });
+
+  test("mobile navbars collapse secondary actions into a menu", async () => {
+    render(
+      <Navbar
+        brand="Platform"
+        groups={manyGroups}
+        variant="mobile"
+        actionSlot={
+          <NavbarActions languageSwitcher themeModeSwitch loginAction={<Button>Log in</Button>} />
+        }
+      />,
+    );
+
+    const nav = screen.getByRole("navigation", { name: "Primary navigation" });
+    const menuTrigger = nav.querySelector('[data-slot="navbar-mobile-menu-trigger"]');
+    const actionTrigger = nav.querySelector('[data-slot="navbar-mobile-actions-trigger"]');
+
+    expect(menuTrigger).not.toBeNull();
+    expect(actionTrigger).not.toBeNull();
+    expect(menuTrigger?.parentElement).toBe(actionTrigger?.parentElement);
+    expect(menuTrigger?.compareDocumentPosition(actionTrigger as Element)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(nav.querySelector('[data-slot="navbar-groups"]')).toBeNull();
+    expect(nav.querySelector('[data-slot="navbar-mobile-actions"]')).toBeNull();
+
+    const moreActionsTrigger = screen.getByRole("button", { name: "More navigation actions" });
+
+    moreActionsTrigger.focus();
+    fireEvent.keyDown(moreActionsTrigger, { code: "Enter", key: "Enter" });
+
+    await waitFor(() => {
+      expect(
+        document.body.querySelector('[data-slot="navbar-mobile-actions-menu"]'),
+      ).not.toBeNull();
+    });
+    expect(screen.getByRole("button", { name: /Language:/ })).toBeTruthy();
+    expect(screen.getByRole("switch", { name: "Color mode" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Log in" })).toBeTruthy();
   });
 
   test("mobile app navigation renders derived tabs and active state", () => {

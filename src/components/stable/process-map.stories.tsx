@@ -8,6 +8,13 @@ const meta = {
   title: "Components/Data Display/Process Map",
   component: ProcessMap,
   tags: ["autodocs", "test"],
+  decorators: [
+    (Story) => (
+      <div className="w-[calc(100vw-2rem)] max-w-full min-w-0">
+        <Story />
+      </div>
+    ),
+  ],
 } satisfies Meta<typeof ProcessMap>;
 
 export default meta;

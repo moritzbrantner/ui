@@ -591,7 +591,7 @@ function ChartDonutGraph({
     }
   }, []);
   const setFocusedDonutSegment = React.useCallback(
-    (path: number[] | null, shouldFocusElement = true) => {
+    (path: number[] | null, shouldFocusElement = false) => {
       if (focusedSegmentPath === undefined) {
         setInternalFocusedSegmentPath(path ? [...path] : null);
       }
@@ -623,11 +623,25 @@ function ChartDonutGraph({
     },
     [onDrillDown, onSegmentSelect, safeActivePath, setDonutPath, setFocusedDonutSegment],
   );
-  const handleSegmentKeyDown = React.useCallback(
-    (event: React.KeyboardEvent<SVGPathElement>, segment: (typeof segments)[number]) => {
+  const handleChartKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<SVGSVGElement>) => {
+      const focusedIndex =
+        currentFocusedSegmentPath &&
+        currentFocusedSegmentPath.length === safeActivePath.length + 1 &&
+        safeActivePath.every((pathIndex, index) => pathIndex === currentFocusedSegmentPath[index])
+          ? currentFocusedSegmentPath[currentFocusedSegmentPath.length - 1]
+          : interactiveSegments[0]?.index;
+      const focusedSegment = interactiveSegments.find((segment) => segment.index === focusedIndex);
+
+      if (!focusedSegment && event.key !== "Escape") {
+        return;
+      }
+
       if (isActivationKey(event)) {
         event.preventDefault();
-        handleSegmentClick(segment);
+        if (focusedSegment) {
+          handleSegmentClick(focusedSegment);
+        }
         return;
       }
 
@@ -643,7 +657,7 @@ function ChartDonutGraph({
 
       event.preventDefault();
 
-      const currentIndex = interactiveSegments.findIndex((item) => item.index === segment.index);
+      const currentIndex = interactiveSegments.findIndex((item) => item.index === focusedIndex);
       const nextIndex =
         event.key === "ArrowRight"
           ? (currentIndex + 1) % interactiveSegments.length
@@ -656,6 +670,7 @@ function ChartDonutGraph({
     },
     [
       canGoUp,
+      currentFocusedSegmentPath,
       goUp,
       handleSegmentClick,
       interactiveSegments,
@@ -673,6 +688,14 @@ function ChartDonutGraph({
             aria-label={ariaLabel}
             viewBox={`0 0 ${size} ${size}`}
             className="mx-auto h-auto w-full max-w-56 overflow-visible"
+            tabIndex={isInteractiveDonut ? 0 : undefined}
+            onFocus={
+              isInteractiveDonut && !currentFocusedSegmentPath && interactiveSegments[0]
+                ? () =>
+                    setFocusedDonutSegment([...safeActivePath, interactiveSegments[0].index])
+                : undefined
+            }
+            onKeyDown={isInteractiveDonut ? handleChartKeyDown : undefined}
           >
             <g data-slot="chart-donut-graph-segments">
               {segments.map((segment) => {
@@ -688,7 +711,7 @@ function ChartDonutGraph({
                   <path
                     key={segment.index}
                     data-slot="chart-donut-graph-segment"
-                    role={isInteractiveSegment ? "button" : "graphics-symbol"}
+                    role="graphics-symbol"
                     aria-label={`${segment.label}: ${formatValue(segment.value)}${
                       segment.children.length ? ". Enter folder" : ""
                     }`}
@@ -714,18 +737,13 @@ function ChartDonutGraph({
                         : undefined
                     }
                     onClick={isInteractiveSegment ? () => handleSegmentClick(segment) : undefined}
-                    onFocus={
+                    onMouseEnter={
                       isInteractiveSegment
-                        ? () => setFocusedDonutSegment([...safeActivePath, segment.index], false)
-                        : undefined
-                    }
-                    onKeyDown={
-                      isInteractiveSegment
-                        ? (event) => handleSegmentKeyDown(event, segment)
+                        ? () => setFocusedDonutSegment([...safeActivePath, segment.index])
                         : undefined
                     }
                     ref={(element) => setSegmentRef([...safeActivePath, segment.index], element)}
-                    tabIndex={isInteractiveSegment ? 0 : undefined}
+                    focusable="false"
                   />
                 );
               })}
@@ -1368,7 +1386,6 @@ function ChartHistogramInteractionLayer({
             data-slot="chart-hit-area"
             role="graphics-symbol"
             aria-label={`${ariaLabel ?? "Histogram"} ${label}`}
-            tabIndex={0}
             x={x0}
             y={layout.top}
             width={Math.max(x1 - x0, 1)}
@@ -1467,7 +1484,6 @@ function ChartInteractionLayer({
             data-slot="chart-hit-area"
             role="graphics-symbol"
             aria-label={`${ariaLabel ?? "Chart"} ${label}`}
-            tabIndex={0}
             x={hitArea.x}
             y={layout.top}
             width={hitArea.width}

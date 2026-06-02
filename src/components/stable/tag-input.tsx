@@ -160,7 +160,7 @@ function TagInput({
               aria-label={removeLabel(tag)}
               disabled={disabled}
               data-slot="tag-input-remove"
-              className="-mr-1 size-5 rounded-[calc(var(--radius)-3px)] opacity-60 hover:opacity-100"
+            className="-mr-1 rounded-[calc(var(--radius)-3px)] opacity-60 hover:opacity-100"
               onClick={() => removeTag(index)}
             >
               <XIcon />
@@ -176,7 +176,7 @@ function TagInput({
           disabled={disabled || !canAddMore}
           data-slot="tag-input-field"
           className={cn(
-            "h-7 min-w-20 flex-1 bg-transparent px-1 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed",
+            "h-9 min-w-20 flex-1 bg-transparent px-1 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed",
             inputProps?.className,
           )}
           onBlur={(event) => {

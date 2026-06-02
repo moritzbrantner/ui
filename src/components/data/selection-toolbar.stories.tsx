@@ -34,7 +34,7 @@ function InteractiveSelectionToolbar({
   }
 
   return (
-    <div className="grid w-[640px] max-w-[calc(100vw-2rem)] gap-4">
+    <div className="grid w-full max-w-[640px] min-w-0 gap-4">
       <div className="grid gap-2 sm:grid-cols-2">
         {selectionItems.map((item) => {
           const selected = selectedIds.includes(item.id);

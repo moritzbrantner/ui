@@ -16,7 +16,7 @@ function Stepper({ className, orientation = "horizontal", ...props }: StepperPro
       data-slot="stepper"
       data-orientation={orientation}
       className={cn(
-        "group/stepper grid w-full gap-4 data-[orientation=horizontal]:grid-cols-[repeat(auto-fit,minmax(8rem,1fr))] data-[orientation=vertical]:grid-cols-1",
+        "group/stepper grid w-full gap-4 data-[orientation=horizontal]:grid-cols-1 data-[orientation=vertical]:grid-cols-1 sm:data-[orientation=horizontal]:grid-cols-[repeat(auto-fit,minmax(8rem,1fr))]",
         className,
       )}
       {...props}

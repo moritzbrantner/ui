@@ -160,15 +160,18 @@ function ImageFilterEditor({
   return (
     <div
       data-slot="image-filter-editor"
-      className={cn("grid gap-4 rounded-lg border border-border/70 bg-card p-4", className)}
+      className={cn(
+        "grid max-w-full min-w-0 gap-4 overflow-hidden rounded-lg border border-border/70 bg-card p-4",
+        className,
+      )}
       {...props}
     >
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           <Badge variant="secondary">{statusLabel}</Badge>
           <Badge variant="outline">{adjustmentLabel}</Badge>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           {showCompare && src ? (
             <>
               <Button
@@ -275,7 +278,7 @@ function ImageFilterEditor({
       </div>
 
       {showPresets && presets.length > 0 ? (
-        <div data-slot="image-filter-presets" className="flex flex-wrap gap-2">
+        <div data-slot="image-filter-presets" className="flex min-w-0 flex-wrap gap-2">
           {presets.map((preset) => {
             const selected = areImageFilterValuesEqual(currentValue, preset.value);
 
@@ -297,7 +300,7 @@ function ImageFilterEditor({
         </div>
       ) : null}
 
-      <div data-slot="image-filter-controls" className="grid gap-3 md:grid-cols-2">
+      <div data-slot="image-filter-controls" className="grid min-w-0 gap-3 md:grid-cols-2">
         {imageFilterControls.map((control) => {
           const controlId = `${controlIdPrefix}-${control.key}`;
           const displayValue = `${currentValue[control.key]}${control.suffix}`;

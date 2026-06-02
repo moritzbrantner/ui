@@ -79,7 +79,7 @@ function AccountMenu({
           className={cn(
             inlineUser
               ? "inline-flex h-10 max-w-56 shrink-0 items-center gap-2 rounded-full border border-border/60 bg-background/45 px-2.5 pr-3 text-left shadow-[var(--glass-shadow)] outline-none transition-[box-shadow,transform,background-color,border-color] hover:-translate-y-[1px] hover:border-border hover:bg-accent/45 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-              : "group/account-menu inline-flex shrink-0 rounded-full outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+              : "group/account-menu inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
             className,
             triggerClassName,
           )}

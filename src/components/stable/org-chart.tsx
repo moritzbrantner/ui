@@ -594,7 +594,7 @@ const OrgChartNode = React.memo(function OrgChartNode({
             aria-label={`${expanded ? "Collapse" : "Expand"} ${accessibleName}`}
             aria-expanded={expanded}
             className={cn(
-              "absolute right-2 top-2 inline-grid size-7 place-items-center rounded-sm text-muted-foreground outline-none transition-colors",
+              "absolute right-1 top-1 inline-grid size-10 place-items-center rounded-sm text-muted-foreground outline-none transition-colors",
               "hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/50",
               "[&_svg]:size-4",
             )}
@@ -610,7 +610,7 @@ const OrgChartNode = React.memo(function OrgChartNode({
             )}
           </button>
         ) : null}
-        <div className={cn(hasChildren && "pr-8")}>
+        <div className={cn(hasChildren && "pr-10")}>
           {renderNode ? (
             renderNode(node, depth, renderContext)
           ) : (
@@ -653,11 +653,11 @@ const OrgChartNode = React.memo(function OrgChartNode({
                 aria-label={getActionAccessibleLabel(action)}
                 disabled={action.disabled}
                 className={cn(
-                  "inline-flex h-7 items-center justify-center gap-1.5 rounded-sm border px-2 text-xs font-medium outline-none transition-colors",
+                  "inline-flex min-h-10 min-w-10 items-center justify-center gap-1.5 rounded-sm border px-2 text-xs font-medium outline-none transition-colors",
                   "hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50",
                   action.destructive &&
                     "text-destructive hover:bg-destructive/10 hover:text-destructive",
-                  action.icon && "w-7 px-0 [&_svg]:size-3.5",
+                  action.icon && "px-0 [&_svg]:size-3.5",
                 )}
                 onClick={(event) => {
                   event.stopPropagation();

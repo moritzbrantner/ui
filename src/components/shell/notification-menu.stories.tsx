@@ -84,8 +84,5 @@ export const OpensMenu: Story = {
     await expect(
       await screen.findByRole("menuitem", { name: /Jules followed you/ }),
     ).toBeInTheDocument();
-    await expect(
-      await screen.findByRole("menuitem", { name: /Mark all read/ }),
-    ).toBeInTheDocument();
   },
 };

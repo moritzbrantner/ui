@@ -26,6 +26,12 @@ export const DesktopMode: Story = {
     trigger: <Button>Open desktop actions</Button>,
     items,
   },
+  parameters: {
+    mobileUsability: {
+      skip: true,
+      reason: "Desktop-only action menu presentation is covered by the mobile-mode story.",
+    },
+  },
   render: () => (
     <ResponsiveActionMenu
       mode="desktop"

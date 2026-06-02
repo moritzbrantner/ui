@@ -168,7 +168,13 @@ function ViewHeaderActionMenu({ actionMenu }: { actionMenu: ViewHeaderActionMenu
     <ActionMenu
       {...actionMenuProps}
       trigger={
-        <Button type="button" variant="outline" size="icon-sm" aria-label={triggerLabel}>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="size-10 min-w-10"
+          aria-label={triggerLabel}
+        >
           <MoreHorizontalIcon />
         </Button>
       }

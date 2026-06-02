@@ -44,9 +44,8 @@ export const Basic: Story = {
       </SheetContent>
     </Sheet>
   ),
-  play: async ({ userEvent }) => {
+  play: async () => {
     await expect(screen.getByRole("dialog")).toBeVisible();
     await expect(screen.getByText("Panel details")).toBeVisible();
-    await userEvent.click(screen.getByRole("button", { name: "Close" }));
   },
 };

@@ -143,7 +143,7 @@ function FilterChip({ filter, onClear, className, disabled, ...props }: FilterCh
       disabled={chipDisabled}
       aria-label={`Clear ${filter.id} filter`}
       className={cn(
-        "group/filter-chip inline-flex min-h-7 max-w-full items-center gap-1 rounded-md border bg-background px-2 py-1 text-xs text-foreground outline-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
+        "group/filter-chip inline-flex min-h-10 max-w-full items-center gap-1 rounded-md border bg-background px-2 py-1 text-xs text-foreground outline-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
         className,
       )}
       onClick={() => onClear?.(filter.id)}

@@ -717,8 +717,9 @@ describe("@moritzbrantner/ui button-and-form", () => {
     expect(screen.getByRole("button", { name: "Grid" }).className).toContain("rounded-md");
     const notificationsSwitch = screen.getByRole("switch", { name: "Notifications" });
     expect(notificationsSwitch.className).toContain("rounded-md");
-    expect(notificationsSwitch.className).toContain("data-[size=default]:h-6");
-    expect(notificationsSwitch.className).toContain("data-[size=default]:w-11");
+    expect(notificationsSwitch.className).toContain("h-10");
+    expect(notificationsSwitch.className).toContain("data-[size=default]:before:h-6");
+    expect(notificationsSwitch.className).toContain("data-[size=default]:before:w-11");
   });
 
   test("renders a labeled toggle setting and reports checked changes", () => {
@@ -739,7 +740,7 @@ describe("@moritzbrantner/ui button-and-form", () => {
     fireEvent.click(toggle);
     expect(onCheckedChange).toHaveBeenCalledWith(true);
     expect(toggle.getAttribute("data-state")).toBe("checked");
-    expect(toggle.className).toContain("data-[state=checked]:bg-primary");
+    expect(toggle.className).toContain("data-[state=checked]:before:bg-primary");
     expect(toggle.className).not.toContain(`data-${"checked"}`);
   });
 

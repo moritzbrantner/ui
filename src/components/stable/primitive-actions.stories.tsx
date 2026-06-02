@@ -20,7 +20,7 @@ import { ToggleSetting } from "./toggle-setting";
 
 function PrimitiveActionsPreview() {
   return (
-    <div className="grid w-[min(920px,calc(100vw-2rem))] gap-4 p-4 md:grid-cols-2">
+    <div className="grid w-full max-w-[920px] min-w-0 gap-4 p-4 md:grid-cols-2">
       <section className="grid gap-3 border border-border/60 bg-card/55 p-4">
         <Badge variant="outline">button-group</Badge>
         <ButtonGroup>

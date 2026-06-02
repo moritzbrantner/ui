@@ -62,7 +62,7 @@ function ToastAction({ className, ...props }: React.ComponentProps<typeof ToastP
     <ToastPrimitive.Action
       data-slot="toast-action"
       className={cn(
-        "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-white/20 group-[.destructive]:hover:bg-destructive-foreground/10 group-[.destructive]:focus-visible:ring-destructive-foreground/30",
+        "inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-white/20 group-[.destructive]:hover:bg-destructive-foreground/10 group-[.destructive]:focus-visible:ring-destructive-foreground/30",
         className,
       )}
       {...props}
@@ -75,7 +75,7 @@ function ToastClose({ className, ...props }: React.ComponentProps<typeof ToastPr
     <ToastPrimitive.Close
       data-slot="toast-close"
       className={cn(
-        "absolute top-2 right-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-destructive-foreground/70 group-[.destructive]:hover:text-destructive-foreground",
+        "absolute top-2 right-2 flex size-10 items-center justify-center rounded-md text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-destructive-foreground/70 group-[.destructive]:hover:text-destructive-foreground",
         className,
       )}
       toast-close=""

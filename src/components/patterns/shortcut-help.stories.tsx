@@ -44,7 +44,12 @@ export const Dialog: Story = {
   args: {
     groups,
   },
-  render: () => <ShortcutHelpDialog open groups={groups} />,
+  render: () => (
+    <div>
+      <Button variant="outline">Keyboard shortcuts</Button>
+      <ShortcutHelpDialog open groups={groups} />
+    </div>
+  ),
 };
 
 export const OpensFromButton: Story = {

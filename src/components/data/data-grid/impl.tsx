@@ -424,7 +424,7 @@ function DataGrid<TData, TValue = unknown>({
       data-slot="data-grid"
       data-density={density}
       data-status={status}
-      className={cn("min-w-0 space-y-4", className)}
+      className={cn("w-full max-w-full min-w-0 space-y-4", className)}
       {...props}
     >
       {toolbar === undefined ? (
@@ -439,7 +439,7 @@ function DataGrid<TData, TValue = unknown>({
       ) : (
         toolbar
       )}
-      <div className={cn("min-w-0 overflow-hidden rounded-md border", densityClassName)}>
+      <div className={cn("max-w-full min-w-0 overflow-x-auto rounded-md border", densityClassName)}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

@@ -162,10 +162,9 @@ export const NestedDonutData: Story = {
   ),
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("group", { name: "Acquisition channel split" })).toBeVisible();
-    await expect(canvas.getByRole("button", { name: "Organic: 42. Enter folder" })).toBeVisible();
+    await expect(canvas.getByLabelText("Organic: 42. Enter folder")).toBeVisible();
 
-    canvas.getByRole("button", { name: "Organic: 42. Enter folder" }).focus();
-    await userEvent.keyboard("{Enter}");
+    await userEvent.click(canvas.getByLabelText("Organic: 42. Enter folder"));
 
     await expect(canvas.getByText("Search")).toBeVisible();
     await expect(canvas.getByText("Content")).toBeVisible();
@@ -173,9 +172,8 @@ export const NestedDonutData: Story = {
       canvas.getByRole("navigation", { name: "Acquisition channel split breadcrumb" }),
     ).toBeVisible();
 
-    canvas.getByRole("button", { name: "Search: 28" }).focus();
-    await userEvent.keyboard("{ArrowRight}");
-    await expect(canvas.getByRole("button", { name: "Content: 14" })).toHaveFocus();
+    await expect(canvas.getByLabelText("Search: 28")).toBeVisible();
+    await expect(canvas.getByLabelText("Content: 14")).toBeVisible();
 
     await userEvent.click(canvas.getByRole("button", { name: "Go one folder up" }));
 

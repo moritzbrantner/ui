@@ -261,12 +261,12 @@ function CitationReference({ label, href, className, children, ...props }: Citat
       {href ? (
         <a
           href={href}
-          className="inline-flex min-h-5 min-w-5 items-center justify-center rounded-md border bg-muted px-1.5 font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border bg-muted px-2 font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
         >
           {content}
         </a>
       ) : (
-        <span className="inline-flex min-h-5 min-w-5 items-center justify-center rounded-md border bg-muted px-1.5 font-medium text-muted-foreground">
+        <span className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border bg-muted px-2 font-medium text-muted-foreground">
           {content}
         </span>
       )}
@@ -384,7 +384,7 @@ function CitationExcerpt({
             type="button"
             aria-controls={contextId}
             aria-expanded={contextOpen}
-            className="mt-2 flex h-7 w-fit items-center gap-1 rounded-md px-1.5 text-xs font-medium text-primary outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50"
+            className="mt-2 flex min-h-10 w-fit items-center gap-1 rounded-md px-2 text-xs font-medium text-primary outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50"
             onClick={() => setContextOpen((open) => !open)}
           >
             {contextOpen ? collapseContextLabel : contextLabel}

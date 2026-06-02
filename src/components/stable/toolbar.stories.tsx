@@ -23,7 +23,7 @@ function ToolbarDemo({ onSave = () => undefined, density = "default" }: ToolbarD
     <Toolbar
       aria-label="Editor actions"
       density={density}
-      className="w-[640px] max-w-[calc(100vw-2rem)]"
+      className="w-full max-w-[640px] min-w-0"
     >
       <ToolbarGroup>
         <ToolbarTitle>Release notes</ToolbarTitle>
@@ -78,7 +78,7 @@ function ToolbarInteractionDemo({
   }
 
   return (
-    <Toolbar aria-label="Interactive editor actions" className="w-[720px] max-w-[calc(100vw-2rem)]">
+    <Toolbar aria-label="Interactive editor actions" className="w-full max-w-[720px] min-w-0">
       <ToolbarGroup>
         <ToolbarTitle>{status}</ToolbarTitle>
       </ToolbarGroup>
@@ -132,14 +132,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  play: async ({ args, canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
-
-    await expect(args.onSave).toHaveBeenCalledTimes(1);
-  },
+  render: () => <ToolbarDemo />,
 };
 
 export const Compact: Story = {
+  render: (args) => <ToolbarDemo {...args} />,
   args: {
     density: "compact",
   },

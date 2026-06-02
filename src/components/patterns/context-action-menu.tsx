@@ -66,7 +66,11 @@ function ContextActionMenu({
         {...restContentProps}
         data-slot="context-action-menu-content"
         aria-label={restContentProps["aria-label"] ?? label}
-        className={cn("min-w-44 max-w-[min(22rem,calc(100vw-2rem))]", contentClassName)}
+        collisionPadding={restContentProps.collisionPadding ?? 8}
+        className={cn(
+          "max-h-[calc(100dvh-1rem)] min-w-44 max-w-[min(22rem,calc(100vw-2rem))]",
+          contentClassName,
+        )}
       >
         {header}
         <div data-slot="context-action-menu-list" className="grid gap-0.5">

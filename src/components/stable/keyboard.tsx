@@ -27,7 +27,7 @@ const keyboardKeyVariants = cva(
   {
     variants: {
       size: {
-        sm: "min-h-9 min-w-9 px-2 py-1.5 text-[0.7rem]",
+        sm: "min-h-10 min-w-10 px-2 py-1.5 text-[0.7rem]",
         default: "min-h-11 min-w-11 px-2.5 py-2 text-xs",
         lg: "min-h-12 min-w-12 px-3 py-2.5 text-sm",
       },
