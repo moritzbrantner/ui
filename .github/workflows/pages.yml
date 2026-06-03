@@ -29,7 +29,9 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build Storybook
-        run: bun run build-storybook
+        run: bun run build-storybook:pages
+        env:
+          STORYBOOK_PAGES_BUILD_ID: ${{ github.sha }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4

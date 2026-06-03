@@ -1,23 +1,51 @@
-name: Publish
+name: Publish to npm
 
 on:
   push:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      npm_tag:
+        description: "npm dist-tag to publish"
+        required: true
+        default: latest
+        type: choice
+        options:
+          - latest
+          - next
+          - beta
+          - canary
+      dry_run:
+        description: "Run verification and publish dry-run without uploading"
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
+  id-token: write
+
+concurrency:
+  group: publish-npm
+  cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: npm
     steps:
       - uses: actions/checkout@v6.0.2
 
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.12
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -28,7 +56,44 @@ jobs:
       - name: Verify release contract
         run: bun run verify:release:ci
 
-      - name: Publish package
-        run: bun publish --access public --registry https://registry.npmjs.org
+      - name: Verify npm supports trusted publishing
+        run: |
+          node --version
+          npm --version
+          node - <<'EOF'
+          const { execFileSync } = require("node:child_process");
+
+          function parse(version) {
+            const match = version.trim().match(/^v?(\d+)\.(\d+)\.(\d+)/);
+            if (!match) {
+              throw new Error(`Could not parse version: ${version}`);
+            }
+            return match.slice(1).map(Number);
+          }
+
+          function assertAtLeast(name, actual, minimum) {
+            const current = parse(actual);
+            const required = parse(minimum);
+            for (let index = 0; index < required.length; index += 1) {
+              if (current[index] > required[index]) return;
+              if (current[index] < required[index]) {
+                throw new Error(`${name} ${actual.trim()} is too old; expected ${minimum} or newer`);
+              }
+            }
+          }
+
+          assertAtLeast("Node", process.version, "22.14.0");
+          assertAtLeast("npm", execFileSync("npm", ["--version"], { encoding: "utf8" }), "11.5.1");
+          EOF
+
+      - name: Dry-run publish package
+        if: ${{ inputs.dry_run }}
+        run: npm publish --dry-run --access public --registry https://registry.npmjs.org --tag "$NPM_TAG"
         env:
-          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TAG: ${{ inputs.npm_tag || 'latest' }}
+
+      - name: Publish package
+        if: ${{ !inputs.dry_run }}
+        run: npm publish --access public --registry https://registry.npmjs.org --tag "$NPM_TAG"
+        env:
+          NPM_TAG: ${{ inputs.npm_tag || 'latest' }}

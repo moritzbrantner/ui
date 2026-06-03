@@ -157,6 +157,7 @@
   "scripts": {
     "build": "tsup --config tsup.config.ts",
     "build-storybook": "storybook build --output-dir storybook-static",
+    "build-storybook:pages": "bun run build-storybook && bun ./scripts/prepare-storybook-pages.ts",
     "bench": "bun ./scripts/benchmark-ui.ts",
     "bench:update": "bun ./scripts/benchmark-ui.ts --update",
     "check:hygiene": "bash ./scripts/check_repo_hygiene.sh",
