@@ -10,4 +10,3 @@ export * from "./components/labs/query-builder";
 export * from "./components/labs/terminal";
 export * from "./components/labs/timeline";
 export * from "./components/labs/tree-view";
-export * from "./components/labs/uml-diagram";

@@ -1458,17 +1458,6 @@ const componentRegistry = [
     status: "lab",
     reason: "Advanced or specialized surface available through explicit labs imports.",
   },
-  {
-    name: "uml-diagram",
-    fileName: "uml-diagram",
-    tier: "labs",
-    rootExport: false,
-    publicSubpath: "@moritzbrantner/ui/components/labs/uml-diagram",
-    storyFiles: ["src/components/labs/uml-diagram.stories.tsx"],
-    testFiles: ["src/components/labs/uml-diagram.test.tsx"],
-    status: "lab",
-    reason: "Advanced or specialized surface available through explicit labs imports.",
-  },
 ] as const satisfies readonly ComponentRegistryEntry[];
 
 export { componentRegistry };
