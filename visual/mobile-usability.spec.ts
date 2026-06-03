@@ -208,6 +208,17 @@ async function gotoStory(page: Page, storyId: string) {
       .catch(() => false);
 
     if (rootVisible) {
+      const storyVisible = await page
+        .locator("#storybook-root *:visible")
+        .first()
+        .waitFor({ state: "visible", timeout: attempt === 0 ? 5_000 : 15_000 })
+        .then(() => true)
+        .catch(() => false);
+
+      if (!storyVisible && attempt === 0) {
+        continue;
+      }
+
       await page.evaluate(() => document.fonts.ready);
       await page.waitForTimeout(250);
       return;
@@ -229,16 +240,29 @@ async function verifyBasicRender(
   storyFindings: MobileUsabilityFinding[],
   errors: { consoleErrors: string[]; failedRequests: string[]; pageErrors: string[] },
 ) {
-  if (
-    !(await page
+  let rootVisible = await page
+    .locator("#storybook-root")
+    .isVisible()
+    .catch(() => false);
+  let visibleElementCount = await page.locator("#storybook-root *:visible").count();
+
+  if (!rootVisible || visibleElementCount === 0) {
+    await page
+      .locator("#storybook-root *:visible")
+      .first()
+      .waitFor({ state: "visible", timeout: 5_000 })
+      .catch(() => undefined);
+
+    rootVisible = await page
       .locator("#storybook-root")
       .isVisible()
-      .catch(() => false))
-  ) {
-    storyFindings.push(createFinding(story, "render", "#storybook-root is not visible."));
+      .catch(() => false);
+    visibleElementCount = await page.locator("#storybook-root *:visible").count();
   }
 
-  const visibleElementCount = await page.locator("#storybook-root *:visible").count();
+  if (!rootVisible) {
+    storyFindings.push(createFinding(story, "render", "#storybook-root is not visible."));
+  }
 
   if (visibleElementCount === 0) {
     storyFindings.push(createFinding(story, "render", "Story root has no visible elements."));
@@ -251,9 +275,20 @@ async function verifyBasicRender(
     storyFindings.push(createFinding(story, "render", "Story failed to load a dynamic import."));
   }
 
-  for (const error of [...errors.pageErrors, ...errors.consoleErrors, ...errors.failedRequests]) {
+  const recoveredFromTransientLoad = rootVisible && visibleElementCount > 0 && !dynamicImportError;
+  const reportableErrors = [
+    ...errors.pageErrors,
+    ...errors.consoleErrors,
+    ...errors.failedRequests,
+  ].filter((error) => !recoveredFromTransientLoad || !isTransientStorybookLoadError(error));
+
+  for (const error of reportableErrors) {
     storyFindings.push(createFinding(story, "render", error));
   }
+}
+
+function isTransientStorybookLoadError(error: string) {
+  return /net::ERR_NETWORK_CHANGED|Failed to fetch dynamically imported module/.test(error);
 }
 
 async function verifyDocumentOverflow(
@@ -544,9 +579,9 @@ async function verifyInteractiveTargets(
             .then(() => true)
             .catch(() => false)
         : await locator
-          .click({ trial: true, timeout: 1_500 })
-          .then(() => true)
-          .catch(() => false);
+            .click({ trial: true, timeout: 1_500 })
+            .then(() => true)
+            .catch(() => false);
 
     if (!actionable) {
       storyFindings.push(

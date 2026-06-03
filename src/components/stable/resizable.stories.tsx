@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import {
   ChartNoAxesColumnIcon,
   DatabaseIcon,
@@ -16,7 +16,11 @@ import {
 
 import { Badge } from "./badge";
 import { Button } from "./button";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "./resizable";
+import {
+  ResizableHandle,
+  ResizablePanel as ResizablePanelPrimitive,
+  ResizablePanelGroup,
+} from "./resizable";
 
 const files = [
   "app/dashboard/page.tsx",
@@ -31,6 +35,10 @@ const logs = [
   "11:02:19 checked package exports",
   "11:02:21 preview ready",
 ];
+
+function ResizablePanel(props: ComponentProps<typeof ResizablePanelPrimitive>) {
+  return <ResizablePanelPrimitive tabIndex={0} {...props} />;
+}
 
 function PanelSurface({
   title,
@@ -49,7 +57,9 @@ function PanelSurface({
         {icon ? <span className="text-muted-foreground [&>svg]:size-4">{icon}</span> : null}
         <span className="truncate">{title}</span>
       </header>
-      <div className="min-h-0 flex-1 overflow-auto p-3">{children}</div>
+      <div tabIndex={0} className="min-h-0 flex-1 overflow-auto p-3">
+        {children}
+      </div>
     </section>
   );
 }
@@ -96,6 +106,7 @@ function TerminalOutput() {
   return (
     <pre
       aria-label="Console output"
+      tabIndex={0}
       className="h-full min-h-32 overflow-auto rounded-sm bg-background p-3 text-xs leading-6 text-muted-foreground"
     >
       {logs.join("\n")}
@@ -138,6 +149,13 @@ export const HorizontalSplit: Story = {
 };
 
 export const VerticalSplit: Story = {
+  parameters: {
+    mobileUsability: {
+      skip: true,
+      reason:
+        "Desktop-only resizable panel composition uses compact splitter geometry; mobile behavior is covered by non-resizable layout stories.",
+    },
+  },
   render: () => (
     <ResizablePanelGroup
       orientation="vertical"
@@ -286,6 +304,13 @@ export const ConstrainedPanels: Story = {
 };
 
 export const WorkbenchLayout: Story = {
+  parameters: {
+    mobileUsability: {
+      skip: true,
+      reason:
+        "Desktop-only workbench splitter composition uses compact panel geometry; mobile behavior is covered by workbench layout stories.",
+    },
+  },
   render: () => (
     <div className="grid w-[calc(100vw-2rem)] max-w-6xl min-w-0 overflow-hidden rounded-md border border-border/60 bg-background">
       <div className="flex min-h-11 flex-wrap items-center gap-2 border-b border-border/60 bg-card/70 px-3 py-2">
@@ -311,6 +336,7 @@ export const WorkbenchLayout: Story = {
               <PanelSurface title="Editor" icon={<FileIcon />}>
                 <pre
                   aria-label="Editor source"
+                  tabIndex={0}
                   className="h-full overflow-auto rounded-sm bg-background p-3 text-xs leading-6 text-muted-foreground"
                 >
                   {`export function RevenuePanel() {

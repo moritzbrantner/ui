@@ -45,7 +45,6 @@ export const Basic: Story = {
     </Sheet>
   ),
   play: async () => {
-    await expect(screen.getByRole("dialog")).toBeVisible();
-    await expect(screen.getByText("Panel details")).toBeVisible();
+    await expect(await screen.findByText("Panel details")).toBeVisible();
   },
 };

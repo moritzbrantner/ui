@@ -438,9 +438,9 @@ describe("chart graph components", () => {
 
     await waitFor(() =>
       expect(
-        screen.getByRole("graphics-symbol", { name: "Illustrations: 2" }).getAttribute(
-          "data-focused",
-        ),
+        screen
+          .getByRole("graphics-symbol", { name: "Illustrations: 2" })
+          .getAttribute("data-focused"),
       ).toBe("true"),
     );
     expect(onFocusedSegmentPathChange).toHaveBeenLastCalledWith(

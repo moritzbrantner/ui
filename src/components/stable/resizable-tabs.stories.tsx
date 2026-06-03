@@ -43,11 +43,7 @@ const items: ResizableTabsItem[] = [
 
 function ResizableTabsDemo() {
   return (
-    <ResizableTabs
-      items={items}
-      defaultValue="preview"
-      className="w-full max-w-3xl min-w-0"
-    />
+    <ResizableTabs items={items} defaultValue="preview" className="w-full max-w-3xl min-w-0" />
   );
 }
 

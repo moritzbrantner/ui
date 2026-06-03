@@ -31,10 +31,7 @@ const steps = [
 
 function StepperDemo({ orientation = "horizontal" }: { orientation?: "horizontal" | "vertical" }) {
   return (
-    <Stepper
-      orientation={orientation}
-      className="w-[calc(100vw-2rem)] max-w-[640px] min-w-0"
-    >
+    <Stepper orientation={orientation} className="w-[calc(100vw-2rem)] max-w-[640px] min-w-0">
       {steps.map((step, index) => (
         <StepperItem key={step.title} status={step.status}>
           <StepperIndicator>{step.status === "complete" ? null : index + 1}</StepperIndicator>

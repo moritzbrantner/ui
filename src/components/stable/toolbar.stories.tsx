@@ -20,11 +20,7 @@ type ToolbarInteractionDemoProps = {
 
 function ToolbarDemo({ onSave = () => undefined, density = "default" }: ToolbarDemoProps) {
   return (
-    <Toolbar
-      aria-label="Editor actions"
-      density={density}
-      className="w-full max-w-[640px] min-w-0"
-    >
+    <Toolbar aria-label="Editor actions" density={density} className="w-full max-w-[640px] min-w-0">
       <ToolbarGroup>
         <ToolbarTitle>Release notes</ToolbarTitle>
       </ToolbarGroup>

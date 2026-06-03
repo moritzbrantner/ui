@@ -265,6 +265,7 @@ function ChartHistogramGraph({
         <>
           <div
             data-slot="chart-scroll-area"
+            tabIndex={0}
             className={cn(
               "overflow-x-auto overflow-y-visible",
               shouldScroll && "pb-2 [scrollbar-width:thin]",
@@ -691,8 +692,7 @@ function ChartDonutGraph({
             tabIndex={isInteractiveDonut ? 0 : undefined}
             onFocus={
               isInteractiveDonut && !currentFocusedSegmentPath && interactiveSegments[0]
-                ? () =>
-                    setFocusedDonutSegment([...safeActivePath, interactiveSegments[0].index])
+                ? () => setFocusedDonutSegment([...safeActivePath, interactiveSegments[0].index])
                 : undefined
             }
             onKeyDown={isInteractiveDonut ? handleChartKeyDown : undefined}
@@ -898,6 +898,7 @@ function ChartGraph({
         <>
           <div
             data-slot="chart-scroll-area"
+            tabIndex={0}
             className={cn(
               "overflow-x-auto overflow-y-visible",
               shouldScroll && "pb-2 [scrollbar-width:thin]",

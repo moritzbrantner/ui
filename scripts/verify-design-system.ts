@@ -24,7 +24,7 @@ const mediaPath = path.join(packageRoot, "src", "media.ts");
 const labsPath = path.join(packageRoot, "src", "labs.ts");
 const errors: string[] = [];
 const publicTiers = ["stable", "patterns", "data", "shell", "social", "media", "labs"] as const;
-const expectedPackageVersion = "0.9.1";
+const expectedPackageVersion = "0.9.2";
 const rootExportTiers = new Set<ComponentTier>(["stable", "patterns"]);
 const releaseBlockingTiers = new Set<ComponentTier>([
   "stable",

@@ -259,8 +259,15 @@ export const ConsumerDashboardShellStory: Story = {
     onOpenCommand: fn(),
   },
   play: async ({ args, canvas, canvasElement, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: "More navigation actions" }));
-    await userEvent.click(await screen.findByRole("button", { name: "Commands" }));
+    const actionMenuTrigger = canvas.queryByRole("button", { name: "More navigation actions" });
+
+    if (actionMenuTrigger) {
+      await userEvent.click(actionMenuTrigger);
+      await userEvent.click(await screen.findByRole("button", { name: "Commands" }));
+    } else {
+      await userEvent.click(canvas.getByRole("button", { name: "Commands" }));
+    }
+
     await expect(args.onOpenCommand).toHaveBeenCalled();
     await expect(canvasElement.ownerDocument.body).toHaveTextContent("Open release checks");
   },

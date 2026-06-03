@@ -73,7 +73,7 @@ bun run test:unlighthouse
 
 The audit builds Storybook, serves the static output locally, checks representative component stories, and writes the generated report to `unlighthouse-report/`.
 
-`bun run test:coverage` is a local fallback when Bun's `node` shim cannot expose V8 coverage APIs. It runs the unit suite and reports that coverage was not measured. Release coverage must use `bun run test:coverage:real` with a real Node runtime, which CI gets from `actions/setup-node`.
+`bun run test:coverage` runs the local coverage helper. When Bun's `node` shim cannot expose V8 coverage APIs, it falls back to the unit suite and reports that coverage was not measured; CI runs the same release contract with the configured runtime.
 
 Run `bun run bench` by itself, not in parallel with Storybook, Playwright, or other browser-heavy checks. The benchmark verifier retries failed samples once to filter transient host load, but repeat failures should be treated as release signals.
 

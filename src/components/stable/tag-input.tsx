@@ -160,7 +160,7 @@ function TagInput({
               aria-label={removeLabel(tag)}
               disabled={disabled}
               data-slot="tag-input-remove"
-            className="-mr-1 rounded-[calc(var(--radius)-3px)] opacity-60 hover:opacity-100"
+              className="-mr-1 rounded-[calc(var(--radius)-3px)] opacity-60 hover:opacity-100"
               onClick={() => removeTag(index)}
             >
               <XIcon />

@@ -1,5 +1,14 @@
 # @moritzbrantner/ui
 
+## 0.9.2
+
+### Patch Changes
+
+- Add mobile usability release audits and skip verification for documented mobile exceptions.
+- Improve Storybook release stability with cache-bust reload handling, stable input stories, and simplified story metadata.
+- Harden release verification around Bun-only package checks, consumer package checks, package styles, coverage fallback behavior, and Unlighthouse Chromium sandbox options.
+- Refine mobile navigation, primitive form controls, overlay behavior, charts, resizable surfaces, media controls, and composed pattern stories for release readiness.
+
 ## 0.9.1
 
 ### Patch Changes

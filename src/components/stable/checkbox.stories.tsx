@@ -59,6 +59,7 @@ export const CssCheck: Story = {
   play: async ({ canvas }) => {
     const checkbox = canvas.getByRole("checkbox", { name: "Accept terms" });
 
-    await expect(getComputedStyle(checkbox).width).toBe("16px");
+    await expect(getComputedStyle(checkbox).width).toBe("40px");
+    await expect(getComputedStyle(checkbox, "::before").width).toBe("16px");
   },
 };
