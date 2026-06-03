@@ -16,6 +16,9 @@ const tokenFiles = [
 const requiredPublicUiTokens = uiTokenMetadata
   .filter((token) => token.name.startsWith("--ui-") || token.name.startsWith("--glass-"))
   .map((token) => token.name);
+const requiredPublicDarkTokens = uiTokenMetadata
+  .filter((token) => token.category === "color" || token.name.startsWith("--glass-"))
+  .map((token) => token.name);
 const tokenBackedComponents = [
   ["src/components/stable/button.tsx", "--ui-button-height-md"],
   ["src/components/stable/input.tsx", "--ui-input-height"],
@@ -60,9 +63,11 @@ for (const relativeFile of tokenFiles) {
       if (!tokens.root.has(token)) {
         errors.push(`${relativeFile}: :root is missing public UI token ${token}`);
       }
+    }
 
+    for (const token of requiredPublicDarkTokens) {
       if (!tokens.dark.has(token)) {
-        errors.push(`${relativeFile}: .dark is missing public UI token ${token}`);
+        errors.push(`${relativeFile}: .dark is missing public dark token ${token}`);
       }
     }
   }

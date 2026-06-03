@@ -19,7 +19,7 @@
   --ui-surface-gap: 0.75rem;
   --ui-focus-ring-width: 3px;
   --ui-motion-hover-y: -1px;
-  --ui-motion-hover-scale: 1.035;
+  --ui-motion-hover-scale: 1.015;
   --ui-shadow-surface: var(--glass-shadow);
   --ui-shadow-interactive: var(--glass-interactive-shadow);
   --ui-button-height-xs: var(--ui-control-height-xs);
@@ -102,7 +102,7 @@
   --ui-surface-gap: 0.75rem;
   --ui-focus-ring-width: 3px;
   --ui-motion-hover-y: -1px;
-  --ui-motion-hover-scale: 1.035;
+  --ui-motion-hover-scale: 1.015;
   --ui-shadow-surface: var(--glass-shadow);
   --ui-shadow-interactive: var(--glass-interactive-shadow);
   --ui-button-height-xs: var(--ui-control-height-xs);

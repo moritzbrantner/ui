@@ -22,8 +22,8 @@ function Slider({
 }: SliderProps) {
   const rootAriaLabel = typeof props["aria-label"] === "string" ? props["aria-label"] : undefined;
   const _values = React.useMemo(
-    () => (Array.isArray(value) ? value : Array.isArray(defaultValue) ? defaultValue : [min, max]),
-    [value, defaultValue, min, max],
+    () => (Array.isArray(value) ? value : Array.isArray(defaultValue) ? defaultValue : [min]),
+    [value, defaultValue, min],
   );
   const getThumbAriaLabel = (index: number) => {
     if (thumbAriaLabelledBy) {

@@ -155,6 +155,22 @@ function ChatComposer({ className, ...props }: React.ComponentProps<"form">) {
   );
 }
 
+/**
+ * Textarea input for the chat composer.
+ *
+ * Keyboard submit behavior (Enter to send, Shift+Enter for newline) is not
+ * handled here — wire it up in the consuming component via `onKeyDown`.
+ *
+ * @example
+ * <ChatComposerInput
+ *   onKeyDown={(e) => {
+ *     if (e.key === 'Enter' && !e.shiftKey) {
+ *       e.preventDefault();
+ *       handleSubmit();
+ *     }
+ *   }}
+ * />
+ */
 function ChatComposerInput({
   className,
   rows = 1,
