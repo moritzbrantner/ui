@@ -165,6 +165,8 @@ Migration examples:
 | `@moritzbrantner/ui/components/chat`          | `@moritzbrantner/ui/components/social/chat`         |
 | `@moritzbrantner/ui/components/image-cropper` | `@moritzbrantner/ui/components/media/image-cropper` |
 
+0.10.0 removes the stable chart, funnel chart, org chart, and labs UML diagram surfaces from this package. Move chart, funnel, org chart, and UML/editor-specific visualization behavior to app-owned code or a dedicated visualization package.
+
 ## Menu Patterns
 
 Use `ActionMenu` for button-triggered command menus. Use `ContextActionMenu` for right-click or contextual target actions. Use `ActionSheet` for touch-first mobile action menus. Use `ResponsiveActionMenu` when the same trigger should open a desktop dropdown and a mobile slide sheet. Use `HoverPreview` for read-only hover and focus previews.

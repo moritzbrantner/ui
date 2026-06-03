@@ -60,7 +60,6 @@ const config: StorybookConfig = {
           "react",
           "react/jsx-dev-runtime",
           "react-resizable-panels",
-          "recharts",
           "sonner",
           "tailwind-merge",
           "three",

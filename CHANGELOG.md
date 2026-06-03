@@ -1,13 +1,15 @@
 # @moritzbrantner/ui
 
-## 0.9.2
+## 0.10.0
 
-### Patch Changes
+### Minor Changes
 
-- Add mobile usability release audits and skip verification for documented mobile exceptions.
-- Improve Storybook release stability with cache-bust reload handling, stable input stories, and simplified story metadata.
-- Harden release verification around Bun-only package checks, consumer package checks, package styles, coverage fallback behavior, and Unlighthouse Chromium sandbox options.
-- Refine mobile navigation, primitive form controls, overlay behavior, charts, resizable surfaces, media controls, and composed pattern stories for release readiness.
+- Remove the stable chart family, including `ChartAreaGraph`, `ChartBarGraph`, `ChartDonutGraph`, `ChartHistogramGraph`, `ChartLineGraph`, `ChartPretext`, `ChartPretextText`, `ChartSparkline`, `FunnelChart`, and `OrgChart`, along with the `chart`, `funnel-chart`, and `org-chart` component subpaths.
+- Remove the labs UML diagram surface, including `UmlDiagram`, `UmlClassDiagram`, `UmlStateDiagram`, `getUmlDiagramBounds`, and the `uml-diagram` component subpath.
+- Drop the Recharts dependency after removing the chart component family.
+- Keep chart color tokens available for non-chart components such as `Infographic`, `Gantt`, and themed shell surfaces.
+- Harden release confidence with passing package export checks, consumer package verification, Storybook build coverage, build-size checks, package dry-run output, and isolated benchmark verification.
+- Migration: move chart, funnel, org chart, and UML/editor-specific visualization behavior to app-owned code or a dedicated visualization package.
 
 ## 0.9.1
 

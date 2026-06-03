@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, screen } from "storybook/test";
+import { expect, screen, waitFor, within } from "storybook/test";
 
 import { Button } from "./button";
 import {
@@ -45,6 +45,10 @@ export const Basic: Story = {
     </Sheet>
   ),
   play: async () => {
-    await expect(await screen.findByText("Panel details")).toBeVisible();
+    const dialog = await screen.findByRole("dialog");
+
+    await waitFor(() => {
+      expect(within(dialog).getByText("Panel details")).toBeVisible();
+    });
   },
 };
