@@ -28,12 +28,6 @@ type BenchmarkFailure = {
   name: string;
   result: BenchmarkResult;
 };
-type BenchmarkOrgChartNode = {
-  id: string;
-  label: string;
-  description: string;
-  children: BenchmarkOrgChartNode[];
-};
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const baselinePath = path.join(
@@ -191,15 +185,6 @@ const benchmarks: BenchmarkRunner[] = [
         tasks: createGanttTasks(250),
         showDependencyLines: true,
         virtualized: true,
-      }),
-    );
-  }),
-  benchmark("render.orgChart340", "render", () => {
-    renderUi(
-      React.createElement(ui.OrgChart, {
-        nodes: createOrgChartNodes(4, 4),
-        defaultExpandedDepth: 1,
-        maxRenderedNodes: 120,
       }),
     );
   }),
@@ -454,27 +439,6 @@ function createGanttTasks(count: number) {
       end: `2026-04-${String(endDay).padStart(2, "0")}`,
       progress: index % 100,
       dependencies: index > 0 ? [`task-${index - 1}`] : [],
-    };
-  });
-}
-
-function createOrgChartNodes(
-  depth: number,
-  breadth: number,
-  prefix = "node",
-): BenchmarkOrgChartNode[] {
-  if (depth === 0) {
-    return [];
-  }
-
-  return Array.from({ length: breadth }, (_, index) => {
-    const id = `${prefix}-${index}`;
-
-    return {
-      id,
-      label: `Node ${id}`,
-      description: "Team member",
-      children: createOrgChartNodes(depth - 1, breadth, id),
     };
   });
 }

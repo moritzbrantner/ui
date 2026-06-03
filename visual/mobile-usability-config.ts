@@ -44,13 +44,6 @@ export const mobileUsabilityConfig = {
       },
     ],
     [
-      "components-data-display-org-chart--team-structure",
-      {
-        selector: '[data-slot="org-chart"]',
-        reason: "Hierarchy layouts can preserve node relationships through an owned scroll region.",
-      },
-    ],
-    [
       "components-data-display-process-map--release-lifecycle",
       {
         selector: '[data-slot="process-map"]',

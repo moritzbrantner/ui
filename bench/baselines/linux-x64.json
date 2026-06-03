@@ -83,12 +83,6 @@
       "name": "render.gantt250",
       "median": 29.647954000000027,
       "p95": 35.4836750000004
-    },
-    "render.orgChart340": {
-      "kind": "render",
-      "name": "render.orgChart340",
-      "median": 5.056833999999981,
-      "p95": 8.197413999999299
     }
   }
 }

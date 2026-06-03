@@ -22,7 +22,6 @@ import {
   FormSectionDescription,
   FormSectionHeader,
   FormSectionTitle,
-  FunnelChart,
   MetricStrip,
   ProcessMap,
   ThemeModeSwitch,
@@ -199,16 +198,8 @@ export function App() {
           </SurfaceHeader>
           <SurfaceContent className="mt-4 grid gap-4">
             <MetricStrip items={businessMetrics} />
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)]">
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)]">
               <ProcessMap steps={releaseSteps} />
-              <FunnelChart
-                ariaLabel="Consumer conversion funnel"
-                data={[
-                  { id: "visitors", label: "Visitors", value: 12000 },
-                  { id: "trials", label: "Trials", value: 2100 },
-                  { id: "customers", label: "Customers", value: 420 },
-                ]}
-              />
             </div>
           </SurfaceContent>
         </Surface>

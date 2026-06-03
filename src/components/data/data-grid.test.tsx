@@ -174,7 +174,6 @@ const shadcnBasicComponentFiles = [
   "calendar",
   "card",
   "carousel",
-  "chart",
   "checkbox",
   "collapsible",
   "combobox",

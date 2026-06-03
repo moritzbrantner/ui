@@ -161,7 +161,6 @@ function getLikelyOwner(fileName: string) {
     [/primitive-components|primitive-/, "primitive stories"],
     [/data-grid/i, "DataGrid"],
     [/navbar/i, "Navbar"],
-    [/chart|recharts/i, "Chart"],
     [/calendar|day-picker/i, "Calendar"],
     [/combobox|base-ui/i, "Combobox"],
     [/motion/i, "Motion"],

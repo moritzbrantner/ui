@@ -14,7 +14,6 @@ const storybookStoryIds = [
   "components-layout-app-shell--comprehensive-app-shell",
   "components-social-overview--social-feed",
   "patterns-release-readiness--consumer-dashboard-shell-story",
-  "components-data-display-chart--business-dashboard",
   "components-forms-inputs-calendar--with-events",
   "components-forms-inputs-combobox--basic",
   "components-navigation-navbar--web",

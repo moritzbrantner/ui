@@ -67,8 +67,6 @@ import {
   EmptyTitle,
   EmptyState,
   ErrorState,
-  FunnelChart,
-  type FunnelChartSegmentData,
   HoverPreview,
   type HoverPreviewProps,
   Infographic,
@@ -98,8 +96,6 @@ import {
   ShortcutList,
   Spinner,
   OrbitSpinner,
-  OrgChart,
-  type OrgChartNodeData,
   PolygonSpinner,
   PulseSpinner,
   ProcessMap,
@@ -172,10 +168,8 @@ import { bobbaTheme as bobbaServerTheme, uiTheme as bobbaServerUiTheme } from ".
 import { Button as ClientButton, Dialog as ClientDialog } from "./client";
 import { Button as SubpathButton } from "./components/stable/button";
 import { ComparisonMatrix as SubpathComparisonMatrix } from "./components/stable/comparison-matrix";
-import { FunnelChart as SubpathFunnelChart } from "./components/stable/funnel-chart";
 import { Infographic as SubpathInfographic } from "./components/stable/infographic";
 import { MetricStrip as SubpathMetricStrip } from "./components/stable/metric-strip";
-import { OrgChart as SubpathOrgChart } from "./components/stable/org-chart";
 import { ProcessMap as SubpathProcessMap } from "./components/stable/process-map";
 import { RelationshipMap as SubpathRelationshipMap } from "./components/stable/relationship-map";
 import { ActionMenu as SubpathActionMenu } from "./components/patterns/action-menu";
@@ -257,7 +251,6 @@ const shadcnBasicComponentFiles = [
   "calendar",
   "card",
   "carousel",
-  "chart",
   "checkbox",
   "collapsible",
   "combobox",
@@ -545,10 +538,8 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(ClientDialog).toBe(Dialog);
     expect(SubpathButton).toBe(Button);
     expect(SubpathComparisonMatrix).toBe(ComparisonMatrix);
-    expect(SubpathFunnelChart).toBe(FunnelChart);
     expect(SubpathInfographic).toBe(Infographic);
     expect(SubpathMetricStrip).toBe(MetricStrip);
-    expect(SubpathOrgChart).toBe(OrgChart);
     expect(SubpathProcessMap).toBe(ProcessMap);
     expect(SubpathRelationshipMap).toBe(RelationshipMap);
     expect(SubpathActionMenu).toBe(ActionMenu);
@@ -573,11 +564,9 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(typeof ActionSheet).toBe("function");
     expect(typeof ResponsiveActionMenu).toBe("function");
     expect(typeof HoverPreview).toBe("function");
-    expect(typeof FunnelChart).toBe("function");
     expect(typeof MetricStrip).toBe("function");
     expect(typeof ProcessMap).toBe("function");
     expect(typeof ComparisonMatrix).toBe("function");
-    expect(typeof OrgChart).toBe("function");
     expect(typeof RelationshipMap).toBe("function");
     expect(typeof Infographic).toBe("function");
     expect(typeof SocialActionGroup).toBe("function");
@@ -625,11 +614,6 @@ describe("@moritzbrantner/ui package-contract", () => {
       value: "42",
       deltaTone: "positive",
     };
-    const funnelSegment: FunnelChartSegmentData = {
-      id: "contract-segment",
-      label: "Contract segment",
-      value: 42,
-    };
     const processStep: ProcessMapStepData = {
       id: "contract-step",
       label: "Contract step",
@@ -645,11 +629,6 @@ describe("@moritzbrantner/ui package-contract", () => {
       label: "Contract row",
       values: { "contract-column": "Ready" },
       toneByColumn: { "contract-column": "positive" },
-    };
-    const orgNode: OrgChartNodeData = {
-      id: "contract-node",
-      label: "Contract node",
-      children: [{ id: "contract-child", label: "Contract child" }],
     };
     const relationshipNode: RelationshipMapNode = {
       id: "contract-source",
@@ -669,11 +648,9 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(responsiveActionMenuProps.items).toHaveLength(1);
     expect(hoverPreviewProps.title).toBe("Preview");
     expect(metricItem.deltaTone).toBe("positive");
-    expect(funnelSegment.value).toBe(42);
     expect(processStep.status).toBe("active");
     expect(matrixColumn.id).toBe("contract-column");
     expect(matrixRow.toneByColumn?.["contract-column"]).toBe("positive");
-    expect(orgNode.children).toHaveLength(1);
     expect(relationshipNode.tone).toBe("accent");
     expect(relationshipEdge.direction).toBe("both");
     const queryBuilderIdFactory: QueryBuilderIdFactory = (kind) => `contract-${kind}`;
