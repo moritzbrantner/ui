@@ -48,6 +48,18 @@ describe("@moritzbrantner/ui mode and language switchers", () => {
     expect(onModeChange).toHaveBeenCalledWith("light");
   });
 
+  test("theme mode switch uses a compact shell control treatment", () => {
+    render(<ThemeModeSwitch defaultMode="light" />);
+
+    const switchControl = screen.getByRole("switch", { name: "Color mode" });
+
+    expect(switchControl.className).toContain("rounded-md");
+    expect(switchControl.className).toContain("w-16");
+    expect(switchControl.className).toContain("border-border");
+    expect(switchControl.className).not.toContain("rounded-full");
+    expect(switchControl.className).not.toContain("bg-sky");
+  });
+
   test("theme mode switch supports controlled mode changes", () => {
     const onModeChange = vi.fn();
 
