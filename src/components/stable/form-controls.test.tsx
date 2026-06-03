@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
+import { act } from "react";
 import { beforeAll, describe, expect, test, vi } from "vitest";
 
 import {
@@ -146,7 +147,7 @@ describe("stable form controls", () => {
     expect(onSwitchChange).not.toHaveBeenCalled();
   });
 
-  test("renders slider, toggle, toggle group, and input otp slots", () => {
+  test("renders slider, toggle, and toggle group controls", () => {
     const onToggle = vi.fn();
     const onToggleGroupChange = vi.fn();
 
@@ -161,13 +162,6 @@ describe("stable form controls", () => {
             Left
           </ToggleGroupItem>
         </ToggleGroup>
-        <InputOTP maxLength={3} value="12" onChange={() => {}}>
-          <InputOTPGroup>
-            <InputOTPSlot index={0} />
-            <InputOTPSlot index={1} />
-            <InputOTPSlot index={2} />
-          </InputOTPGroup>
-        </InputOTP>
       </div>,
     );
 
@@ -177,7 +171,32 @@ describe("stable form controls", () => {
 
     expect(onToggle).toHaveBeenCalledWith(true);
     expect(onToggleGroupChange).toHaveBeenCalledWith("left");
-    expect(document.querySelector('[data-slot="input-otp"]')).toBeTruthy();
-    expect(document.querySelectorAll('[data-slot="input-otp-slot"]').length).toBe(3);
+  });
+
+  test("renders input otp slots without leaking delayed updates", async () => {
+    vi.useFakeTimers();
+
+    try {
+      const view = render(
+        <InputOTP maxLength={3} value="12" onChange={() => {}}>
+          <InputOTPGroup>
+            <InputOTPSlot index={0} />
+            <InputOTPSlot index={1} />
+            <InputOTPSlot index={2} />
+          </InputOTPGroup>
+        </InputOTP>,
+      );
+
+      expect(document.querySelector('[data-slot="input-otp"]')).toBeTruthy();
+      expect(document.querySelectorAll('[data-slot="input-otp-slot"]').length).toBe(3);
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(50);
+      });
+
+      view.unmount();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
