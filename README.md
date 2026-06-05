@@ -372,7 +372,7 @@ bun run publish:registry
 The `.github/workflows/publish.yml` workflow can also publish on `v*` tags or manual dispatch. Configure npm trusted publishing for `moritzbrantner/ui` with workflow filename `publish.yml`, environment `npm`, and `npm publish` allowed:
 
 ```sh
-npm trust github @moritzbrantner/ui --repo moritzbrantner/ui --file publish.yml --env npm
+npm trust github @moritzbrantner/ui --repo moritzbrantner/ui --file publish.yml --env npm --allow-publish
 ```
 
 As a fallback, add an `NPM_TOKEN` secret with publish access to the GitHub `npm` environment.

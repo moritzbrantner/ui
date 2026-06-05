@@ -131,7 +131,7 @@ jobs:
               echo "### npm publish failed"
               echo ""
               echo "A registry \`E404\` or permission error during \`npm publish\` means the workflow authenticated without publish access."
-              echo "Configure npm trusted publishing for \`moritzbrantner/ui\` with workflow filename \`publish.yml\`, environment \`npm\`, and \`npm publish\` allowed, or add an \`NPM_TOKEN\` secret with publish access to the GitHub \`npm\` environment."
+              echo "Configure npm trusted publishing with \`npm trust github @moritzbrantner/ui --repo moritzbrantner/ui --file publish.yml --env npm --allow-publish\`, or add an \`NPM_TOKEN\` secret with publish access to the GitHub \`npm\` environment."
             } >> "$GITHUB_STEP_SUMMARY"
             exit "$publish_status"
           fi
