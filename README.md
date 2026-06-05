@@ -107,7 +107,7 @@ import "@moritzbrantner/ui/paper/styles.css";
 
 Use `atlas` for dense dashboards and analytics, `studio` for creative tooling, and `paper` for document or research-heavy interfaces.
 
-Token metadata now lives in `src/token-metadata.ts`. CSS is still manually authored in this release; see [docs/token-source-of-truth.md](./docs/token-source-of-truth.md) for the current source-of-truth status and the deferred generation plan.
+Token metadata and built-in theme token values live in `src/token-metadata.ts`. Run `bun run generate:tokens` after token changes to update generated CSS and [token docs](./docs/tokens.md).
 
 ## Components
 

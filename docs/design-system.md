@@ -90,7 +90,7 @@ The typed component registry in `src/component-registry.ts` records the tier, pu
 
 ## Token Source Status
 
-Token names and categories are centralized in `src/token-metadata.ts`. CSS remains manually authored for now. The future token pass should generate `styles.css`, theme CSS files, `theme-scopes.css`, and docs from one canonical source; generation is explicitly out of scope for `0.8.0`.
+Token names, categories, descriptions, and built-in theme values are centralized in `src/token-metadata.ts`. Run `bun run generate:tokens` after token changes to update `styles.css`, theme CSS files, `theme-scopes.css`, and `docs/tokens.md`.
 
 ## Do Not Put Here
 

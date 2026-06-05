@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -32,6 +33,16 @@ const tokenBackedComponents = [
   ["src/components/stable/toolbar.tsx", "--ui-toolbar-min-height"],
 ];
 const errors: string[] = [];
+const generatedCheck = spawnSync("bun", ["./scripts/generate-theme-css.ts", "--check"], {
+  cwd: packageRoot,
+  encoding: "utf8",
+  stdio: "pipe",
+});
+
+if (generatedCheck.status !== 0) {
+  errors.push((generatedCheck.stderr || generatedCheck.stdout).trim());
+}
+
 const baseTokens = readTokens(path.join(packageRoot, "styles.css"));
 const requiredTokens = intersection(baseTokens.root, baseTokens.dark);
 
