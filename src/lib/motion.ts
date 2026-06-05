@@ -15,24 +15,23 @@ type LegacyMotionProps = {
   whileTap?: unknown;
 };
 
-const glassMotionTransition = {
-  type: "spring",
-  stiffness: 420,
-  damping: 34,
-  mass: 0.6,
-} satisfies Record<string, unknown>;
+/**
+ * @deprecated No longer functional. Framer Motion has been removed.
+ * Kept for one release to avoid hard breaking changes. Remove spreads of this object.
+ */
+const glassMotionTransition: Record<string, never> = {};
 
-const glassSurfaceMotion = {
-  layout: true,
-  transition: glassMotionTransition,
-} satisfies LegacyMotionProps;
+/**
+ * @deprecated No longer functional. Framer Motion has been removed.
+ * Kept for one release to avoid hard breaking changes. Remove spreads of this object.
+ */
+const glassSurfaceMotion: LegacyMotionProps = {};
 
-const glassInteractiveMotion = {
-  layout: true,
-  whileHover: { y: -1, scale: 1.012 },
-  whileTap: { scale: 0.99 },
-  transition: glassMotionTransition,
-} satisfies LegacyMotionProps;
+/**
+ * @deprecated No longer functional. Framer Motion has been removed.
+ * Kept for one release to avoid hard breaking changes. Remove spreads of this object.
+ */
+const glassInteractiveMotion: LegacyMotionProps = {};
 
 export { glassInteractiveMotion, glassMotionTransition, glassSurfaceMotion };
 export type { LegacyMotionProps };

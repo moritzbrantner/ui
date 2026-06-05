@@ -30,6 +30,23 @@ Run the full release contract:
 bun run verify:release
 ```
 
+`verify:release` stops at the first failing command. Fix that failure first, then rerun the
+full contract so the later checks still get a clean pass.
+
+For Storybook interaction failures, keep assertions aligned with browser timing:
+
+- Assert portal-mounted overlay content with `screen`, not `canvas`.
+- Use a story-local zero delay or `waitFor` for delayed hover/focus content.
+- Avoid immediate `getBy*` or `getAllBy*` assertions after async interactions unless the UI is synchronous.
+
+For the common tooltip-style failure loop, use:
+
+```sh
+bun run test:storybook
+bun run verify:release
+bun run bench
+```
+
 When bisecting release failures locally, run the checks in this order:
 
 ```sh
@@ -52,6 +69,11 @@ bun run pack:dry
 ```
 
 Run `bun run bench` by itself, not alongside Storybook, Playwright, Unlighthouse, or other browser-heavy checks.
+Benchmarks read the built `dist` entrypoints, so run `bun run build` first when invoking
+`bun run bench` outside the full release contract.
+
+Visual and mobile usability checks start their own Storybook server on port `6007`.
+Stop any existing local Storybook process on that port before running the release contract.
 
 Inspect the package contents:
 
@@ -67,4 +89,11 @@ After `bun run verify:release` and `bun run pack:dry` pass, authenticate for the
 bun run publish:registry
 ```
 
-The GitHub publish workflow can also publish on a `v*` tag or manual dispatch when `NPM_TOKEN` is configured. CI uses `bun run verify:release:ci`, which measures coverage with a real Node runtime instead of the local Bun coverage fallback.
+The GitHub publish workflow can also publish on a `v*` tag or manual dispatch. Configure npm trusted publishing for `moritzbrantner/ui` with workflow filename `publish.yml`, environment `npm`, and `npm publish` allowed:
+
+```sh
+npm trust github @moritzbrantner/ui --repo moritzbrantner/ui --file publish.yml --env npm
+npm trust list @moritzbrantner/ui
+```
+
+As a fallback, add an `NPM_TOKEN` secret with publish access to the GitHub `npm` environment. CI uses `bun run verify:release:ci`, which measures coverage with a real Node runtime instead of the local Bun coverage fallback.

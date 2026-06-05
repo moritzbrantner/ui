@@ -369,7 +369,13 @@ Publishing goes directly to the public package registry. For a local publish, au
 bun run publish:registry
 ```
 
-The `.github/workflows/publish.yml` workflow can also publish on `v*` tags or manual dispatch when the repository has an `NPM_TOKEN` secret with publish access.
+The `.github/workflows/publish.yml` workflow can also publish on `v*` tags or manual dispatch. Configure npm trusted publishing for `moritzbrantner/ui` with workflow filename `publish.yml`, environment `npm`, and `npm publish` allowed:
+
+```sh
+npm trust github @moritzbrantner/ui --repo moritzbrantner/ui --file publish.yml --env npm
+```
+
+As a fallback, add an `NPM_TOKEN` secret with publish access to the GitHub `npm` environment.
 
 Before tagging, dispatching, or publishing manually, run:
 

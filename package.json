@@ -165,7 +165,7 @@
     "dev": "bun run storybook",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
-    "lint": "bun ./scripts/verify-design-system.ts && bun ./scripts/verify-state-selectors.ts && bun ./scripts/verify-tokens.ts && bun ./scripts/verify-package-imports.ts ./src @/ next/ && bun ./scripts/verify-package-styles.ts . && bun ./scripts/verify-docs-links.ts && bun run verify:mobile-usability-skips",
+    "lint": "bun ./scripts/verify-design-system.ts && bun ./scripts/verify-state-selectors.ts && bun ./scripts/verify-tokens.ts && bun ./scripts/verify-package-imports.ts ./src @/ next/ && bun ./scripts/verify-package-styles.ts . && bun ./scripts/verify-docs-links.ts && bun ./scripts/verify-story-interactions.ts && bun run verify:mobile-usability-skips",
     "pack:dry": "bun pm pack --dry-run --ignore-scripts",
     "perf:report": "bun ./scripts/report-performance-hotspots.ts",
     "prepack": "bun run build",

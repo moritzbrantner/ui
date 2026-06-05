@@ -52,7 +52,7 @@ function Avatar({
   shape = "round",
   name,
   imageUrl,
-  imageAlt = "",
+  imageAlt,
   initials,
   maxInitials = 2,
   online = false,
@@ -61,7 +61,9 @@ function Avatar({
 }: AvatarProps) {
   return (
     <AvatarRoot className={className} size={size} shape={shape} {...props}>
-      {imageUrl ? <AvatarImage src={imageUrl} alt={imageAlt} /> : null}
+      {imageUrl ? (
+        <AvatarImage src={imageUrl} alt={imageAlt ?? (typeof name === "string" ? name : "")} />
+      ) : null}
       <AvatarFallback name={name} initials={initials} maxInitials={maxInitials}>
         {fallback}
       </AvatarFallback>

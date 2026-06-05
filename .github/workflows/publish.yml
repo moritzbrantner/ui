@@ -1,4 +1,5 @@
 name: Publish to npm
+run-name: Publish to npm (${{ inputs.npm_tag || 'latest' }}, dry_run=${{ inputs.dry_run || false }})
 
 on:
   push:
@@ -86,14 +87,54 @@ jobs:
           assertAtLeast("npm", execFileSync("npm", ["--version"], { encoding: "utf8" }), "11.5.1");
           EOF
 
+      - name: Summarize publish target
+        run: |
+          {
+            echo "### npm publish target"
+            echo ""
+            echo "- Package: \`$(node -p "require('./package.json').name")@$(node -p "require('./package.json').version")\`"
+            echo "- Dist tag: \`$NPM_TAG\`"
+            echo "- Dry run: \`$DRY_RUN\`"
+            echo "- Ref: \`$GITHUB_REF_NAME\`"
+            echo ""
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "This run verifies and packs the package only. It will not upload a new npm version."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          DRY_RUN: ${{ inputs.dry_run || false }}
+          NPM_TAG: ${{ inputs.npm_tag || 'latest' }}
+
       - name: Dry-run publish package
-        if: ${{ inputs.dry_run }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
         run: npm publish --dry-run --access public --registry https://registry.npmjs.org --tag "$NPM_TAG"
         env:
           NPM_TAG: ${{ inputs.npm_tag || 'latest' }}
 
       - name: Publish package
-        if: ${{ !inputs.dry_run }}
-        run: npm publish --access public --registry https://registry.npmjs.org --tag "$NPM_TAG"
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.dry_run }}
+        run: |
+          set +e
+
+          unset NODE_AUTH_TOKEN
+          npm publish --access public --registry https://registry.npmjs.org --tag "$NPM_TAG"
+          publish_status=$?
+
+          if [ "$publish_status" -ne 0 ] && [ -n "$NPM_PUBLISH_TOKEN" ]; then
+            echo "Trusted publishing did not complete; retrying with NPM_TOKEN."
+            NODE_AUTH_TOKEN="$NPM_PUBLISH_TOKEN" npm publish --access public --registry https://registry.npmjs.org --tag "$NPM_TAG"
+            publish_status=$?
+          fi
+
+          if [ "$publish_status" -ne 0 ]; then
+            {
+              echo "### npm publish failed"
+              echo ""
+              echo "A registry \`E404\` or permission error during \`npm publish\` means the workflow authenticated without publish access."
+              echo "Configure npm trusted publishing for \`moritzbrantner/ui\` with workflow filename \`publish.yml\`, environment \`npm\`, and \`npm publish\` allowed, or add an \`NPM_TOKEN\` secret with publish access to the GitHub \`npm\` environment."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit "$publish_status"
+          fi
         env:
+          NPM_PUBLISH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TAG: ${{ inputs.npm_tag || 'latest' }}

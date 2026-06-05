@@ -244,7 +244,7 @@ if (failures.length > 0) {
 
   for (const failure of failures) {
     console.error(
-      `- ${failure.name}: median ${failure.result.median.toFixed(3)}ms exceeds allowed ${failure.allowedMedian.toFixed(3)}ms`,
+      `- ${failure.name}: median ${failure.result.median.toFixed(3)}ms exceeds allowed ${failure.allowedMedian.toFixed(3)}ms (baseline ${failure.baseline.median.toFixed(3)}ms)`,
     );
   }
 

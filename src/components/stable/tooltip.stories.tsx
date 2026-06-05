@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, screen } from "storybook/test";
+import { expect, screen, waitFor } from "storybook/test";
 
 import { Button } from "./button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip";
@@ -16,7 +16,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Basic: Story = {
   render: () => (
-    <TooltipProvider>
+    <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
           <Button type="button" variant="outline">
@@ -29,6 +29,8 @@ export const Basic: Story = {
   ),
   play: async ({ canvas, userEvent }) => {
     await userEvent.hover(canvas.getByRole("button", { name: "Hover target" }));
-    await expect(screen.getAllByText("Helpful context").length).toBeGreaterThan(0);
+    await waitFor(() => {
+      expect(screen.getAllByText("Helpful context").length).toBeGreaterThan(0);
+    });
   },
 };
