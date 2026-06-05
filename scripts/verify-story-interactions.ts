@@ -106,7 +106,10 @@ function hasImmediateHoverTextAssertion(playBlock: string): boolean {
       .map((line) => line.trim())
       .find((line) => line.length > 0 && !line.startsWith("//"));
 
-    if (!nextMeaningfulLine || /^await\s+(waitFor|screen\.findByText|canvas\.findByText)\b/.test(nextMeaningfulLine)) {
+    if (
+      !nextMeaningfulLine ||
+      /^await\s+(waitFor|screen\.findByText|canvas\.findByText)\b/.test(nextMeaningfulLine)
+    ) {
       continue;
     }
 
