@@ -7,11 +7,14 @@ import {
   type ComponentRegistryEntry,
   type ComponentTier,
 } from "../src/component-registry.js";
+import tsupConfig from "../tsup.config.js";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const componentsDir = path.join(packageRoot, "src", "components");
 const srcDir = path.join(packageRoot, "src");
 const packageJsonPath = path.join(packageRoot, "package.json");
+const changelogPath = path.join(packageRoot, "CHANGELOG.md");
+const releaseRunbookPath = path.join(packageRoot, "docs", "release.md");
 const indexPath = path.join(packageRoot, "src", "index.ts");
 const serverPath = path.join(packageRoot, "src", "server.ts");
 const clientPath = path.join(packageRoot, "src", "client.ts");
@@ -24,7 +27,6 @@ const mediaPath = path.join(packageRoot, "src", "media.ts");
 const labsPath = path.join(packageRoot, "src", "labs.ts");
 const errors: string[] = [];
 const publicTiers = ["stable", "patterns", "data", "shell", "social", "media", "labs"] as const;
-const expectedPackageVersion = "0.10.0";
 const rootExportTiers = new Set<ComponentTier>(["stable", "patterns"]);
 const releaseBlockingTiers = new Set<ComponentTier>([
   "stable",
@@ -34,6 +36,7 @@ const releaseBlockingTiers = new Set<ComponentTier>([
   "social",
   "media",
 ]);
+const publicTierSourceAllowlist = new Set(["src/components/media/media-gallery-types.ts"]);
 const tierBarrelPaths = {
   stable: stablePath,
   patterns: patternsPath,
@@ -70,9 +73,11 @@ const clientComponentPatterns = [
 ];
 
 const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8")) as Record<string, any>;
+const packageVersion = typeof packageJson.version === "string" ? packageJson.version : "";
 const indexSource = readFileSync(indexPath, "utf8");
 const serverSource = readFileSync(serverPath, "utf8");
 const clientSource = readFileSync(clientPath, "utf8");
+const tsupEntries = getTsupEntries();
 const registryEntries: readonly ComponentRegistryEntry[] = componentRegistry;
 const tierBarrelSources = Object.fromEntries(
   publicTiers.map((tier) => [tier, readFileSync(tierBarrelPaths[tier], "utf8")]),
@@ -82,6 +87,8 @@ const registryByName = new Map<string, ComponentRegistryEntry>(
 );
 
 verifyPackageMetadata();
+verifyReleaseDocumentation();
+verifyPublicApiMetadata();
 verifyTierLayout();
 verifyComponentRegistry();
 verifyEntrypointBoundaries();
@@ -111,12 +118,16 @@ function verifyPackageMetadata() {
     "@moritzbrantner/ui",
     "package name must remain @moritzbrantner/ui",
   );
-  expectEqual(
-    packageJson.version,
-    expectedPackageVersion,
-    "package version must match the prepared release",
-  );
+  if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(packageVersion)) {
+    errors.push("package version must be a valid semver string");
+  }
   expectEqual(packageJson.private, false, "package must stay publishable");
+  expectEqual(packageJson.main, "./dist/index.js", "package main must point at dist/index.js");
+  expectEqual(
+    packageJson.types,
+    "./dist/index.d.ts",
+    "package types must point at dist/index.d.ts",
+  );
   expectArrayIncludes(packageJson.files, "dist", "package files must include dist");
   expectArrayIncludes(packageJson.files, "styles.css", "package files must include styles.css");
   expectArrayIncludes(
@@ -207,6 +218,205 @@ function verifyPackageMetadata() {
     "./theme-scopes.css",
     "scoped theme stylesheet must be exported",
   );
+}
+
+function verifyReleaseDocumentation() {
+  const changelogSource = readFileSync(changelogPath, "utf8");
+  const releaseRunbookSource = readFileSync(releaseRunbookPath, "utf8");
+  const firstChangelogHeading = changelogSource.match(/^##\s+(.+)$/m)?.[1]?.trim();
+
+  if (firstChangelogHeading !== packageVersion) {
+    errors.push(
+      `CHANGELOG.md top release heading must match package.json version ${packageVersion}`,
+    );
+  }
+
+  if (releaseRunbookSource.includes("expectedPackageVersion")) {
+    errors.push("docs/release.md must not instruct maintainers to update expectedPackageVersion");
+  }
+}
+
+function verifyPublicApiMetadata() {
+  verifyPackageExportsMatchBuildEntries();
+  verifyComponentWildcardExports();
+  verifyTsupComponentEntries();
+  verifyTierBarrelExports();
+}
+
+function verifyPackageExportsMatchBuildEntries() {
+  const entryNames = new Set(Object.keys(tsupEntries));
+
+  for (const [entryName, sourcePath] of Object.entries(tsupEntries)) {
+    const relativeSourcePath = toPackageRelativePath(sourcePath);
+
+    if (entryName.startsWith("components/")) {
+      continue;
+    }
+
+    if (!existsSync(path.join(packageRoot, relativeSourcePath))) {
+      errors.push(`tsup entry ${entryName} points at missing ${relativeSourcePath}`);
+    }
+
+    const exportPath = entryName === "index" ? "." : `./${entryName}`;
+    expectExport(exportPath, `./dist/${entryName}.js`, `./dist/${entryName}.d.ts`);
+  }
+
+  for (const [exportPath, exportValue] of Object.entries(packageJson.exports ?? {})) {
+    if (typeof exportValue === "string" || exportPath.includes("*")) {
+      continue;
+    }
+
+    const importPath = (exportValue as { import?: unknown }).import;
+
+    if (typeof importPath !== "string") {
+      errors.push(`${exportPath} package export must include an import target`);
+      continue;
+    }
+
+    const entryName = entryNameFromDistImport(importPath);
+
+    if (!entryName) {
+      errors.push(`${exportPath} package export import must point at a dist JS entry`);
+      continue;
+    }
+
+    if (!entryNames.has(entryName)) {
+      errors.push(
+        `${exportPath} package export points at dist/${entryName}.js without a tsup entry`,
+      );
+    }
+
+    const expectedExportPath = entryName === "index" ? "." : `./${entryName}`;
+
+    if (exportPath !== expectedExportPath) {
+      errors.push(
+        `${exportPath} package export must match the tsup entry path ${expectedExportPath}`,
+      );
+    }
+  }
+}
+
+function verifyComponentWildcardExports() {
+  const componentWildcardExports = new Set(
+    Object.keys(packageJson.exports ?? {}).filter((exportPath) =>
+      /^\.\/components\/[^/]+\/\*$/.test(exportPath),
+    ),
+  );
+
+  for (const tier of publicTiers) {
+    const exportPath = `./components/${tier}/*`;
+
+    expectExport(exportPath, `./dist/components/${tier}/*.js`, `./dist/components/${tier}/*.d.ts`);
+    componentWildcardExports.delete(exportPath);
+  }
+
+  for (const exportPath of componentWildcardExports) {
+    errors.push(`${exportPath} is not an approved public component wildcard export`);
+  }
+}
+
+function verifyTsupComponentEntries() {
+  const expectedComponentEntries = new Map<string, string>();
+
+  for (const sourceFile of listPublicTierSourceFiles()) {
+    const relativeSourcePath = toPackageRelativePath(sourceFile);
+    const { tier, fileName } = getPublicTierSourceParts(sourceFile);
+
+    expectedComponentEntries.set(`components/${tier}/${fileName}`, relativeSourcePath);
+  }
+
+  for (const [entryName, relativeSourcePath] of expectedComponentEntries) {
+    const configuredSourcePath = tsupEntries[entryName];
+
+    if (!configuredSourcePath) {
+      errors.push(`${entryName}: missing tsup component entry`);
+      continue;
+    }
+
+    const configuredRelativePath = toPackageRelativePath(configuredSourcePath);
+
+    if (configuredRelativePath !== relativeSourcePath) {
+      errors.push(`${entryName}: tsup entry must point at ${relativeSourcePath}`);
+    }
+  }
+
+  for (const [entryName, sourcePath] of Object.entries(tsupEntries)) {
+    if (!entryName.startsWith("components/")) {
+      continue;
+    }
+
+    const relativeSourcePath = toPackageRelativePath(sourcePath);
+
+    if (!expectedComponentEntries.has(entryName)) {
+      errors.push(`${entryName}: tsup exposes unexpected component source ${relativeSourcePath}`);
+    }
+  }
+}
+
+function verifyTierBarrelExports() {
+  const registryExportPaths = new Map<ComponentTier, Set<string>>(
+    publicTiers.map((tier) => [tier, new Set<string>()]),
+  );
+
+  for (const entry of registryEntries) {
+    registryExportPaths.get(entry.tier)?.add(`./components/${entry.tier}/${entry.fileName}`);
+  }
+
+  for (const relativeFile of publicTierSourceAllowlist) {
+    const absoluteFile = path.join(packageRoot, relativeFile);
+    const { tier, fileName } = getPublicTierSourceParts(absoluteFile);
+
+    registryExportPaths.get(tier)?.add(`./components/${tier}/${fileName}`);
+  }
+
+  for (const tier of publicTiers) {
+    const expectedExports = registryExportPaths.get(tier) ?? new Set<string>();
+    const actualExports = new Set(
+      parseExportTargets(tierBarrelSources[tier]).filter((target) =>
+        target.startsWith(`./components/${tier}/`),
+      ),
+    );
+
+    for (const exportPath of parseExportTargets(tierBarrelSources[tier])) {
+      if (
+        exportPath.startsWith("./components/") &&
+        !exportPath.startsWith(`./components/${tier}/`)
+      ) {
+        errors.push(
+          `src/${tier}.ts must not export component code from another tier (${exportPath})`,
+        );
+      }
+    }
+
+    for (const expectedExport of expectedExports) {
+      if (!actualExports.has(expectedExport)) {
+        errors.push(`src/${tier}.ts must export ${expectedExport}`);
+      }
+    }
+
+    for (const actualExport of actualExports) {
+      if (!expectedExports.has(actualExport)) {
+        errors.push(`src/${tier}.ts contains stale or unregistered public export ${actualExport}`);
+      }
+    }
+  }
+
+  const expectedRootTierExports = new Set([...rootExportTiers].map((tier) => `./${tier}`));
+  const actualRootTierExports = parseExportTargets(indexSource).filter((target) =>
+    publicTiers.some((tier) => target === `./${tier}`),
+  );
+
+  for (const expectedExport of expectedRootTierExports) {
+    if (!actualRootTierExports.includes(expectedExport)) {
+      errors.push(`src/index.ts must export ${expectedExport}`);
+    }
+  }
+
+  for (const actualExport of actualRootTierExports) {
+    if (!expectedRootTierExports.has(actualExport)) {
+      errors.push(`src/index.ts must not export focused tier barrel ${actualExport}`);
+    }
+  }
 }
 
 function verifyTierLayout() {
@@ -671,6 +881,76 @@ function resolveTypeScriptModulePath(fromDir: string, importPath: string): strin
   ];
 
   return candidates.find((candidate) => existsSync(candidate));
+}
+
+function getTsupEntries(): Record<string, string> {
+  const config = Array.isArray(tsupConfig) ? tsupConfig[0] : tsupConfig;
+  const entry =
+    config && typeof config === "object" ? (config as { entry?: unknown }).entry : undefined;
+
+  if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+    errors.push("tsup.config.ts must expose an object entry map");
+    return {};
+  }
+
+  const entryMap: Record<string, string> = {};
+
+  for (const [entryName, sourcePath] of Object.entries(entry)) {
+    if (typeof sourcePath !== "string") {
+      errors.push(`tsup entry ${entryName} must point at a source file path`);
+      continue;
+    }
+
+    entryMap[entryName] = sourcePath;
+  }
+
+  return entryMap;
+}
+
+function entryNameFromDistImport(importPath: string): string | undefined {
+  const match = importPath.match(/^\.\/dist\/(.+)\.js$/);
+
+  return match?.[1];
+}
+
+function listPublicTierSourceFiles(): string[] {
+  return publicTiers.flatMap((tier) => {
+    const tierDir = path.join(componentsDir, tier);
+
+    return readdirSync(tierDir)
+      .filter(
+        (fileName) =>
+          /\.(ts|tsx)$/.test(fileName) &&
+          !fileName.endsWith(".stories.tsx") &&
+          !fileName.endsWith(".test.ts") &&
+          !fileName.endsWith(".test.tsx"),
+      )
+      .map((fileName) => path.join(tierDir, fileName));
+  });
+}
+
+function getPublicTierSourceParts(filePath: string): { tier: ComponentTier; fileName: string } {
+  const relativePath = normalizePath(path.relative(componentsDir, filePath));
+  const [tier, fileNameWithExtension] = relativePath.split("/");
+
+  return {
+    tier: tier as ComponentTier,
+    fileName: fileNameWithExtension.replace(/\.(ts|tsx)$/, ""),
+  };
+}
+
+function parseExportTargets(source: string): string[] {
+  return [...source.matchAll(/export\s+(?:type\s+)?\*\s+from\s+["']([^"']+)["'];/g)].map(
+    (match) => match[1],
+  );
+}
+
+function toPackageRelativePath(filePath: string): string {
+  return normalizePath(path.isAbsolute(filePath) ? path.relative(packageRoot, filePath) : filePath);
+}
+
+function normalizePath(filePath: string): string {
+  return filePath.split(path.sep).join("/");
 }
 
 function escapeRegExp(value: string): string {

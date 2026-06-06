@@ -1,4 +1,21 @@
+import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
+
+type AxeViolation = Awaited<ReturnType<AxeBuilder["analyze"]>>["violations"][number];
+
+const accessibilityExpect = expect.extend({
+  toHaveNoViolations(violations: AxeViolation[]) {
+    const pass = violations.length === 0;
+
+    return {
+      pass,
+      message: () =>
+        pass
+          ? "Expected axe to report at least one accessibility violation."
+          : formatA11yViolations(violations),
+    };
+  },
+});
 
 const viewports = [
   { name: "narrow-mobile", width: 360, height: 740 },
@@ -270,6 +287,7 @@ async function rightClickTarget(page: Page, name: string) {
 
 async function verifyPageLayout(page: Page, storyId: string) {
   await expect(page.locator("#storybook-root")).toBeVisible();
+  accessibilityExpect(await checkA11y(page)).toHaveNoViolations();
 
   const layout = await page.evaluate((allowDenseControls) => {
     const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
@@ -385,6 +403,42 @@ async function verifyPageLayout(page: Page, storyId: string) {
   if (storyId.startsWith("components-navigation-navbar--")) {
     await verifyNavbarLayout(page, storyId);
   }
+}
+
+async function checkA11y(page: Page) {
+  const results = await new AxeBuilder({ page })
+    .setLegacyMode()
+    .withRules("color-contrast")
+    .analyze();
+
+  return results.violations;
+}
+
+function formatA11yViolations(violations: AxeViolation[]) {
+  return violations
+    .map((violation) => {
+      const wcagTags = violation.tags.filter((tag) => tag.startsWith("wcag"));
+      const nodes = violation.nodes
+        .slice(0, 5)
+        .map((node) => {
+          const messages = [...node.any, ...node.all, ...node.none]
+            .map((check) => check.message)
+            .filter(Boolean)
+            .join(" ");
+
+          return `  - ${node.target.join(", ")}: ${messages}`;
+        })
+        .join("\n");
+      const truncated =
+        violation.nodes.length > 5 ? `\n  - ...and ${violation.nodes.length - 5} more` : "";
+
+      return [
+        `${violation.id} (${violation.impact ?? "unknown impact"}): ${violation.help}`,
+        `WCAG: ${wcagTags.length > 0 ? wcagTags.join(", ") : "not tagged"}`,
+        nodes + truncated,
+      ].join("\n");
+    })
+    .join("\n\n");
 }
 
 async function verifyPostTabFocusTarget(page: Page) {

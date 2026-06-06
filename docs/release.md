@@ -10,7 +10,7 @@ This package publishes directly to the public package registry as `@moritzbrantn
    bun pm view @moritzbrantner/ui version dist-tags
    ```
 
-2. Bump `package.json` to the next semver version and update `expectedPackageVersion` in `scripts/verify-design-system.ts`.
+2. Bump `package.json` to the next semver version. The design-system verifier reads this version and checks the top `CHANGELOG.md` release heading.
 
 3. Add a matching top entry in `CHANGELOG.md` that calls out public component/API changes, verification changes, and migration notes. If a prepared local version has not been published yet, update that prepared top entry instead of preserving an unpublished version heading.
 
