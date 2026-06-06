@@ -56,14 +56,47 @@ describe("Citation", () => {
 
     expect(items).toHaveLength(2);
     expect(screen.getByText("Attention Is All You Need")).toBeTruthy();
-    expect(screen.getByText(/Vaswani/)).toBeTruthy();
-    expect(screen.getByText(/Shazeer/)).toBeTruthy();
-    expect(screen.getByText("NeurIPS")).toBeTruthy();
-    expect(screen.getByText("section 3")).toBeTruthy();
+    expect(screen.getByText("Evaluation notes")).toBeTruthy();
+    expect(screen.queryByText(/Vaswani/)).toBeNull();
+    expect(screen.queryByText(/Shazeer/)).toBeNull();
+    expect(screen.queryByText("NeurIPS")).toBeNull();
+    expect(screen.queryByText("section 3")).toBeNull();
+    expect(screen.queryByText("Supporting")).toBeNull();
     expect(
       screen.getByText("The Transformer allows for significantly more parallelization."),
     ).toBeTruthy();
-    expect(screen.getByText("Supporting")).toBeTruthy();
+
+    const header = document.querySelector('[data-slot="citation-header"]');
+    const trigger = within(header as HTMLElement).getByRole("button", { name: /show context/i });
+
+    fireEvent.click(trigger);
+
+    const context = document.querySelector('[data-slot="citation-context"]');
+
+    expect(context?.textContent).toContain("Supporting");
+    expect(context?.textContent).toContain("Vaswani");
+    expect(context?.textContent).toContain("Shazeer");
+    expect(context?.textContent).toContain("NeurIPS");
+    expect(context?.textContent).toContain("section 3");
+  });
+
+  test("allows generated top-row status icons and badge icons to be hidden", () => {
+    render(<CitationList citations={citations.slice(0, 1)} showStatusIcon={false} />);
+
+    const header = document.querySelector('[data-slot="citation-header"]');
+
+    expect(header?.querySelector('[data-slot="citation-status-badge"]')).toBeNull();
+
+    fireEvent.click(within(header as HTMLElement).getByRole("button", { name: /show context/i }));
+
+    const context = document.querySelector('[data-slot="citation-context"]');
+
+    expect(context?.textContent).toContain("Supporting");
+
+    const { container } = render(<CitationStatusBadge status="cited" showIcon={false} />);
+
+    expect(container.querySelector("svg")).toBeNull();
+    expect(screen.getByText("Cited")).toBeTruthy();
   });
 
   test("expands citation excerpts to reveal context", () => {
@@ -152,13 +185,13 @@ describe("Citation", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /show context/i }));
 
-    const context = document.querySelector('[data-slot="citation-context"]');
+    const excerpt = document.querySelector('[data-slot="citation-excerpt"]');
     const hiddenText = document.querySelector('[data-slot="citation-text-hidden"]');
 
-    expect(context?.textContent).toContain("[The reviewer] wrote that");
-    expect(context?.textContent).toContain("after checking Friday's audit log");
-    expect(context?.textContent).not.toContain("Opening context.");
-    expect(context?.textContent).not.toContain("Follow-up context.");
+    expect(excerpt?.textContent).toContain("[The reviewer] wrote that");
+    expect(excerpt?.textContent).toContain("after checking Friday's audit log");
+    expect(excerpt?.textContent).not.toContain("Opening context.");
+    expect(excerpt?.textContent).not.toContain("Follow-up context.");
     expect(hiddenText?.className).toContain("animate-in");
   });
 

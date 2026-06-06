@@ -177,6 +177,7 @@
     "test:package": "bun ./scripts/verify-package.ts",
     "test:storybook": "vitest --config vitest.storybook.config.ts --project=storybook --run",
     "test:unit": "vitest run src",
+    "test:unit:report": "vitest run src --reporter=default --reporter=json --outputFile=benchmark-results/unit-tests.json",
     "test:unlighthouse": "bun run build-storybook && bun ./scripts/run-unlighthouse.ts",
     "test:mobile-usability": "playwright test --config playwright.visual.config.ts visual/mobile-usability.spec.ts",
     "test:visual": "playwright test --config playwright.visual.config.ts",
@@ -187,6 +188,7 @@
     "verify:mobile-usability-skips": "bun ./scripts/verify-mobile-usability-skips.ts",
     "verify:release:ci": "bun run check-types && bun run lint && bun run test:unit && bun run build && bun run test:package && bun run test:storybook && bun run test:coverage && bun run test:visual && bun run test:mobile-usability && bun run test:unlighthouse && bun run verify:consumer && bun run verify:build-size && bun run bench && bun run pack:dry",
     "verify:release": "bun run check-types && bun run lint && bun run test:unit && bun run build && bun run test:package && bun run test:storybook && bun run test:coverage && bun run test:visual && bun run test:mobile-usability && bun run test:unlighthouse && bun run verify:consumer && bun run verify:build-size && bun run bench && bun run pack:dry",
+    "verify:results": "mkdir -p benchmark-results && bun run test:unit:report && bun run bench",
     "verify:tokens": "bun ./scripts/verify-tokens.ts"
   },
   "dependencies": {

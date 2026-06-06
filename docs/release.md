@@ -72,6 +72,19 @@ Run `bun run bench` by itself, not alongside Storybook, Playwright, Unlighthouse
 Benchmarks read the built `dist` entrypoints, so run `bun run build` first when invoking
 `bun run bench` outside the full release contract.
 
+For persisted local evidence from the fast checks, run:
+
+```sh
+bun run verify:results
+```
+
+This writes unit test and benchmark summaries under `benchmark-results/`. CI uploads
+`benchmark-results` from the performance validation job. Benchmark baselines and run
+artifacts have different jobs: `bench/baselines/*.json` are acceptance thresholds,
+`benchmark-results/*.json` and `benchmark-results/*.md` are run evidence, and
+`bun run bench:update` should only be used when intentionally accepting new performance
+baselines.
+
 Visual and mobile usability checks start their own Storybook server on port `6007`.
 Stop any existing local Storybook process on that port before running the release contract.
 

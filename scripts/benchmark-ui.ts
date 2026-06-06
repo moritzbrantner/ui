@@ -28,6 +28,18 @@ type BenchmarkFailure = {
   name: string;
   result: BenchmarkResult;
 };
+type BenchmarkArtifact = {
+  arch: string;
+  baselinePath: string;
+  ci: boolean;
+  failures: BenchmarkFailure[];
+  missingBaselineEntries: string[];
+  platform: string;
+  results: Record<string, BenchmarkResult>;
+  staleBaselineEntries: string[];
+  status: "passed" | "failed";
+  timestamp: string;
+};
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const baselinePath = path.join(
@@ -36,6 +48,7 @@ const baselinePath = path.join(
   "baselines",
   `${process.platform}-${process.arch}.json`,
 );
+const benchmarkResultsDir = path.join(packageRoot, "benchmark-results");
 const updateBaseline = process.argv.includes("--update");
 const distEntry = path.join(packageRoot, "dist", "index.js");
 const dataEntry = path.join(packageRoot, "dist", "data.js");
@@ -45,6 +58,18 @@ const runningInCi = process.env.CI === "true";
 const missingDistEntries = [distEntry, dataEntry, labsEntry].filter((entry) => !existsSync(entry));
 
 if (missingDistEntries.length > 0) {
+  writeBenchmarkArtifacts({
+    arch: process.arch,
+    baselinePath: path.relative(packageRoot, baselinePath),
+    ci: runningInCi,
+    failures: [],
+    missingBaselineEntries: [],
+    platform: process.platform,
+    results: {},
+    staleBaselineEntries: [],
+    status: "failed",
+    timestamp: new Date().toISOString(),
+  });
   console.error(
     `@moritzbrantner/ui benchmark requires built dist entrypoints. Missing: ${missingDistEntries
       .map((entry) => path.relative(packageRoot, entry))
@@ -203,17 +228,43 @@ for (const runBenchmark of benchmarks) {
 if (updateBaseline) {
   mkdirSync(path.dirname(baselinePath), { recursive: true });
   writeFileSync(`${baselinePath}`, `${JSON.stringify({ results }, null, 2)}\n`);
+  writeBenchmarkArtifacts({
+    arch: process.arch,
+    baselinePath: path.relative(packageRoot, baselinePath),
+    ci: runningInCi,
+    failures: [],
+    missingBaselineEntries: [],
+    platform: process.platform,
+    results,
+    staleBaselineEntries: [],
+    status: "passed",
+    timestamp: new Date().toISOString(),
+  });
   console.log(`Updated benchmark baseline: ${path.relative(packageRoot, baselinePath)}`);
   process.exit(0);
 }
 
 if (!existsSync(baselinePath)) {
+  const missingBaseline = getBenchmarkFailures(results, {});
+  writeBenchmarkArtifacts({
+    arch: process.arch,
+    baselinePath: path.relative(packageRoot, baselinePath),
+    ci: runningInCi,
+    failures: missingBaseline,
+    missingBaselineEntries: Object.keys(results).sort(),
+    platform: process.platform,
+    results,
+    staleBaselineEntries: [],
+    status: "failed",
+    timestamp: new Date().toISOString(),
+  });
   console.error(`Missing benchmark baseline ${path.relative(packageRoot, baselinePath)}.`);
   console.error("Run `bun run bench:update` after reviewing the current benchmark results.");
   process.exit(1);
 }
 
 const baseline = JSON.parse(readFileSync(baselinePath, "utf8")) as BenchmarkBaseline;
+const baselineHygiene = getBaselineHygiene(results, baseline);
 let failures = getBenchmarkFailures(results, baseline);
 
 if (failures.length > 0) {
@@ -248,9 +299,33 @@ if (failures.length > 0) {
     );
   }
 
+  warnBaselineHygiene(baselineHygiene);
+  writeBenchmarkArtifacts({
+    arch: process.arch,
+    baselinePath: path.relative(packageRoot, baselinePath),
+    ci: runningInCi,
+    failures,
+    platform: process.platform,
+    results,
+    status: "failed",
+    timestamp: new Date().toISOString(),
+    ...baselineHygiene,
+  });
   process.exit(1);
 }
 
+warnBaselineHygiene(baselineHygiene);
+writeBenchmarkArtifacts({
+  arch: process.arch,
+  baselinePath: path.relative(packageRoot, baselinePath),
+  ci: runningInCi,
+  failures: [],
+  platform: process.platform,
+  results,
+  status: "passed",
+  timestamp: new Date().toISOString(),
+  ...baselineHygiene,
+});
 console.log("@moritzbrantner/ui benchmarks verified");
 
 function benchmark(name: string, kind: BenchmarkKind, callback: () => void): BenchmarkRunner {
@@ -319,6 +394,123 @@ function getAllowedMedian(result: BenchmarkResult, baselineResult: BenchmarkResu
   const noiseFloorMs = result.kind === "logic" ? (runningInCi ? 1.5 : 0.75) : runningInCi ? 20 : 5;
 
   return Math.max(baselineResult.median * tolerance, baselineResult.median + noiseFloorMs);
+}
+
+function getBaselineHygiene(
+  currentResults: Record<string, BenchmarkResult>,
+  baseline: BenchmarkBaseline,
+): {
+  missingBaselineEntries: string[];
+  staleBaselineEntries: string[];
+} {
+  const currentNames = new Set(Object.keys(currentResults));
+  const baselineNames = new Set(Object.keys(baseline.results ?? {}));
+
+  return {
+    missingBaselineEntries: [...currentNames].filter((name) => !baselineNames.has(name)).sort(),
+    staleBaselineEntries: [...baselineNames].filter((name) => !currentNames.has(name)).sort(),
+  };
+}
+
+function warnBaselineHygiene({
+  missingBaselineEntries,
+  staleBaselineEntries,
+}: {
+  missingBaselineEntries: string[];
+  staleBaselineEntries: string[];
+}): void {
+  if (missingBaselineEntries.length > 0) {
+    console.warn(
+      `@moritzbrantner/ui benchmark warning: missing baseline entries: ${missingBaselineEntries.join(", ")}`,
+    );
+  }
+
+  if (staleBaselineEntries.length > 0) {
+    console.warn(
+      `@moritzbrantner/ui benchmark warning: stale baseline entries: ${staleBaselineEntries.join(", ")}`,
+    );
+  }
+}
+
+function writeBenchmarkArtifacts(artifact: BenchmarkArtifact): void {
+  mkdirSync(benchmarkResultsDir, { recursive: true });
+  writeFileSync(
+    path.join(benchmarkResultsDir, "benchmark-ui.json"),
+    `${JSON.stringify(artifact, null, 2)}\n`,
+  );
+  writeFileSync(
+    path.join(benchmarkResultsDir, "benchmark-ui.md"),
+    formatBenchmarkMarkdown(artifact),
+  );
+}
+
+function formatBenchmarkMarkdown(artifact: BenchmarkArtifact): string {
+  const baseline = existsSync(baselinePath)
+    ? (JSON.parse(readFileSync(baselinePath, "utf8")) as BenchmarkBaseline)
+    : {};
+  const resultRows = Object.values(artifact.results)
+    .sort((left, right) => left.name.localeCompare(right.name))
+    .map((result) => {
+      const baselineResult = baseline.results?.[result.name];
+      const allowedMedian = baselineResult ? getAllowedMedian(result, baselineResult) : 0;
+
+      return [
+        result.name,
+        result.kind,
+        `${result.median.toFixed(3)}ms`,
+        `${result.p95.toFixed(3)}ms`,
+        baselineResult ? `${baselineResult.median.toFixed(3)}ms` : "missing",
+        baselineResult ? `${allowedMedian.toFixed(3)}ms` : "missing",
+      ];
+    });
+  const failureRows = artifact.failures.map((failure) => [
+    failure.name,
+    `${failure.result.median.toFixed(3)}ms`,
+    `${failure.allowedMedian.toFixed(3)}ms`,
+    `${failure.baseline.median.toFixed(3)}ms`,
+  ]);
+
+  return [
+    "# Benchmark Results",
+    "",
+    `- Command: \`bun run bench\``,
+    `- Status: \`${artifact.status}\``,
+    `- Timestamp: \`${artifact.timestamp}\``,
+    `- Platform: \`${artifact.platform}-${artifact.arch}\``,
+    `- CI: \`${artifact.ci ? "true" : "false"}\``,
+    `- Baseline: \`${artifact.baselinePath}\``,
+    "",
+    "## Benchmarks",
+    "",
+    markdownTable(
+      ["Name", "Kind", "Median", "P95", "Baseline Median", "Allowed Median"],
+      resultRows,
+    ),
+    "",
+    "## Failures",
+    "",
+    failureRows.length > 0
+      ? markdownTable(["Name", "Median", "Allowed Median", "Baseline Median"], failureRows)
+      : "No benchmark failures.",
+    "",
+    "## Baseline Hygiene",
+    "",
+    `- Missing baseline entries: ${formatNameList(artifact.missingBaselineEntries)}`,
+    `- Stale baseline entries: ${formatNameList(artifact.staleBaselineEntries)}`,
+    "",
+  ].join("\n");
+}
+
+function markdownTable(headers: string[], rows: string[][]): string {
+  return [
+    `| ${headers.join(" | ")} |`,
+    `| ${headers.map(() => "---").join(" | ")} |`,
+    ...rows.map((row) => `| ${row.join(" | ")} |`),
+  ].join("\n");
+}
+
+function formatNameList(names: string[]): string {
+  return names.length > 0 ? names.map((name) => `\`${name}\``).join(", ") : "none";
 }
 
 function renderUi(element: React.ReactElement): void {

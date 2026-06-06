@@ -95,11 +95,13 @@ type CitationData = {
 export type CitationListProps = React.ComponentProps<"ol"> & {
   citations?: readonly CitationData[];
   compact?: boolean;
+  showStatusIcon?: boolean;
 };
 
 export type CitationItemProps = React.ComponentProps<"li"> & {
   citation?: CitationData;
   compact?: boolean;
+  showStatusIcon?: boolean;
 };
 
 export type CitationReferenceProps = React.ComponentProps<"sup"> & {
@@ -109,14 +111,21 @@ export type CitationReferenceProps = React.ComponentProps<"sup"> & {
 
 export type CitationStatusBadgeProps = React.ComponentProps<"span"> & {
   status: CitationStatus;
+  showIcon?: boolean;
+  showLabel?: boolean;
 };
 
 export type CitationExcerptProps = React.ComponentProps<"blockquote"> & {
   context?: React.ReactNode;
+  contextHeader?: React.ReactNode;
+  contextContentId?: string;
+  contextOpen?: boolean;
   contextSource?: CitationContextSource;
   defaultContextOpen?: boolean;
   contextLabel?: React.ReactNode;
   collapseContextLabel?: React.ReactNode;
+  onContextOpenChange?: (open: boolean) => void;
+  showContextToggle?: boolean;
 };
 
 export type CitationTextContextProps = React.ComponentProps<"div"> & {
@@ -175,6 +184,7 @@ const statusClassNames: Record<CitationStatus, string> = {
 function CitationList({
   citations,
   compact = false,
+  showStatusIcon = true,
   className,
   children,
   ...props
@@ -195,6 +205,7 @@ function CitationList({
               label: citation.label ?? index + 1,
             }}
             compact={compact}
+            showStatusIcon={showStatusIcon}
           />
         ))}
     </ol>
@@ -204,10 +215,25 @@ function CitationList({
 function CitationItem({
   citation,
   compact = false,
+  showStatusIcon = true,
   className,
   children,
   ...props
 }: CitationItemProps) {
+  const contextContentId = React.useId();
+  const [contextOpen, setContextOpen] = React.useState(false);
+  const citationExcerpt = citation ? getCitationExcerpt(citation) : undefined;
+  const citationContextSource = citation ? getCitationContextSource(citation) : undefined;
+  const citationContextHeader = citation ? formatCitationContextHeader(citation) : undefined;
+  const hasCitationContext =
+    citationContextSource !== undefined ||
+    citationContextHeader !== undefined ||
+    (citation?.context !== undefined && citation.context !== null && citation.context !== false);
+  const hasCitationContextPanel =
+    citationContextHeader !== undefined ||
+    (citation?.context !== undefined && citation.context !== null && citation.context !== false) ||
+    (citationContextSource !== undefined && !isTextPartsContextSource(citationContextSource));
+
   return (
     <li
       data-slot="citation-item"
@@ -225,21 +251,40 @@ function CitationItem({
         (citation ? (
           <>
             <CitationHeader>
-              <CitationMarker>{citation.label}</CitationMarker>
+              <div className="flex items-start gap-2">
+                <CitationMarker>{citation.label}</CitationMarker>
+                {hasCitationContext ? (
+                  <CitationContextToggle
+                    open={contextOpen}
+                    controlsId={hasCitationContextPanel ? contextContentId : undefined}
+                    contextLabel="Show context"
+                    collapseContextLabel="Hide context"
+                    showLabel={false}
+                    onToggle={() => setContextOpen((open) => !open)}
+                  />
+                ) : null}
+              </div>
               <div className="min-w-0">
                 <CitationTitle href={citation.url}>{citation.title}</CitationTitle>
-                <CitationMeta>{formatCitationMeta(citation)}</CitationMeta>
               </div>
-              {citation.status ? <CitationStatusBadge status={citation.status} /> : null}
+              {citation.status && showStatusIcon ? (
+                <CitationStatusBadge status={citation.status} showLabel={false} />
+              ) : null}
             </CitationHeader>
-            {getCitationExcerpt(citation) ||
+            {citationExcerpt ||
             citation.context ||
-            getCitationContextSource(citation) ? (
+            citationContextSource ||
+            citationContextHeader ? (
               <CitationExcerpt
                 context={citation.context}
-                contextSource={getCitationContextSource(citation)}
+                contextHeader={citationContextHeader}
+                contextContentId={contextContentId}
+                contextOpen={contextOpen}
+                contextSource={citationContextSource}
+                onContextOpenChange={setContextOpen}
+                showContextToggle={false}
               >
-                {getCitationExcerpt(citation)}
+                {citationExcerpt}
               </CitationExcerpt>
             ) : null}
             {citation.note ? <CitationNote>{citation.note}</CitationNote> : null}
@@ -357,16 +402,45 @@ function CitationExcerpt({
   className,
   children,
   context,
+  contextContentId,
+  contextHeader,
+  contextOpen: controlledContextOpen,
   contextSource,
   defaultContextOpen = false,
   contextLabel = "Show context",
   collapseContextLabel = "Hide context",
+  onContextOpenChange,
+  showContextToggle = true,
   ...props
 }: CitationExcerptProps) {
-  const contextId = React.useId();
-  const [contextOpen, setContextOpen] = React.useState(defaultContextOpen);
+  const generatedContextId = React.useId();
+  const contextId = contextContentId ?? generatedContextId;
+  const [uncontrolledContextOpen, setUncontrolledContextOpen] = React.useState(defaultContextOpen);
+  const contextOpen = controlledContextOpen ?? uncontrolledContextOpen;
   const hasContext =
-    contextSource !== undefined || (context !== undefined && context !== null && context !== false);
+    contextSource !== undefined ||
+    contextHeader !== undefined ||
+    (context !== undefined && context !== null && context !== false);
+  const shouldExpandTextParts = isTextPartsContextSource(contextSource);
+  const excerptContent =
+    shouldExpandTextParts && contextOpen ? (
+      <CitationTextParts parts={contextSource.parts} mode="context" />
+    ) : (
+      children
+    );
+  const hasContextPanel =
+    contextHeader !== undefined ||
+    (context !== undefined && context !== null && context !== false) ||
+    (contextSource !== undefined && !shouldExpandTextParts);
+  const handleContextToggle = React.useCallback(() => {
+    const nextContextOpen = !contextOpen;
+
+    if (controlledContextOpen === undefined) {
+      setUncontrolledContextOpen(nextContextOpen);
+    }
+
+    onContextOpenChange?.(nextContextOpen);
+  }, [contextOpen, controlledContextOpen, onContextOpenChange]);
 
   return (
     <blockquote
@@ -377,25 +451,24 @@ function CitationExcerpt({
       )}
       {...props}
     >
-      {children ? children : null}
-      {hasContext ? (
+      {excerptContent ? excerptContent : null}
+      {hasContext && showContextToggle ? (
         <>
-          <button
-            type="button"
-            aria-controls={contextId}
-            aria-expanded={contextOpen}
-            className="mt-2 flex min-h-10 w-fit items-center gap-1 rounded-md px-2 text-xs font-medium text-primary outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50"
-            onClick={() => setContextOpen((open) => !open)}
-          >
-            {contextOpen ? collapseContextLabel : contextLabel}
-            <ChevronDownIcon
-              className={cn("size-3.5 transition-transform", contextOpen && "rotate-180")}
-              aria-hidden="true"
-            />
-          </button>
-          {contextOpen ? (
+          <CitationContextToggle
+            open={contextOpen}
+            controlsId={hasContextPanel ? contextId : undefined}
+            contextLabel={contextLabel}
+            collapseContextLabel={collapseContextLabel}
+            onToggle={handleContextToggle}
+          />
+          {contextOpen && hasContextPanel ? (
             <CitationContext id={contextId}>
-              {contextSource ? (
+              {contextHeader ? (
+                <div data-slot="citation-context-header" className="mb-2">
+                  {contextHeader}
+                </div>
+              ) : null}
+              {contextSource && !shouldExpandTextParts ? (
                 <CitationContextSourceView source={contextSource} active={contextOpen} />
               ) : null}
               {context ? <CitationContextText>{context}</CitationContextText> : null}
@@ -403,7 +476,62 @@ function CitationExcerpt({
           ) : null}
         </>
       ) : null}
+      {hasContext && !showContextToggle && contextOpen && hasContextPanel ? (
+        <CitationContext id={contextId}>
+          {contextHeader ? (
+            <div data-slot="citation-context-header" className="mb-2">
+              {contextHeader}
+            </div>
+          ) : null}
+          {contextSource && !shouldExpandTextParts ? (
+            <CitationContextSourceView source={contextSource} active={contextOpen} />
+          ) : null}
+          {context ? <CitationContextText>{context}</CitationContextText> : null}
+        </CitationContext>
+      ) : null}
     </blockquote>
+  );
+}
+
+function CitationContextToggle({
+  open,
+  controlsId,
+  contextLabel,
+  collapseContextLabel,
+  showLabel = true,
+  className,
+  onToggle,
+}: {
+  open: boolean;
+  controlsId?: string;
+  contextLabel: React.ReactNode;
+  collapseContextLabel: React.ReactNode;
+  showLabel?: boolean;
+  className?: string;
+  onToggle: () => void;
+}) {
+  const label = open ? collapseContextLabel : contextLabel;
+
+  return (
+    <button
+      type="button"
+      data-slot="citation-context-toggle"
+      aria-controls={controlsId}
+      aria-expanded={open}
+      aria-label={!showLabel && typeof label === "string" ? label : undefined}
+      className={cn(
+        "inline-flex items-center justify-center gap-1 rounded-md text-xs font-medium text-primary outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50",
+        showLabel ? "mt-2 min-h-10 w-fit px-2" : "min-h-7 min-w-7",
+        className,
+      )}
+      onClick={onToggle}
+    >
+      {showLabel ? label : null}
+      <ChevronDownIcon
+        className={cn("size-3.5 transition-transform", open && "rotate-180")}
+        aria-hidden="true"
+      />
+    </button>
   );
 }
 
@@ -743,24 +871,59 @@ function CitationNote({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CitationStatusBadge({ status, className, children, ...props }: CitationStatusBadgeProps) {
+function CitationStatusBadge({
+  status,
+  showIcon = true,
+  showLabel = true,
+  className,
+  children,
+  ...props
+}: CitationStatusBadgeProps) {
   const Icon =
     status === "disputed" ? AlertTriangleIcon : status === "missing" ? InfoIcon : CheckCircle2Icon;
+  const label = children ?? statusLabels[status];
+  const ariaLabel =
+    props["aria-label"] ?? (!showLabel && typeof label === "string" ? label : undefined);
 
   return (
     <span
       data-slot="citation-status-badge"
       data-status={status}
+      aria-label={ariaLabel}
       className={cn(
-        "inline-flex h-6 items-center gap-1.5 rounded-md border px-2 text-xs font-medium",
+        "inline-flex h-6 items-center justify-center gap-1.5 rounded-md border px-2 text-xs font-medium",
+        !showLabel && "w-6 px-0",
         statusClassNames[status],
         className,
       )}
       {...props}
     >
-      <Icon className="size-3.5" aria-hidden="true" />
-      {children ?? statusLabels[status]}
+      {showIcon ? <Icon className="size-3.5" aria-hidden="true" /> : null}
+      {showLabel ? label : null}
     </span>
+  );
+}
+
+function formatCitationContextHeader(citation: CitationData) {
+  const meta = formatCitationMeta(citation);
+
+  if (!meta.length && !citation.status) {
+    return undefined;
+  }
+
+  return (
+    <div
+      data-slot="citation-context-labels"
+      className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"
+    >
+      {citation.status ? (
+        <>
+          <CitationStatusBadge status={citation.status} />
+          {meta.length ? <span aria-hidden="true">/</span> : null}
+        </>
+      ) : null}
+      {meta}
+    </div>
   );
 }
 
@@ -880,6 +1043,12 @@ function getCitationContextSource(citation: CitationData): CitationContextSource
   }
 
   return undefined;
+}
+
+function isTextPartsContextSource(
+  source: CitationContextSource | undefined,
+): source is CitationTextContextSource & { parts: readonly CitationTextPart[] } {
+  return source?.type === "text" && Boolean(source.parts?.length);
 }
 
 function formatCitationAuthors(authors: readonly React.ReactNode[]) {
