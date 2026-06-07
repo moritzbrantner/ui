@@ -5,7 +5,6 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 
 import { cn } from "../../lib/cn";
-import type { LegacyMotionProps } from "../../lib/motion";
 import { Separator } from "./separator";
 
 // TODO: restore last-child rounding for SelectTrigger without relying on Radix internals
@@ -29,15 +28,8 @@ const buttonGroupVariants = cva(
 function ButtonGroup({
   className,
   orientation,
-  layout: _layout,
-  transition: _transition,
-  initial: _initial,
-  animate: _animate,
-  exit: _exit,
-  whileHover: _whileHover,
-  whileTap: _whileTap,
   ...props
-}: React.ComponentProps<"div"> & LegacyMotionProps & VariantProps<typeof buttonGroupVariants>) {
+}: React.ComponentProps<"div"> & VariantProps<typeof buttonGroupVariants>) {
   return (
     <div
       role="group"
@@ -52,17 +44,10 @@ function ButtonGroup({
 function ButtonGroupText({
   className,
   asChild = false,
-  layout: _layout,
-  transition: _transition,
-  initial: _initial,
-  animate: _animate,
-  exit: _exit,
-  whileHover: _whileHover,
-  whileTap: _whileTap,
   ...props
 }: React.ComponentProps<"div"> & {
   asChild?: boolean;
-} & LegacyMotionProps) {
+}) {
   if (asChild) {
     return (
       <Slot.Root

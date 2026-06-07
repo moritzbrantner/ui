@@ -406,12 +406,28 @@ async function verifyPageLayout(page: Page, storyId: string) {
 }
 
 async function checkA11y(page: Page) {
-  const results = await new AxeBuilder({ page })
-    .setLegacyMode()
-    .withRules("color-contrast")
-    .analyze();
+  let lastError: unknown;
 
-  return results.violations;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const results = await new AxeBuilder({ page })
+        .setLegacyMode()
+        .withRules("color-contrast")
+        .analyze();
+
+      return results.violations;
+    } catch (error) {
+      lastError = error;
+
+      if (!String(error).includes("Axe is already running")) {
+        throw error;
+      }
+
+      await page.waitForTimeout(150);
+    }
+  }
+
+  throw lastError;
 }
 
 function formatA11yViolations(violations: AxeViolation[]) {

@@ -68,7 +68,7 @@ const contractAllowlist = new Map([
 const clientComponentPatterns = [
   /\bReact\.use[A-Z]/,
   /\buse(State|Effect|LayoutEffect|Memo|Callback|Ref|Id|Reducer)\b/,
-  /from\s+["'](?:@base-ui\/react|cmdk|embla-carousel-react|input-otp|motion\/react|radix-ui|react-day-picker|react-resizable-panels|sonner|vaul)/,
+  /from\s+["'](?:@base-ui\/react|cmdk|embla-carousel-react|input-otp|radix-ui|react-day-picker|react-resizable-panels|sonner|vaul)/,
   /\b(window|document|navigator)\b/,
 ];
 
@@ -130,6 +130,7 @@ function verifyPackageMetadata() {
   );
   expectArrayIncludes(packageJson.files, "dist", "package files must include dist");
   expectArrayIncludes(packageJson.files, "styles.css", "package files must include styles.css");
+  expectArrayIncludes(packageJson.files, "base.css", "package files must include base.css");
   expectArrayIncludes(
     packageJson.files,
     "theme-scopes.css",
@@ -157,6 +158,13 @@ function verifyPackageMetadata() {
   expectExport("./media", "./dist/media.js", "./dist/media.d.ts");
   expectExport("./labs", "./dist/labs.js", "./dist/labs.d.ts");
   expectExport("./themes", "./dist/themes.js", "./dist/themes.d.ts");
+  for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper", "pop"]) {
+    expectExport(
+      `./themes/${themeName}`,
+      `./dist/themes/${themeName}.js`,
+      `./dist/themes/${themeName}.d.ts`,
+    );
+  }
   expectExport("./lib/cn", "./dist/lib/cn.js", "./dist/lib/cn.d.ts");
   expectExport(
     "./components/stable/*",
@@ -198,7 +206,7 @@ function verifyPackageMetadata() {
     errors.push("package exports must not expose the removed flat ./components/* wildcard");
   }
 
-  for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper"]) {
+  for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper", "pop"]) {
     expectExport(`./${themeName}`, `./dist/${themeName}.js`, `./dist/${themeName}.d.ts`);
     expectExport(
       `./${themeName}/server`,
@@ -212,6 +220,7 @@ function verifyPackageMetadata() {
     );
   }
 
+  expectEqual(packageJson.exports["./base.css"], "./base.css", "base stylesheet must be exported");
   expectEqual(packageJson.exports["./styles.css"], "./styles.css", "stylesheet must be exported");
   expectEqual(
     packageJson.exports["./theme-scopes.css"],
@@ -223,11 +232,16 @@ function verifyPackageMetadata() {
 function verifyReleaseDocumentation() {
   const changelogSource = readFileSync(changelogPath, "utf8");
   const releaseRunbookSource = readFileSync(releaseRunbookPath, "utf8");
-  const firstChangelogHeading = changelogSource.match(/^##\s+(.+)$/m)?.[1]?.trim();
+  const changelogHeadings = [...changelogSource.matchAll(/^##\s+(.+)$/gm)].map((match) =>
+    match[1]?.trim(),
+  );
+  const firstChangelogHeading = changelogHeadings[0];
+  const currentReleaseHeading =
+    firstChangelogHeading === "Unreleased" ? changelogHeadings[1] : firstChangelogHeading;
 
-  if (firstChangelogHeading !== packageVersion) {
+  if (currentReleaseHeading !== packageVersion) {
     errors.push(
-      `CHANGELOG.md top release heading must match package.json version ${packageVersion}`,
+      `CHANGELOG.md current release heading must match package.json version ${packageVersion}`,
     );
   }
 
@@ -561,7 +575,7 @@ function verifyEntrypointBoundaries() {
     /from\s+["']\.\/index["']/,
     /from\s+["']\.\/themes["']/,
     /from\s+["']\.\/components\//,
-    /from\s+["'](?:@base-ui\/react|cmdk|embla-carousel-react|input-otp|motion\/react|next-themes|radix-ui|react-day-picker|react-resizable-panels|sonner|vaul)/,
+    /from\s+["'](?:@base-ui\/react|cmdk|embla-carousel-react|input-otp|next-themes|radix-ui|react-day-picker|react-resizable-panels|sonner|vaul)/,
   ];
 
   for (const pattern of forbiddenServerExports) {

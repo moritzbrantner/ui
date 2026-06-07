@@ -7,6 +7,7 @@ export {
   customTheme,
   defaultUiThemeName,
   paperTheme,
+  popTheme,
   studioTheme,
   themeConfig,
   uiThemeLabels,

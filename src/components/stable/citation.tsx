@@ -354,7 +354,7 @@ function CitationTitle({
         data-slot="citation-title"
         href={href}
         className={cn(
-          "inline-flex min-w-0 items-center gap-1.5 font-medium leading-5 text-foreground underline-offset-4 hover:underline",
+          "inline-flex min-h-10 min-w-0 items-center gap-1.5 font-medium leading-5 text-foreground underline-offset-4 hover:underline",
           className,
         )}
         {...props}
@@ -521,7 +521,7 @@ function CitationContextToggle({
       aria-label={!showLabel && typeof label === "string" ? label : undefined}
       className={cn(
         "inline-flex items-center justify-center gap-1 rounded-md text-xs font-medium text-primary outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50",
-        showLabel ? "mt-2 min-h-10 w-fit px-2" : "min-h-7 min-w-7",
+        showLabel ? "mt-2 min-h-10 w-fit px-2" : "min-h-10 min-w-10",
         className,
       )}
       onClick={onToggle}
@@ -877,6 +877,7 @@ function CitationStatusBadge({
   showLabel = true,
   className,
   children,
+  role,
   ...props
 }: CitationStatusBadgeProps) {
   const Icon =
@@ -890,6 +891,7 @@ function CitationStatusBadge({
       data-slot="citation-status-badge"
       data-status={status}
       aria-label={ariaLabel}
+      role={ariaLabel ? (role ?? "img") : role}
       className={cn(
         "inline-flex h-6 items-center justify-center gap-1.5 rounded-md border px-2 text-xs font-medium",
         !showLabel && "w-6 px-0",

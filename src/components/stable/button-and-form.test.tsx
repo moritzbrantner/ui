@@ -443,12 +443,13 @@ describe("@moritzbrantner/ui button-and-form", () => {
     expect(screen.getByRole("button", { name: "Save" })).toBeTruthy();
   });
 
-  test("uses a 150ms lit pressed state for buttons", () => {
+  test("uses tokenized lit pressed state for buttons", () => {
     render(<Button>Press</Button>);
 
     const button = screen.getByRole("button", { name: "Press" });
 
-    expect(button.className).toContain("duration-150");
+    expect(button.className).toContain("duration-[var(--ui-motion-duration-base)]");
+    expect(button.className).toContain("active:scale-[var(--ui-motion-press-scale)]");
     expect(button.className).toContain("active:brightness-110");
   });
 
@@ -502,7 +503,9 @@ describe("@moritzbrantner/ui button-and-form", () => {
     expect(selectedButton.className).toContain(
       "aria-[pressed=true]:shadow-[var(--ui-shadow-interactive)]",
     );
-    expect(keyboardButton.className).toContain("data-[keyboard-active=true]:scale-[0.98]");
+    expect(keyboardButton.className).toContain(
+      "data-[keyboard-active=true]:scale-[var(--ui-motion-press-scale)]",
+    );
     expect(keyboardButton.className).toContain("data-[keyboard-active=true]:brightness-110");
 
     fireEvent.keyDown(keyboardButton, { key: "Enter" });

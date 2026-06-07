@@ -11,12 +11,14 @@
   "files": [
     "dist",
     "styles.css",
+    "base.css",
     "theme-scopes.css",
     "zleek",
     "bobba",
     "atlas",
     "studio",
-    "paper"
+    "paper",
+    "pop"
   ],
   "type": "module",
   "packageManager": "bun@1.3.12",
@@ -106,9 +108,41 @@
       "types": "./dist/paper/server.d.ts",
       "import": "./dist/paper/server.js"
     },
+    "./pop": {
+      "types": "./dist/pop.d.ts",
+      "import": "./dist/pop.js"
+    },
+    "./pop/server": {
+      "types": "./dist/pop/server.d.ts",
+      "import": "./dist/pop/server.js"
+    },
     "./themes": {
       "types": "./dist/themes.d.ts",
       "import": "./dist/themes.js"
+    },
+    "./themes/zleek": {
+      "types": "./dist/themes/zleek.d.ts",
+      "import": "./dist/themes/zleek.js"
+    },
+    "./themes/bobba": {
+      "types": "./dist/themes/bobba.d.ts",
+      "import": "./dist/themes/bobba.js"
+    },
+    "./themes/atlas": {
+      "types": "./dist/themes/atlas.d.ts",
+      "import": "./dist/themes/atlas.js"
+    },
+    "./themes/studio": {
+      "types": "./dist/themes/studio.d.ts",
+      "import": "./dist/themes/studio.js"
+    },
+    "./themes/paper": {
+      "types": "./dist/themes/paper.d.ts",
+      "import": "./dist/themes/paper.js"
+    },
+    "./themes/pop": {
+      "types": "./dist/themes/pop.d.ts",
+      "import": "./dist/themes/pop.js"
     },
     "./lib/cn": {
       "types": "./dist/lib/cn.d.ts",
@@ -142,13 +176,15 @@
       "types": "./dist/components/labs/*.d.ts",
       "import": "./dist/components/labs/*.js"
     },
+    "./base.css": "./base.css",
     "./styles.css": "./styles.css",
     "./theme-scopes.css": "./theme-scopes.css",
     "./zleek/styles.css": "./zleek/styles.css",
     "./bobba/styles.css": "./bobba/styles.css",
     "./atlas/styles.css": "./atlas/styles.css",
     "./studio/styles.css": "./studio/styles.css",
-    "./paper/styles.css": "./paper/styles.css"
+    "./paper/styles.css": "./paper/styles.css",
+    "./pop/styles.css": "./pop/styles.css"
   },
   "publishConfig": {
     "access": "public",
@@ -165,8 +201,9 @@
     "dev": "bun run storybook",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
+    "generate:components": "bun ./scripts/generate-component-catalog.ts",
     "generate:tokens": "bun ./scripts/generate-theme-css.ts",
-    "lint": "bun ./scripts/verify-design-system.ts && bun ./scripts/verify-state-selectors.ts && bun ./scripts/verify-tokens.ts && bun ./scripts/verify-package-imports.ts ./src @/ next/ && bun ./scripts/verify-package-styles.ts . && bun ./scripts/verify-docs-links.ts && bun ./scripts/verify-story-interactions.ts && bun run verify:mobile-usability-skips",
+    "lint": "bun ./scripts/verify-design-system.ts && bun ./scripts/verify-state-selectors.ts && bun ./scripts/verify-tokens.ts && bun ./scripts/verify-package-imports.ts ./src @/ next/ && bun ./scripts/verify-package-styles.ts . && bun run verify:component-catalog && bun ./scripts/verify-docs-links.ts && bun ./scripts/verify-story-interactions.ts && bun run verify:mobile-usability-skips",
     "pack:dry": "bun pm pack --dry-run --ignore-scripts",
     "perf:report": "bun ./scripts/report-performance-hotspots.ts",
     "prepack": "bun run build",
@@ -182,6 +219,7 @@
     "test:mobile-usability": "playwright test --config playwright.visual.config.ts visual/mobile-usability.spec.ts",
     "test:visual": "playwright test --config playwright.visual.config.ts",
     "verify:build-size": "bun ./scripts/verify-build-size.ts",
+    "verify:component-catalog": "bun ./scripts/generate-component-catalog.ts --check",
     "verify:consumer": "bun ./scripts/verify-consumer-build.ts",
     "verify:state-selectors": "bun ./scripts/verify-state-selectors.ts",
     "verify": "bun run check:hygiene && bun run verify:release",

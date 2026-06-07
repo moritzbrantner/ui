@@ -4,7 +4,6 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../../lib/cn";
-import type { LegacyMotionProps } from "../../lib/motion";
 
 const alertVariants = cva(
   "group/alert relative grid w-full gap-0.5 rounded-lg border px-2.5 py-2 text-left text-sm has-data-[slot=alert-action]:relative has-data-[slot=alert-action]:pr-18 has-[>svg]:grid-cols-[auto_1fr] has-[>svg]:gap-x-2 *:[svg]:row-span-2 *:[svg]:translate-y-0.5 *:[svg]:text-current *:[svg:not([class*='size-'])]:size-4",
@@ -25,15 +24,8 @@ const alertVariants = cva(
 function Alert({
   className,
   variant,
-  layout: _layout,
-  transition: _transition,
-  initial: _initial,
-  animate: _animate,
-  exit: _exit,
-  whileHover: _whileHover,
-  whileTap: _whileTap,
   ...props
-}: React.ComponentProps<"div"> & LegacyMotionProps & VariantProps<typeof alertVariants>) {
+}: React.ComponentProps<"div"> & VariantProps<typeof alertVariants>) {
   return (
     <div
       data-slot="alert"

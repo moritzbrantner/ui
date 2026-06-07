@@ -11,6 +11,7 @@ import {
   customTheme,
   defaultUiThemeName,
   paperTheme,
+  popTheme,
   studioTheme,
   themeConfig,
   uiThemeLabels,
@@ -58,10 +59,15 @@ function PaperTheme(props: Omit<UiThemeProps, "theme">) {
   return <UiTheme theme="paper" {...props} />;
 }
 
+function PopTheme(props: Omit<UiThemeProps, "theme">) {
+  return <UiTheme theme="pop" {...props} />;
+}
+
 export {
   AtlasTheme,
   BobbaTheme,
   PaperTheme,
+  PopTheme,
   StudioTheme,
   UiTheme,
   ZleekTheme,
@@ -72,6 +78,7 @@ export {
   customTheme,
   defaultUiThemeName,
   paperTheme,
+  popTheme,
   studioTheme,
   themeConfig,
   uiThemeLabels,

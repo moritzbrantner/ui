@@ -4,19 +4,8 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../../lib/cn";
-import type { LegacyMotionProps } from "../../lib/motion";
 
-function Empty({
-  className,
-  layout: _layout,
-  transition: _transition,
-  initial: _initial,
-  animate: _animate,
-  exit: _exit,
-  whileHover: _whileHover,
-  whileTap: _whileTap,
-  ...props
-}: React.ComponentProps<"div"> & LegacyMotionProps) {
+function Empty({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="empty"

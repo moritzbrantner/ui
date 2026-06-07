@@ -121,6 +121,10 @@ const paper = await importPackage("@moritzbrantner/ui/paper");
 assert.equal(paper.uiTheme.name, "paper", "paper entry should expose paper uiTheme");
 assert.equal(typeof paper.PaperTheme, "function", "paper entry should expose PaperTheme");
 
+const pop = await importPackage("@moritzbrantner/ui/pop");
+assert.equal(pop.uiTheme.name, "pop", "pop entry should expose pop uiTheme");
+assert.equal(typeof pop.PopTheme, "function", "pop entry should expose PopTheme");
+
 const serverThemeEntries = [
   {
     specifier: "@moritzbrantner/ui/zleek/server",
@@ -146,6 +150,11 @@ const serverThemeEntries = [
     specifier: "@moritzbrantner/ui/paper/server",
     exportName: "paperTheme",
     expectedName: "paper",
+  },
+  {
+    specifier: "@moritzbrantner/ui/pop/server",
+    exportName: "popTheme",
+    expectedName: "pop",
   },
 ] as const;
 
@@ -237,6 +246,32 @@ assert.equal(themes.themeConfig.bobba.name, "bobba", "themes subpath should expo
 assert.equal(themes.themeConfig.atlas.name, "atlas", "themes subpath should expose themeConfig");
 assert.equal(themes.themeConfig.studio.name, "studio", "themes subpath should expose themeConfig");
 assert.equal(themes.themeConfig.paper.name, "paper", "themes subpath should expose themeConfig");
+assert.equal(themes.themeConfig.pop.name, "pop", "themes subpath should expose themeConfig");
+
+const scopedThemeEntries = [
+  ["@moritzbrantner/ui/themes/zleek", "ZleekTheme", "zleek"],
+  ["@moritzbrantner/ui/themes/bobba", "BobbaTheme", "bobba"],
+  ["@moritzbrantner/ui/themes/atlas", "AtlasTheme", "atlas"],
+  ["@moritzbrantner/ui/themes/studio", "StudioTheme", "studio"],
+  ["@moritzbrantner/ui/themes/paper", "PaperTheme", "paper"],
+  ["@moritzbrantner/ui/themes/pop", "PopTheme", "pop"],
+] as const;
+
+for (const [specifier, componentName, themeName] of scopedThemeEntries) {
+  const scopedTheme = await importPackage(specifier);
+
+  assert.equal(scopedTheme.uiTheme.name, themeName, `${specifier} should expose uiTheme`);
+  assert.equal(
+    typeof scopedTheme[componentName],
+    "function",
+    `${specifier} should expose ${componentName}`,
+  );
+  assert.equal(
+    Object.hasOwn(scopedTheme, "Button"),
+    false,
+    `${specifier} should not expose broad component barrels`,
+  );
+}
 
 const pack = spawnSync("bun", ["pm", "pack", "--dry-run", "--ignore-scripts"], {
   encoding: "utf8",
@@ -285,6 +320,8 @@ const requiredPackageFiles = [
   "dist/studio/server.d.ts",
   "dist/paper/server.js",
   "dist/paper/server.d.ts",
+  "dist/pop/server.js",
+  "dist/pop/server.d.ts",
   "dist/components/stable/button.js",
   "dist/components/stable/button.d.ts",
   "dist/components/stable/dialog.js",
@@ -309,6 +346,19 @@ const requiredPackageFiles = [
   "dist/components/media/media-gallery-types.d.ts",
   "dist/lib/cn.js",
   "dist/themes.js",
+  "dist/themes/atlas.js",
+  "dist/themes/atlas.d.ts",
+  "dist/themes/bobba.js",
+  "dist/themes/bobba.d.ts",
+  "dist/themes/paper.js",
+  "dist/themes/paper.d.ts",
+  "dist/themes/pop.js",
+  "dist/themes/pop.d.ts",
+  "dist/themes/studio.js",
+  "dist/themes/studio.d.ts",
+  "dist/themes/zleek.js",
+  "dist/themes/zleek.d.ts",
+  "base.css",
   "styles.css",
   "theme-scopes.css",
   "bobba/styles.css",
@@ -316,6 +366,7 @@ const requiredPackageFiles = [
   "atlas/styles.css",
   "studio/styles.css",
   "paper/styles.css",
+  "pop/styles.css",
 ];
 
 for (const requiredFile of requiredPackageFiles) {

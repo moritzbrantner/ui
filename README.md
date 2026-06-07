@@ -103,9 +103,12 @@ Additional visual systems are available for specific product surfaces:
 import "@moritzbrantner/ui/atlas/styles.css";
 import "@moritzbrantner/ui/studio/styles.css";
 import "@moritzbrantner/ui/paper/styles.css";
+import "@moritzbrantner/ui/pop/styles.css";
 ```
 
-Use `atlas` for dense dashboards and analytics, `studio` for creative tooling, and `paper` for document or research-heavy interfaces.
+Use `atlas` for dense dashboards and analytics, `studio` for creative tooling, `paper` for document or research-heavy interfaces, and `pop` for playful consumer surfaces with brighter color and stronger motion.
+
+`base.css` is the generated shared layer for Tailwind, animation helpers, compatibility variants, and component normalization. It is exported for tooling and advanced composition, but it generally should not be the only stylesheet an app imports because it does not provide concrete theme token values. Apps should import exactly one concrete stylesheet such as `@moritzbrantner/ui/styles.css`, `@moritzbrantner/ui/atlas/styles.css`, or `@moritzbrantner/ui/pop/styles.css`.
 
 Token metadata and built-in theme token values live in `src/token-metadata.ts`. Run `bun run generate:tokens` after token changes to update generated CSS and [token docs](./docs/tokens.md).
 
@@ -120,6 +123,8 @@ Components are organized into support tiers:
 - `social`: state-light social, chat, feed, action, and profile summary components.
 - `media`: image cropper and filter editing surfaces.
 - `labs`: experimental components that are public only through explicit labs paths and can change faster.
+
+See the generated [component catalog](./docs/components.md) for every public component, support tier, import path, and story/test coverage record.
 
 Root imports expose only `stable` and `patterns` components, plus `cn` and theme client APIs:
 
@@ -202,7 +207,7 @@ import "@moritzbrantner/ui/atlas/styles.css";
 
 import { Button } from "@moritzbrantner/ui/components/stable/button";
 import { DataGrid } from "@moritzbrantner/ui/components/data/data-grid";
-import { uiTheme } from "@moritzbrantner/ui/atlas/server";
+import { uiTheme } from "@moritzbrantner/ui/themes/atlas";
 import { cn } from "@moritzbrantner/ui/server";
 ```
 
@@ -212,7 +217,7 @@ Use the server entrypoint for `cn`, `themeConfig`, `createUiTheme`, and theme me
 import { cn, createUiTheme, themeConfig } from "@moritzbrantner/ui/server";
 ```
 
-Every app should import one stylesheet, usually `@moritzbrantner/ui/styles.css`. Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css` replace that default when a product surface needs a different visual system. `UiTheme` and `themeConfig` provide metadata classes and attributes; they do not fetch data or switch global CSS by themselves.
+Every app should import one stylesheet, usually `@moritzbrantner/ui/styles.css`. Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css` and `@moritzbrantner/ui/pop/styles.css` replace that default when a product surface needs a different visual system. `UiTheme` and `themeConfig` provide metadata classes and attributes; they do not fetch data or switch global CSS by themselves.
 
 ## Do Not Put Here
 
@@ -314,7 +319,7 @@ These components render UI state and slots only. Keep fetching, routing, upload 
 
 ## Theme Metadata
 
-`UiTheme`, `BobbaTheme`, `ZleekTheme`, `AtlasTheme`, `StudioTheme`, and `PaperTheme` add theme metadata classes and `data-ui-theme` attributes around a subtree. They do not scope CSS tokens by themselves; the active visual theme still comes from the single stylesheet imported by the app.
+`UiTheme`, `BobbaTheme`, `ZleekTheme`, `AtlasTheme`, `StudioTheme`, `PaperTheme`, and `PopTheme` add theme metadata classes and `data-ui-theme` attributes around a subtree. They do not scope CSS tokens by themselves; the active visual theme still comes from the single stylesheet imported by the app.
 
 ```tsx
 import { UiTheme, type UiThemeName } from "@moritzbrantner/ui";
@@ -328,18 +333,32 @@ export function Shell({ theme }: { theme: UiThemeName }) {
 }
 ```
 
-Theme metadata is also available from subpaths. The full theme subpaths are client/full-package convenience entrypoints:
+Theme metadata is also available from subpaths. Use the scoped theme subpaths for bundle-sensitive client surfaces:
 
 ```ts
 import { themeConfig, uiThemeNames } from "@moritzbrantner/ui/themes";
+import { AtlasTheme, uiTheme as atlasTheme } from "@moritzbrantner/ui/themes/atlas";
+import { PopTheme, uiTheme as popTheme } from "@moritzbrantner/ui/themes/pop";
+```
+
+Import classes are intentionally split:
+
+- Compatibility/convenience: `@moritzbrantner/ui`, `@moritzbrantner/ui/client`, and legacy client theme subpaths such as `@moritzbrantner/ui/atlas`.
+- Optimized client theme wrappers and metadata: `@moritzbrantner/ui/themes/<theme>`.
+- Server-only metadata: `@moritzbrantner/ui/<theme>/server` and `@moritzbrantner/ui/server`.
+
+The legacy theme subpaths remain client/full-package convenience entrypoints:
+
+```ts
 import { uiTheme as zleekTheme } from "@moritzbrantner/ui/zleek";
 import { uiTheme as bobbaTheme } from "@moritzbrantner/ui/bobba";
 import { uiTheme as atlasTheme } from "@moritzbrantner/ui/atlas";
 import { uiTheme as studioTheme } from "@moritzbrantner/ui/studio";
 import { uiTheme as paperTheme } from "@moritzbrantner/ui/paper";
+import { uiTheme as popTheme } from "@moritzbrantner/ui/pop";
 ```
 
-Use metadata-only theme server subpaths for server code and bundle-sensitive theme metadata:
+Use metadata-only theme server subpaths for server code:
 
 ```ts
 import { uiTheme as zleekTheme } from "@moritzbrantner/ui/zleek/server";
@@ -347,6 +366,7 @@ import { uiTheme as bobbaTheme } from "@moritzbrantner/ui/bobba/server";
 import { uiTheme as atlasTheme } from "@moritzbrantner/ui/atlas/server";
 import { uiTheme as studioTheme } from "@moritzbrantner/ui/studio/server";
 import { uiTheme as paperTheme } from "@moritzbrantner/ui/paper/server";
+import { uiTheme as popTheme } from "@moritzbrantner/ui/pop/server";
 ```
 
 Storybook uses the same theme registry for its design-system toolbar and for the per-style component catalog stories.

@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { uiTokenMetadata } from "../src/token-metadata.js";
+import { uiTokenNames } from "../src/token-names.js";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const tokenFiles = [
@@ -13,6 +14,15 @@ const tokenFiles = [
   "atlas/styles.css",
   "studio/styles.css",
   "paper/styles.css",
+  "pop/styles.css",
+];
+const themeStylesheets = [
+  "bobba/styles.css",
+  "zleek/styles.css",
+  "atlas/styles.css",
+  "studio/styles.css",
+  "paper/styles.css",
+  "pop/styles.css",
 ];
 const requiredPublicUiTokens = uiTokenMetadata
   .filter((token) => token.name.startsWith("--ui-") || token.name.startsWith("--glass-"))
@@ -33,6 +43,12 @@ const tokenBackedComponents = [
   ["src/components/stable/toolbar.tsx", "--ui-toolbar-min-height"],
 ];
 const errors: string[] = [];
+const metadataTokenNames = uiTokenMetadata.map((token) => token.name);
+
+if (metadataTokenNames.join("\n") !== uiTokenNames.join("\n")) {
+  errors.push("src/token-names.ts must match token names from src/token-metadata.ts");
+}
+
 const generatedCheck = spawnSync("bun", ["./scripts/generate-theme-css.ts", "--check"], {
   cwd: packageRoot,
   encoding: "utf8",
@@ -42,6 +58,8 @@ const generatedCheck = spawnSync("bun", ["./scripts/generate-theme-css.ts", "--c
 if (generatedCheck.status !== 0) {
   errors.push((generatedCheck.stderr || generatedCheck.stdout).trim());
 }
+
+verifyCssImportTopology();
 
 const baseTokens = readTokens(path.join(packageRoot, "styles.css"));
 const requiredTokens = intersection(baseTokens.root, baseTokens.dark);
@@ -86,7 +104,7 @@ for (const relativeFile of tokenFiles) {
 
 const scopedThemeSource = readFileSync(path.join(packageRoot, "theme-scopes.css"), "utf8");
 
-for (const themeName of ["bobba", "zleek", "atlas", "studio", "paper", "custom"]) {
+for (const themeName of ["bobba", "zleek", "atlas", "studio", "paper", "pop", "custom"]) {
   if (!scopedThemeSource.includes(`[data-ui-theme="${themeName}"]`)) {
     errors.push(`theme-scopes.css: missing scoped selector for ${themeName}`);
   }
@@ -164,4 +182,37 @@ function intersection(left: Set<string>, right: Set<string>): string[] {
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function verifyCssImportTopology() {
+  const stylesSource = readFileSync(path.join(packageRoot, "styles.css"), "utf8");
+  const themeScopesSource = readFileSync(path.join(packageRoot, "theme-scopes.css"), "utf8");
+
+  if (!hasCssImport(stylesSource, "./base.css")) {
+    errors.push("styles.css must import ./base.css");
+  }
+
+  if (!hasCssImport(themeScopesSource, "./base.css")) {
+    errors.push("theme-scopes.css must import ./base.css");
+  }
+
+  if (hasCssImport(themeScopesSource, "./styles.css")) {
+    errors.push("theme-scopes.css must not import ./styles.css");
+  }
+
+  for (const relativeFile of themeStylesheets) {
+    const source = readFileSync(path.join(packageRoot, relativeFile), "utf8");
+
+    if (!hasCssImport(source, "../base.css")) {
+      errors.push(`${relativeFile} must import ../base.css`);
+    }
+
+    if (hasCssImport(source, "../styles.css")) {
+      errors.push(`${relativeFile} must not import ../styles.css`);
+    }
+  }
+}
+
+function hasCssImport(source: string, importPath: string) {
+  return new RegExp(`^\\s*@import\\s+["']${escapeRegExp(importPath)}["'];?\\s*$`, "m").test(source);
 }

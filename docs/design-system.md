@@ -15,8 +15,8 @@ import { PageShell } from "@moritzbrantner/ui/components/shell/app-layout";
 import { Chat } from "@moritzbrantner/ui/components/social/chat";
 import { ImageCropper } from "@moritzbrantner/ui/components/media/image-cropper";
 import { Timeline } from "@moritzbrantner/ui/components/labs/timeline";
-import { uiTheme } from "@moritzbrantner/ui/atlas/server";
 import { cn, themeConfig } from "@moritzbrantner/ui/server";
+import { uiTheme } from "@moritzbrantner/ui/themes/atlas";
 ```
 
 Component tiers:
@@ -46,9 +46,15 @@ Import exactly one global stylesheet in an app:
 import "@moritzbrantner/ui/styles.css";
 ```
 
-Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css`, `@moritzbrantner/ui/studio/styles.css`, and `@moritzbrantner/ui/paper/styles.css` replace the default stylesheet for product surfaces with different visual needs. `UiTheme` and the theme metadata exports add classes and attributes; they do not load stylesheets or own theme persistence.
+Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css`, `@moritzbrantner/ui/studio/styles.css`, `@moritzbrantner/ui/paper/styles.css`, and `@moritzbrantner/ui/pop/styles.css` replace the default stylesheet for product surfaces with different visual needs. Each theme stylesheet imports the shared generated `base.css` layer and only its own token blocks. `base.css` is exported for tooling and advanced composition, but it generally should not be the only stylesheet an app imports because it does not provide concrete theme token values.
 
-Existing theme subpaths such as `@moritzbrantner/ui/zleek` and `@moritzbrantner/ui/atlas` remain full client convenience entrypoints. Use metadata-only subpaths such as `@moritzbrantner/ui/zleek/server`, `@moritzbrantner/ui/bobba/server`, `@moritzbrantner/ui/atlas/server`, `@moritzbrantner/ui/studio/server`, and `@moritzbrantner/ui/paper/server` in server code.
+Import classes are intentionally split:
+
+- Compatibility and convenience: `@moritzbrantner/ui`, `@moritzbrantner/ui/client`, and legacy client theme subpaths such as `@moritzbrantner/ui/atlas`.
+- Optimized client theme wrappers and metadata: `@moritzbrantner/ui/themes/<theme>`, such as `@moritzbrantner/ui/themes/atlas` and `@moritzbrantner/ui/themes/pop`.
+- Server-only metadata: `@moritzbrantner/ui/<theme>/server` and `@moritzbrantner/ui/server`.
+
+Apps should still import exactly one concrete stylesheet such as `@moritzbrantner/ui/styles.css`, `@moritzbrantner/ui/atlas/styles.css`, or `@moritzbrantner/ui/pop/styles.css`.
 
 ## App Recipes
 
@@ -86,11 +92,11 @@ Non-happy paths: compose `EmptyState`, `LoadingState`, `ErrorState`, `OfflineSta
 
 Public components should accept `className`, forward DOM props where they render DOM, expose stable `data-slot` values, use semantic tokens from the published stylesheets, and avoid arbitrary visual knobs. If a wrapper cannot satisfy a rule because it delegates to a third-party primitive or provider, the verifier allowlist must include a reason.
 
-The typed component registry in `src/component-registry.ts` records the tier, public subpath, root-export policy, Storybook files, and test files for every public component. `stable`, `patterns`, `data`, `shell`, `social`, and `media` entries must list story and test coverage. `labs` entries may use catalog or family coverage while the APIs settle.
+The typed component registry in `src/component-registry.ts` records the tier, public subpath, root-export policy, Storybook files, and test files for every public component. `stable`, `patterns`, `data`, `shell`, `social`, and `media` entries must list story and test coverage. `labs` entries may use catalog or family coverage while the APIs settle. The generated [component catalog](./components.md) publishes the registry as reviewer-friendly documentation.
 
 ## Token Source Status
 
-Token names, categories, descriptions, and built-in theme values are centralized in `src/token-metadata.ts`. Run `bun run generate:tokens` after token changes to update `styles.css`, theme CSS files, `theme-scopes.css`, and `docs/tokens.md`.
+Token names used at runtime live in `src/token-names.ts`; token categories, descriptions, and built-in theme values live in `src/token-metadata.ts`. Run `bun run generate:tokens` after token changes to update `base.css`, `styles.css`, theme CSS files, `theme-scopes.css`, and `docs/tokens.md`.
 
 ## Do Not Put Here
 

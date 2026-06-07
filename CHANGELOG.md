@@ -1,5 +1,11 @@
 # @moritzbrantner/ui
 
+## Unreleased
+
+### Minor Changes
+
+- Remove deprecated no-op Framer Motion compatibility props from stable primitives. Consumers should remove legacy props such as `layout`, `transition`, `initial`, `animate`, `exit`, `whileHover`, and `whileTap` from UI primitives.
+
 ## 0.10.0
 
 ### Minor Changes

@@ -48,13 +48,18 @@ for (const packageDir of packageDirs) {
   }
 
   const stylesheet = readFileSync(stylesPath, "utf8");
+  const baseStylesPath = path.join(packageDir, "base.css");
+  const baseStylesheet = existsSync(baseStylesPath) ? readFileSync(baseStylesPath, "utf8") : "";
+  const effectiveStylesheet = `${stylesheet}\n${baseStylesheet}`;
 
-  if (!/@import\s+"tailwindcss";/.test(stylesheet)) {
-    errors.push(`${packageName}: styles.css must import tailwindcss`);
+  if (!/@import\s+"tailwindcss";/.test(effectiveStylesheet)) {
+    errors.push(`${packageName}: styles.css or base.css must import tailwindcss`);
   }
 
-  if (!/@source\s+/.test(stylesheet)) {
-    errors.push(`${packageName}: styles.css must declare at least one Tailwind @source`);
+  if (!/@source\s+/.test(effectiveStylesheet)) {
+    errors.push(
+      `${packageName}: styles.css or base.css must declare at least one Tailwind @source`,
+    );
   }
 
   if (!files.includes("styles.css")) {
@@ -63,6 +68,16 @@ for (const packageDir of packageDirs) {
 
   if (stylesExport !== "./styles.css") {
     errors.push(`${packageName}: package.json exports must expose ./styles.css`);
+  }
+
+  if (existsSync(baseStylesPath)) {
+    if (!files.includes("base.css")) {
+      errors.push(`${packageName}: package.json files must include base.css`);
+    }
+
+    if (packageJson.exports?.["./base.css"] !== "./base.css") {
+      errors.push(`${packageName}: package.json exports must expose ./base.css`);
+    }
   }
 
   if (!sideEffects.includes("*.css")) {

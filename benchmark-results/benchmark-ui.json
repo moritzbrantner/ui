@@ -8,71 +8,66 @@
     "logic.cnMerge": {
       "kind": "logic",
       "name": "logic.cnMerge",
-      "median": 0.0036269999999376523,
-      "p95": 0.010869999999954416
+      "median": 0.0040079999998852145,
+      "p95": 0.03505600000062259
     },
     "logic.queryBuilderEvaluate1000": {
       "kind": "logic",
       "name": "logic.queryBuilderEvaluate1000",
-      "median": 0.32669400000008864,
-      "p95": 0.6350340000000188
+      "median": 0.6465170000010403,
+      "p95": 1.4889510000011796
     },
     "logic.dataGridFilter1000Rows": {
       "kind": "logic",
       "name": "logic.dataGridFilter1000Rows",
-      "median": 1.47209799999996,
-      "p95": 1.650474000000031
+      "median": 1.4707060000000638,
+      "p95": 1.5306090000012773
     },
     "render.dataGrid100": {
       "kind": "render",
       "name": "render.dataGrid100",
-      "median": 5.601082000000019,
-      "p95": 7.408429999999953
+      "median": 3.073371999998926,
+      "p95": 5.705863999999565
     },
     "render.dataGrid1000": {
       "kind": "render",
       "name": "render.dataGrid1000",
-      "median": 9.858757000000196,
-      "p95": 12.939057999999932
+      "median": 6.5375180000010005,
+      "p95": 9.288022000000637
     },
     "render.dataGrid500Rows10Columns": {
       "kind": "render",
       "name": "render.dataGrid500Rows10Columns",
-      "median": 10.619858000000022,
-      "p95": 12.967812999999978
+      "median": 6.785072999999102,
+      "p95": 7.38210700000127
     },
     "render.calendar100Events": {
       "kind": "render",
       "name": "render.calendar100Events",
-      "median": 11.824883,
-      "p95": 14.341023999999834
+      "median": 8.4079270000002,
+      "p95": 14.608720000000176
     },
     "render.documentViewer100Pages": {
       "kind": "render",
       "name": "render.documentViewer100Pages",
-      "median": 9.25376899999992,
-      "p95": 19.110302000000047
+      "median": 6.869221999997535,
+      "p95": 7.668374999997468
     },
     "render.assetBrowser500": {
       "kind": "render",
       "name": "render.assetBrowser500",
-      "median": 41.587755000000016,
-      "p95": 55.121983
+      "median": 45.278644999998505,
+      "p95": 120.26889200000005
     },
     "render.gantt250": {
       "kind": "render",
       "name": "render.gantt250",
-      "median": 27.865813999999773,
-      "p95": 29.427411000000575
+      "median": 28.18403799999942,
+      "p95": 32.86663600000247
     }
   },
   "status": "passed",
-  "timestamp": "2026-06-06T19:35:46.946Z",
+  "timestamp": "2026-06-06T21:41:23.073Z",
   "missingBaselineEntries": [],
-  "staleBaselineEntries": [
-    "logic.timelineHelpers1000",
-    "logic.workflowBuilderConnectionValidity1000",
-    "logic.workflowConnectionValidation",
-    "render.workflowBuilder50Nodes80Edges"
-  ]
+  "staleBaselineEntries": []
 }

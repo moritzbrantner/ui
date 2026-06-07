@@ -5,7 +5,6 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 
 import { cn } from "../../lib/cn";
-import type { LegacyMotionProps } from "../../lib/motion";
 import { Separator } from "./separator";
 
 function ItemGroup({ className, ...props }: React.ComponentProps<"div">) {
@@ -60,17 +59,8 @@ function Item({
   variant = "default",
   size = "default",
   asChild = false,
-  layout: _layout,
-  transition: _transition,
-  initial: _initial,
-  animate: _animate,
-  exit: _exit,
-  whileHover: _whileHover,
-  whileTap: _whileTap,
   ...props
-}: React.ComponentProps<"div"> &
-  LegacyMotionProps &
-  VariantProps<typeof itemVariants> & { asChild?: boolean }) {
+}: React.ComponentProps<"div"> & VariantProps<typeof itemVariants> & { asChild?: boolean }) {
   if (asChild) {
     return (
       <Slot.Root

@@ -3,26 +3,18 @@
 import * as React from "react";
 
 import { cn } from "../../lib/cn";
-import type { LegacyMotionProps } from "../../lib/motion";
 
 function Card({
   className,
   size = "default",
-  layout: _layout,
-  transition: _transition,
-  initial: _initial,
-  animate: _animate,
-  exit: _exit,
-  whileHover: _whileHover,
-  whileTap: _whileTap,
   ...props
-}: React.ComponentProps<"div"> & LegacyMotionProps & { size?: "default" | "sm" }) {
+}: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
   return (
     <div
       data-slot="card"
       data-size={size}
       className={cn(
-        "group/card flex flex-col gap-[var(--ui-card-gap,var(--ui-surface-gap))] overflow-hidden rounded-[var(--ui-card-radius,var(--ui-radius-surface))] bg-card py-[var(--ui-card-padding,var(--ui-surface-padding-md))] text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-[var(--ui-surface-padding-sm)] data-[size=sm]:py-[var(--ui-surface-padding-sm)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[var(--ui-card-radius,var(--ui-radius-surface))] *:[img:last-child]:rounded-b-[var(--ui-card-radius,var(--ui-radius-surface))]",
+        "group/card flex flex-col gap-[var(--ui-card-gap,var(--ui-surface-gap))] overflow-hidden rounded-[var(--ui-card-radius,var(--ui-radius-surface))] bg-card py-[var(--ui-card-padding,var(--ui-surface-padding-md))] text-sm text-card-foreground ring-1 ring-foreground/10 transition-[background-color,border-color,box-shadow,transform] duration-[var(--ui-motion-duration-base)] ease-[var(--ui-motion-ease-standard)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[interactive=true]:shadow-[var(--ui-shadow-surface)] data-[interactive=true]:hover:translate-y-[var(--ui-motion-hover-y)] data-[interactive=true]:hover:scale-[var(--ui-motion-hover-scale)] data-[interactive=true]:hover:shadow-[var(--ui-shadow-interactive)] data-[interactive=true]:active:scale-[var(--ui-motion-press-scale)] data-[size=sm]:gap-[var(--ui-surface-padding-sm)] data-[size=sm]:py-[var(--ui-surface-padding-sm)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 motion-reduce:transition-none motion-reduce:data-[interactive=true]:hover:translate-y-0 motion-reduce:data-[interactive=true]:hover:scale-100 motion-reduce:data-[interactive=true]:active:scale-100 *:[img:first-child]:rounded-t-[var(--ui-card-radius,var(--ui-radius-surface))] *:[img:last-child]:rounded-b-[var(--ui-card-radius,var(--ui-radius-surface))]",
         className,
       )}
       {...props}

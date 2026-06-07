@@ -114,6 +114,16 @@ const systems = [
     bestFor: ["OCR", "Linguistics", "Translation and text tools"],
     icon: FileTextIcon,
   },
+  {
+    id: "pop",
+    name: "Pop",
+    label: "Playful consumer style",
+    description: "Colorful, rounded, and motion-forward for polished consumer product surfaces.",
+    surface: "Bright elevated cards with animated affordances",
+    density: "Comfortable spacing",
+    bestFor: ["Consumer apps", "Creator tools", "Onboarding surfaces"],
+    icon: ActivityIcon,
+  },
 ] as const satisfies readonly SystemProfile[];
 
 const meta = {
@@ -151,6 +161,11 @@ export const Studio: Story = {
 export const Paper: Story = {
   globals: { designSystem: "paper" },
   render: () => <DesignSystemShowcase systemId="paper" />,
+};
+
+export const Pop: Story = {
+  globals: { designSystem: "pop" },
+  render: () => <DesignSystemShowcase systemId="pop" />,
 };
 
 function DesignSystemShowcase({ systemId }: { systemId: UiThemeName }) {
@@ -237,7 +252,7 @@ function HeroPanel({ system }: { system: SystemProfile }) {
 
 function SystemProfileCard({ system, className }: { system: SystemProfile; className?: string }) {
   return (
-    <Card className={className}>
+    <Card data-interactive="true" className={className}>
       <CardHeader>
         <CardTitle>System profile</CardTitle>
         <CardDescription>{system.surface}</CardDescription>
@@ -293,7 +308,7 @@ function ComponentPreview({ className }: { className?: string }) {
   const [includeTables, setIncludeTables] = useState(false);
 
   return (
-    <Card className={className}>
+    <Card data-interactive="true" className={className}>
       <CardHeader>
         <CardTitle>Controls and status</CardTitle>
         <CardDescription>

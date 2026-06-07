@@ -3,19 +3,8 @@
 import * as React from "react";
 
 import { cn } from "../../lib/cn";
-import type { LegacyMotionProps } from "../../lib/motion";
 
-function Kbd({
-  className,
-  layout: _layout,
-  transition: _transition,
-  initial: _initial,
-  animate: _animate,
-  exit: _exit,
-  whileHover: _whileHover,
-  whileTap: _whileTap,
-  ...props
-}: React.ComponentProps<"kbd"> & LegacyMotionProps) {
+function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {
   return (
     <kbd
       data-slot="kbd"
@@ -28,17 +17,7 @@ function Kbd({
   );
 }
 
-function KbdGroup({
-  className,
-  layout: _layout,
-  transition: _transition,
-  initial: _initial,
-  animate: _animate,
-  exit: _exit,
-  whileHover: _whileHover,
-  whileTap: _whileTap,
-  ...props
-}: React.ComponentProps<"kbd"> & LegacyMotionProps) {
+function KbdGroup({ className, ...props }: React.ComponentProps<"kbd">) {
   return (
     <kbd
       data-slot="kbd-group"

@@ -215,6 +215,14 @@ import {
 } from "./labs";
 import { PaperTheme, paperTheme, uiTheme as paperUiTheme } from "./paper";
 import { paperTheme as paperServerTheme, uiTheme as paperServerUiTheme } from "./paper-server";
+import { PopTheme, popTheme, uiTheme as popUiTheme } from "./pop";
+import { popTheme as popServerTheme, uiTheme as popServerUiTheme } from "./pop-server";
+import { AtlasTheme as ScopedAtlasTheme, uiTheme as scopedAtlasUiTheme } from "./themes/atlas";
+import { BobbaTheme as ScopedBobbaTheme, uiTheme as scopedBobbaUiTheme } from "./themes/bobba";
+import { PaperTheme as ScopedPaperTheme, uiTheme as scopedPaperUiTheme } from "./themes/paper";
+import { PopTheme as ScopedPopTheme, uiTheme as scopedPopUiTheme } from "./themes/pop";
+import { StudioTheme as ScopedStudioTheme, uiTheme as scopedStudioUiTheme } from "./themes/studio";
+import { ZleekTheme as ScopedZleekTheme, uiTheme as scopedZleekUiTheme } from "./themes/zleek";
 import { cn as serverCn, themeConfig as serverThemeConfig } from "./server";
 import {
   Chat,
@@ -428,15 +436,18 @@ describe("@moritzbrantner/ui package-contract", () => {
       expect.arrayContaining([
         "dist",
         "styles.css",
+        "base.css",
         "theme-scopes.css",
         "zleek",
         "bobba",
         "atlas",
         "studio",
         "paper",
+        "pop",
       ]),
     );
     expect(packageJson.sideEffects).toEqual(expect.arrayContaining(["*.css"]));
+    expect(packageJson.exports["./base.css"]).toBe("./base.css");
     expect(packageJson.exports["./styles.css"]).toBe("./styles.css");
     expect(packageJson.exports["./theme-scopes.css"]).toBe("./theme-scopes.css");
     expect(packageJson.exports["./zleek/styles.css"]).toBe("./zleek/styles.css");
@@ -450,6 +461,17 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./paper"].import).toBe("./dist/paper.js");
     expect(packageJson.exports["./paper/server"].import).toBe("./dist/paper/server.js");
     expect(packageJson.exports["./paper/server"].types).toBe("./dist/paper/server.d.ts");
+    expect(packageJson.exports["./pop"].import).toBe("./dist/pop.js");
+    expect(packageJson.exports["./pop/server"].import).toBe("./dist/pop/server.js");
+    expect(packageJson.exports["./pop/server"].types).toBe("./dist/pop/server.d.ts");
+    for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper", "pop"]) {
+      expect(packageJson.exports[`./themes/${themeName}`].import).toBe(
+        `./dist/themes/${themeName}.js`,
+      );
+      expect(packageJson.exports[`./themes/${themeName}`].types).toBe(
+        `./dist/themes/${themeName}.d.ts`,
+      );
+    }
     expect(packageJson.exports["./zleek/server"].import).toBe("./dist/zleek/server.js");
     expect(packageJson.exports["./zleek/server"].types).toBe("./dist/zleek/server.d.ts");
     expect(packageJson.exports["./bobba/server"].import).toBe("./dist/bobba/server.js");
@@ -471,6 +493,7 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./atlas/styles.css"]).toBe("./atlas/styles.css");
     expect(packageJson.exports["./studio/styles.css"]).toBe("./studio/styles.css");
     expect(packageJson.exports["./paper/styles.css"]).toBe("./paper/styles.css");
+    expect(packageJson.exports["./pop/styles.css"]).toBe("./pop/styles.css");
     expect(packageJson.exports["./components/*"]).toBeUndefined();
     expect(packageJson.exports["./components/stable/*"].import).toBe(
       "./dist/components/stable/*.js",
@@ -489,6 +512,70 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./lib/cn"].import).toBe("./dist/lib/cn.js");
     expect(consumerExample).toContain('import "@moritzbrantner/ui/styles.css";');
     expect(consumerExample).toContain('from "@moritzbrantner/ui"');
+  });
+
+  test("exposes optimized scoped theme client entrypoints without broad barrels", () => {
+    const scopedThemeEntries = [
+      {
+        name: "zleek",
+        component: ScopedZleekTheme,
+        uiTheme: scopedZleekUiTheme,
+        sourcePath: "src/themes/zleek.tsx",
+      },
+      {
+        name: "bobba",
+        component: ScopedBobbaTheme,
+        uiTheme: scopedBobbaUiTheme,
+        sourcePath: "src/themes/bobba.tsx",
+      },
+      {
+        name: "atlas",
+        component: ScopedAtlasTheme,
+        uiTheme: scopedAtlasUiTheme,
+        sourcePath: "src/themes/atlas.tsx",
+      },
+      {
+        name: "studio",
+        component: ScopedStudioTheme,
+        uiTheme: scopedStudioUiTheme,
+        sourcePath: "src/themes/studio.tsx",
+      },
+      {
+        name: "paper",
+        component: ScopedPaperTheme,
+        uiTheme: scopedPaperUiTheme,
+        sourcePath: "src/themes/paper.tsx",
+      },
+      {
+        name: "pop",
+        component: ScopedPopTheme,
+        uiTheme: scopedPopUiTheme,
+        sourcePath: "src/themes/pop.tsx",
+      },
+    ] as const;
+    const forbiddenSourceImports = [
+      "../themes",
+      "./themes",
+      "../index",
+      "./index",
+      "../stable",
+      "./stable",
+    ];
+
+    for (const themeEntry of scopedThemeEntries) {
+      const source = readFileSync(themeEntry.sourcePath, "utf8");
+
+      expect(typeof themeEntry.component).toBe("function");
+      expect(themeEntry.uiTheme.name).toBe(themeEntry.name);
+      expect(source).not.toContain('export * from "../index"');
+      expect(source).not.toContain('export * from "./index"');
+
+      for (const forbiddenSourceImport of forbiddenSourceImports) {
+        expect(source).not.toMatch(
+          new RegExp(`\\b(?:from\\s+|import\\s*)["']${escapeRegExp(forbiddenSourceImport)}["']`),
+        );
+      }
+    }
   });
 
   test("ships tiered component source and root barrels by governance policy", () => {
@@ -534,6 +621,7 @@ describe("@moritzbrantner/ui package-contract", () => {
   test("exposes explicit server, client, and representative subpath APIs", () => {
     expect(serverCn("px-4", "px-2")).toBe("px-2");
     expect(serverThemeConfig.bobba.name).toBe("bobba");
+    expect(serverThemeConfig.pop.name).toBe("pop");
     expect(ClientButton).toBe(Button);
     expect(ClientDialog).toBe(Dialog);
     expect(SubpathButton).toBe(Button);
@@ -690,6 +778,12 @@ describe("@moritzbrantner/ui package-contract", () => {
         uiTheme: paperServerUiTheme,
         theme: paperServerTheme,
       },
+      {
+        name: "pop",
+        label: "Pop",
+        uiTheme: popServerUiTheme,
+        theme: popServerTheme,
+      },
     ] as const;
 
     for (const themeEntry of serverThemeEntries) {
@@ -701,3 +795,7 @@ describe("@moritzbrantner/ui package-contract", () => {
     }
   });
 });
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}

@@ -1,8 +1,8 @@
 import type * as React from "react";
 
-import { uiTokenNames, type UiThemeTokens, type UiTokenName } from "./token-metadata";
+import { uiTokenNames, type UiThemeTokens, type UiTokenName } from "./token-names";
 
-const builtInUiThemeNames = ["bobba", "zleek", "atlas", "studio", "paper"] as const;
+const builtInUiThemeNames = ["bobba", "zleek", "atlas", "studio", "paper", "pop"] as const;
 const uiThemeNames = [...builtInUiThemeNames, "custom"] as const;
 
 type UiThemeName = (typeof uiThemeNames)[number];
@@ -16,6 +16,7 @@ const uiThemeLabels = {
   atlas: "Atlas",
   studio: "Studio",
   paper: "Paper",
+  pop: "Pop",
   custom: "Custom",
 } as const satisfies Record<UiThemeName, string>;
 
@@ -59,6 +60,12 @@ const paperTheme = {
   dataAttribute: { "data-ui-theme": "paper" },
 } as const satisfies UiThemeConfig;
 
+const popTheme = {
+  name: "pop",
+  className: "pop",
+  dataAttribute: { "data-ui-theme": "pop" },
+} as const satisfies UiThemeConfig;
+
 const customTheme = {
   name: "custom",
   className: "custom",
@@ -71,6 +78,7 @@ const themeConfig = {
   atlas: atlasTheme,
   studio: studioTheme,
   paper: paperTheme,
+  pop: popTheme,
   custom: customTheme,
 } as const satisfies Record<UiThemeName, UiThemeConfig>;
 
@@ -94,6 +102,7 @@ export {
   customTheme,
   defaultUiThemeName,
   paperTheme,
+  popTheme,
   studioTheme,
   themeConfig,
   uiThemeLabels,

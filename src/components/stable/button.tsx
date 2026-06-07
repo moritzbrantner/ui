@@ -4,10 +4,9 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 import { cn } from "../../lib/cn";
-import type { LegacyMotionProps } from "../../lib/motion";
 
 const buttonVariants = cva(
-  "inline-flex min-h-10 min-w-10 shrink-0 origin-bottom transform-gpu items-center justify-center gap-[var(--ui-control-gap)] whitespace-nowrap rounded-[var(--ui-button-radius,var(--ui-radius-control))] text-sm font-medium outline-none transition-[transform,box-shadow,background-color,color,border-color,filter] duration-150 ease-out will-change-transform hover:translate-y-[var(--ui-motion-hover-y)] hover:scale-[var(--ui-motion-hover-scale)] active:brightness-110 disabled:pointer-events-none disabled:opacity-50 aria-[pressed=true]:translate-y-[var(--ui-motion-hover-y)] aria-[pressed=true]:scale-[var(--ui-motion-hover-scale)] data-[selected=true]:translate-y-[var(--ui-motion-hover-y)] data-[selected=true]:scale-[var(--ui-motion-hover-scale)] data-[state=on]:translate-y-[var(--ui-motion-hover-y)] data-[state=on]:scale-[var(--ui-motion-hover-scale)] data-[keyboard-active=true]:scale-[0.98] data-[keyboard-active=true]:brightness-110 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 focus-visible:border-ring focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+  "inline-flex min-h-10 min-w-10 shrink-0 origin-bottom transform-gpu items-center justify-center gap-[var(--ui-control-gap)] whitespace-nowrap rounded-[var(--ui-button-radius,var(--ui-radius-control))] text-sm font-medium outline-none transition-[transform,box-shadow,background-color,color,border-color,filter] duration-[var(--ui-motion-duration-base)] ease-[var(--ui-motion-ease-standard)] will-change-transform hover:translate-y-[var(--ui-motion-hover-y)] hover:scale-[var(--ui-motion-hover-scale)] active:scale-[var(--ui-motion-press-scale)] active:brightness-110 disabled:pointer-events-none disabled:opacity-50 aria-[pressed=true]:translate-y-[var(--ui-motion-hover-y)] aria-[pressed=true]:scale-[var(--ui-motion-hover-scale)] data-[selected=true]:translate-y-[var(--ui-motion-hover-y)] data-[selected=true]:scale-[var(--ui-motion-hover-scale)] data-[state=on]:translate-y-[var(--ui-motion-hover-y)] data-[state=on]:scale-[var(--ui-motion-hover-scale)] data-[keyboard-active=true]:scale-[var(--ui-motion-press-scale)] data-[keyboard-active=true]:brightness-110 motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100 motion-reduce:active:scale-100 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 focus-visible:border-ring focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
   {
     variants: {
       variant: {
@@ -51,9 +50,7 @@ type SharedProps = VariantProps<typeof buttonVariants> & {
   onDrag?: React.ComponentProps<"button">["onDrag"] | boolean;
 };
 
-export type ButtonProps = SharedProps &
-  Omit<React.ComponentProps<"button">, "onDrag"> &
-  LegacyMotionProps;
+export type ButtonProps = SharedProps & Omit<React.ComponentProps<"button">, "onDrag">;
 
 function Button(props: ButtonProps) {
   const {
@@ -71,13 +68,6 @@ function Button(props: ButtonProps) {
     onPointerMove,
     onPointerUp,
     disabled,
-    layout: _layout,
-    transition: _transition,
-    initial: _initial,
-    animate: _animate,
-    exit: _exit,
-    whileHover: _whileHover,
-    whileTap: _whileTap,
     style,
     ...rest
   } = props;

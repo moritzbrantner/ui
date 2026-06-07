@@ -23,10 +23,10 @@ const rootBudget = {
   maxTotalBytes: 900 * 1024,
 };
 const subpathBudget = {
-  // Bundle-sensitive fixture: current DataGrid + Dialog subpath build is about 523 KB.
+  // Bundle-sensitive fixture: scoped theme metadata + DataGrid + Dialog is about 409 KB.
   // Keep the hard budget close enough to catch regressions while preserving current behavior.
-  maxChunkBytes: 550 * 1024,
-  maxTotalBytes: 575 * 1024,
+  maxChunkBytes: 450 * 1024,
+  maxTotalBytes: 465 * 1024,
 };
 
 rmSync(path.join(consumerRoot, "node_modules"), { recursive: true, force: true });
@@ -154,7 +154,7 @@ function verifyConsumerSource(root: string): void {
     'from "@moritzbrantner/ui/components/stable/button"',
     'from "@moritzbrantner/ui/components/data/data-grid"',
     'from "@moritzbrantner/ui/components/stable/dialog"',
-    'from "@moritzbrantner/ui/atlas/server"',
+    'from "@moritzbrantner/ui/themes/atlas"',
     'from "@moritzbrantner/ui/server"',
     'import "@moritzbrantner/ui/atlas/styles.css";',
   ]) {
@@ -167,8 +167,18 @@ function verifyConsumerSource(root: string): void {
     }
   }
 
-  if (subpathSource.includes('from "@moritzbrantner/ui/client"')) {
-    throw new Error("SubpathApp.tsx must avoid the convenience client barrel");
+  for (const forbiddenImport of [
+    'from "@moritzbrantner/ui"',
+    'from "@moritzbrantner/ui/client"',
+    'from "@moritzbrantner/ui/stable"',
+    'from "@moritzbrantner/ui/data"',
+    'from "@moritzbrantner/ui/shell"',
+    'from "@moritzbrantner/ui/atlas"',
+    'from "@moritzbrantner/ui/atlas/server"',
+  ]) {
+    if (subpathSource.includes(forbiddenImport)) {
+      throw new Error(`SubpathApp.tsx must avoid broad import ${forbiddenImport}`);
+    }
   }
 }
 

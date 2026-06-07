@@ -11,6 +11,7 @@ import {
 import atlasStyles from "../atlas/styles.css?inline";
 import bobbaStyles from "../bobba/styles.css?inline";
 import paperStyles from "../paper/styles.css?inline";
+import popStyles from "../pop/styles.css?inline";
 import studioStyles from "../studio/styles.css?inline";
 import themeScopesStyles from "../theme-scopes.css?inline";
 import zleekStyles from "../zleek/styles.css?inline";
@@ -22,6 +23,7 @@ const designSystemStyles = {
   atlas: atlasStyles,
   studio: studioStyles,
   paper: paperStyles,
+  pop: popStyles,
 } as const satisfies Record<BuiltInUiThemeName, string>;
 
 const designSystemOptions = uiThemeNames.map((value) => ({

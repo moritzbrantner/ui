@@ -12,29 +12,11 @@
       "median": 0.3240010000000666,
       "p95": 0.40915099999995164
     },
-    "logic.workflowConnectionValidation": {
-      "kind": "logic",
-      "name": "logic.workflowConnectionValidation",
-      "median": 0.08403799999996409,
-      "p95": 0.09593099999995047
-    },
-    "logic.workflowBuilderConnectionValidity1000": {
-      "kind": "logic",
-      "name": "logic.workflowBuilderConnectionValidity1000",
-      "median": 2.5167050000000017,
-      "p95": 4.331014999999979
-    },
     "logic.dataGridFilter1000Rows": {
       "kind": "logic",
       "name": "logic.dataGridFilter1000Rows",
       "median": 1.4790179999999964,
       "p95": 2.57311100000004
-    },
-    "logic.timelineHelpers1000": {
-      "kind": "logic",
-      "name": "logic.timelineHelpers1000",
-      "median": 0.07912899999996625,
-      "p95": 0.08689300000003186
     },
     "render.dataGrid100": {
       "kind": "render",
@@ -53,12 +35,6 @@
       "name": "render.dataGrid500Rows10Columns",
       "median": 10.698859999999968,
       "p95": 13.885037999999895
-    },
-    "render.workflowBuilder50Nodes80Edges": {
-      "kind": "render",
-      "name": "render.workflowBuilder50Nodes80Edges",
-      "median": 28.64213800000016,
-      "p95": 37.85308399999985
     },
     "render.calendar100Events": {
       "kind": "render",
