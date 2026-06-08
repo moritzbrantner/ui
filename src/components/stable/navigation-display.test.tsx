@@ -211,6 +211,7 @@ describe("stable navigation and display components", () => {
     expect(screen.getByText("Coverage")).toBeTruthy();
     expect(screen.getByText("No results")).toBeTruthy();
     expect(screen.getByLabelText("Loading preview").getAttribute("data-slot")).toBe("skeleton");
+    expect(screen.getByRole("status", { name: "Loading preview" })).toBeTruthy();
     expect(screen.getByLabelText("Loading preview").getAttribute("aria-busy")).toBe("true");
     expect(screen.getByLabelText("Build progress").getAttribute("data-slot")).toBe("progress");
     expect(screen.getByLabelText("Package progress").getAttribute("data-slot")).toBe("loading-bar");

@@ -222,7 +222,7 @@ function SystemProfileCard({ system, className }: { system: SystemProfile; class
   return (
     <Card data-interactive="true" className={className}>
       <CardHeader>
-        <CardTitle>System profile</CardTitle>
+        <CardTitle level={2}>System profile</CardTitle>
         <CardDescription>{surfaceDescriptions[system.surface]}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-5">
@@ -319,7 +319,7 @@ function ComponentPreview({ className }: { className?: string }) {
   return (
     <Card data-interactive="true" className={className}>
       <CardHeader>
-        <CardTitle>Controls and status</CardTitle>
+        <CardTitle level={2}>Controls and status</CardTitle>
         <CardDescription>
           Buttons, sliders, radio groups, checkbox selects, and menu selects.
         </CardDescription>
@@ -503,7 +503,7 @@ function DataPreview({ className }: { className?: string }) {
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle>Data and product patterns</CardTitle>
+        <CardTitle level={2}>Data and product patterns</CardTitle>
         <CardDescription>Shared tokens across tabular, status, and workflow UI.</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-5">
