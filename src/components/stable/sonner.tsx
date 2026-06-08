@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useTheme } from "next-themes";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 import {
   CircleCheckIcon,
@@ -16,13 +15,10 @@ type UiToasterProps = ToasterProps & {
 };
 
 const Toaster = ({ theme: themeProp, className, ...props }: UiToasterProps) => {
-  const { theme = "system" } = useTheme();
-  const resolvedTheme = themeProp ?? (theme as ToasterProps["theme"]);
-
   return (
     <Sonner
       data-slot="toaster"
-      theme={resolvedTheme}
+      theme={themeProp ?? "system"}
       className={className ? `toaster group ${className}` : "toaster group"}
       icons={{
         success: <CircleCheckIcon className="size-4" />,

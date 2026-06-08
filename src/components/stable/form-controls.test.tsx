@@ -157,7 +157,12 @@ describe("stable form controls", () => {
         <Toggle aria-label="Bold" onPressedChange={onToggle}>
           B
         </Toggle>
-        <ToggleGroup type="single" aria-label="Text alignment" onValueChange={onToggleGroupChange}>
+        <ToggleGroup
+          type="single"
+          aria-label="Text alignment"
+          spacing={2}
+          onValueChange={onToggleGroupChange}
+        >
           <ToggleGroupItem value="left" aria-label="Align left">
             Left
           </ToggleGroupItem>
@@ -166,6 +171,9 @@ describe("stable form controls", () => {
     );
 
     expect(screen.getByRole("slider", { name: "Volume handle" })).toBeTruthy();
+    expect(
+      screen.getByRole("group", { name: "Text alignment" }).style.getPropertyValue("--gap"),
+    ).toBe("0.5rem");
     fireEvent.click(screen.getByRole("button", { name: "Bold" }));
     fireEvent.click(screen.getByRole("radio", { name: "Align left" }));
 

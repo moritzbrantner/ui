@@ -55,7 +55,6 @@ const config: StorybookConfig = {
           "embla-carousel-react",
           "input-otp",
           "lucide-react",
-          "next-themes",
           "radix-ui",
           "react",
           "react/jsx-dev-runtime",

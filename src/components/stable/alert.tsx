@@ -5,6 +5,9 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../../lib/cn";
 
+type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+type HeadingTag = `h${HeadingLevel}`;
+
 const alertVariants = cva(
   "group/alert relative grid w-full gap-0.5 rounded-lg border px-2.5 py-2 text-left text-sm has-data-[slot=alert-action]:relative has-data-[slot=alert-action]:pr-18 has-[>svg]:grid-cols-[auto_1fr] has-[>svg]:gap-x-2 *:[svg]:row-span-2 *:[svg]:translate-y-0.5 *:[svg]:text-current *:[svg:not([class*='size-'])]:size-4",
   {
@@ -36,9 +39,17 @@ function Alert({
   );
 }
 
-function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
+function AlertTitle({
+  className,
+  level = 3,
+  ...props
+}: React.ComponentProps<"h3"> & {
+  level?: HeadingLevel;
+}) {
+  const Heading = `h${level}` as HeadingTag;
+
   return (
-    <div
+    <Heading
       data-slot="alert-title"
       className={cn(
         "font-heading font-medium group-has-[>svg]/alert:col-start-2 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground",

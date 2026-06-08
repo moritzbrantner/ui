@@ -4,6 +4,9 @@ import * as React from "react";
 
 import { cn } from "../../lib/cn";
 
+type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+type HeadingTag = `h${HeadingLevel}`;
+
 function Card({
   className,
   size = "default",
@@ -35,9 +38,17 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
+function CardTitle({
+  className,
+  level = 3,
+  ...props
+}: React.ComponentProps<"h3"> & {
+  level?: HeadingLevel;
+}) {
+  const Heading = `h${level}` as HeadingTag;
+
   return (
-    <div
+    <Heading
       data-slot="card-title"
       className={cn(
         "font-heading text-base leading-snug font-medium group-data-[size=sm]/card:text-sm",

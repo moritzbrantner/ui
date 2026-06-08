@@ -43,6 +43,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableHeader,
   TableRow,
@@ -126,6 +127,9 @@ describe("stable navigation and display components", () => {
     expect(accordionContent?.getAttribute("data-state")).toBe("open");
     expect(accordionContent?.className).toContain("data-[state=open]:animate-accordion-down");
     expect(accordionContent?.className).not.toContain("data-open");
+    expect(screen.getByText("Panel content").className).not.toContain(
+      "h-(--radix-accordion-content-height)",
+    );
 
     const activeTab = screen.getByRole("tab", { name: "Overview" });
     expect(activeTab.getAttribute("data-state")).toBe("active");
@@ -133,10 +137,13 @@ describe("stable navigation and display components", () => {
     expect(activeTab.className).not.toContain("data-active");
 
     expect(screen.getByRole("link", { name: "Home" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Home" }).className).not.toContain("min-h-10");
     expect(screen.getByRole("navigation", { name: "pagination" })).toBeTruthy();
     const navigationTrigger = screen.getByRole("button", { name: "Products" });
     expect(navigationTrigger.getAttribute("data-state")).toBe("open");
     expect(navigationTrigger.className).toContain("data-[state=open]");
+    expect(navigationTrigger.className).toContain("gap-1");
+    expect(navigationTrigger.textContent).toBe("Products");
     expect(navigationTrigger.className).not.toContain("data-popup-open");
     expect(navigationTrigger.className).not.toContain("data-open");
 
@@ -163,6 +170,15 @@ describe("stable navigation and display components", () => {
             </TableRow>
           </TableBody>
         </Table>
+        <TableContainer data-testid="custom-table-container">
+          <table>
+            <tbody>
+              <tr>
+                <td>Nested table</td>
+              </tr>
+            </tbody>
+          </table>
+        </TableContainer>
         <DescriptionList>
           <DescriptionListItem>
             <DescriptionListTerm>Version</DescriptionListTerm>
@@ -187,11 +203,15 @@ describe("stable navigation and display components", () => {
       </div>,
     );
 
-    expect(screen.getByRole("table")).toBeTruthy();
+    expect(screen.getAllByRole("table")).toHaveLength(2);
+    expect(screen.getByTestId("custom-table-container").getAttribute("data-slot")).toBe(
+      "table-container",
+    );
     expect(screen.getByText("0.8.0")).toBeTruthy();
     expect(screen.getByText("Coverage")).toBeTruthy();
     expect(screen.getByText("No results")).toBeTruthy();
     expect(screen.getByLabelText("Loading preview").getAttribute("data-slot")).toBe("skeleton");
+    expect(screen.getByLabelText("Loading preview").getAttribute("aria-busy")).toBe("true");
     expect(screen.getByLabelText("Build progress").getAttribute("data-slot")).toBe("progress");
     expect(screen.getByLabelText("Package progress").getAttribute("data-slot")).toBe("loading-bar");
   });

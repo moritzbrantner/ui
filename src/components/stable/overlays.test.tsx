@@ -13,8 +13,11 @@ import {
   AlertDialogTitle,
   Button,
   ContextMenu,
+  ContextMenuCheckboxItem,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
   ContextMenuTrigger,
   Dialog,
   DialogContent,
@@ -27,8 +30,11 @@ import {
   DrawerHeader,
   DrawerTitle,
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
   HoverCard,
   HoverCardContent,
@@ -180,6 +186,10 @@ describe("stable overlays", () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onSelect={onDropdownSelect}>Archive</DropdownMenuItem>
+            <DropdownMenuCheckboxItem checked>Show grid</DropdownMenuCheckboxItem>
+            <DropdownMenuRadioGroup value="comfortable">
+              <DropdownMenuRadioItem value="comfortable">Comfortable</DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
         <ContextMenu>
@@ -188,6 +198,10 @@ describe("stable overlays", () => {
           </ContextMenuTrigger>
           <ContextMenuContent>
             <ContextMenuItem onSelect={onContextSelect}>Duplicate</ContextMenuItem>
+            <ContextMenuCheckboxItem checked>Show guides</ContextMenuCheckboxItem>
+            <ContextMenuRadioGroup value="compact">
+              <ContextMenuRadioItem value="compact">Compact</ContextMenuRadioItem>
+            </ContextMenuRadioGroup>
           </ContextMenuContent>
         </ContextMenu>
         <Menubar>
@@ -209,6 +223,15 @@ describe("stable overlays", () => {
     const dropdownContent = document.querySelector('[data-slot="dropdown-menu-content"]');
     expectOpenState(dropdownContent);
     expectStateSelectorClass(dropdownContent);
+    expect(
+      document.querySelector('[data-slot="dropdown-menu-checkbox-item"]')?.className,
+    ).toContain("pl-8");
+    expect(
+      document.querySelector('[data-slot="dropdown-menu-checkbox-item-indicator"]')?.className,
+    ).toContain("left-2");
+    expect(
+      document.querySelector('[data-slot="dropdown-menu-radio-item-indicator"]')?.className,
+    ).toContain("left-2");
     fireEvent.click(dropdownItem);
     expect(onDropdownSelect).toHaveBeenCalledTimes(1);
 
@@ -217,6 +240,15 @@ describe("stable overlays", () => {
     const contextContent = document.querySelector('[data-slot="context-menu-content"]');
     expectOpenState(contextContent);
     expectStateSelectorClass(contextContent);
+    expect(document.querySelector('[data-slot="context-menu-checkbox-item"]')?.className).toContain(
+      "pl-8",
+    );
+    expect(
+      document.querySelector('[data-slot="context-menu-checkbox-item"] span')?.className,
+    ).toContain("left-2");
+    expect(
+      document.querySelector('[data-slot="context-menu-radio-item"] span')?.className,
+    ).toContain("left-2");
     fireEvent.click(contextItem);
     expect(onContextSelect).toHaveBeenCalledTimes(1);
 

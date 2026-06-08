@@ -73,13 +73,26 @@ describe("stable feedback and utility components", () => {
     );
 
     expect(screen.getByRole("alert").className).toContain("contract-alert");
+    expect(screen.getByRole("heading", { level: 3, name: "Release ready" })).toBeTruthy();
     expect(screen.getByText("Stable").className).toContain("contract-badge");
+    expect(screen.getByText("Stable").className).toContain("rounded-full");
+    expect(screen.getByText("Stable").className).not.toContain("rounded-4xl");
     expect(screen.getByLabelText("Loading package")).toBeTruthy();
     expect(screen.getByText("Meta").getAttribute("data-slot")).toBe("kbd");
     expect(screen.getByRole("heading", { name: "Heading" })).toBeTruthy();
     expect(screen.getByText("const value = true").getAttribute("data-slot")).toBe(
       "typography-inline-code",
     );
+  });
+
+  test("supports configurable alert heading levels", () => {
+    render(
+      <Alert>
+        <AlertTitle level={4}>Nested alert</AlertTitle>
+      </Alert>,
+    );
+
+    expect(screen.getByRole("heading", { level: 4, name: "Nested alert" })).toBeTruthy();
   });
 
   test("renders code block and copy button workflow", async () => {

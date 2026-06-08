@@ -55,6 +55,9 @@ import {
   EmptyDescription,
   EmptyTitle,
   Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupTextarea,
   Kbd,
   LoadingBar,
   MenubarShortcut,
@@ -347,7 +350,32 @@ describe("@moritzbrantner/ui button-and-form", () => {
     );
 
     expect(screen.getByRole("button", { name: "Press" })).toBeTruthy();
-    expect(screen.getByText("Shared UI")).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 3, name: "Shared UI" })).toBeTruthy();
+  });
+
+  test("supports configurable card heading levels", () => {
+    render(
+      <Card>
+        <CardHeader>
+          <CardTitle level={2}>Section card</CardTitle>
+        </CardHeader>
+      </Card>,
+    );
+
+    expect(screen.getByRole("heading", { level: 2, name: "Section card" })).toBeTruthy();
+  });
+
+  test("focuses input group textarea controls from addons", () => {
+    render(
+      <InputGroup>
+        <InputGroupAddon data-testid="addon">Notes</InputGroupAddon>
+        <InputGroupTextarea aria-label="Notes field" />
+      </InputGroup>,
+    );
+
+    fireEvent.pointerDown(screen.getByTestId("addon"));
+
+    expect(screen.getByLabelText("Notes field")).toBe(document.activeElement);
   });
 
   test("renders an app layout page shell with semantic content", () => {
