@@ -137,8 +137,8 @@ describe("stable navigation and display components", () => {
     expect(activeTab.className).not.toContain("data-active");
 
     expect(screen.getByRole("link", { name: "Home" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Home" }).className).toContain("min-h-10");
-    expect(screen.getByRole("link", { name: "Home" }).className).toContain("min-w-10");
+    expect(screen.getByRole("link", { name: "Home" }).className).not.toContain("min-h-10");
+    expect(screen.getByRole("link", { name: "Home" }).className).not.toContain("min-w-10");
     expect(screen.getByRole("navigation", { name: "pagination" })).toBeTruthy();
     const navigationTrigger = screen.getByRole("button", { name: "Products" });
     expect(navigationTrigger.getAttribute("data-state")).toBe("open");
