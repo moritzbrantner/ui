@@ -10,7 +10,7 @@ Keep product workflows, routing, auth/session state, backend contracts, settings
 
 - `src/components/`: reusable React components, component tests, and component stories. Public components should accept `className`, forward DOM props, use `data-slot`, and be exported from `src/index.ts`.
 - `src/`: package entrypoints, theme metadata, hooks, helpers, and package-level tests.
-- `styles.css`, `theme-scopes.css`, `zleek/`, `bobba/`, `atlas/`, `studio/`, `paper/`: published global styles and theme-specific CSS entrypoints.
+- `styles.css`, `theme-scopes.css`, `zleek/`, `bobba/`, `atlas/`, `studio/`, `paper/`, `pop/`, `pulse/`: published global styles and theme-specific CSS entrypoints.
 - `.storybook/`: Storybook configuration and preview theme wiring.
 - `scripts/`: local verification, package-contract, coverage, benchmark, and hygiene scripts.
 - `visual/`: Playwright visual/layout checks. These start Storybook on port `6007`.

@@ -6,14 +6,14 @@ Generated from `src/token-metadata.ts` by `bun run generate:tokens`.
 
 | Theme  | Light tokens | Dark tokens |
 | ------ | -----------: | ----------: |
-| bobba  |          104 |         104 |
-| custom |          104 |         104 |
-| zleek  |          104 |         104 |
-| atlas  |          104 |         104 |
-| studio |          104 |         104 |
-| paper  |          104 |         104 |
-| pop    |          104 |         104 |
-| pulse  |          104 |         104 |
+| bobba  |          115 |         115 |
+| custom |          115 |         115 |
+| zleek  |          115 |         115 |
+| atlas  |          115 |         115 |
+| studio |          115 |         115 |
+| paper  |          115 |         115 |
+| pop    |          115 |         115 |
+| pulse  |          115 |         115 |
 
 ## Tokens
 
@@ -34,6 +34,12 @@ Generated from `src/token-metadata.ts` by `bun run generate:tokens`.
 | `--accent`                          | color     | Accent surface background color.                                  |
 | `--accent-foreground`               | color     | Accent foreground color.                                          |
 | `--destructive`                     | color     | Destructive action color.                                         |
+| `--success`                         | color     | Success state color.                                              |
+| `--success-foreground`              | color     | Foreground color on success backgrounds.                          |
+| `--warning`                         | color     | Warning state color.                                              |
+| `--warning-foreground`              | color     | Foreground color on warning backgrounds.                          |
+| `--info`                            | color     | Informational state color.                                        |
+| `--info-foreground`                 | color     | Foreground color on informational backgrounds.                    |
 | `--border`                          | color     | Default border color.                                             |
 | `--input`                           | color     | Input border and track color.                                     |
 | `--ring`                            | color     | Focus ring color.                                                 |
@@ -42,6 +48,11 @@ Generated from `src/token-metadata.ts` by `bun run generate:tokens`.
 | `--chart-3`                         | color     | Third chart series color.                                         |
 | `--chart-4`                         | color     | Fourth chart series color.                                        |
 | `--chart-5`                         | color     | Fifth chart series color.                                         |
+| `--chart-6`                         | color     | Sixth chart series color.                                         |
+| `--chart-7`                         | color     | Seventh chart series color.                                       |
+| `--chart-8`                         | color     | Eighth chart series color.                                        |
+| `--chart-9`                         | color     | Ninth chart series color.                                         |
+| `--chart-10`                        | color     | Tenth chart series color.                                         |
 | `--sidebar`                         | color     | Sidebar background color.                                         |
 | `--sidebar-foreground`              | color     | Sidebar foreground color.                                         |
 | `--sidebar-primary`                 | color     | Sidebar primary color.                                            |

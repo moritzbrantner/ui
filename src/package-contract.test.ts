@@ -132,9 +132,11 @@ import {
   themeConfig,
   uiThemeLabels,
   uiThemeNames,
+  uiThemeProfiles,
   type UiThemeName,
 } from ".";
 import * as RootExports from ".";
+import * as ThemeExports from "./themes";
 import {
   DataGrid,
   DataGridColumnHeader,
@@ -226,7 +228,11 @@ import * as ScopedPopEntry from "./themes/pop";
 import * as ScopedPulseEntry from "./themes/pulse";
 import * as ScopedStudioEntry from "./themes/studio";
 import * as ScopedZleekEntry from "./themes/zleek";
-import { cn as serverCn, themeConfig as serverThemeConfig } from "./server";
+import {
+  cn as serverCn,
+  themeConfig as serverThemeConfig,
+  uiThemeProfiles as serverUiThemeProfiles,
+} from "./server";
 import {
   Chat,
   ChatBubble,
@@ -760,6 +766,9 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(serverThemeConfig.bobba.name).toBe("bobba");
     expect(serverThemeConfig.pop.name).toBe("pop");
     expect(serverThemeConfig.pulse.name).toBe("pulse");
+    expect(uiThemeProfiles.bobba.surface).toBe("neutral");
+    expect(ThemeExports.uiThemeProfiles.zleek.surface).toBe("glass");
+    expect(serverUiThemeProfiles.pulse.motion).toBe("energetic");
     expect(ClientButton).toBe(Button);
     expect(ClientDialog).toBe(Dialog);
     expect(SubpathButton).toBe(Button);

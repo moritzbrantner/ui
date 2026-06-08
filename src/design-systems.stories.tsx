@@ -50,92 +50,42 @@ import {
   TableRow,
 } from "./components/stable/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/stable/tabs";
-import { UiTheme, type UiThemeName } from "./themes";
+import { UiTheme, uiThemeLabels, uiThemeProfiles, type UiThemeProfile } from "./themes";
 
-type SystemProfile = {
-  id: UiThemeName;
-  name: string;
-  label: string;
-  description: string;
-  surface: string;
-  density: string;
-  bestFor: string[];
+type SystemProfile = UiThemeProfile & {
   icon: typeof Layers3Icon;
 };
 
-const systems = [
-  {
-    id: "bobba",
-    name: "Bobba",
-    label: "Default package style",
-    description: "Neutral, rounded, and product-safe for general platform applications.",
-    surface: "Clean surfaces with moderate radius",
-    density: "Balanced spacing",
-    bestFor: ["Shared apps", "Admin flows", "Core components"],
-    icon: Layers3Icon,
-  },
-  {
-    id: "zleek",
-    name: "Zleek",
-    label: "Glass interface style",
-    description: "Sharper translucent surfaces for polished application shells and launch tools.",
-    surface: "Glass effects with strong depth",
-    density: "Medium spacing",
-    bestFor: ["Command centers", "Launch screens", "Presentation surfaces"],
-    icon: PaletteIcon,
-  },
-  {
-    id: "atlas",
-    name: "Atlas",
-    label: "Dense dashboard style",
-    description: "Crisp, compact, and data-forward for maps, tables, charts, and analytics.",
-    surface: "Flat data panels with tighter controls",
-    density: "High density",
-    bestFor: ["Maps", "Tables", "Operational dashboards"],
-    icon: BarChart3Icon,
-  },
-  {
-    id: "studio",
-    name: "Studio",
-    label: "Creative tooling style",
-    description: "Expressive color and stronger emphasis for media and generation workflows.",
-    surface: "Vivid panels with creative accents",
-    density: "Medium spacing",
-    bestFor: ["Media tools", "Storytelling", "Image and video workflows"],
-    icon: ImageIcon,
-  },
-  {
-    id: "paper",
-    name: "Paper",
-    label: "Document and research style",
-    description: "Serif-led, document-like surfaces for reading, OCR, text, and research tools.",
-    surface: "Paper texture with quiet controls",
-    density: "Reading density",
-    bestFor: ["OCR", "Linguistics", "Translation and text tools"],
-    icon: FileTextIcon,
-  },
-  {
-    id: "pop",
-    name: "Pop",
-    label: "Playful consumer style",
-    description: "Colorful, rounded, and motion-forward for polished consumer product surfaces.",
-    surface: "Bright elevated cards with animated affordances",
-    density: "Comfortable spacing",
-    bestFor: ["Consumer apps", "Creator tools", "Onboarding surfaces"],
-    icon: ActivityIcon,
-  },
-  {
-    id: "pulse",
-    name: "Pulse",
-    label: "Energized motion style",
-    description:
-      "Electric color, responsive scale, and animated affordances for surfaces where interactions should feel active.",
-    surface: "Glowing interactive cards with animated gradients",
-    density: "Comfortable motion density",
-    bestFor: ["Realtime tools", "Launch moments", "High-touch interactions"],
-    icon: ActivityIcon,
-  },
-] as const satisfies readonly SystemProfile[];
+const systemIcons = {
+  bobba: Layers3Icon,
+  zleek: PaletteIcon,
+  atlas: BarChart3Icon,
+  studio: ImageIcon,
+  paper: FileTextIcon,
+  pop: ActivityIcon,
+  pulse: ActivityIcon,
+} as const satisfies Record<UiThemeProfile["name"], typeof Layers3Icon>;
+
+const surfaceDescriptions = {
+  neutral: "Clean surfaces with moderate radius",
+  glass: "Glass effects with strong depth",
+  dense: "Flat data panels with tighter controls",
+  creative: "Vivid panels with creative accents",
+  document: "Paper texture with quiet controls",
+  consumer: "Bright elevated cards with animated affordances",
+  realtime: "Glowing interactive cards with animated gradients",
+} as const satisfies Record<UiThemeProfile["surface"], string>;
+
+const densityLabels = {
+  compact: "High density",
+  balanced: "Balanced spacing",
+  comfortable: "Comfortable spacing",
+} as const satisfies Record<UiThemeProfile["density"], string>;
+
+const systems = Object.values(uiThemeProfiles).map((profile) => ({
+  ...profile,
+  icon: systemIcons[profile.name],
+})) as readonly SystemProfile[];
 
 const meta = {
   title: "Design System/Theme Catalog",
@@ -184,11 +134,11 @@ export const Pulse: Story = {
   render: () => <DesignSystemShowcase systemId="pulse" />,
 };
 
-function DesignSystemShowcase({ systemId }: { systemId: UiThemeName }) {
-  const system = systems.find((item) => item.id === systemId) ?? systems[0];
+function DesignSystemShowcase({ systemId }: { systemId: UiThemeProfile["name"] }) {
+  const system = systems.find((item) => item.name === systemId) ?? systems[0];
 
   return (
-    <UiTheme theme={system.id} className="min-h-screen bg-background text-foreground">
+    <UiTheme theme={system.name} className="min-h-screen bg-background text-foreground">
       <main className="mx-auto grid w-full max-w-7xl gap-8 px-6 py-8 lg:px-10">
         <section className="grid gap-6 lg:hidden">
           <HeroPanel system={system} />
@@ -239,10 +189,12 @@ function HeroPanel({ system }: { system: SystemProfile }) {
     <div className="grid content-center gap-5">
       <div className="flex flex-wrap items-center gap-3">
         <Badge variant="secondary">{system.label}</Badge>
-        <Badge variant="outline">{system.density}</Badge>
+        <Badge variant="outline">{densityLabels[system.density]}</Badge>
       </div>
       <div className="grid gap-3">
-        <h1 className="text-4xl font-semibold tracking-normal lg:text-5xl">{system.name}</h1>
+        <h1 className="text-4xl font-semibold tracking-normal lg:text-5xl">
+          {uiThemeLabels[system.name]}
+        </h1>
         <p className="max-w-3xl text-lg text-muted-foreground">{system.description}</p>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -271,10 +223,12 @@ function SystemProfileCard({ system, className }: { system: SystemProfile; class
     <Card data-interactive="true" className={className}>
       <CardHeader>
         <CardTitle>System profile</CardTitle>
-        <CardDescription>{system.surface}</CardDescription>
+        <CardDescription>{surfaceDescriptions[system.surface]}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-5">
         <TokenSwatches />
+        <StatusSwatches />
+        <ChartSwatches />
         <Separator />
         <div className="grid gap-3">
           <div className="flex items-center justify-between text-sm">
@@ -308,6 +262,45 @@ function TokenSwatches() {
         >
           {label}
         </div>
+      ))}
+    </div>
+  );
+}
+
+function StatusSwatches() {
+  const tokens = [
+    ["Success", "var(--success)", "var(--success-foreground)"],
+    ["Warning", "var(--warning)", "var(--warning-foreground)"],
+    ["Info", "var(--info)", "var(--info-foreground)"],
+  ] as const;
+
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {tokens.map(([label, background, foreground]) => (
+        <div
+          key={label}
+          className="grid h-14 place-items-center rounded-md border px-2 text-xs font-medium"
+          style={{ background, color: foreground }}
+        >
+          {label}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ChartSwatches() {
+  const tokens = Array.from({ length: 10 }, (_, index) => `var(--chart-${index + 1})`);
+
+  return (
+    <div className="grid grid-cols-10 gap-1" aria-label="Chart token swatches">
+      {tokens.map((background, index) => (
+        <div
+          key={background}
+          className="h-8 rounded-sm border border-border/70"
+          style={{ background }}
+          title={`Chart ${index + 1}`}
+        />
       ))}
     </div>
   );

@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { uiTokenMetadata } from "../src/token-metadata.js";
+import { uiThemeTokenValues } from "../src/token-metadata.js";
 import { uiTokenNames } from "../src/token-names.js";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -78,6 +79,7 @@ if (generatedCheck.status !== 0) {
 verifyCssImportTopology();
 verifyCssSourceTopology();
 verifySimpleThemeStylesheets();
+verifyTokenContrast();
 
 const baseTokens = readTokens(path.join(packageRoot, "styles.css"));
 const requiredTokens = intersection(baseTokens.root, baseTokens.dark);
@@ -200,6 +202,153 @@ function intersection(left: Set<string>, right: Set<string>): string[] {
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function verifyTokenContrast() {
+  const builtInThemeNames = ["bobba", "zleek", "atlas", "studio", "paper", "pop", "pulse"] as const;
+  const textContrastPairs = [
+    ["--background", "--foreground"],
+    ["--card", "--card-foreground"],
+    ["--popover", "--popover-foreground"],
+    ["--primary", "--primary-foreground"],
+    ["--secondary", "--secondary-foreground"],
+    ["--accent", "--accent-foreground"],
+    ["--success", "--success-foreground"],
+    ["--warning", "--warning-foreground"],
+    ["--info", "--info-foreground"],
+    ["--sidebar", "--sidebar-foreground"],
+    ["--sidebar-primary", "--sidebar-primary-foreground"],
+    ["--sidebar-accent", "--sidebar-accent-foreground"],
+  ] as const;
+  const focusContrastPairs = [
+    ["--background", "--ring"],
+    ["--card", "--ring"],
+    ["--popover", "--ring"],
+  ] as const;
+
+  for (const themeName of builtInThemeNames) {
+    for (const mode of ["light", "dark"] as const) {
+      const tokens = uiThemeTokenValues[themeName][mode];
+
+      for (const [backgroundToken, foregroundToken] of textContrastPairs) {
+        verifyContrastPair({
+          backgroundToken,
+          foregroundToken,
+          minimumRatio: 4.5,
+          mode,
+          themeName,
+          tokens,
+        });
+      }
+
+      for (const [backgroundToken, foregroundToken] of focusContrastPairs) {
+        verifyContrastPair({
+          backgroundToken,
+          foregroundToken,
+          minimumRatio: 3,
+          mode,
+          themeName,
+          tokens,
+        });
+      }
+    }
+  }
+}
+
+function verifyContrastPair({
+  backgroundToken,
+  foregroundToken,
+  minimumRatio,
+  mode,
+  themeName,
+  tokens,
+}: {
+  backgroundToken: string;
+  foregroundToken: string;
+  minimumRatio: number;
+  mode: "light" | "dark";
+  themeName: string;
+  tokens: Record<string, string>;
+}) {
+  const background = parseOpaqueOklch(tokens[backgroundToken]);
+  const foreground = parseOpaqueOklch(tokens[foregroundToken]);
+
+  if (!background || !foreground) {
+    return;
+  }
+
+  const ratio = contrastRatio(relativeLuminance(background), relativeLuminance(foreground));
+
+  if (ratio < minimumRatio) {
+    errors.push(
+      `${themeName}/${mode}: ${foregroundToken} on ${backgroundToken} contrast ${ratio.toFixed(
+        2,
+      )} is below ${minimumRatio}`,
+    );
+  }
+}
+
+function parseOpaqueOklch(value: string | undefined): { l: number; c: number; h: number } | null {
+  if (!value) {
+    return null;
+  }
+
+  const match =
+    /^oklch\(\s*([0-9.]+%?)\s+([0-9.]+)\s+([0-9.]+)(?:deg)?(?:\s*\/\s*([^)]+))?\s*\)$/.exec(value);
+
+  if (!match) {
+    return null;
+  }
+
+  const alpha = match[4]?.trim();
+
+  if (alpha && alpha !== "1" && alpha !== "100%") {
+    return null;
+  }
+
+  const lightness = match[1].endsWith("%")
+    ? Number.parseFloat(match[1]) / 100
+    : Number.parseFloat(match[1]);
+
+  return {
+    l: lightness,
+    c: Number.parseFloat(match[2]),
+    h: Number.parseFloat(match[3]),
+  };
+}
+
+function relativeLuminance(color: { l: number; c: number; h: number }): number {
+  const hueRadians = (color.h * Math.PI) / 180;
+  const a = color.c * Math.cos(hueRadians);
+  const b = color.c * Math.sin(hueRadians);
+  const long = color.l + 0.3963377774 * a + 0.2158037573 * b;
+  const medium = color.l - 0.1055613458 * a - 0.0638541728 * b;
+  const short = color.l - 0.0894841775 * a - 1.291485548 * b;
+  const longLinear = long ** 3;
+  const mediumLinear = medium ** 3;
+  const shortLinear = short ** 3;
+  const red = clamp(
+    4.0767416621 * longLinear - 3.3077115913 * mediumLinear + 0.2309699292 * shortLinear,
+  );
+  const green = clamp(
+    -1.2684380046 * longLinear + 2.6097574011 * mediumLinear - 0.3413193965 * shortLinear,
+  );
+  const blue = clamp(
+    -0.0041960863 * longLinear - 0.7034186147 * mediumLinear + 1.707614701 * shortLinear,
+  );
+
+  return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+}
+
+function contrastRatio(left: number, right: number): number {
+  const lighter = Math.max(left, right);
+  const darker = Math.min(left, right);
+
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function clamp(value: number): number {
+  return Math.min(1, Math.max(0, value));
 }
 
 function verifyCssImportTopology() {

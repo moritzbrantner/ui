@@ -12,6 +12,7 @@ export {
   themeConfig,
   uiThemeLabels,
   uiThemeNames,
+  uiThemeProfiles,
   uiTokenNames,
   zleekTheme,
 } from "./theme-config";
@@ -19,6 +20,7 @@ export type {
   BuiltInUiThemeName,
   UiThemeConfig,
   UiThemeName,
+  UiThemeProfile,
   UiThemeTokens,
   UiTokenName,
 } from "./theme-config";

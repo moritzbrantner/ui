@@ -87,11 +87,13 @@ import {
   ToolbarSpacer,
   ToolbarTitle,
   UiTheme,
+  builtInUiThemeNames,
   createUiTheme,
   defaultUiThemeName,
   themeConfig,
   uiThemeLabels,
   uiThemeNames,
+  uiThemeProfiles,
   uiTokenNames,
   type UiThemeName,
 } from ".";
@@ -417,6 +419,7 @@ describe("@moritzbrantner/ui theme-contract", () => {
       "--glass-saturation": "145%",
       "--glass-surface-gradient": "linear-gradient(90deg, transparent, white, transparent)",
       "--glass-shine-duration": "1400ms",
+      "--success": "oklch(0.45 0.12 155)",
       "--primary": "oklch(0.58 0.17 250)",
       "--ui-radius-control": "0.75rem",
       "--ui-control-height-md": "2.5rem",
@@ -439,6 +442,13 @@ describe("@moritzbrantner/ui theme-contract", () => {
     expect(uiTokenNames).toContain("--glass-background-position");
     expect(uiTokenNames).toContain("--glass-background-position-hover");
     expect(uiTokenNames).toContain("--glass-shine-duration");
+    expect(uiTokenNames).toContain("--success");
+    expect(uiTokenNames).toContain("--success-foreground");
+    expect(uiTokenNames).toContain("--warning");
+    expect(uiTokenNames).toContain("--warning-foreground");
+    expect(uiTokenNames).toContain("--info");
+    expect(uiTokenNames).toContain("--info-foreground");
+    expect(uiTokenNames).toContain("--chart-10");
     expect(root.getAttribute("data-ui-theme")).toBe("custom");
     expect(root.className).toContain("custom");
     expect(root.getAttribute("style")).toContain("--glass-saturation: 145%");
@@ -446,8 +456,19 @@ describe("@moritzbrantner/ui theme-contract", () => {
       "--glass-surface-gradient: linear-gradient(90deg, transparent, white, transparent)",
     );
     expect(root.getAttribute("style")).toContain("--glass-shine-duration: 1400ms");
+    expect(root.getAttribute("style")).toContain("--success: oklch(0.45 0.12 155)");
     expect(root.getAttribute("style")).toContain("--primary: oklch(0.58 0.17 250)");
     expect(root.getAttribute("style")).toContain("--ui-radius-control: 0.75rem");
     expect(root.getAttribute("style")).not.toContain("--unknown-token");
+  });
+
+  test("exports public built-in theme profiles", () => {
+    expect(Object.keys(uiThemeProfiles).sort()).toEqual([...builtInUiThemeNames].sort());
+    expect(uiThemeProfiles.bobba.name).toBe("bobba");
+    expect(uiThemeProfiles.bobba.surface).toBe("neutral");
+    expect(uiThemeProfiles.zleek.surface).toBe("glass");
+    expect(uiThemeProfiles.atlas.density).toBe("compact");
+    expect(uiThemeProfiles.pulse.motion).toBe("energetic");
+    expect(Object.hasOwn(uiThemeProfiles, "custom")).toBe(false);
   });
 });

@@ -6,9 +6,11 @@ import { bobbaTheme } from "./bobba";
 import { customTheme } from "./custom";
 import { paperTheme } from "./paper";
 import { popTheme } from "./pop";
+import { uiThemeProfiles } from "./profiles";
 import { pulseTheme } from "./pulse";
 import { studioTheme } from "./studio";
 import type { BuiltInUiThemeName, UiThemeConfig, UiThemeName } from "./types";
+import type { UiThemeProfile } from "./profiles";
 import { zleekTheme } from "./zleek";
 
 const builtInUiThemeNames = ["bobba", "zleek", "atlas", "studio", "paper", "pop", "pulse"] as const;
@@ -66,7 +68,15 @@ export {
   themeConfig,
   uiThemeLabels,
   uiThemeNames,
+  uiThemeProfiles,
   uiTokenNames,
   zleekTheme,
 };
-export type { BuiltInUiThemeName, UiThemeConfig, UiThemeName, UiThemeTokens, UiTokenName };
+export type {
+  BuiltInUiThemeName,
+  UiThemeConfig,
+  UiThemeName,
+  UiThemeProfile,
+  UiThemeTokens,
+  UiTokenName,
+};
