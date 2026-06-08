@@ -2,16 +2,16 @@
 
 - Command: `bun run verify:build-size`
 - Status: `passed`
-- Timestamp: `2026-06-08T10:07:30.083Z`
-- Total JS size: 536.4 KB / 880.0 KB
+- Timestamp: `2026-06-08T13:05:02.781Z`
+- Total JS size: 539.6 KB / 880.0 KB
 
 ## Public Entries
 
 | Entry                   | Owner  |    Size |  Budget | Status |
 | ----------------------- | ------ | ------: | ------: | ------ |
-| `dist/index.js`         | shared | 18.1 KB | 35.0 KB | passed |
+| `dist/index.js`         | shared | 18.2 KB | 35.0 KB | passed |
 | `dist/server.js`        | shared |  0.7 KB | 35.0 KB | passed |
-| `dist/client.js`        | shared | 18.1 KB | 35.0 KB | passed |
+| `dist/client.js`        | shared | 18.2 KB | 35.0 KB | passed |
 | `dist/bobba.js`         | shared |  0.2 KB | 35.0 KB | passed |
 | `dist/zleek.js`         | shared |  0.2 KB | 35.0 KB | passed |
 | `dist/atlas.js`         | shared |  0.2 KB | 35.0 KB | passed |
@@ -32,8 +32,8 @@
 
 | Chunk                    | Owner  |    Size |  Budget | Status |
 | ------------------------ | ------ | ------: | ------: | ------ |
-| `dist/index.js`          | shared | 18.1 KB | 40.0 KB | passed |
-| `dist/client.js`         | shared | 18.1 KB | 40.0 KB | passed |
+| `dist/index.js`          | shared | 18.2 KB | 40.0 KB | passed |
+| `dist/client.js`         | shared | 18.2 KB | 40.0 KB | passed |
 | `dist/stable.js`         | shared | 15.1 KB | 40.0 KB | passed |
 | `dist/chunk-XHBKOGSE.js` | shared | 13.7 KB | 40.0 KB | passed |
 | `dist/chunk-TRJDRPX5.js` | shared | 13.6 KB | 40.0 KB | passed |
@@ -52,6 +52,7 @@
 | `dist/chunk-VKGYIZMX.js` | shared |  6.7 KB | 40.0 KB | passed |
 | `dist/chunk-DES2UDOF.js` | shared |  6.6 KB | 40.0 KB | passed |
 | `dist/chunk-LPC2PIMG.js` | shared |  6.6 KB | 40.0 KB | passed |
+| `dist/chunk-X2O4A7IW.js` | shared |  6.1 KB | 40.0 KB | passed |
 | `dist/chunk-RNTQ3WUG.js` | shared |  6.1 KB | 40.0 KB | passed |
 | `dist/chunk-UB6ZU5NY.js` | shared |  6.0 KB | 40.0 KB | passed |
 | `dist/chunk-BW3LQJI5.js` | shared |  5.8 KB | 40.0 KB | passed |
@@ -61,7 +62,6 @@
 | `dist/chunk-23SMAGIJ.js` | shared |  5.5 KB | 40.0 KB | passed |
 | `dist/chunk-4P4WEEOU.js` | shared |  5.4 KB | 40.0 KB | passed |
 | `dist/chunk-T6VL5366.js` | shared |  5.3 KB | 40.0 KB | passed |
-| `dist/chunk-REM5VKDD.js` | shared |  5.0 KB | 40.0 KB | passed |
 
 ## Failures
 

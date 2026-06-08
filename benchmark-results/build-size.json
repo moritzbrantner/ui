@@ -1,18 +1,18 @@
 {
   "status": "passed",
-  "timestamp": "2026-06-08T10:07:30.083Z",
+  "timestamp": "2026-06-08T13:05:02.781Z",
   "distDir": "dist",
   "budgets": {
     "maxTotalBytes": 901120,
     "maxEntryBytes": 35840,
     "maxChunkBytes": 40960
   },
-  "totalBytes": 549255,
+  "totalBytes": 552577,
   "entries": [
     {
       "name": "index",
       "relativePath": "dist/index.js",
-      "bytes": 18567,
+      "bytes": 18597,
       "budgetBytes": 35840,
       "passed": true,
       "owner": "shared"
@@ -20,7 +20,7 @@
     {
       "name": "server",
       "relativePath": "dist/server.js",
-      "bytes": 694,
+      "bytes": 717,
       "budgetBytes": 35840,
       "passed": true,
       "owner": "shared"
@@ -28,7 +28,7 @@
     {
       "name": "client",
       "relativePath": "dist/client.js",
-      "bytes": 18562,
+      "bytes": 18592,
       "budgetBytes": 35840,
       "passed": true,
       "owner": "shared"
@@ -92,7 +92,7 @@
     {
       "name": "themes",
       "relativePath": "dist/themes.js",
-      "bytes": 895,
+      "bytes": 923,
       "budgetBytes": 35840,
       "passed": true,
       "owner": "shared"
@@ -157,14 +157,14 @@
   "chunks": [
     {
       "relativePath": "dist/index.js",
-      "bytes": 18567,
+      "bytes": 18597,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
     },
     {
       "relativePath": "dist/client.js",
-      "bytes": 18562,
+      "bytes": 18592,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
@@ -291,6 +291,13 @@
     {
       "relativePath": "dist/chunk-LPC2PIMG.js",
       "bytes": 6721,
+      "budgetBytes": 40960,
+      "passed": true,
+      "owner": "shared"
+    },
+    {
+      "relativePath": "dist/chunk-X2O4A7IW.js",
+      "bytes": 6286,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
@@ -508,13 +515,6 @@
     {
       "relativePath": "dist/chunk-7RBS5MXH.js",
       "bytes": 3100,
-      "budgetBytes": 40960,
-      "passed": true,
-      "owner": "shared"
-    },
-    {
-      "relativePath": "dist/chunk-5VMAJFKB.js",
-      "bytes": 3075,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
@@ -1039,7 +1039,7 @@
     },
     {
       "relativePath": "dist/themes.js",
-      "bytes": 895,
+      "bytes": 923,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
@@ -1087,15 +1087,15 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-I23R67HI.js",
-      "bytes": 701,
+      "relativePath": "dist/server.js",
+      "bytes": 717,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
     },
     {
-      "relativePath": "dist/server.js",
-      "bytes": 694,
+      "relativePath": "dist/chunk-I23R67HI.js",
+      "bytes": 701,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
@@ -1115,7 +1115,7 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-O35FE6IN.js",
+      "relativePath": "dist/chunk-NREHDXJ2.js",
       "bytes": 636,
       "budgetBytes": 40960,
       "passed": true,
