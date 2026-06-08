@@ -8,66 +8,66 @@
     "logic.cnMerge": {
       "kind": "logic",
       "name": "logic.cnMerge",
-      "median": 0.0020839999999680003,
-      "p95": 0.005350000000021282
+      "median": 0.0021340000000122927,
+      "p95": 0.01094999999997981
     },
     "logic.queryBuilderEvaluate1000": {
       "kind": "logic",
       "name": "logic.queryBuilderEvaluate1000",
-      "median": 0.32826699999998254,
-      "p95": 0.3976289999999949
+      "median": 0.3254440000000045,
+      "p95": 0.5841610000000514
     },
     "logic.dataGridFilter1000Rows": {
       "kind": "logic",
       "name": "logic.dataGridFilter1000Rows",
-      "median": 1.462472000000048,
-      "p95": 1.6555150000000367
+      "median": 1.4561540000000264,
+      "p95": 2.343345999999997
     },
     "render.dataGrid100": {
       "kind": "render",
       "name": "render.dataGrid100",
-      "median": 4.872739999999908,
-      "p95": 8.381213000000002
+      "median": 5.050780000000032,
+      "p95": 8.711660000000052
     },
     "render.dataGrid1000": {
       "kind": "render",
       "name": "render.dataGrid1000",
-      "median": 8.770666000000006,
-      "p95": 13.354332
+      "median": 9.465470000000096,
+      "p95": 14.646275999999943
     },
     "render.dataGrid500Rows10Columns": {
       "kind": "render",
       "name": "render.dataGrid500Rows10Columns",
-      "median": 8.929554999999937,
-      "p95": 15.250680999999986
+      "median": 10.10344299999997,
+      "p95": 12.138658999999961
     },
     "render.calendar100Events": {
       "kind": "render",
       "name": "render.calendar100Events",
-      "median": 10.48052400000006,
-      "p95": 12.59167699999989
+      "median": 10.635065000000168,
+      "p95": 14.038851000000022
     },
     "render.documentViewer100Pages": {
       "kind": "render",
       "name": "render.documentViewer100Pages",
-      "median": 9.127437999999984,
-      "p95": 11.24003300000004
+      "median": 9.732754999999997,
+      "p95": 15.340894999999819
     },
     "render.assetBrowser500": {
       "kind": "render",
       "name": "render.assetBrowser500",
-      "median": 41.04842000000008,
-      "p95": 48.15758000000005
+      "median": 50.40179699999999,
+      "p95": 66.14349799999991
     },
     "render.gantt250": {
       "kind": "render",
       "name": "render.gantt250",
-      "median": 27.182315000000017,
-      "p95": 30.293690999999853
+      "median": 30.43869100000029,
+      "p95": 36.53181500000028
     }
   },
   "status": "passed",
-  "timestamp": "2026-06-08T13:34:09.971Z",
+  "timestamp": "2026-06-08T16:05:28.121Z",
   "missingBaselineEntries": [],
   "staleBaselineEntries": []
 }
