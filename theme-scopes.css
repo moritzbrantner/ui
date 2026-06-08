@@ -17,6 +17,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -121,6 +128,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -217,16 +231,42 @@
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
   --radius: 0.25rem;
-  --glass-blur: 20px;
-  --glass-shadow: 0 24px 60px oklch(0.145 0 0 / 0.12);
-  --glass-interactive-shadow: 0 18px 38px oklch(0.145 0 0 / 0.12);
-  --glass-raised-shadow: 0 18px 32px oklch(0.145 0 0 / 0.16), 0 4px 10px oklch(0.145 0 0 / 0.08);
+  --glass-blur: 26px;
+  --glass-shadow: 0 28px 70px oklch(0.32 0.02 255 / 0.15), 0 8px 24px oklch(0.145 0 0 / 0.08);
+  --glass-interactive-shadow:
+    0 22px 48px oklch(0.32 0.02 255 / 0.14), 0 5px 14px oklch(0.145 0 0 / 0.08);
+  --glass-raised-shadow:
+    0 30px 72px oklch(0.32 0.02 255 / 0.18), 0 8px 18px oklch(0.145 0 0 / 0.1),
+    inset 0 1px 0 oklch(1 0 0 / 0.55);
   --glass-inset-shadow:
     inset 0 2px 6px oklch(0.145 0 0 / 0.1), inset 0 1px 0 oklch(1 0 0 / 0.42),
     0 1px 0 oklch(1 0 0 / 0.14);
   --glass-inset-highlight: oklch(1 0 0 / 0.55);
   --glass-surface-tint: oklch(1 0 0 / 0.12);
   --glass-inset-surface: oklch(0.93 0.01 248 / 0.38);
+  --glass-saturation: 145%;
+  --glass-surface-gradient:
+    linear-gradient(
+      115deg,
+      transparent 0%,
+      oklch(1 0 0 / 0.2) 38%,
+      oklch(1 0 0 / 0.34) 47%,
+      transparent 60%
+    ),
+    linear-gradient(180deg, oklch(1 0 0 / 0.16), oklch(0.86 0.018 248 / 0.08));
+  --glass-overlay-gradient:
+    linear-gradient(
+      115deg,
+      transparent 0%,
+      oklch(1 0 0 / 0.24) 36%,
+      oklch(1 0 0 / 0.42) 47%,
+      transparent 62%
+    ),
+    linear-gradient(180deg, oklch(1 0 0 / 0.22), oklch(0.84 0.018 248 / 0.1));
+  --glass-background-size: 240% 100%, 100% 100%;
+  --glass-background-position: -120% 0, 0 0;
+  --glass-background-position-hover: 120% 0, 0 0;
+  --glass-shine-duration: 1400ms;
   --background: oklch(0.985 0.006 250);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0 / 0.48);
@@ -272,13 +312,13 @@
   --ui-surface-padding-md: 1rem;
   --ui-surface-gap: 1rem;
   --ui-focus-ring-width: 3px;
-  --ui-motion-hover-y: -1px;
-  --ui-motion-hover-scale: 1.02;
-  --ui-motion-press-scale: 0.98;
-  --ui-motion-duration-fast: 100ms;
-  --ui-motion-duration-base: 150ms;
-  --ui-motion-duration-slow: 200ms;
-  --ui-motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ui-motion-hover-y: -1.5px;
+  --ui-motion-hover-scale: 1.018;
+  --ui-motion-press-scale: 0.975;
+  --ui-motion-duration-fast: 130ms;
+  --ui-motion-duration-base: 210ms;
+  --ui-motion-duration-slow: 360ms;
+  --ui-motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
   --ui-motion-ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
   --ui-motion-enter-y: 0.25rem;
   --ui-motion-overlay-scale: 0.95;
@@ -331,6 +371,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(0.985 0.006 248);
   --foreground: oklch(0.18 0.025 255);
   --card: oklch(1 0 0);
@@ -435,6 +482,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(0.975 0.012 285);
   --foreground: oklch(0.17 0.025 285);
   --card: oklch(1 0 0 / 0.94);
@@ -537,6 +591,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(0.985 0.018 88);
   --foreground: oklch(0.2 0.022 70);
   --card: oklch(0.998 0.006 88);
@@ -643,6 +704,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: oklch(1 0 0 / 0.18);
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(0.985 0.018 195);
   --foreground: oklch(0.18 0.035 255);
   --card: oklch(1 0 0 / 0.88);
@@ -748,6 +816,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -853,6 +928,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -950,16 +1032,41 @@
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
   --radius: 0.25rem;
-  --glass-blur: 20px;
-  --glass-shadow: 0 24px 70px oklch(0 0 0 / 0.35);
-  --glass-interactive-shadow: 0 18px 40px oklch(0 0 0 / 0.3);
-  --glass-raised-shadow: 0 18px 34px oklch(0 0 0 / 0.34), 0 4px 12px oklch(0 0 0 / 0.2);
+  --glass-blur: 26px;
+  --glass-shadow: 0 30px 78px oklch(0 0 0 / 0.42), 0 10px 28px oklch(0 0 0 / 0.24);
+  --glass-interactive-shadow: 0 24px 54px oklch(0 0 0 / 0.38), 0 7px 18px oklch(0 0 0 / 0.22);
+  --glass-raised-shadow:
+    0 32px 78px oklch(0 0 0 / 0.46), 0 8px 22px oklch(0 0 0 / 0.28),
+    inset 0 1px 0 oklch(1 0 0 / 0.11);
   --glass-inset-shadow:
     inset 0 2px 8px oklch(0 0 0 / 0.34), inset 0 1px 0 oklch(1 0 0 / 0.08),
     0 1px 0 oklch(1 0 0 / 0.04);
   --glass-inset-highlight: oklch(1 0 0 / 0.12);
   --glass-surface-tint: oklch(1 0 0 / 0.035);
   --glass-inset-surface: oklch(0.16 0.008 255 / 0.52);
+  --glass-saturation: 145%;
+  --glass-surface-gradient:
+    linear-gradient(
+      115deg,
+      transparent 0%,
+      oklch(1 0 0 / 0.06) 38%,
+      oklch(1 0 0 / 0.12) 47%,
+      transparent 60%
+    ),
+    linear-gradient(180deg, oklch(1 0 0 / 0.055), oklch(0 0 0 / 0.12));
+  --glass-overlay-gradient:
+    linear-gradient(
+      115deg,
+      transparent 0%,
+      oklch(1 0 0 / 0.075) 36%,
+      oklch(1 0 0 / 0.16) 47%,
+      transparent 62%
+    ),
+    linear-gradient(180deg, oklch(1 0 0 / 0.075), oklch(0 0 0 / 0.16));
+  --glass-background-size: 240% 100%, 100% 100%;
+  --glass-background-position: -120% 0, 0 0;
+  --glass-background-position-hover: 120% 0, 0 0;
+  --glass-shine-duration: 1400ms;
   --background: oklch(0.17 0.01 255);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.23 0.012 255 / 0.56);
@@ -1005,13 +1112,13 @@
   --ui-surface-padding-md: 1rem;
   --ui-surface-gap: 1rem;
   --ui-focus-ring-width: 3px;
-  --ui-motion-hover-y: -1px;
-  --ui-motion-hover-scale: 1.02;
-  --ui-motion-press-scale: 0.98;
-  --ui-motion-duration-fast: 100ms;
-  --ui-motion-duration-base: 150ms;
-  --ui-motion-duration-slow: 200ms;
-  --ui-motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ui-motion-hover-y: -1.5px;
+  --ui-motion-hover-scale: 1.018;
+  --ui-motion-press-scale: 0.975;
+  --ui-motion-duration-fast: 130ms;
+  --ui-motion-duration-base: 210ms;
+  --ui-motion-duration-slow: 360ms;
+  --ui-motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
   --ui-motion-ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
   --ui-motion-enter-y: 0.25rem;
   --ui-motion-overlay-scale: 0.95;
@@ -1065,6 +1172,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(0.17 0.018 250);
   --foreground: oklch(0.95 0.008 245);
   --card: oklch(0.22 0.022 250);
@@ -1170,6 +1284,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(0.16 0.025 285);
   --foreground: oklch(0.96 0.008 285);
   --card: oklch(0.22 0.032 285);
@@ -1273,6 +1394,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(0.18 0.018 70);
   --foreground: oklch(0.93 0.018 88);
   --card: oklch(0.23 0.02 70);
@@ -1379,6 +1507,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: oklch(1 0 0 / 0.05);
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(0.17 0.035 255);
   --foreground: oklch(0.97 0.012 210);
   --card: oklch(0.23 0.04 255 / 0.86);

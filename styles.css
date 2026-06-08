@@ -17,6 +17,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -121,6 +128,13 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-saturation: 100%;
+  --glass-surface-gradient: none;
+  --glass-overlay-gradient: none;
+  --glass-background-size: auto;
+  --glass-background-position: 0 0;
+  --glass-background-position-hover: 0 0;
+  --glass-shine-duration: 1ms;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);

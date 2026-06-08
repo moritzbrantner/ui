@@ -157,6 +157,22 @@
     [data-slot="page-header"],
     [data-slot="card"],
     [data-slot="alert"],
+    [data-slot="surface"],
+    [data-slot="action-bar"],
+    [data-slot="toast"],
+    [data-slot="toolbar"],
+    [data-slot="dropzone"],
+    [data-slot="navbar"]
+  ) {
+    background-image: var(--glass-surface-gradient) !important;
+    background-size: var(--glass-background-size);
+    background-position: var(--glass-background-position);
+    background-repeat: no-repeat;
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  }
+
+  :where(
     [data-slot="dialog-content"],
     [data-slot="alert-dialog-content"],
     [data-slot="sheet-content"],
@@ -175,19 +191,21 @@
     [data-slot="select-content"],
     [data-slot="combobox-content"],
     [data-slot="command"],
-    [data-slot="calendar"],
-    [data-slot="code-block"],
-    [data-slot="surface"],
-    [data-slot="action-bar"],
-    [data-slot="toast"],
-    [data-slot="toolbar"],
-    [data-slot="dropzone"],
-    [data-slot="navbar"],
     [data-slot="navbar-submenu"]
   ) {
-    background-image: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    background-image: var(--glass-overlay-gradient) !important;
+    background-size: var(--glass-background-size);
+    background-position: var(--glass-background-position);
+    background-repeat: no-repeat;
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  }
+
+  :where([data-slot="button"]:not([data-variant="link"])) {
+    background-image: var(--glass-surface-gradient);
+    background-size: var(--glass-background-size);
+    background-position: var(--glass-background-position);
+    background-repeat: no-repeat;
   }
 
   :where(
@@ -369,6 +387,16 @@
     }
   }
 
+  @keyframes ui-glass-shine {
+    from {
+      background-position: var(--glass-background-position);
+    }
+
+    to {
+      background-position: var(--glass-background-position-hover);
+    }
+  }
+
   @keyframes ui-triquetra-spinner {
     0%,
     100% {
@@ -377,6 +405,49 @@
 
     50% {
       transform: rotate(180deg) scale(0.94);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :where(
+      [data-slot="page-header"],
+      [data-slot="card"],
+      [data-slot="alert"],
+      [data-slot="surface"],
+      [data-slot="action-bar"],
+      [data-slot="toast"],
+      [data-slot="toolbar"],
+      [data-slot="dropzone"],
+      [data-slot="navbar"],
+      [data-slot="dialog-content"],
+      [data-slot="alert-dialog-content"],
+      [data-slot="sheet-content"],
+      [data-slot="drawer-content"],
+      [data-slot="popover-content"],
+      [data-slot="hover-card-content"],
+      [data-slot="tooltip-content"],
+      [data-slot="dropdown-menu-content"],
+      [data-slot="dropdown-menu-sub-content"],
+      [data-slot="context-menu-content"],
+      [data-slot="context-menu-sub-content"],
+      [data-slot="menubar-content"],
+      [data-slot="menubar-sub-content"],
+      [data-slot="navigation-menu-content"],
+      [data-slot="navigation-menu-viewport"],
+      [data-slot="select-content"],
+      [data-slot="combobox-content"],
+      [data-slot="command"],
+      [data-slot="navbar-submenu"],
+      [data-slot="button"]:not([data-variant="link"])
+    ):is(
+      :hover,
+      :focus-visible,
+      [data-state="open"],
+      [data-open]:not([data-open="false"]),
+      [data-active]:not([data-active="false"]),
+      [data-selected="true"]
+    ) {
+      animation: ui-glass-shine var(--glass-shine-duration) var(--ui-motion-ease-emphasized) both;
     }
   }
 

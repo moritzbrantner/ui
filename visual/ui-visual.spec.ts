@@ -79,6 +79,15 @@ const releaseReadinessThemeStories = [
     designSystem: "paper",
   },
 ] as const;
+const zleekGlassStories = [
+  "components-layout-app-shell--comprehensive-app-shell",
+  "components-navigation-navbar--web",
+  "components-overlays-dialog--open",
+  "components-overlay-sheet--basic",
+  "components-overlay-action-menu--with-descriptions-and-shortcuts",
+  "components-overlay-hover-preview--profile-preview",
+] as const;
+const zleekGlassViewports = new Set(["mobile", "desktop"]);
 const uiThemes = ["bobba", "zleek", "atlas", "studio", "paper"] as const;
 const colorSchemes = ["light", "dark"] as const;
 const horizontallyScrollableStories = new Set([
@@ -146,8 +155,40 @@ for (const viewport of viewports) {
         await verifyPageLayout(page, storyId);
       });
     }
+
+    if (zleekGlassViewports.has(viewport.name)) {
+      for (const storyId of zleekGlassStories) {
+        for (const colorScheme of colorSchemes) {
+          test(`${storyId} renders zleek glass ${colorScheme}`, async ({ page }) => {
+            await gotoStory(page, storyId, { designSystem: "zleek", theme: colorScheme });
+            await verifyPageLayout(page, storyId);
+          });
+        }
+      }
+    }
   });
 }
+
+test.describe("zleek glass motion preferences", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  test("does not run glass shine animation when reduced motion is requested", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await gotoStory(page, "components-actions-button--variants", {
+      designSystem: "zleek",
+      theme: "light",
+    });
+
+    const button = page.locator('[data-slot="button"]:not([data-variant="link"])').first();
+    await button.hover();
+
+    const animationName = await button.evaluate(
+      (element) => window.getComputedStyle(element).animationName,
+    );
+
+    expect(animationName).not.toContain("ui-glass-shine");
+  });
+});
 
 async function gotoStory(
   page: Page,

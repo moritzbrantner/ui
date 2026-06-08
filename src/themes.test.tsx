@@ -395,6 +395,9 @@ describe("@moritzbrantner/ui theme-contract", () => {
 
   test("creates sanitized custom theme token styles", () => {
     const style = createUiTheme({
+      "--glass-saturation": "145%",
+      "--glass-surface-gradient": "linear-gradient(90deg, transparent, white, transparent)",
+      "--glass-shine-duration": "1400ms",
       "--primary": "oklch(0.58 0.17 250)",
       "--ui-radius-control": "0.75rem",
       "--ui-control-height-md": "2.5rem",
@@ -410,8 +413,20 @@ describe("@moritzbrantner/ui theme-contract", () => {
     const root = screen.getByTestId("custom-theme");
 
     expect(uiTokenNames).toContain("--ui-radius-control");
+    expect(uiTokenNames).toContain("--glass-saturation");
+    expect(uiTokenNames).toContain("--glass-surface-gradient");
+    expect(uiTokenNames).toContain("--glass-overlay-gradient");
+    expect(uiTokenNames).toContain("--glass-background-size");
+    expect(uiTokenNames).toContain("--glass-background-position");
+    expect(uiTokenNames).toContain("--glass-background-position-hover");
+    expect(uiTokenNames).toContain("--glass-shine-duration");
     expect(root.getAttribute("data-ui-theme")).toBe("custom");
     expect(root.className).toContain("custom");
+    expect(root.getAttribute("style")).toContain("--glass-saturation: 145%");
+    expect(root.getAttribute("style")).toContain(
+      "--glass-surface-gradient: linear-gradient(90deg, transparent, white, transparent)",
+    );
+    expect(root.getAttribute("style")).toContain("--glass-shine-duration: 1400ms");
     expect(root.getAttribute("style")).toContain("--primary: oklch(0.58 0.17 250)");
     expect(root.getAttribute("style")).toContain("--ui-radius-control: 0.75rem");
     expect(root.getAttribute("style")).not.toContain("--unknown-token");
