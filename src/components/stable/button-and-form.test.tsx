@@ -469,6 +469,9 @@ describe("@moritzbrantner/ui button-and-form", () => {
 
     expect(card?.className).toContain("rounded-[var(--ui-card-radius");
     expect(card?.className).toContain("gap-[var(--ui-card-gap");
+    expect(card?.className).toContain(
+      "data-[interactive=true]:not-has-[[data-slot=button]:active]:active:scale-[var(--ui-motion-press-scale)]",
+    );
     expect(input.className).toContain("h-[var(--ui-input-height");
     expect(input.className).toContain("rounded-[var(--ui-input-radius");
     expect(button.className).toContain("h-[var(--ui-button-height-md");
