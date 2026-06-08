@@ -1,11 +1,4 @@
 "use client";
 
-import { pulseTheme } from "./themes";
-
-export * from "./index";
-export { PulseTheme, UiTheme, pulseTheme, themeConfig } from "./themes";
-export type { UiThemeConfig, UiThemeName, UiThemeProps } from "./themes";
-
-const uiTheme = pulseTheme;
-
-export { uiTheme };
+export { PulseTheme, pulseTheme, uiTheme } from "./themes/pulse";
+export type { PulseThemeProps, UiThemeConfig, UiThemeName } from "./themes/pulse";

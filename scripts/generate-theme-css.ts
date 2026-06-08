@@ -28,6 +28,7 @@ const scopedThemeNames = [
 const cssFiles = {
   base: "base.css",
   styles: "styles.css",
+  componentSources: "component-sources.css",
   themeScopes: "theme-scopes.css",
   docs: "docs/tokens.md",
   bobba: "bobba/styles.css",
@@ -42,6 +43,7 @@ const cssFiles = {
 const generatedFiles = new Map<string, string>([
   [cssFiles.base, generateBaseStyles()],
   [cssFiles.styles, generateDefaultStyles()],
+  [cssFiles.componentSources, generateComponentSources()],
   [cssFiles.themeScopes, generateThemeScopes()],
   [cssFiles.docs, generateTokenDocs()],
   [cssFiles.bobba, generateThemeStyles("bobba")],
@@ -91,9 +93,6 @@ function generateBaseStyles(): string {
     '@import "tailwindcss";',
     '@import "tw-animate-css";',
     "",
-    '@source "./dist/**/*.{js,mjs}";',
-    '@source "./src/**/*.{ts,tsx}";',
-    "",
     "@custom-variant dark (&:is(.dark *));",
     "",
     generateTailwindThemeBlock(),
@@ -101,6 +100,17 @@ function generateBaseStyles(): string {
     generateShadcnCompat(),
     "",
     extractBaseStaticCss(),
+  ].join("\n");
+}
+
+function generateComponentSources(): string {
+  return [
+    generatedHeader,
+    '@import "tailwindcss/utilities.css" layer(utilities) source(none);',
+    '@reference "./base.css";',
+    "",
+    '@source "./dist/**/*.{js,mjs}";',
+    '@source "./src/**/*.{ts,tsx}";',
   ].join("\n");
 }
 

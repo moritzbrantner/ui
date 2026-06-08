@@ -79,7 +79,7 @@ Run `bun run bench` by itself, not in parallel with Storybook, Playwright, or ot
 
 ## Styles
 
-Import exactly one UI stylesheet for the app. Theme tokens are global CSS custom properties, so different UI themes are not intended to coexist on the same page.
+Import exactly one concrete UI stylesheet for the app. Theme stylesheets provide Tailwind setup, animation helpers, component normalization, and theme tokens. They no longer opt Tailwind into scanning this package's component source strings by default.
 
 ```ts
 import "@moritzbrantner/ui/styles.css";
@@ -109,7 +109,23 @@ import "@moritzbrantner/ui/pulse/styles.css";
 
 Use `atlas` for dense dashboards and analytics, `studio` for creative tooling, `paper` for document or research-heavy interfaces, `pop` for playful consumer surfaces with brighter color and stronger motion, and `pulse` for energized interaction-heavy surfaces.
 
-`base.css` is the generated shared layer for Tailwind, animation helpers, compatibility variants, and component normalization. It is exported for tooling and advanced composition, but it generally should not be the only stylesheet an app imports because it does not provide concrete theme token values. Apps should import exactly one concrete stylesheet such as `@moritzbrantner/ui/styles.css`, `@moritzbrantner/ui/atlas/styles.css`, or `@moritzbrantner/ui/pulse/styles.css`.
+When an app renders components from `@moritzbrantner/ui`, also import the explicit component source opt-in:
+
+```ts
+import "@moritzbrantner/ui/atlas/styles.css";
+import "@moritzbrantner/ui/component-sources.css";
+```
+
+Theme-only consumers can omit `component-sources.css`:
+
+```ts
+import "@moritzbrantner/ui/atlas/styles.css";
+import { AtlasTheme, uiTheme } from "@moritzbrantner/ui/atlas";
+```
+
+Use `@moritzbrantner/ui/theme-scopes.css` only when multiple built-in themes must intentionally coexist in one document. Pair it with `component-sources.css` only if the app also renders package components.
+
+`base.css` is the generated shared layer for Tailwind, animation helpers, compatibility variants, and component normalization. It is exported for tooling and advanced composition, but it generally should not be the only stylesheet an app imports because it does not provide concrete theme token values or package component source scanning. Apps should import exactly one concrete stylesheet such as `@moritzbrantner/ui/styles.css`, `@moritzbrantner/ui/atlas/styles.css`, or `@moritzbrantner/ui/pulse/styles.css`.
 
 Token metadata and built-in theme token values live in `src/token-metadata.ts`. Run `bun run generate:tokens` after token changes to update generated CSS and [token docs](./docs/tokens.md).
 
@@ -205,10 +221,11 @@ Use component subpaths for bundle-sensitive app surfaces:
 
 ```tsx
 import "@moritzbrantner/ui/atlas/styles.css";
+import "@moritzbrantner/ui/component-sources.css";
 
+import { AtlasTheme, uiTheme } from "@moritzbrantner/ui/atlas";
 import { Button } from "@moritzbrantner/ui/components/stable/button";
 import { DataGrid } from "@moritzbrantner/ui/components/data/data-grid";
-import { uiTheme } from "@moritzbrantner/ui/themes/atlas";
 import { cn } from "@moritzbrantner/ui/server";
 ```
 
@@ -218,7 +235,7 @@ Use the server entrypoint for `cn`, `themeConfig`, `createUiTheme`, and theme me
 import { cn, createUiTheme, themeConfig } from "@moritzbrantner/ui/server";
 ```
 
-Every app should import one stylesheet, usually `@moritzbrantner/ui/styles.css`. Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css`, `@moritzbrantner/ui/pop/styles.css`, and `@moritzbrantner/ui/pulse/styles.css` replace that default when a product surface needs a different visual system. `UiTheme` and `themeConfig` provide metadata classes and attributes; they do not fetch data or switch global CSS by themselves.
+Every app should import one concrete theme stylesheet, usually `@moritzbrantner/ui/styles.css`. Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css`, `@moritzbrantner/ui/pop/styles.css`, and `@moritzbrantner/ui/pulse/styles.css` replace that default when a product surface needs a different visual system. Add `@moritzbrantner/ui/component-sources.css` when the app renders package components. Use `@moritzbrantner/ui/theme-scopes.css` only when multiple built-in themes must coexist in one document.
 
 ## Do Not Put Here
 
@@ -334,22 +351,23 @@ export function Shell({ theme }: { theme: UiThemeName }) {
 }
 ```
 
-Theme metadata is also available from subpaths. Use the scoped theme subpaths for bundle-sensitive client surfaces:
+Theme metadata is also available from subpaths. Use single-theme subpaths for bundle-sensitive client surfaces:
 
 ```ts
 import { themeConfig, uiThemeNames } from "@moritzbrantner/ui/themes";
-import { AtlasTheme, uiTheme as atlasTheme } from "@moritzbrantner/ui/themes/atlas";
+import { AtlasTheme, uiTheme as atlasTheme } from "@moritzbrantner/ui/atlas";
 import { PopTheme, uiTheme as popTheme } from "@moritzbrantner/ui/themes/pop";
 import { PulseTheme, uiTheme as pulseTheme } from "@moritzbrantner/ui/themes/pulse";
 ```
 
 Import classes are intentionally split:
 
-- Compatibility/convenience: `@moritzbrantner/ui`, `@moritzbrantner/ui/client`, and legacy client theme subpaths such as `@moritzbrantner/ui/atlas`.
-- Optimized client theme wrappers and metadata: `@moritzbrantner/ui/themes/<theme>`.
+- Compatibility/convenience component barrels: `@moritzbrantner/ui` and `@moritzbrantner/ui/client`.
+- Lean single-theme wrappers and metadata: `@moritzbrantner/ui/<theme>` and `@moritzbrantner/ui/themes/<theme>`.
+- Multi-theme client wrappers and metadata: `@moritzbrantner/ui/themes`.
 - Server-only metadata: `@moritzbrantner/ui/<theme>/server` and `@moritzbrantner/ui/server`.
 
-The legacy theme subpaths remain client/full-package convenience entrypoints:
+The theme root subpaths are lean entrypoints. They intentionally do not export components, `UiTheme`, or `themeConfig`; import components through subpaths and use `@moritzbrantner/ui/themes` or `@moritzbrantner/ui/server` when a surface needs the full theme registry.
 
 ```ts
 import { uiTheme as zleekTheme } from "@moritzbrantner/ui/zleek";

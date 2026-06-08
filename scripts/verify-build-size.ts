@@ -41,7 +41,10 @@ const maxTotalBytes = 880 * 1024;
 const maxEntryBytes = 35 * 1024;
 const maxChunkBytes = 40 * 1024;
 const maxOptimizedThemeEntryBytes = 1024;
+const maxLeanThemeEntryBytes = 1024;
+const maxSimpleThemeReachableGraphBytes = 4 * 1024;
 const optimizedThemeNames = ["zleek", "bobba", "atlas", "studio", "paper", "pop", "pulse"] as const;
+const simpleThemeNames = ["bobba", "atlas", "studio", "paper"] as const;
 const publicEntries = [
   "index",
   "server",
@@ -284,40 +287,119 @@ function formatBytes(bytes: number) {
 
 function verifyOptimizedThemeEntries() {
   for (const themeName of optimizedThemeNames) {
-    const entryPath = path.join(distDir, "themes", `${themeName}.js`);
-    const relativePath = `dist/themes/${themeName}.js`;
+    verifyLeanThemeEntry(themeName, path.join(distDir, `${themeName}.js`), {
+      entryBudgetBytes: maxLeanThemeEntryBytes,
+      forbidThemeRootEntry: false,
+    });
+    verifyLeanThemeEntry(themeName, path.join(distDir, "themes", `${themeName}.js`), {
+      entryBudgetBytes: maxOptimizedThemeEntryBytes,
+      forbidThemeRootEntry: true,
+    });
+  }
+}
 
-    if (!existsSync(entryPath)) {
-      failures.push(`missing optimized theme entry ${relativePath}`);
+function verifyLeanThemeEntry(
+  themeName: (typeof optimizedThemeNames)[number],
+  entryPath: string,
+  options: {
+    entryBudgetBytes: number;
+    forbidThemeRootEntry: boolean;
+  },
+) {
+  const relativePath = path.relative(packageRoot, entryPath);
+
+  if (!existsSync(entryPath)) {
+    failures.push(`missing optimized theme entry ${relativePath}`);
+    return;
+  }
+
+  const bytes = statSync(entryPath).size;
+
+  if (bytes > options.entryBudgetBytes) {
+    failures.push(
+      `${relativePath} is ${formatBytes(bytes)}, above ${formatBytes(options.entryBudgetBytes)} lean theme entry budget`,
+    );
+  }
+
+  const graph = collectReachableJsFiles(entryPath);
+  const graphRelativePaths = [...graph].map((filePath) => path.relative(packageRoot, filePath));
+  const graphBytes = [...graph].reduce((sum, filePath) => sum + statSync(filePath).size, 0);
+
+  if (simpleThemeNames.includes(themeName as (typeof simpleThemeNames)[number])) {
+    if (graphBytes > maxSimpleThemeReachableGraphBytes) {
+      failures.push(
+        `${relativePath} reachable graph is ${formatBytes(graphBytes)}, above ${formatBytes(maxSimpleThemeReachableGraphBytes)} simple theme budget`,
+      );
+    }
+  }
+
+  const forbiddenGraphPaths = [
+    "dist/index.js",
+    "dist/client.js",
+    "dist/stable.js",
+    "dist/patterns.js",
+    "dist/themes.js",
+    ...optimizedThemeNames
+      .filter((otherThemeName) => otherThemeName !== themeName)
+      .map((otherThemeName) => `dist/${otherThemeName}.js`),
+  ];
+
+  if (options.forbidThemeRootEntry) {
+    forbiddenGraphPaths.push(`dist/${themeName}.js`);
+  }
+
+  for (const forbiddenGraphPath of forbiddenGraphPaths) {
+    if (graphRelativePaths.includes(forbiddenGraphPath)) {
+      failures.push(`${relativePath} reachable graph must not include ${forbiddenGraphPath}`);
+    }
+  }
+
+  const graphSource = [...graph].map((filePath) => readFileSync(filePath, "utf8")).join("\n");
+
+  for (const siblingThemeName of optimizedThemeNames.filter(
+    (otherThemeName) => otherThemeName !== themeName,
+  )) {
+    if (new RegExp(`["']${escapeRegExp(siblingThemeName)}["']`).test(graphSource)) {
+      failures.push(
+        `${relativePath} reachable graph must not contain sibling theme literal "${siblingThemeName}"`,
+      );
+    }
+  }
+}
+
+function collectReachableJsFiles(entryPath: string): Set<string> {
+  const reachableFiles = new Set<string>();
+  const pendingFiles = [entryPath];
+
+  while (pendingFiles.length > 0) {
+    const filePath = pendingFiles.pop();
+
+    if (!filePath || reachableFiles.has(filePath)) {
       continue;
     }
 
-    const bytes = statSync(entryPath).size;
+    reachableFiles.add(filePath);
 
-    if (bytes > maxOptimizedThemeEntryBytes) {
-      failures.push(
-        `${relativePath} is ${formatBytes(bytes)}, above ${formatBytes(maxOptimizedThemeEntryBytes)} optimized theme budget`,
-      );
-    }
+    const source = readFileSync(filePath, "utf8");
 
-    const source = readFileSync(entryPath, "utf8");
-    const forbiddenReferences = [
-      "dist/index.js",
-      "dist/client.js",
-      "dist/stable.js",
-      "dist/themes.js",
-      `dist/${themeName}.js`,
-      "../index.js",
-      "../client.js",
-      "../stable.js",
-      "../themes.js",
-      `../${themeName}.js`,
-    ];
+    for (const specifier of readRelativeJsSpecifiers(source)) {
+      const resolvedPath = path.resolve(path.dirname(filePath), specifier);
 
-    for (const forbiddenReference of forbiddenReferences) {
-      if (source.includes(forbiddenReference)) {
-        failures.push(`${relativePath} must not reference broad barrel ${forbiddenReference}`);
+      if (resolvedPath.startsWith(distDir) && existsSync(resolvedPath)) {
+        pendingFiles.push(resolvedPath);
       }
     }
   }
+
+  return reachableFiles;
+}
+
+function readRelativeJsSpecifiers(source: string): string[] {
+  return [
+    ...source.matchAll(/\b(?:import|export)\b(?:[^"']*\bfrom)?\s*["'](\.[^"']+\.js)["']/g),
+  ].map((match) => match[1]);
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

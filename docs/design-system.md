@@ -40,21 +40,38 @@ Migration examples:
 
 ## Styles And Themes
 
-Import exactly one global stylesheet in an app:
+Import exactly one concrete global stylesheet in an app:
 
 ```ts
 import "@moritzbrantner/ui/styles.css";
 ```
 
-Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css`, `@moritzbrantner/ui/studio/styles.css`, `@moritzbrantner/ui/paper/styles.css`, and `@moritzbrantner/ui/pop/styles.css` replace the default stylesheet for product surfaces with different visual needs. Each theme stylesheet imports the shared generated `base.css` layer and only its own token blocks. `base.css` is exported for tooling and advanced composition, but it generally should not be the only stylesheet an app imports because it does not provide concrete theme token values.
+Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css`, `@moritzbrantner/ui/studio/styles.css`, `@moritzbrantner/ui/paper/styles.css`, and `@moritzbrantner/ui/pop/styles.css` replace the default stylesheet for product surfaces with different visual needs. Each theme stylesheet imports the shared generated `base.css` layer and only its own token blocks. Theme stylesheets provide Tailwind setup, animation helpers, component normalization, and theme tokens; they do not scan package component source strings.
+
+Import `@moritzbrantner/ui/component-sources.css` when an app renders package components:
+
+```ts
+import "@moritzbrantner/ui/atlas/styles.css";
+import "@moritzbrantner/ui/component-sources.css";
+```
+
+Theme-only consumers can stay lean:
+
+```ts
+import "@moritzbrantner/ui/atlas/styles.css";
+import { AtlasTheme, uiTheme } from "@moritzbrantner/ui/atlas";
+```
+
+`base.css` is exported for tooling and advanced composition, but it generally should not be the only stylesheet an app imports because it does not provide concrete theme token values or package component source scanning.
 
 Import classes are intentionally split:
 
-- Compatibility and convenience: `@moritzbrantner/ui`, `@moritzbrantner/ui/client`, and legacy client theme subpaths such as `@moritzbrantner/ui/atlas`.
-- Optimized client theme wrappers and metadata: `@moritzbrantner/ui/themes/<theme>`, such as `@moritzbrantner/ui/themes/atlas` and `@moritzbrantner/ui/themes/pop`.
+- Compatibility component barrels: `@moritzbrantner/ui` and `@moritzbrantner/ui/client`.
+- Lean single-theme wrappers and metadata: `@moritzbrantner/ui/<theme>` and `@moritzbrantner/ui/themes/<theme>`, such as `@moritzbrantner/ui/atlas` and `@moritzbrantner/ui/themes/atlas`.
+- Multi-theme wrappers and metadata: `@moritzbrantner/ui/themes`.
 - Server-only metadata: `@moritzbrantner/ui/<theme>/server` and `@moritzbrantner/ui/server`.
 
-Apps should still import exactly one concrete stylesheet such as `@moritzbrantner/ui/styles.css`, `@moritzbrantner/ui/atlas/styles.css`, or `@moritzbrantner/ui/pop/styles.css`.
+Apps should still import exactly one concrete stylesheet such as `@moritzbrantner/ui/styles.css`, `@moritzbrantner/ui/atlas/styles.css`, or `@moritzbrantner/ui/pop/styles.css`. Add `@moritzbrantner/ui/component-sources.css` when rendering package components. Use `@moritzbrantner/ui/theme-scopes.css` only for explicit multi-theme coexistence.
 
 ## App Recipes
 
@@ -96,7 +113,7 @@ The typed component registry in `src/component-registry.ts` records the tier, pu
 
 ## Token Source Status
 
-Token names used at runtime live in `src/token-names.ts`; token categories, descriptions, and built-in theme values live in `src/token-metadata.ts`. Run `bun run generate:tokens` after token changes to update `base.css`, `styles.css`, theme CSS files, `theme-scopes.css`, and `docs/tokens.md`.
+Token names used at runtime live in `src/token-names.ts`; token categories, descriptions, and built-in theme values live in `src/token-metadata.ts`. Run `bun run generate:tokens` after token changes to update `base.css`, `styles.css`, `component-sources.css`, theme CSS files, `theme-scopes.css`, and `docs/tokens.md`.
 
 ## Do Not Put Here
 

@@ -1,6 +1,6 @@
-import { bobbaTheme } from "./theme-metadata";
+import { bobbaTheme } from "./theme-config/bobba";
 
 const uiTheme = bobbaTheme;
 
 export { bobbaTheme, uiTheme };
-export type { BuiltInUiThemeName, UiThemeConfig, UiThemeName } from "./theme-metadata";
+export type { BuiltInUiThemeName, UiThemeConfig, UiThemeName } from "./theme-config";

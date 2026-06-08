@@ -2,24 +2,24 @@
 
 - Command: `bun run verify:build-size`
 - Status: `passed`
-- Timestamp: `2026-06-08T07:47:30.481Z`
-- Total JS size: 658.2 KB / 880.0 KB
+- Timestamp: `2026-06-08T10:07:30.083Z`
+- Total JS size: 536.4 KB / 880.0 KB
 
 ## Public Entries
 
 | Entry                   | Owner  |    Size |  Budget | Status |
 | ----------------------- | ------ | ------: | ------: | ------ |
-| `dist/index.js`         | shared | 17.9 KB | 35.0 KB | passed |
-| `dist/server.js`        | shared |  0.5 KB | 35.0 KB | passed |
-| `dist/client.js`        | shared | 17.9 KB | 35.0 KB | passed |
-| `dist/bobba.js`         | shared | 17.9 KB | 35.0 KB | passed |
-| `dist/zleek.js`         | shared | 17.9 KB | 35.0 KB | passed |
-| `dist/atlas.js`         | shared | 17.9 KB | 35.0 KB | passed |
-| `dist/studio.js`        | shared | 17.9 KB | 35.0 KB | passed |
-| `dist/paper.js`         | shared | 17.9 KB | 35.0 KB | passed |
-| `dist/pop.js`           | shared | 17.9 KB | 35.0 KB | passed |
-| `dist/pulse.js`         | shared | 17.9 KB | 35.0 KB | passed |
-| `dist/themes.js`        | shared |  0.6 KB | 35.0 KB | passed |
+| `dist/index.js`         | shared | 18.1 KB | 35.0 KB | passed |
+| `dist/server.js`        | shared |  0.7 KB | 35.0 KB | passed |
+| `dist/client.js`        | shared | 18.1 KB | 35.0 KB | passed |
+| `dist/bobba.js`         | shared |  0.2 KB | 35.0 KB | passed |
+| `dist/zleek.js`         | shared |  0.2 KB | 35.0 KB | passed |
+| `dist/atlas.js`         | shared |  0.2 KB | 35.0 KB | passed |
+| `dist/studio.js`        | shared |  0.2 KB | 35.0 KB | passed |
+| `dist/paper.js`         | shared |  0.2 KB | 35.0 KB | passed |
+| `dist/pop.js`           | shared |  0.2 KB | 35.0 KB | passed |
+| `dist/pulse.js`         | shared |  0.2 KB | 35.0 KB | passed |
+| `dist/themes.js`        | shared |  0.9 KB | 35.0 KB | passed |
 | `dist/themes/zleek.js`  | shared |  0.2 KB | 35.0 KB | passed |
 | `dist/themes/bobba.js`  | shared |  0.2 KB | 35.0 KB | passed |
 | `dist/themes/atlas.js`  | shared |  0.2 KB | 35.0 KB | passed |
@@ -32,15 +32,8 @@
 
 | Chunk                    | Owner  |    Size |  Budget | Status |
 | ------------------------ | ------ | ------: | ------: | ------ |
-| `dist/zleek.js`          | shared | 17.9 KB | 40.0 KB | passed |
-| `dist/studio.js`         | shared | 17.9 KB | 40.0 KB | passed |
-| `dist/bobba.js`          | shared | 17.9 KB | 40.0 KB | passed |
-| `dist/pop.js`            | shared | 17.9 KB | 40.0 KB | passed |
-| `dist/paper.js`          | shared | 17.9 KB | 40.0 KB | passed |
-| `dist/atlas.js`          | shared | 17.9 KB | 40.0 KB | passed |
-| `dist/pulse.js`          | shared | 17.9 KB | 40.0 KB | passed |
-| `dist/index.js`          | shared | 17.9 KB | 40.0 KB | passed |
-| `dist/client.js`         | shared | 17.9 KB | 40.0 KB | passed |
+| `dist/index.js`          | shared | 18.1 KB | 40.0 KB | passed |
+| `dist/client.js`         | shared | 18.1 KB | 40.0 KB | passed |
 | `dist/stable.js`         | shared | 15.1 KB | 40.0 KB | passed |
 | `dist/chunk-XHBKOGSE.js` | shared | 13.7 KB | 40.0 KB | passed |
 | `dist/chunk-TRJDRPX5.js` | shared | 13.6 KB | 40.0 KB | passed |
@@ -62,6 +55,13 @@
 | `dist/chunk-RNTQ3WUG.js` | shared |  6.1 KB | 40.0 KB | passed |
 | `dist/chunk-UB6ZU5NY.js` | shared |  6.0 KB | 40.0 KB | passed |
 | `dist/chunk-BW3LQJI5.js` | shared |  5.8 KB | 40.0 KB | passed |
+| `dist/chunk-DWKU2344.js` | shared |  5.7 KB | 40.0 KB | passed |
+| `dist/chunk-A3NL45ZK.js` | shared |  5.7 KB | 40.0 KB | passed |
+| `dist/chunk-QNYEXBRT.js` | shared |  5.6 KB | 40.0 KB | passed |
+| `dist/chunk-23SMAGIJ.js` | shared |  5.5 KB | 40.0 KB | passed |
+| `dist/chunk-4P4WEEOU.js` | shared |  5.4 KB | 40.0 KB | passed |
+| `dist/chunk-T6VL5366.js` | shared |  5.3 KB | 40.0 KB | passed |
+| `dist/chunk-REM5VKDD.js` | shared |  5.0 KB | 40.0 KB | passed |
 
 ## Failures
 

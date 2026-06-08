@@ -21,13 +21,22 @@ const rootBudget = {
   // Compatibility smoke test: root imports intentionally exercise the broad public surface.
   maxChunkBytes: 750 * 1024,
   maxTotalBytes: 900 * 1024,
+  maxCssBytes: 330 * 1024,
 };
 const subpathBudget = {
   // Bundle-sensitive fixture: scoped theme metadata + DataGrid + Dialog is about 409 KB.
   // Keep the hard budget close enough to catch regressions while preserving current behavior.
   maxChunkBytes: 450 * 1024,
   maxTotalBytes: 465 * 1024,
+  maxCssBytes: 330 * 1024,
 };
+const singleThemeBudget = {
+  // Minimal React app + one theme wrapper. This catches accidental broad UI package imports.
+  maxChunkBytes: 225 * 1024,
+  maxTotalBytes: 240 * 1024,
+  maxCssBytes: 80 * 1024,
+};
+const simpleThemeFixtures = ["bobba", "atlas", "studio", "paper"] as const;
 
 rmSync(path.join(consumerRoot, "node_modules"), { recursive: true, force: true });
 rmSync(path.join(consumerRoot, "dist"), { recursive: true, force: true });
@@ -69,6 +78,13 @@ try {
     entry: "/src/main-subpath.tsx",
     budget: subpathBudget,
   });
+  for (const themeName of simpleThemeFixtures) {
+    buildConsumerFixture(tempConsumerRoot, {
+      name: `single-${themeName}`,
+      entry: `/src/main-single-${themeName}.tsx`,
+      budget: singleThemeBudget,
+    });
+  }
 } finally {
   rmSync(tempWorkspace, { recursive: true, force: true });
 }
@@ -139,6 +155,7 @@ function verifyConsumerSource(root: string): void {
 
   for (const expected of [
     'from "@moritzbrantner/ui"',
+    'import "@moritzbrantner/ui/component-sources.css";',
     "Navbar",
     "PageShell",
     "DataGrid",
@@ -157,6 +174,7 @@ function verifyConsumerSource(root: string): void {
     'from "@moritzbrantner/ui/themes/atlas"',
     'from "@moritzbrantner/ui/server"',
     'import "@moritzbrantner/ui/atlas/styles.css";',
+    'import "@moritzbrantner/ui/component-sources.css";',
   ]) {
     if (
       !subpathSource.includes(expected) &&
@@ -180,16 +198,46 @@ function verifyConsumerSource(root: string): void {
       throw new Error(`SubpathApp.tsx must avoid broad import ${forbiddenImport}`);
     }
   }
+
+  for (const themeName of simpleThemeFixtures) {
+    const fixturePath = path.join(root, "src", `main-single-${themeName}.tsx`);
+    const source = readFileSync(fixturePath, "utf8");
+    const expectedCssImport = `import "@moritzbrantner/ui/${themeName}/styles.css";`;
+    const expectedThemeImport = `from "@moritzbrantner/ui/${themeName}"`;
+
+    if (!source.includes(expectedCssImport)) {
+      throw new Error(`single theme fixture ${themeName} must import ${expectedCssImport}`);
+    }
+
+    if (!source.includes(expectedThemeImport)) {
+      throw new Error(`single theme fixture ${themeName} must import ${expectedThemeImport}`);
+    }
+
+    if (source.includes("@moritzbrantner/ui/component-sources.css")) {
+      throw new Error(`single theme fixture ${themeName} must not import component-sources.css`);
+    }
+
+    for (const siblingThemeName of simpleThemeFixtures.filter(
+      (candidate) => candidate !== themeName,
+    )) {
+      if (source.includes(`@moritzbrantner/ui/${siblingThemeName}`)) {
+        throw new Error(
+          `single theme fixture ${themeName} must not import sibling theme ${siblingThemeName}`,
+        );
+      }
+    }
+  }
 }
 
 function buildConsumerFixture(
   root: string,
   fixture: {
-    name: "root" | "subpath";
+    name: "root" | "subpath" | `single-${(typeof simpleThemeFixtures)[number]}`;
     entry: string;
     budget: {
       maxChunkBytes: number;
       maxTotalBytes: number;
+      maxCssBytes: number;
     };
   },
 ): void {
@@ -213,9 +261,11 @@ function buildConsumerFixture(
   rmSync(path.join(root, "dist"), { recursive: true, force: true });
   run("bun", ["run", "build"], root);
 
-  const report = getJsSizeReport(path.join(root, "dist", "assets"));
+  const assetsDir = path.join(root, "dist", "assets");
+  const report = getAssetSizeReport(assetsDir, ".js");
+  const cssReport = getAssetSizeReport(assetsDir, ".css");
   console.log(
-    `consumer ${fixture.name} build: total ${formatKb(report.totalBytes)}, max chunk ${formatKb(report.maxChunkBytes)}`,
+    `consumer ${fixture.name} build: JS total ${formatKb(report.totalBytes)}, JS max chunk ${formatKb(report.maxChunkBytes)}, CSS total ${formatKb(cssReport.totalBytes)}, CSS max chunk ${formatKb(cssReport.maxChunkBytes)}`,
   );
 
   if (report.maxChunkBytes > fixture.budget.maxChunkBytes) {
@@ -229,16 +279,25 @@ function buildConsumerFixture(
       `consumer ${fixture.name} build exceeded total JS budget: ${formatKb(report.totalBytes)} > ${formatKb(fixture.budget.maxTotalBytes)}`,
     );
   }
+
+  if (cssReport.totalBytes > fixture.budget.maxCssBytes) {
+    throw new Error(
+      `consumer ${fixture.name} build exceeded total CSS budget: ${formatKb(cssReport.totalBytes)} > ${formatKb(fixture.budget.maxCssBytes)}`,
+    );
+  }
 }
 
-function getJsSizeReport(assetsDir: string): { totalBytes: number; maxChunkBytes: number } {
-  const jsFiles = listFiles(assetsDir).filter((filePath) => filePath.endsWith(".js"));
+function getAssetSizeReport(
+  assetsDir: string,
+  extension: ".css" | ".js",
+): { totalBytes: number; maxChunkBytes: number } {
+  const assetFiles = listFiles(assetsDir).filter((filePath) => filePath.endsWith(extension));
 
-  if (jsFiles.length === 0) {
-    throw new Error("consumer build did not emit any JS chunks");
+  if (assetFiles.length === 0) {
+    throw new Error(`consumer build did not emit any ${extension} chunks`);
   }
 
-  const sizes = jsFiles.map((filePath) => statSync(filePath).size);
+  const sizes = assetFiles.map((filePath) => statSync(filePath).size);
 
   return {
     totalBytes: sizes.reduce((total, size) => total + size, 0),

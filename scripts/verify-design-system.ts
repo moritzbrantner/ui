@@ -87,6 +87,7 @@ const registryByName = new Map<string, ComponentRegistryEntry>(
 );
 
 verifyPackageMetadata();
+verifyCssSourceTopology();
 verifyReleaseDocumentation();
 verifyPublicApiMetadata();
 verifyTierLayout();
@@ -131,6 +132,11 @@ function verifyPackageMetadata() {
   expectArrayIncludes(packageJson.files, "dist", "package files must include dist");
   expectArrayIncludes(packageJson.files, "styles.css", "package files must include styles.css");
   expectArrayIncludes(packageJson.files, "base.css", "package files must include base.css");
+  expectArrayIncludes(
+    packageJson.files,
+    "component-sources.css",
+    "package files must include component-sources.css",
+  );
   expectArrayIncludes(
     packageJson.files,
     "theme-scopes.css",
@@ -223,10 +229,59 @@ function verifyPackageMetadata() {
   expectEqual(packageJson.exports["./base.css"], "./base.css", "base stylesheet must be exported");
   expectEqual(packageJson.exports["./styles.css"], "./styles.css", "stylesheet must be exported");
   expectEqual(
+    packageJson.exports["./component-sources.css"],
+    "./component-sources.css",
+    "component source stylesheet must be exported",
+  );
+  expectEqual(
     packageJson.exports["./theme-scopes.css"],
     "./theme-scopes.css",
     "scoped theme stylesheet must be exported",
   );
+}
+
+function verifyCssSourceTopology() {
+  const cssSources = {
+    base: readFileSync(path.join(packageRoot, "base.css"), "utf8"),
+    styles: readFileSync(path.join(packageRoot, "styles.css"), "utf8"),
+    themeScopes: readFileSync(path.join(packageRoot, "theme-scopes.css"), "utf8"),
+    componentSources: readFileSync(path.join(packageRoot, "component-sources.css"), "utf8"),
+  };
+
+  for (const [relativeFile, source] of [
+    ["base.css", cssSources.base],
+    ["styles.css", cssSources.styles],
+    ["theme-scopes.css", cssSources.themeScopes],
+  ] as const) {
+    if (/@source\s+/.test(source)) {
+      errors.push(`${relativeFile} must not declare Tailwind @source`);
+    }
+  }
+
+  if (!/@source\s+/.test(cssSources.componentSources)) {
+    errors.push("component-sources.css must declare Tailwind @source");
+  }
+
+  for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper", "pop", "pulse"]) {
+    const relativeFile = `${themeName}/styles.css`;
+    const source = readFileSync(path.join(packageRoot, relativeFile), "utf8");
+
+    if (/@source\s+/.test(source)) {
+      errors.push(`${relativeFile} must not declare Tailwind @source`);
+    }
+
+    if (!hasCssImport(source, "../base.css")) {
+      errors.push(`${relativeFile} must import ../base.css`);
+    }
+
+    if (hasCssImport(source, "../styles.css")) {
+      errors.push(`${relativeFile} must not import ../styles.css`);
+    }
+
+    if (hasCssImport(source, "../component-sources.css")) {
+      errors.push(`${relativeFile} must not import ../component-sources.css`);
+    }
+  }
 }
 
 function verifyReleaseDocumentation() {
@@ -971,6 +1026,10 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function hasCssImport(source: string, importPath: string): boolean {
+  return new RegExp(`^\\s*@import\\s+["']${escapeRegExp(importPath)}["'];?\\s*$`, "m").test(source);
+}
+
 function verifyClientDirectives() {
   const sourceFiles = [
     ...registryEntries.map((entry) =>
@@ -998,17 +1057,35 @@ function verifyClientDirectives() {
 function verifyConsumerExample() {
   const appPath = path.join(packageRoot, "examples", "consumer", "src", "App.tsx");
   const subpathPath = path.join(packageRoot, "examples", "consumer", "src", "SubpathApp.tsx");
+  const subpathEntryPath = path.join(
+    packageRoot,
+    "examples",
+    "consumer",
+    "src",
+    "main-subpath.tsx",
+  );
 
-  if (!existsSync(appPath) || !existsSync(subpathPath)) {
-    errors.push("consumer example must include App.tsx and SubpathApp.tsx");
+  if (!existsSync(appPath) || !existsSync(subpathPath) || !existsSync(subpathEntryPath)) {
+    errors.push("consumer example must include App.tsx, SubpathApp.tsx, and main-subpath.tsx");
     return;
   }
 
   const appSource = readFileSync(appPath, "utf8");
   const subpathSource = readFileSync(subpathPath, "utf8");
+  const subpathEntrySource = readFileSync(subpathEntryPath, "utf8");
 
   if (!appSource.includes('import "@moritzbrantner/ui/styles.css";')) {
     errors.push("consumer example must import the default UI stylesheet");
+  }
+
+  if (!appSource.includes('import "@moritzbrantner/ui/component-sources.css";')) {
+    errors.push("consumer example must import component-sources.css for package components");
+  }
+
+  if (!subpathEntrySource.includes('import "@moritzbrantner/ui/component-sources.css";')) {
+    errors.push(
+      "consumer subpath example must import component-sources.css for package components",
+    );
   }
 
   if (!appSource.includes('from "@moritzbrantner/ui"')) {

@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import { cn } from "../lib/cn";
-import type { UiThemeConfig } from "../theme-metadata";
+import type { UiThemeConfig } from "../theme-config";
 
 type ScopedThemeProps = React.ComponentProps<"div">;
 

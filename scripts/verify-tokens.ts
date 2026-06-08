@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -26,6 +26,20 @@ const themeStylesheets = [
   "pop/styles.css",
   "pulse/styles.css",
 ];
+const generatedArtifactFiles = [
+  "base.css",
+  "styles.css",
+  "component-sources.css",
+  "theme-scopes.css",
+  ...themeStylesheets,
+];
+const simpleThemeNames = ["bobba", "atlas", "studio", "paper"] as const;
+const simpleThemeStylesheets = simpleThemeNames.map((themeName) => `${themeName}/styles.css`);
+const maxSimpleThemeCssBytes = 10 * 1024;
+const componentSourceDirectives = [
+  '@source "./dist/**/*.{js,mjs}";',
+  '@source "./src/**/*.{ts,tsx}";',
+] as const;
 const requiredPublicUiTokens = uiTokenMetadata
   .filter((token) => token.name.startsWith("--ui-") || token.name.startsWith("--glass-"))
   .map((token) => token.name);
@@ -62,6 +76,8 @@ if (generatedCheck.status !== 0) {
 }
 
 verifyCssImportTopology();
+verifyCssSourceTopology();
+verifySimpleThemeStylesheets();
 
 const baseTokens = readTokens(path.join(packageRoot, "styles.css"));
 const requiredTokens = intersection(baseTokens.root, baseTokens.dark);
@@ -212,7 +228,109 @@ function verifyCssImportTopology() {
     if (hasCssImport(source, "../styles.css")) {
       errors.push(`${relativeFile} must not import ../styles.css`);
     }
+
+    if (hasCssImport(source, "../component-sources.css")) {
+      errors.push(`${relativeFile} must not import ../component-sources.css`);
+    }
   }
+}
+
+function verifyCssSourceTopology() {
+  for (const relativeFile of generatedArtifactFiles) {
+    const filePath = path.join(packageRoot, relativeFile);
+
+    try {
+      readFileSync(filePath, "utf8");
+    } catch {
+      errors.push(`${relativeFile}: generated artifact is missing`);
+    }
+  }
+
+  for (const relativeFile of ["base.css", "styles.css", "theme-scopes.css", ...themeStylesheets]) {
+    const source = readFileSync(path.join(packageRoot, relativeFile), "utf8");
+
+    if (/@source\s+/.test(source)) {
+      errors.push(`${relativeFile} must not declare Tailwind @source`);
+    }
+  }
+
+  const componentSources = readFileSync(path.join(packageRoot, "component-sources.css"), "utf8");
+
+  for (const directive of componentSourceDirectives) {
+    if (!componentSources.includes(directive)) {
+      errors.push(`component-sources.css must include ${directive}`);
+    }
+  }
+}
+
+function verifySimpleThemeStylesheets() {
+  for (const relativeFile of simpleThemeStylesheets) {
+    const themeName = relativeFile.split("/")[0];
+    const filePath = path.join(packageRoot, relativeFile);
+    const source = readFileSync(filePath, "utf8");
+    const bytes = statSync(filePath).size;
+
+    if (bytes > maxSimpleThemeCssBytes) {
+      errors.push(
+        `${relativeFile}: simple theme stylesheet is ${bytes} bytes, above ${maxSimpleThemeCssBytes} byte budget`,
+      );
+    }
+
+    for (const siblingThemeName of tokenFiles
+      .map((fileName) => fileName.split("/")[0])
+      .filter(
+        (candidateThemeName) =>
+          candidateThemeName !== "styles.css" && candidateThemeName !== themeName,
+      )) {
+      if (source.includes(`[data-ui-theme="${siblingThemeName}"]`)) {
+        errors.push(`${relativeFile}: must not include sibling theme selector ${siblingThemeName}`);
+      }
+
+      if (source.includes(`${siblingThemeName}/styles.css`)) {
+        errors.push(
+          `${relativeFile}: must not reference sibling theme stylesheet ${siblingThemeName}`,
+        );
+      }
+    }
+
+    expectTokenValue(relativeFile, source, "--glass-blur", "0px");
+    expectTokenValue(relativeFile, source, "--glass-surface-gradient", "none");
+    expectTokenValue(relativeFile, source, "--glass-overlay-gradient", "none");
+
+    for (const tokenName of [
+      "--glass-shadow",
+      "--glass-interactive-shadow",
+      "--glass-raised-shadow",
+      "--glass-inset-shadow",
+    ]) {
+      const value = readTokenValue(source, tokenName);
+
+      if (value && value.includes(",")) {
+        errors.push(`${relativeFile}: ${tokenName} must stay single-layer for simple themes`);
+      }
+    }
+  }
+}
+
+function expectTokenValue(
+  relativeFile: string,
+  source: string,
+  tokenName: string,
+  expectedValue: string,
+) {
+  const value = readTokenValue(source, tokenName);
+
+  if (value !== expectedValue) {
+    errors.push(
+      `${relativeFile}: expected ${tokenName}: ${expectedValue}, found ${value ?? "missing"}`,
+    );
+  }
+}
+
+function readTokenValue(source: string, tokenName: string): string | undefined {
+  const match = new RegExp(`${escapeRegExp(tokenName)}\\s*:\\s*([^;]+);`).exec(source);
+
+  return match?.[1]?.trim();
 }
 
 function hasCssImport(source: string, importPath: string) {

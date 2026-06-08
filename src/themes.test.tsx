@@ -149,12 +149,13 @@ import {
   TimelineTitle,
 } from "./labs";
 import { AtlasTheme, atlasTheme, uiTheme as atlasUiTheme } from "./atlas";
-import { BobbaTheme, Button as BobbaButton, bobbaTheme, uiTheme as bobbaUiTheme } from "./bobba";
+import { BobbaTheme, bobbaTheme, uiTheme as bobbaUiTheme } from "./bobba";
+import { Button as BobbaButton, Button as ZleekButton } from "./components/stable/button";
 import { PaperTheme, paperTheme, uiTheme as paperUiTheme } from "./paper";
 import { PopTheme, popTheme, uiTheme as popUiTheme } from "./pop";
 import { PulseTheme, pulseTheme, uiTheme as pulseUiTheme } from "./pulse";
 import { StudioTheme, studioTheme, uiTheme as studioUiTheme } from "./studio";
-import { Button as ZleekButton, ZleekTheme, uiTheme as zleekUiTheme, zleekTheme } from "./zleek";
+import { ZleekTheme, uiTheme as zleekUiTheme, zleekTheme } from "./zleek";
 
 const shadcnBasicComponentFiles = [
   "accordion",

@@ -129,6 +129,28 @@ const pulse = await importPackage("@moritzbrantner/ui/pulse");
 assert.equal(pulse.uiTheme.name, "pulse", "pulse entry should expose pulse uiTheme");
 assert.equal(typeof pulse.PulseTheme, "function", "pulse entry should expose PulseTheme");
 
+for (const [specifier, module, expectedExports] of [
+  ["@moritzbrantner/ui/zleek", zleek, ["ZleekTheme", "uiTheme", "zleekTheme"]],
+  ["@moritzbrantner/ui/bobba", bobba, ["BobbaTheme", "bobbaTheme", "uiTheme"]],
+  ["@moritzbrantner/ui/atlas", atlas, ["AtlasTheme", "atlasTheme", "uiTheme"]],
+  ["@moritzbrantner/ui/studio", studio, ["StudioTheme", "studioTheme", "uiTheme"]],
+  ["@moritzbrantner/ui/paper", paper, ["PaperTheme", "paperTheme", "uiTheme"]],
+  ["@moritzbrantner/ui/pop", pop, ["PopTheme", "popTheme", "uiTheme"]],
+  ["@moritzbrantner/ui/pulse", pulse, ["PulseTheme", "pulseTheme", "uiTheme"]],
+] as const) {
+  assert.deepEqual(
+    Object.keys(module).sort(),
+    [...expectedExports].sort(),
+    `${specifier} should expose only lean theme runtime exports`,
+  );
+  assert.equal(Object.hasOwn(module, "Button"), false, `${specifier} should not expose Button`);
+  assert.equal(
+    Object.hasOwn(module, "themeConfig"),
+    false,
+    `${specifier} should not expose themeConfig`,
+  );
+}
+
 const serverThemeEntries = [
   {
     specifier: "@moritzbrantner/ui/zleek/server",
@@ -282,6 +304,11 @@ for (const [specifier, componentName, themeName] of scopedThemeEntries) {
     false,
     `${specifier} should not expose broad component barrels`,
   );
+  assert.equal(
+    Object.keys(scopedTheme).length,
+    3,
+    `${specifier} should expose only theme component, theme metadata, and uiTheme`,
+  );
 }
 
 const pack = spawnSync("bun", ["pm", "pack", "--dry-run", "--ignore-scripts"], {
@@ -375,6 +402,7 @@ const requiredPackageFiles = [
   "dist/themes/zleek.d.ts",
   "base.css",
   "styles.css",
+  "component-sources.css",
   "theme-scopes.css",
   "bobba/styles.css",
   "zleek/styles.css",
