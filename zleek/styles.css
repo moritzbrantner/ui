@@ -5,11 +5,15 @@
   --font-sans-app:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-heading-app:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   --font-mono-app:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
   --radius: 0.25rem;
   --glass-blur: 22px;
+  --glass-reduced-blur: 0px;
   --glass-shadow: 0 28px 70px oklch(0.32 0.02 255 / 0.15), 0 8px 24px oklch(0.145 0 0 / 0.08);
   --glass-interactive-shadow:
     0 22px 48px oklch(0.32 0.02 255 / 0.14), 0 5px 14px oklch(0.145 0 0 / 0.08);
@@ -22,6 +26,10 @@
   --glass-inset-highlight: oklch(1 0 0 / 0.55);
   --glass-surface-tint: oklch(1 0 0 / 0.12);
   --glass-inset-surface: oklch(0.93 0.01 248 / 0.38);
+  --glass-reduced-card: oklch(0.975 0.008 250);
+  --glass-reduced-popover: oklch(1 0 0);
+  --glass-reduced-border: oklch(0.74 0.018 250);
+  --glass-reduced-input: oklch(0.78 0.014 248);
   --glass-saturation: 135%;
   --glass-surface-gradient:
     linear-gradient(
@@ -57,8 +65,8 @@
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.95 0.01 248 / 0.5);
   --muted-foreground: oklch(0.5 0 0);
-  --accent: oklch(0.91 0.025 228 / 0.62);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent: oklch(0.9 0.062 286 / 0.68);
+  --accent-foreground: oklch(0.24 0.055 286);
   --destructive: oklch(0.577 0.245 27.325);
   --success: oklch(0.48 0.1 158);
   --success-foreground: oklch(0.985 0 0);
@@ -68,17 +76,37 @@
   --info-foreground: oklch(0.985 0 0);
   --border: oklch(0.68 0.018 250 / 0.42);
   --input: oklch(0.78 0.014 248 / 0.34);
-  --ring: oklch(0.58 0.04 245);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --ring: oklch(0.58 0.07 265);
+  --chart-1: oklch(0.52 0.16 254);
+  --chart-2: oklch(0.6 0.13 178);
+  --chart-3: oklch(0.66 0.15 78);
+  --chart-4: oklch(0.62 0.16 286);
+  --chart-5: oklch(0.62 0.17 28);
   --chart-6: oklch(0.58 0.12 155);
   --chart-7: oklch(0.56 0.11 250);
-  --chart-8: oklch(0.6 0.13 320);
+  --chart-8: oklch(0.64 0.15 326);
   --chart-9: oklch(0.7 0.12 120);
   --chart-10: oklch(0.62 0.14 15);
+  --data-positive: oklch(0.45 0.12 155);
+  --data-negative: oklch(0.577 0.245 27.325);
+  --data-neutral: oklch(0.5 0 0);
+  --trend-up: oklch(0.45 0.12 155);
+  --trend-down: oklch(0.577 0.245 27.325);
+  --trend-flat: oklch(0.5 0 0);
+  --severity-low: oklch(0.48 0.1 235);
+  --severity-medium: oklch(0.62 0.14 75);
+  --severity-high: oklch(0.62 0.17 35);
+  --severity-critical: oklch(0.577 0.245 27.325);
+  --map-layer-base: oklch(0.88 0.008 255);
+  --map-layer-accent: oklch(0.56 0.09 252);
+  --map-layer-warning: oklch(0.62 0.14 75);
+  --map-layer-critical: oklch(0.577 0.245 27.325);
+  --editor-selection: oklch(0.56 0.09 252 / 0.22);
+  --editor-canvas: oklch(0.985 0.002 255);
+  --editor-canvas-grid: oklch(0.88 0.008 255);
+  --editor-timeline: oklch(0.94 0.006 255);
+  --editor-playhead: oklch(0.56 0.09 252);
+  --editor-layer: oklch(0.925 0.032 242);
   --sidebar: oklch(0.985 0.006 250 / 0.56);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.39 0.04 255 / 0.82);
@@ -97,6 +125,10 @@
   --ui-control-padding-x-sm: 0.75rem;
   --ui-control-padding-x-md: 1rem;
   --ui-control-gap: 0.5rem;
+  --ui-table-row-height: 2.75rem;
+  --ui-table-cell-padding-x: 0.75rem;
+  --ui-filter-control-height: var(--ui-control-height-md);
+  --ui-sidebar-compact-width: 16rem;
   --ui-surface-padding-sm: 0.75rem;
   --ui-surface-padding-md: 1rem;
   --ui-surface-gap: 1rem;
@@ -148,11 +180,15 @@
   --font-sans-app:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-heading-app:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   --font-mono-app:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
   --radius: 0.25rem;
   --glass-blur: 22px;
+  --glass-reduced-blur: 0px;
   --glass-shadow: 0 30px 78px oklch(0 0 0 / 0.42), 0 10px 28px oklch(0 0 0 / 0.24);
   --glass-interactive-shadow: 0 24px 54px oklch(0 0 0 / 0.38), 0 7px 18px oklch(0 0 0 / 0.22);
   --glass-raised-shadow:
@@ -163,7 +199,11 @@
     0 1px 0 oklch(1 0 0 / 0.04);
   --glass-inset-highlight: oklch(1 0 0 / 0.12);
   --glass-surface-tint: oklch(1 0 0 / 0.035);
-  --glass-inset-surface: oklch(0.16 0.008 255 / 0.52);
+  --glass-inset-surface: oklch(0.18 0.01 255 / 0.62);
+  --glass-reduced-card: oklch(0.225 0.014 255);
+  --glass-reduced-popover: oklch(0.27 0.016 255);
+  --glass-reduced-border: oklch(0.38 0.018 255);
+  --glass-reduced-input: oklch(0.34 0.018 255);
   --glass-saturation: 135%;
   --glass-surface-gradient:
     linear-gradient(
@@ -187,11 +227,11 @@
   --glass-background-position: -120% 0, 0 0;
   --glass-background-position-hover: 120% 0, 0 0;
   --glass-shine-duration: 1400ms;
-  --background: oklch(0.17 0.01 255);
+  --background: oklch(0.155 0.012 255);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.23 0.014 255 / 0.72);
+  --card: oklch(0.23 0.016 255 / 0.82);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.23 0.014 255 / 0.78);
+  --popover: oklch(0.275 0.018 255 / 0.9);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.82 0.04 245);
   --primary-foreground: oklch(0.205 0 0);
@@ -199,7 +239,7 @@
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.29 0.014 255 / 0.5);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.34 0.022 245 / 0.62);
+  --accent: oklch(0.4 0.07 286 / 0.72);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --success: oklch(0.74 0.1 158);
@@ -208,19 +248,39 @@
   --warning-foreground: oklch(0.18 0.018 70);
   --info: oklch(0.78 0.08 245);
   --info-foreground: oklch(0.14 0.018 245);
-  --border: oklch(0.88 0.01 255 / 0.24);
-  --input: oklch(0.88 0.01 255 / 0.2);
-  --ring: oklch(0.62 0.035 245);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
+  --border: oklch(0.9 0.012 255 / 0.34);
+  --input: oklch(0.9 0.012 255 / 0.3);
+  --ring: oklch(0.72 0.075 265);
+  --chart-1: oklch(0.74 0.13 254);
+  --chart-2: oklch(0.76 0.12 178);
+  --chart-3: oklch(0.79 0.14 78);
+  --chart-4: oklch(0.75 0.15 286);
+  --chart-5: oklch(0.75 0.16 28);
   --chart-6: oklch(0.72 0.12 155);
   --chart-7: oklch(0.7 0.13 250);
-  --chart-8: oklch(0.72 0.14 320);
+  --chart-8: oklch(0.77 0.14 326);
   --chart-9: oklch(0.76 0.12 120);
   --chart-10: oklch(0.7 0.14 15);
+  --data-positive: oklch(0.72 0.13 155);
+  --data-negative: oklch(0.704 0.191 22.216);
+  --data-neutral: oklch(0.708 0 0);
+  --trend-up: oklch(0.72 0.13 155);
+  --trend-down: oklch(0.704 0.191 22.216);
+  --trend-flat: oklch(0.708 0 0);
+  --severity-low: oklch(0.74 0.12 235);
+  --severity-medium: oklch(0.78 0.14 80);
+  --severity-high: oklch(0.76 0.15 35);
+  --severity-critical: oklch(0.704 0.191 22.216);
+  --map-layer-base: oklch(1 0 0 / 15%);
+  --map-layer-accent: oklch(0.72 0.08 252);
+  --map-layer-warning: oklch(0.78 0.14 80);
+  --map-layer-critical: oklch(0.704 0.191 22.216);
+  --editor-selection: oklch(0.72 0.08 252 / 0.28);
+  --editor-canvas: oklch(0.17 0.008 255);
+  --editor-canvas-grid: oklch(1 0 0 / 10%);
+  --editor-timeline: oklch(0.245 0.012 255);
+  --editor-playhead: oklch(0.72 0.08 252);
+  --editor-layer: oklch(0.33 0.04 245);
   --sidebar: oklch(0.23 0.012 255 / 0.68);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.78 0.028 245 / 0.78);
@@ -239,6 +299,10 @@
   --ui-control-padding-x-sm: 0.75rem;
   --ui-control-padding-x-md: 1rem;
   --ui-control-gap: 0.5rem;
+  --ui-table-row-height: 2.75rem;
+  --ui-table-cell-padding-x: 0.75rem;
+  --ui-filter-control-height: var(--ui-control-height-md);
+  --ui-sidebar-compact-width: 16rem;
   --ui-surface-padding-sm: 0.75rem;
   --ui-surface-padding-md: 1rem;
   --ui-surface-gap: 1rem;

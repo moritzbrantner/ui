@@ -5,11 +5,13 @@
   --font-sans-app:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-heading-app: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono-app:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
   --radius: 0.5rem;
   --glass-blur: 0px;
+  --glass-reduced-blur: 0px;
   --glass-shadow: 0 16px 36px oklch(0.18 0.04 292 / 0.13);
   --glass-interactive-shadow: 0 12px 24px oklch(0.18 0.04 292 / 0.14);
   --glass-raised-shadow: var(--glass-interactive-shadow);
@@ -17,6 +19,10 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-reduced-card: oklch(1 0 0);
+  --glass-reduced-popover: oklch(1 0 0);
+  --glass-reduced-border: oklch(0.88 0.008 255);
+  --glass-reduced-input: oklch(0.86 0.008 255);
   --glass-saturation: 100%;
   --glass-surface-gradient: none;
   --glass-overlay-gradient: none;
@@ -58,6 +64,26 @@
   --chart-8: oklch(0.72 0.15 45);
   --chart-9: oklch(0.68 0.14 245);
   --chart-10: oklch(0.7 0.13 125);
+  --data-positive: oklch(0.45 0.12 155);
+  --data-negative: oklch(0.577 0.245 27.325);
+  --data-neutral: oklch(0.5 0 0);
+  --trend-up: oklch(0.45 0.12 155);
+  --trend-down: oklch(0.577 0.245 27.325);
+  --trend-flat: oklch(0.5 0 0);
+  --severity-low: oklch(0.48 0.1 235);
+  --severity-medium: oklch(0.62 0.14 75);
+  --severity-high: oklch(0.62 0.17 35);
+  --severity-critical: oklch(0.577 0.245 27.325);
+  --map-layer-base: oklch(0.88 0.008 255);
+  --map-layer-accent: oklch(0.56 0.09 252);
+  --map-layer-warning: oklch(0.62 0.14 75);
+  --map-layer-critical: oklch(0.577 0.245 27.325);
+  --editor-selection: oklch(0.62 0.16 292 / 0.28);
+  --editor-canvas: oklch(0.965 0.014 285);
+  --editor-canvas-grid: oklch(0.82 0.028 285 / 0.62);
+  --editor-timeline: oklch(0.91 0.032 285);
+  --editor-playhead: oklch(0.68 0.16 18);
+  --editor-layer: oklch(0.9 0.075 18);
   --sidebar: oklch(0.96 0.015 285);
   --sidebar-foreground: oklch(0.17 0.025 285);
   --sidebar-primary: oklch(0.55 0.18 292);
@@ -76,13 +102,17 @@
   --ui-control-padding-x-sm: 0.75rem;
   --ui-control-padding-x-md: 1rem;
   --ui-control-gap: 0.625rem;
+  --ui-table-row-height: 2.75rem;
+  --ui-table-cell-padding-x: 0.75rem;
+  --ui-filter-control-height: var(--ui-control-height-md);
+  --ui-sidebar-compact-width: 16rem;
   --ui-surface-padding-sm: 0.875rem;
   --ui-surface-padding-md: 1.125rem;
   --ui-surface-gap: 1.125rem;
   --ui-focus-ring-width: 3px;
   --ui-motion-hover-y: -1px;
-  --ui-motion-hover-scale: 1.02;
-  --ui-motion-press-scale: 0.98;
+  --ui-motion-hover-scale: 1.012;
+  --ui-motion-press-scale: 0.985;
   --ui-motion-duration-fast: 100ms;
   --ui-motion-duration-base: 150ms;
   --ui-motion-duration-slow: 200ms;
@@ -127,11 +157,13 @@
   --font-sans-app:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-heading-app: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono-app:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
   --radius: 0.5rem;
   --glass-blur: 0px;
+  --glass-reduced-blur: 0px;
   --glass-shadow: 0 18px 44px oklch(0 0 0 / 0.34);
   --glass-interactive-shadow: 0 14px 30px oklch(0 0 0 / 0.32);
   --glass-raised-shadow: var(--glass-interactive-shadow);
@@ -139,6 +171,10 @@
   --glass-inset-highlight: transparent;
   --glass-surface-tint: transparent;
   --glass-inset-surface: var(--background);
+  --glass-reduced-card: oklch(0.21 0.01 255);
+  --glass-reduced-popover: oklch(0.21 0.01 255);
+  --glass-reduced-border: oklch(1 0 0 / 10%);
+  --glass-reduced-input: oklch(1 0 0 / 15%);
   --glass-saturation: 100%;
   --glass-surface-gradient: none;
   --glass-overlay-gradient: none;
@@ -148,9 +184,9 @@
   --glass-shine-duration: 1ms;
   --background: oklch(0.16 0.025 285);
   --foreground: oklch(0.96 0.008 285);
-  --card: oklch(0.22 0.032 285);
+  --card: oklch(0.205 0.03 285);
   --card-foreground: oklch(0.96 0.008 285);
-  --popover: oklch(0.2 0.035 285);
+  --popover: oklch(0.255 0.04 285);
   --popover-foreground: oklch(0.96 0.008 285);
   --primary: oklch(0.74 0.17 285);
   --primary-foreground: oklch(0.14 0.024 285);
@@ -180,6 +216,26 @@
   --chart-8: oklch(0.78 0.15 45);
   --chart-9: oklch(0.74 0.14 245);
   --chart-10: oklch(0.75 0.14 125);
+  --data-positive: oklch(0.72 0.13 155);
+  --data-negative: oklch(0.704 0.191 22.216);
+  --data-neutral: oklch(0.708 0 0);
+  --trend-up: oklch(0.72 0.13 155);
+  --trend-down: oklch(0.704 0.191 22.216);
+  --trend-flat: oklch(0.708 0 0);
+  --severity-low: oklch(0.74 0.12 235);
+  --severity-medium: oklch(0.78 0.14 80);
+  --severity-high: oklch(0.76 0.15 35);
+  --severity-critical: oklch(0.704 0.191 22.216);
+  --map-layer-base: oklch(1 0 0 / 15%);
+  --map-layer-accent: oklch(0.72 0.08 252);
+  --map-layer-warning: oklch(0.78 0.14 80);
+  --map-layer-critical: oklch(0.704 0.191 22.216);
+  --editor-selection: oklch(0.74 0.17 292 / 0.34);
+  --editor-canvas: oklch(0.13 0.024 285);
+  --editor-canvas-grid: oklch(0.38 0.04 285 / 0.58);
+  --editor-timeline: oklch(0.18 0.032 285);
+  --editor-playhead: oklch(0.76 0.15 25);
+  --editor-layer: oklch(0.42 0.1 18);
   --sidebar: oklch(0.18 0.028 285);
   --sidebar-foreground: oklch(0.96 0.008 285);
   --sidebar-primary: oklch(0.72 0.17 292);
@@ -198,13 +254,17 @@
   --ui-control-padding-x-sm: 0.75rem;
   --ui-control-padding-x-md: 1rem;
   --ui-control-gap: 0.625rem;
+  --ui-table-row-height: 2.75rem;
+  --ui-table-cell-padding-x: 0.75rem;
+  --ui-filter-control-height: var(--ui-control-height-md);
+  --ui-sidebar-compact-width: 16rem;
   --ui-surface-padding-sm: 0.875rem;
   --ui-surface-padding-md: 1.125rem;
   --ui-surface-gap: 1.125rem;
   --ui-focus-ring-width: 3px;
   --ui-motion-hover-y: -1px;
-  --ui-motion-hover-scale: 1.02;
-  --ui-motion-press-scale: 0.98;
+  --ui-motion-hover-scale: 1.012;
+  --ui-motion-press-scale: 0.985;
   --ui-motion-duration-fast: 100ms;
   --ui-motion-duration-base: 150ms;
   --ui-motion-duration-slow: 200ms;

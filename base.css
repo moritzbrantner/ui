@@ -7,9 +7,13 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-heading: var(--font-sans-app);
+  --font-heading: var(--font-heading-app);
   --font-sans: var(--font-sans-app);
   --font-mono: var(--font-mono-app);
+  --color-glass-reduced-card: var(--glass-reduced-card);
+  --color-glass-reduced-popover: var(--glass-reduced-popover);
+  --color-glass-reduced-border: var(--glass-reduced-border);
+  --color-glass-reduced-input: var(--glass-reduced-input);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -42,6 +46,26 @@
   --color-chart-8: var(--chart-8);
   --color-chart-9: var(--chart-9);
   --color-chart-10: var(--chart-10);
+  --color-data-positive: var(--data-positive);
+  --color-data-negative: var(--data-negative);
+  --color-data-neutral: var(--data-neutral);
+  --color-trend-up: var(--trend-up);
+  --color-trend-down: var(--trend-down);
+  --color-trend-flat: var(--trend-flat);
+  --color-severity-low: var(--severity-low);
+  --color-severity-medium: var(--severity-medium);
+  --color-severity-high: var(--severity-high);
+  --color-severity-critical: var(--severity-critical);
+  --color-map-layer-base: var(--map-layer-base);
+  --color-map-layer-accent: var(--map-layer-accent);
+  --color-map-layer-warning: var(--map-layer-warning);
+  --color-map-layer-critical: var(--map-layer-critical);
+  --color-editor-selection: var(--editor-selection);
+  --color-editor-canvas: var(--editor-canvas);
+  --color-editor-canvas-grid: var(--editor-canvas-grid);
+  --color-editor-timeline: var(--editor-timeline);
+  --color-editor-playhead: var(--editor-playhead);
+  --color-editor-layer: var(--editor-layer);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -159,6 +183,41 @@
 
   html {
     @apply font-sans;
+  }
+
+  [data-ui-glass="solid"][data-ui-glass="solid"][data-ui-glass="solid"],
+  .ui-glass-solid.ui-glass-solid.ui-glass-solid {
+    --glass-blur: var(--glass-reduced-blur);
+    --glass-saturation: 100%;
+    --glass-surface-gradient: none;
+    --glass-overlay-gradient: none;
+    --glass-background-size: auto;
+    --glass-background-position: 0 0;
+    --glass-background-position-hover: 0 0;
+    --glass-shine-duration: 1ms;
+    --card: var(--glass-reduced-card);
+    --popover: var(--glass-reduced-popover);
+    --border: var(--glass-reduced-border);
+    --input: var(--glass-reduced-input);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    :root:root:root,
+    .dark.dark.dark,
+    [data-ui-theme][data-ui-theme][data-ui-theme] {
+      --glass-blur: var(--glass-reduced-blur);
+      --glass-saturation: 100%;
+      --glass-surface-gradient: none;
+      --glass-overlay-gradient: none;
+      --glass-background-size: auto;
+      --glass-background-position: 0 0;
+      --glass-background-position-hover: 0 0;
+      --glass-shine-duration: 1ms;
+      --card: var(--glass-reduced-card);
+      --popover: var(--glass-reduced-popover);
+      --border: var(--glass-reduced-border);
+      --input: var(--glass-reduced-input);
+    }
   }
 
   :where(
