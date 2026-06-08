@@ -13,6 +13,7 @@ Generated from `src/token-metadata.ts` by `bun run generate:tokens`.
 | studio |          104 |         104 |
 | paper  |          104 |         104 |
 | pop    |          104 |         104 |
+| pulse  |          104 |         104 |
 
 ## Tokens
 

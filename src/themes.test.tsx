@@ -152,6 +152,7 @@ import { AtlasTheme, atlasTheme, uiTheme as atlasUiTheme } from "./atlas";
 import { BobbaTheme, Button as BobbaButton, bobbaTheme, uiTheme as bobbaUiTheme } from "./bobba";
 import { PaperTheme, paperTheme, uiTheme as paperUiTheme } from "./paper";
 import { PopTheme, popTheme, uiTheme as popUiTheme } from "./pop";
+import { PulseTheme, pulseTheme, uiTheme as pulseUiTheme } from "./pulse";
 import { StudioTheme, studioTheme, uiTheme as studioUiTheme } from "./studio";
 import { Button as ZleekButton, ZleekTheme, uiTheme as zleekUiTheme, zleekTheme } from "./zleek";
 
@@ -341,6 +342,7 @@ describe("@moritzbrantner/ui theme-contract", () => {
       "studio",
       "paper",
       "pop",
+      "pulse",
       "custom",
     ] as const satisfies readonly UiThemeName[];
 
@@ -364,6 +366,9 @@ describe("@moritzbrantner/ui theme-contract", () => {
         <PopTheme>
           <Button>Pop action</Button>
         </PopTheme>
+        <PulseTheme>
+          <Button>Pulse action</Button>
+        </PulseTheme>
       </>,
     );
 
@@ -373,11 +378,22 @@ describe("@moritzbrantner/ui theme-contract", () => {
     expect(screen.getByRole("button", { name: "Studio action" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Paper action" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Pop action" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Pulse action" })).toBeTruthy();
     expect(Object.keys(themeConfig).sort()).toEqual([...allThemeNames].sort());
-    expect(uiThemeNames).toEqual(["bobba", "zleek", "atlas", "studio", "paper", "pop", "custom"]);
+    expect(uiThemeNames).toEqual([
+      "bobba",
+      "zleek",
+      "atlas",
+      "studio",
+      "paper",
+      "pop",
+      "pulse",
+      "custom",
+    ]);
     expect(defaultUiThemeName).toBe("bobba");
     expect(uiThemeLabels.paper).toBe("Paper");
     expect(uiThemeLabels.pop).toBe("Pop");
+    expect(uiThemeLabels.pulse).toBe("Pulse");
     expect(uiThemeLabels.custom).toBe("Custom");
     expect(zleekTheme.name).toBe("zleek");
     expect(bobbaTheme.name).toBe("bobba");
@@ -385,12 +401,14 @@ describe("@moritzbrantner/ui theme-contract", () => {
     expect(studioTheme.name).toBe("studio");
     expect(paperTheme.name).toBe("paper");
     expect(popTheme.name).toBe("pop");
+    expect(pulseTheme.name).toBe("pulse");
     expect(zleekUiTheme).toBe(zleekTheme);
     expect(bobbaUiTheme).toBe(bobbaTheme);
     expect(atlasUiTheme).toBe(atlasTheme);
     expect(studioUiTheme).toBe(studioTheme);
     expect(paperUiTheme).toBe(paperTheme);
     expect(popUiTheme).toBe(popTheme);
+    expect(pulseUiTheme).toBe(pulseTheme);
   });
 
   test("creates sanitized custom theme token styles", () => {

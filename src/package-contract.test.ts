@@ -217,10 +217,13 @@ import { PaperTheme, paperTheme, uiTheme as paperUiTheme } from "./paper";
 import { paperTheme as paperServerTheme, uiTheme as paperServerUiTheme } from "./paper-server";
 import { PopTheme, popTheme, uiTheme as popUiTheme } from "./pop";
 import { popTheme as popServerTheme, uiTheme as popServerUiTheme } from "./pop-server";
+import { PulseTheme, pulseTheme, uiTheme as pulseUiTheme } from "./pulse";
+import { pulseTheme as pulseServerTheme, uiTheme as pulseServerUiTheme } from "./pulse-server";
 import { AtlasTheme as ScopedAtlasTheme, uiTheme as scopedAtlasUiTheme } from "./themes/atlas";
 import { BobbaTheme as ScopedBobbaTheme, uiTheme as scopedBobbaUiTheme } from "./themes/bobba";
 import { PaperTheme as ScopedPaperTheme, uiTheme as scopedPaperUiTheme } from "./themes/paper";
 import { PopTheme as ScopedPopTheme, uiTheme as scopedPopUiTheme } from "./themes/pop";
+import { PulseTheme as ScopedPulseTheme, uiTheme as scopedPulseUiTheme } from "./themes/pulse";
 import { StudioTheme as ScopedStudioTheme, uiTheme as scopedStudioUiTheme } from "./themes/studio";
 import { ZleekTheme as ScopedZleekTheme, uiTheme as scopedZleekUiTheme } from "./themes/zleek";
 import { cn as serverCn, themeConfig as serverThemeConfig } from "./server";
@@ -444,6 +447,7 @@ describe("@moritzbrantner/ui package-contract", () => {
         "studio",
         "paper",
         "pop",
+        "pulse",
       ]),
     );
     expect(packageJson.sideEffects).toEqual(expect.arrayContaining(["*.css"]));
@@ -464,7 +468,10 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./pop"].import).toBe("./dist/pop.js");
     expect(packageJson.exports["./pop/server"].import).toBe("./dist/pop/server.js");
     expect(packageJson.exports["./pop/server"].types).toBe("./dist/pop/server.d.ts");
-    for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper", "pop"]) {
+    expect(packageJson.exports["./pulse"].import).toBe("./dist/pulse.js");
+    expect(packageJson.exports["./pulse/server"].import).toBe("./dist/pulse/server.js");
+    expect(packageJson.exports["./pulse/server"].types).toBe("./dist/pulse/server.d.ts");
+    for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper", "pop", "pulse"]) {
       expect(packageJson.exports[`./themes/${themeName}`].import).toBe(
         `./dist/themes/${themeName}.js`,
       );
@@ -494,6 +501,7 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./studio/styles.css"]).toBe("./studio/styles.css");
     expect(packageJson.exports["./paper/styles.css"]).toBe("./paper/styles.css");
     expect(packageJson.exports["./pop/styles.css"]).toBe("./pop/styles.css");
+    expect(packageJson.exports["./pulse/styles.css"]).toBe("./pulse/styles.css");
     expect(packageJson.exports["./components/*"]).toBeUndefined();
     expect(packageJson.exports["./components/stable/*"].import).toBe(
       "./dist/components/stable/*.js",
@@ -551,6 +559,12 @@ describe("@moritzbrantner/ui package-contract", () => {
         component: ScopedPopTheme,
         uiTheme: scopedPopUiTheme,
         sourcePath: "src/themes/pop.tsx",
+      },
+      {
+        name: "pulse",
+        component: ScopedPulseTheme,
+        uiTheme: scopedPulseUiTheme,
+        sourcePath: "src/themes/pulse.tsx",
       },
     ] as const;
     const forbiddenSourceImports = [
@@ -622,6 +636,7 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(serverCn("px-4", "px-2")).toBe("px-2");
     expect(serverThemeConfig.bobba.name).toBe("bobba");
     expect(serverThemeConfig.pop.name).toBe("pop");
+    expect(serverThemeConfig.pulse.name).toBe("pulse");
     expect(ClientButton).toBe(Button);
     expect(ClientDialog).toBe(Dialog);
     expect(SubpathButton).toBe(Button);
@@ -783,6 +798,12 @@ describe("@moritzbrantner/ui package-contract", () => {
         label: "Pop",
         uiTheme: popServerUiTheme,
         theme: popServerTheme,
+      },
+      {
+        name: "pulse",
+        label: "Pulse",
+        uiTheme: pulseServerUiTheme,
+        theme: pulseServerTheme,
       },
     ] as const;
 

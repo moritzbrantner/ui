@@ -88,7 +88,7 @@ const zleekGlassStories = [
   "components-overlay-hover-preview--profile-preview",
 ] as const;
 const zleekGlassViewports = new Set(["mobile", "desktop"]);
-const uiThemes = ["bobba", "zleek", "atlas", "studio", "paper"] as const;
+const uiThemes = ["bobba", "zleek", "atlas", "studio", "paper", "pulse"] as const;
 const colorSchemes = ["light", "dark"] as const;
 const horizontallyScrollableStories = new Set([
   "components-stable-primitive-components--overview",
@@ -176,6 +176,23 @@ test.describe("zleek glass motion preferences", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await gotoStory(page, "components-actions-button--variants", {
       designSystem: "zleek",
+      theme: "light",
+    });
+
+    const button = page.locator('[data-slot="button"]:not([data-variant="link"])').first();
+    await button.hover();
+
+    const animationName = await button.evaluate(
+      (element) => window.getComputedStyle(element).animationName,
+    );
+
+    expect(animationName).not.toContain("ui-glass-shine");
+  });
+
+  test("does not run pulse shine animation when reduced motion is requested", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await gotoStory(page, "components-actions-button--variants", {
+      designSystem: "pulse",
       theme: "light",
     });
 

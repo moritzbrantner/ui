@@ -41,7 +41,7 @@ const maxTotalBytes = 880 * 1024;
 const maxEntryBytes = 35 * 1024;
 const maxChunkBytes = 40 * 1024;
 const maxOptimizedThemeEntryBytes = 1024;
-const optimizedThemeNames = ["zleek", "bobba", "atlas", "studio", "paper", "pop"] as const;
+const optimizedThemeNames = ["zleek", "bobba", "atlas", "studio", "paper", "pop", "pulse"] as const;
 const publicEntries = [
   "index",
   "server",
@@ -52,6 +52,7 @@ const publicEntries = [
   "studio",
   "paper",
   "pop",
+  "pulse",
   "themes",
   "themes/zleek",
   "themes/bobba",
@@ -59,6 +60,7 @@ const publicEntries = [
   "themes/studio",
   "themes/paper",
   "themes/pop",
+  "themes/pulse",
 ];
 const failures: string[] = [];
 

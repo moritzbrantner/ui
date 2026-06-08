@@ -15,6 +15,7 @@ const tokenFiles = [
   "studio/styles.css",
   "paper/styles.css",
   "pop/styles.css",
+  "pulse/styles.css",
 ];
 const themeStylesheets = [
   "bobba/styles.css",
@@ -23,6 +24,7 @@ const themeStylesheets = [
   "studio/styles.css",
   "paper/styles.css",
   "pop/styles.css",
+  "pulse/styles.css",
 ];
 const requiredPublicUiTokens = uiTokenMetadata
   .filter((token) => token.name.startsWith("--ui-") || token.name.startsWith("--glass-"))
@@ -104,7 +106,7 @@ for (const relativeFile of tokenFiles) {
 
 const scopedThemeSource = readFileSync(path.join(packageRoot, "theme-scopes.css"), "utf8");
 
-for (const themeName of ["bobba", "zleek", "atlas", "studio", "paper", "pop", "custom"]) {
+for (const themeName of ["bobba", "zleek", "atlas", "studio", "paper", "pop", "pulse", "custom"]) {
   if (!scopedThemeSource.includes(`[data-ui-theme="${themeName}"]`)) {
     errors.push(`theme-scopes.css: missing scoped selector for ${themeName}`);
   }

@@ -125,6 +125,10 @@ const pop = await importPackage("@moritzbrantner/ui/pop");
 assert.equal(pop.uiTheme.name, "pop", "pop entry should expose pop uiTheme");
 assert.equal(typeof pop.PopTheme, "function", "pop entry should expose PopTheme");
 
+const pulse = await importPackage("@moritzbrantner/ui/pulse");
+assert.equal(pulse.uiTheme.name, "pulse", "pulse entry should expose pulse uiTheme");
+assert.equal(typeof pulse.PulseTheme, "function", "pulse entry should expose PulseTheme");
+
 const serverThemeEntries = [
   {
     specifier: "@moritzbrantner/ui/zleek/server",
@@ -155,6 +159,11 @@ const serverThemeEntries = [
     specifier: "@moritzbrantner/ui/pop/server",
     exportName: "popTheme",
     expectedName: "pop",
+  },
+  {
+    specifier: "@moritzbrantner/ui/pulse/server",
+    exportName: "pulseTheme",
+    expectedName: "pulse",
   },
 ] as const;
 
@@ -247,6 +256,7 @@ assert.equal(themes.themeConfig.atlas.name, "atlas", "themes subpath should expo
 assert.equal(themes.themeConfig.studio.name, "studio", "themes subpath should expose themeConfig");
 assert.equal(themes.themeConfig.paper.name, "paper", "themes subpath should expose themeConfig");
 assert.equal(themes.themeConfig.pop.name, "pop", "themes subpath should expose themeConfig");
+assert.equal(themes.themeConfig.pulse.name, "pulse", "themes subpath should expose themeConfig");
 
 const scopedThemeEntries = [
   ["@moritzbrantner/ui/themes/zleek", "ZleekTheme", "zleek"],
@@ -255,6 +265,7 @@ const scopedThemeEntries = [
   ["@moritzbrantner/ui/themes/studio", "StudioTheme", "studio"],
   ["@moritzbrantner/ui/themes/paper", "PaperTheme", "paper"],
   ["@moritzbrantner/ui/themes/pop", "PopTheme", "pop"],
+  ["@moritzbrantner/ui/themes/pulse", "PulseTheme", "pulse"],
 ] as const;
 
 for (const [specifier, componentName, themeName] of scopedThemeEntries) {
@@ -322,6 +333,8 @@ const requiredPackageFiles = [
   "dist/paper/server.d.ts",
   "dist/pop/server.js",
   "dist/pop/server.d.ts",
+  "dist/pulse/server.js",
+  "dist/pulse/server.d.ts",
   "dist/components/stable/button.js",
   "dist/components/stable/button.d.ts",
   "dist/components/stable/dialog.js",
@@ -354,6 +367,8 @@ const requiredPackageFiles = [
   "dist/themes/paper.d.ts",
   "dist/themes/pop.js",
   "dist/themes/pop.d.ts",
+  "dist/themes/pulse.js",
+  "dist/themes/pulse.d.ts",
   "dist/themes/studio.js",
   "dist/themes/studio.d.ts",
   "dist/themes/zleek.js",
@@ -367,6 +382,7 @@ const requiredPackageFiles = [
   "studio/styles.css",
   "paper/styles.css",
   "pop/styles.css",
+  "pulse/styles.css",
 ];
 
 for (const requiredFile of requiredPackageFiles) {

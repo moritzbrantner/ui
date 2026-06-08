@@ -8,6 +8,7 @@ export {
   defaultUiThemeName,
   paperTheme,
   popTheme,
+  pulseTheme,
   studioTheme,
   themeConfig,
   uiThemeLabels,

@@ -124,6 +124,17 @@ const systems = [
     bestFor: ["Consumer apps", "Creator tools", "Onboarding surfaces"],
     icon: ActivityIcon,
   },
+  {
+    id: "pulse",
+    name: "Pulse",
+    label: "Energized motion style",
+    description:
+      "Electric color, responsive scale, and animated affordances for surfaces where interactions should feel active.",
+    surface: "Glowing interactive cards with animated gradients",
+    density: "Comfortable motion density",
+    bestFor: ["Realtime tools", "Launch moments", "High-touch interactions"],
+    icon: ActivityIcon,
+  },
 ] as const satisfies readonly SystemProfile[];
 
 const meta = {
@@ -166,6 +177,11 @@ export const Paper: Story = {
 export const Pop: Story = {
   globals: { designSystem: "pop" },
   render: () => <DesignSystemShowcase systemId="pop" />,
+};
+
+export const Pulse: Story = {
+  globals: { designSystem: "pulse" },
+  render: () => <DesignSystemShowcase systemId="pulse" />,
 };
 
 function DesignSystemShowcase({ systemId }: { systemId: UiThemeName }) {

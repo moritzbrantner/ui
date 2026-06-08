@@ -158,7 +158,7 @@ function verifyPackageMetadata() {
   expectExport("./media", "./dist/media.js", "./dist/media.d.ts");
   expectExport("./labs", "./dist/labs.js", "./dist/labs.d.ts");
   expectExport("./themes", "./dist/themes.js", "./dist/themes.d.ts");
-  for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper", "pop"]) {
+  for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper", "pop", "pulse"]) {
     expectExport(
       `./themes/${themeName}`,
       `./dist/themes/${themeName}.js`,
@@ -206,7 +206,7 @@ function verifyPackageMetadata() {
     errors.push("package exports must not expose the removed flat ./components/* wildcard");
   }
 
-  for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper", "pop"]) {
+  for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper", "pop", "pulse"]) {
     expectExport(`./${themeName}`, `./dist/${themeName}.js`, `./dist/${themeName}.d.ts`);
     expectExport(
       `./${themeName}/server`,

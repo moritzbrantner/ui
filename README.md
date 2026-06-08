@@ -104,11 +104,12 @@ import "@moritzbrantner/ui/atlas/styles.css";
 import "@moritzbrantner/ui/studio/styles.css";
 import "@moritzbrantner/ui/paper/styles.css";
 import "@moritzbrantner/ui/pop/styles.css";
+import "@moritzbrantner/ui/pulse/styles.css";
 ```
 
-Use `atlas` for dense dashboards and analytics, `studio` for creative tooling, `paper` for document or research-heavy interfaces, and `pop` for playful consumer surfaces with brighter color and stronger motion.
+Use `atlas` for dense dashboards and analytics, `studio` for creative tooling, `paper` for document or research-heavy interfaces, `pop` for playful consumer surfaces with brighter color and stronger motion, and `pulse` for energized interaction-heavy surfaces.
 
-`base.css` is the generated shared layer for Tailwind, animation helpers, compatibility variants, and component normalization. It is exported for tooling and advanced composition, but it generally should not be the only stylesheet an app imports because it does not provide concrete theme token values. Apps should import exactly one concrete stylesheet such as `@moritzbrantner/ui/styles.css`, `@moritzbrantner/ui/atlas/styles.css`, or `@moritzbrantner/ui/pop/styles.css`.
+`base.css` is the generated shared layer for Tailwind, animation helpers, compatibility variants, and component normalization. It is exported for tooling and advanced composition, but it generally should not be the only stylesheet an app imports because it does not provide concrete theme token values. Apps should import exactly one concrete stylesheet such as `@moritzbrantner/ui/styles.css`, `@moritzbrantner/ui/atlas/styles.css`, or `@moritzbrantner/ui/pulse/styles.css`.
 
 Token metadata and built-in theme token values live in `src/token-metadata.ts`. Run `bun run generate:tokens` after token changes to update generated CSS and [token docs](./docs/tokens.md).
 
@@ -217,7 +218,7 @@ Use the server entrypoint for `cn`, `themeConfig`, `createUiTheme`, and theme me
 import { cn, createUiTheme, themeConfig } from "@moritzbrantner/ui/server";
 ```
 
-Every app should import one stylesheet, usually `@moritzbrantner/ui/styles.css`. Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css` and `@moritzbrantner/ui/pop/styles.css` replace that default when a product surface needs a different visual system. `UiTheme` and `themeConfig` provide metadata classes and attributes; they do not fetch data or switch global CSS by themselves.
+Every app should import one stylesheet, usually `@moritzbrantner/ui/styles.css`. Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css`, `@moritzbrantner/ui/pop/styles.css`, and `@moritzbrantner/ui/pulse/styles.css` replace that default when a product surface needs a different visual system. `UiTheme` and `themeConfig` provide metadata classes and attributes; they do not fetch data or switch global CSS by themselves.
 
 ## Do Not Put Here
 
@@ -339,6 +340,7 @@ Theme metadata is also available from subpaths. Use the scoped theme subpaths fo
 import { themeConfig, uiThemeNames } from "@moritzbrantner/ui/themes";
 import { AtlasTheme, uiTheme as atlasTheme } from "@moritzbrantner/ui/themes/atlas";
 import { PopTheme, uiTheme as popTheme } from "@moritzbrantner/ui/themes/pop";
+import { PulseTheme, uiTheme as pulseTheme } from "@moritzbrantner/ui/themes/pulse";
 ```
 
 Import classes are intentionally split:
@@ -356,6 +358,7 @@ import { uiTheme as atlasTheme } from "@moritzbrantner/ui/atlas";
 import { uiTheme as studioTheme } from "@moritzbrantner/ui/studio";
 import { uiTheme as paperTheme } from "@moritzbrantner/ui/paper";
 import { uiTheme as popTheme } from "@moritzbrantner/ui/pop";
+import { uiTheme as pulseTheme } from "@moritzbrantner/ui/pulse";
 ```
 
 Use metadata-only theme server subpaths for server code:
@@ -367,6 +370,7 @@ import { uiTheme as atlasTheme } from "@moritzbrantner/ui/atlas/server";
 import { uiTheme as studioTheme } from "@moritzbrantner/ui/studio/server";
 import { uiTheme as paperTheme } from "@moritzbrantner/ui/paper/server";
 import { uiTheme as popTheme } from "@moritzbrantner/ui/pop/server";
+import { uiTheme as pulseTheme } from "@moritzbrantner/ui/pulse/server";
 ```
 
 Storybook uses the same theme registry for its design-system toolbar and for the per-style component catalog stories.

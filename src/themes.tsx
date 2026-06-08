@@ -12,6 +12,7 @@ import {
   defaultUiThemeName,
   paperTheme,
   popTheme,
+  pulseTheme,
   studioTheme,
   themeConfig,
   uiThemeLabels,
@@ -63,11 +64,16 @@ function PopTheme(props: Omit<UiThemeProps, "theme">) {
   return <UiTheme theme="pop" {...props} />;
 }
 
+function PulseTheme(props: Omit<UiThemeProps, "theme">) {
+  return <UiTheme theme="pulse" {...props} />;
+}
+
 export {
   AtlasTheme,
   BobbaTheme,
   PaperTheme,
   PopTheme,
+  PulseTheme,
   StudioTheme,
   UiTheme,
   ZleekTheme,
@@ -79,6 +85,7 @@ export {
   defaultUiThemeName,
   paperTheme,
   popTheme,
+  pulseTheme,
   studioTheme,
   themeConfig,
   uiThemeLabels,
