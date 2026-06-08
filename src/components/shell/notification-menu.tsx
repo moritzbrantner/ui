@@ -139,7 +139,10 @@ function NotificationMenu({
         >
           <BellIcon />
           {effectiveUnreadCount > 0 ? (
-            <Badge asChild className="absolute -right-2 -top-2 min-w-5 justify-center px-1">
+            <Badge
+              asChild
+              className="absolute right-0.5 top-0.5 h-4 min-w-4 justify-center px-1 text-[10px] leading-none"
+            >
               <span aria-hidden="true">{countLabel}</span>
             </Badge>
           ) : null}
