@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -10,6 +10,11 @@ import {
   type ComponentTier,
 } from "../src/component-registry";
 import { mobileUsabilityConfig } from "./mobile-usability-config";
+import {
+  mobileUsabilityViewport,
+  type MobileUsabilityFinding,
+  writeMobileUsabilityFindingFragment,
+} from "./mobile-usability-report";
 
 type StoryIndexEntry = {
   type: "story" | "docs";
@@ -31,35 +36,9 @@ type MobileUsabilityStory = {
   skipReason?: string;
 };
 
-type MobileUsabilityFinding = {
-  component: string;
-  tier: string;
-  storyId: string;
-  storyTitle: string;
-  storyName: string;
-  importPath: string;
-  viewport: { width: 360; height: 568 };
-  severity: "fail";
-  category:
-    | "render"
-    | "document-overflow"
-    | "internal-scroll"
-    | "target-size"
-    | "target-actionability"
-    | "text-clipping"
-    | "overlay"
-    | "keyboard-focus";
-  message: string;
-  selector?: string;
-  boundingBox?: { x: number; y: number; width: number; height: number };
-  screenshotPath?: string;
-};
-
 type BoundingBox = { x: number; y: number; width: number; height: number };
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const reportDirectory = path.join(packageRoot, "test-results", "mobile-usability");
-const fragmentDirectory = path.join(reportDirectory, "fragments");
 const sourceSkipCache = new Map<string, Map<string, string | null>>();
 let storyIndexEntries: StoryIndexEntry[] = [];
 
@@ -78,24 +57,13 @@ test.use({
   },
 });
 
-test.beforeAll(async ({ request }, workerInfo) => {
-  if (workerInfo.workerIndex === 0) {
-    rmSync(reportDirectory, { force: true, recursive: true });
-  }
-
-  mkdirSync(reportDirectory, { recursive: true });
-  mkdirSync(fragmentDirectory, { recursive: true });
-
+test.beforeAll(async ({ request }) => {
   const response = await request.get("/index.json");
 
   expect(response.ok(), "Storybook index should be available").toBe(true);
 
   const index = (await response.json()) as { entries: Record<string, StoryIndexEntry> };
   storyIndexEntries = Object.values(index.entries).filter((entry) => entry.type === "story");
-});
-
-test.afterAll(() => {
-  writeReports(readFindingFragments());
 });
 
 for (const component of auditedComponents) {
@@ -124,7 +92,7 @@ for (const component of auditedComponents) {
       componentFindings.push(...storyFindings);
     }
 
-    writeFindingFragment(component.name, componentFindings);
+    writeMobileUsabilityFindingFragment(component.name, componentFindings);
 
     expect(componentFindings, formatFindingSummary(componentFindings)).toEqual([]);
   });
@@ -1227,10 +1195,7 @@ function createFinding(
     storyTitle: story.storyTitle,
     storyName: story.storyName,
     importPath: story.importPath,
-    viewport: {
-      width: mobileUsabilityConfig.viewport.width,
-      height: mobileUsabilityConfig.viewport.height,
-    },
+    viewport: mobileUsabilityViewport,
     severity: "fail",
     category,
     message,
@@ -1252,74 +1217,6 @@ async function attachStoryScreenshot(
   for (const finding of storyFindings) {
     finding.screenshotPath = path.relative(packageRoot, screenshotPath);
   }
-}
-
-function writeReports(reportFindings: MobileUsabilityFinding[]) {
-  mkdirSync(reportDirectory, { recursive: true });
-  writeFileSync(
-    path.join(reportDirectory, "report.json"),
-    `${JSON.stringify(reportFindings, null, 2)}\n`,
-  );
-  writeFileSync(path.join(reportDirectory, "report.md"), formatMarkdownReport(reportFindings));
-}
-
-function writeFindingFragment(componentName: string, componentFindings: MobileUsabilityFinding[]) {
-  mkdirSync(fragmentDirectory, { recursive: true });
-  writeFileSync(
-    path.join(fragmentDirectory, `${sanitizeFileName(componentName)}.json`),
-    `${JSON.stringify(componentFindings, null, 2)}\n`,
-  );
-  writeReports(readFindingFragments());
-}
-
-function readFindingFragments() {
-  if (!existsSync(fragmentDirectory)) {
-    return [] satisfies MobileUsabilityFinding[];
-  }
-
-  return readdirSync(fragmentDirectory)
-    .filter((fileName) => fileName.endsWith(".json"))
-    .flatMap((fileName) => {
-      const filePath = path.join(fragmentDirectory, fileName);
-      const source = readFileSync(filePath, "utf8").trim();
-
-      return source.length > 0 ? (JSON.parse(source) as MobileUsabilityFinding[]) : [];
-    });
-}
-
-function formatMarkdownReport(reportFindings: MobileUsabilityFinding[]) {
-  if (reportFindings.length === 0) {
-    return "# Mobile Usability Report\n\nNo mobile usability findings.\n";
-  }
-
-  const sections = ["# Mobile Usability Report", ""];
-
-  for (const finding of reportFindings) {
-    sections.push(`## ${finding.component}`);
-    sections.push(`- Component: ${finding.component} (${finding.tier})`);
-    sections.push(`- Story: ${finding.storyTitle} / ${finding.storyName} (${finding.storyId})`);
-    sections.push(`- Failure category: ${finding.category}`);
-    sections.push(`- What failed: ${finding.message}`);
-
-    if (finding.selector) {
-      sections.push(`- Selector: \`${finding.selector}\``);
-    }
-
-    if (finding.boundingBox) {
-      sections.push(`- Bounding box: \`${JSON.stringify(finding.boundingBox)}\``);
-    }
-
-    if (finding.screenshotPath) {
-      sections.push(`- Screenshot: ${finding.screenshotPath}`);
-    }
-
-    sections.push(
-      "- Suggested next decision: fix layout, add mobile variant, mark desktop/web-only, use an internal scroll container, or replace with an alternative component.",
-    );
-    sections.push("");
-  }
-
-  return `${sections.join("\n")}\n`;
 }
 
 function formatFindingSummary(reportFindings: MobileUsabilityFinding[]) {
@@ -1362,10 +1259,6 @@ function roundBox(box: BoundingBox) {
 
 function normalizeImportPath(importPath: string) {
   return importPath.replace(/^\.\//, "");
-}
-
-function sanitizeFileName(value: string) {
-  return value.replace(/[^a-z0-9_-]+/gi, "-").replace(/^-+|-+$/g, "");
 }
 
 function findMatchingBrace(source: string, start: number) {
