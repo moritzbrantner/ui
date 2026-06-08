@@ -36,7 +36,7 @@ const generatedArtifactFiles = [
 ];
 const simpleThemeNames = ["bobba", "atlas", "studio", "paper"] as const;
 const simpleThemeStylesheets = simpleThemeNames.map((themeName) => `${themeName}/styles.css`);
-const maxSimpleThemeCssBytes = 13 * 1024;
+const maxSimpleThemeCssBytes = 16 * 1024;
 const componentSourceDirectives = [
   '@source "./dist/**/*.{js,mjs}";',
   '@source "./src/**/*.{ts,tsx}";',

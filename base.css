@@ -7,6 +7,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --font-body: var(--font-body-app);
+  --font-control: var(--font-control-app);
   --font-heading: var(--font-heading-app);
   --font-sans: var(--font-sans-app);
   --font-mono: var(--font-mono-app);
@@ -66,6 +68,30 @@
   --color-editor-timeline: var(--editor-timeline);
   --color-editor-playhead: var(--editor-playhead);
   --color-editor-layer: var(--editor-layer);
+  --color-document-annotation: var(--document-annotation);
+  --color-document-highlight: var(--document-highlight);
+  --color-document-citation: var(--document-citation);
+  --color-document-margin-note: var(--document-margin-note);
+  --color-document-selection: var(--document-selection);
+  --color-document-ruled-background: var(--document-ruled-background);
+  --color-document-grid-background: var(--document-grid-background);
+  --color-document-quote: var(--document-quote);
+  --color-document-callout: var(--document-callout);
+  --color-ui-badge-neutral: var(--ui-badge-neutral);
+  --color-ui-badge-info: var(--ui-badge-info);
+  --color-ui-badge-success: var(--ui-badge-success);
+  --color-ui-badge-warning: var(--ui-badge-warning);
+  --color-ui-badge-danger: var(--ui-badge-danger);
+  --color-ui-onboarding: var(--ui-onboarding);
+  --color-ui-progress-track: var(--ui-progress-track);
+  --color-ui-progress-fill: var(--ui-progress-fill);
+  --color-ui-celebratory-accent: var(--ui-celebratory-accent);
+  --color-live-active: var(--live-active);
+  --color-live-streaming: var(--live-streaming);
+  --color-live-stale: var(--live-stale);
+  --color-live-alert: var(--live-alert);
+  --color-live-healthy: var(--live-healthy);
+  --color-live-syncing: var(--live-syncing);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -182,7 +208,36 @@
   }
 
   html {
-    @apply font-sans;
+    font-family: var(--font-body-app, var(--font-sans-app));
+  }
+
+  :where(
+    button,
+    input,
+    select,
+    textarea,
+    [role="button"],
+    [role="menu"],
+    [role="menuitem"],
+    [role="option"],
+    [data-slot="button"],
+    [data-slot="input"],
+    [data-slot="textarea"],
+    [data-slot="select-trigger"],
+    [data-slot="native-select"],
+    [data-slot="dropdown-menu-content"],
+    [data-slot="dropdown-menu-item"],
+    [data-slot="context-menu-content"],
+    [data-slot="context-menu-item"],
+    [data-slot="menubar-content"],
+    [data-slot="menubar-item"],
+    [data-slot="command"],
+    [data-slot="command-input"],
+    [data-slot="command-item"],
+    [data-slot="table"],
+    [data-slot="data-grid"]
+  ) {
+    font-family: var(--font-control-app, var(--font-sans-app));
   }
 
   [data-ui-glass="solid"][data-ui-glass="solid"][data-ui-glass="solid"],
@@ -562,6 +617,13 @@
       --ui-motion-enter-y: 0px;
       --ui-motion-overlay-scale: 1;
       --glass-shine-duration: 1ms;
+    }
+
+    :where(.pulse, .pulse *, [data-ui-theme="pulse"], [data-ui-theme="pulse"] *) {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 1ms !important;
     }
   }
 }

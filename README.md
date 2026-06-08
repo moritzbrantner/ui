@@ -337,7 +337,7 @@ These components render UI state and slots only. Keep fetching, routing, upload 
 
 ## Theme Metadata
 
-`UiTheme`, `BobbaTheme`, `ZleekTheme`, `AtlasTheme`, `StudioTheme`, `PaperTheme`, and `PopTheme` add theme metadata classes and `data-ui-theme` attributes around a subtree. They do not scope CSS tokens by themselves; the active visual theme still comes from the single stylesheet imported by the app.
+`UiTheme`, `BobbaTheme`, `ZleekTheme`, `AtlasTheme`, `StudioTheme`, `PaperTheme`, `PopTheme`, and `PulseTheme` add theme metadata classes and `data-ui-theme` attributes around a subtree. They do not scope CSS tokens by themselves; the active visual theme still comes from the single stylesheet imported by the app.
 
 ```tsx
 import { UiTheme, type UiThemeName } from "@moritzbrantner/ui";

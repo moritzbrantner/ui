@@ -196,6 +196,8 @@ function generateTailwindThemeBlock(): string {
   const aliases = [
     ["--color-background", "var(--background)"],
     ["--color-foreground", "var(--foreground)"],
+    ["--font-body", "var(--font-body-app)"],
+    ["--font-control", "var(--font-control-app)"],
     ["--font-heading", "var(--font-heading-app)"],
     ["--font-sans", "var(--font-sans-app)"],
     ["--font-mono", "var(--font-mono-app)"],

@@ -6,14 +6,14 @@ Generated from `src/token-metadata.ts` by `bun run generate:tokens`.
 
 | Theme  | Light tokens | Dark tokens |
 | ------ | -----------: | ----------: |
-| bobba  |          145 |         145 |
-| custom |          145 |         145 |
-| zleek  |          145 |         145 |
-| atlas  |          145 |         145 |
-| studio |          145 |         145 |
-| paper  |          145 |         145 |
-| pop    |          145 |         145 |
-| pulse  |          145 |         145 |
+| bobba  |          172 |         172 |
+| custom |          172 |         172 |
+| zleek  |          172 |         172 |
+| atlas  |          172 |         172 |
+| studio |          172 |         172 |
+| paper  |          172 |         172 |
+| pop    |          172 |         172 |
+| pulse  |          172 |         172 |
 
 ## Tokens
 
@@ -77,6 +77,30 @@ Generated from `src/token-metadata.ts` by `bun run generate:tokens`.
 | `--editor-timeline`                 | color     | Editor timeline track color.                                            |
 | `--editor-playhead`                 | color     | Editor timeline playhead color.                                         |
 | `--editor-layer`                    | color     | Editor layer highlight color.                                           |
+| `--document-annotation`             | color     | Document annotation mark color.                                         |
+| `--document-highlight`              | color     | Document highlight swatch color.                                        |
+| `--document-citation`               | color     | Document citation reference color.                                      |
+| `--document-margin-note`            | color     | Document margin note accent color.                                      |
+| `--document-selection`              | color     | Document text selection color.                                          |
+| `--document-ruled-background`       | color     | Document ruled background line color.                                   |
+| `--document-grid-background`        | color     | Document grid background line color.                                    |
+| `--document-quote`                  | color     | Document quote accent color.                                            |
+| `--document-callout`                | color     | Document callout accent color.                                          |
+| `--ui-badge-neutral`                | color     | Neutral badge background color.                                         |
+| `--ui-badge-info`                   | color     | Info badge background color.                                            |
+| `--ui-badge-success`                | color     | Success badge background color.                                         |
+| `--ui-badge-warning`                | color     | Warning badge background color.                                         |
+| `--ui-badge-danger`                 | color     | Danger badge background color.                                          |
+| `--ui-onboarding`                   | color     | Onboarding and guided-start accent color.                               |
+| `--ui-progress-track`               | color     | Progress track background color.                                        |
+| `--ui-progress-fill`                | color     | Progress fill color.                                                    |
+| `--ui-celebratory-accent`           | color     | Celebratory accent color for reward and completion states.              |
+| `--live-active`                     | color     | Realtime active state color.                                            |
+| `--live-streaming`                  | color     | Realtime streaming state color.                                         |
+| `--live-stale`                      | color     | Realtime stale state color.                                             |
+| `--live-alert`                      | color     | Realtime alert state color.                                             |
+| `--live-healthy`                    | color     | Realtime healthy state color.                                           |
+| `--live-syncing`                    | color     | Realtime syncing state color.                                           |
 | `--sidebar`                         | color     | Sidebar background color.                                               |
 | `--sidebar-foreground`              | color     | Sidebar foreground color.                                               |
 | `--sidebar-primary`                 | color     | Sidebar primary color.                                                  |
@@ -86,12 +110,15 @@ Generated from `src/token-metadata.ts` by `bun run generate:tokens`.
 | `--sidebar-border`                  | color     | Sidebar border color.                                                   |
 | `--sidebar-ring`                    | color     | Sidebar focus ring color.                                               |
 | `--font-sans-app`                   | font      | Application sans font stack.                                            |
+| `--font-body-app`                   | font      | Application body font stack.                                            |
+| `--font-control-app`                | font      | Application control and dense UI font stack.                            |
 | `--font-heading-app`                | font      | Application heading and display font stack.                             |
 | `--font-mono-app`                   | font      | Application monospace font stack.                                       |
 | `--radius`                          | radius    | Base radius used by Tailwind radius aliases.                            |
 | `--ui-radius-control`               | radius    | Control radius token.                                                   |
 | `--ui-radius-surface`               | radius    | Surface radius token.                                                   |
 | `--ui-radius-overlay`               | radius    | Overlay radius token.                                                   |
+| `--ui-radius-pill`                  | radius    | Pill affordance radius token.                                           |
 | `--glass-inset-surface`             | surface   | Glass inset control background.                                         |
 | `--glass-saturation`                | surface   | Backdrop saturation amount for glass surfaces.                          |
 | `--glass-surface-gradient`          | surface   | Layered background gradient for glass shell and surface slots.          |

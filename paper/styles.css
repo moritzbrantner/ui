@@ -2,18 +2,20 @@
 @import "../base.css";
 
 :root {
-  --font-sans-app: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-heading-app:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-sans-app:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-body-app: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-control-app:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-heading-app: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono-app:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
   --radius: 0.25rem;
   --glass-blur: 0px;
   --glass-reduced-blur: 0px;
-  --glass-shadow: 0 3px 10px oklch(0.34 0.035 80 / 0.07);
-  --glass-interactive-shadow: 0 2px 8px oklch(0.34 0.035 80 / 0.07);
+  --glass-shadow: 0 1px 2px oklch(0.34 0.035 80 / 0.1);
+  --glass-interactive-shadow: 0 1px 1px oklch(0.34 0.035 80 / 0.12);
   --glass-raised-shadow: var(--glass-interactive-shadow);
   --glass-inset-shadow: none;
   --glass-inset-highlight: transparent;
@@ -51,8 +53,8 @@
   --warning-foreground: oklch(0.14 0.018 70);
   --info: oklch(0.46 0.085 225);
   --info-foreground: oklch(0.99 0.006 88);
-  --border: oklch(0.8 0.025 88);
-  --input: oklch(0.83 0.024 88);
+  --border: oklch(0.74 0.032 88);
+  --input: oklch(0.76 0.034 88);
   --ring: oklch(0.55 0.09 165);
   --chart-1: oklch(0.5 0.11 165);
   --chart-2: oklch(0.58 0.11 75);
@@ -84,6 +86,30 @@
   --editor-timeline: oklch(0.94 0.006 255);
   --editor-playhead: oklch(0.56 0.09 252);
   --editor-layer: oklch(0.925 0.032 242);
+  --document-annotation: oklch(0.52 0.12 48);
+  --document-highlight: oklch(0.88 0.12 86 / 0.58);
+  --document-citation: oklch(0.42 0.09 225);
+  --document-margin-note: oklch(0.5 0.07 150);
+  --document-selection: oklch(0.74 0.08 88 / 0.48);
+  --document-ruled-background: oklch(0.78 0.03 88 / 0.55);
+  --document-grid-background: oklch(0.78 0.03 88 / 0.36);
+  --document-quote: oklch(0.38 0.065 160);
+  --document-callout: oklch(0.58 0.095 78);
+  --ui-badge-neutral: oklch(0.94 0.006 255);
+  --ui-badge-info: oklch(0.88 0.06 235);
+  --ui-badge-success: oklch(0.88 0.07 155);
+  --ui-badge-warning: oklch(0.9 0.08 78);
+  --ui-badge-danger: oklch(0.9 0.07 25);
+  --ui-onboarding: oklch(0.56 0.11 252);
+  --ui-progress-track: oklch(0.92 0.008 255);
+  --ui-progress-fill: oklch(0.5 0.12 252);
+  --ui-celebratory-accent: oklch(0.64 0.14 302);
+  --live-active: oklch(0.5 0.12 252);
+  --live-streaming: oklch(0.54 0.13 195);
+  --live-stale: oklch(0.58 0.06 255);
+  --live-alert: oklch(0.62 0.17 35);
+  --live-healthy: oklch(0.48 0.12 155);
+  --live-syncing: oklch(0.58 0.13 285);
   --sidebar: oklch(0.96 0.02 88);
   --sidebar-foreground: oklch(0.2 0.022 70);
   --sidebar-primary: oklch(0.42 0.075 165);
@@ -95,6 +121,7 @@
   --ui-radius-control: var(--radius-md);
   --ui-radius-surface: var(--radius-lg);
   --ui-radius-overlay: var(--radius-lg);
+  --ui-radius-pill: 999px;
   --ui-control-height-xs: 1.5rem;
   --ui-control-height-sm: 1.875rem;
   --ui-control-height-md: 2.125rem;
@@ -154,18 +181,20 @@
 }
 
 .dark {
-  --font-sans-app: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-heading-app:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-sans-app:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-body-app: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-control-app:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-heading-app: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono-app:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
   --radius: 0.25rem;
   --glass-blur: 0px;
   --glass-reduced-blur: 0px;
-  --glass-shadow: 0 3px 10px oklch(0.34 0.035 80 / 0.07);
-  --glass-interactive-shadow: 0 2px 8px oklch(0.34 0.035 80 / 0.07);
+  --glass-shadow: 0 1px 2px oklch(0 0 0 / 0.24);
+  --glass-interactive-shadow: 0 1px 1px oklch(0 0 0 / 0.28);
   --glass-raised-shadow: var(--glass-interactive-shadow);
   --glass-inset-shadow: none;
   --glass-inset-highlight: transparent;
@@ -203,8 +232,8 @@
   --warning-foreground: oklch(0.16 0.018 70);
   --info: oklch(0.7 0.1 225);
   --info-foreground: oklch(0.14 0.018 70);
-  --border: oklch(0.34 0.028 70);
-  --input: oklch(0.39 0.03 70);
+  --border: oklch(0.42 0.036 70);
+  --input: oklch(0.46 0.036 70);
   --ring: oklch(0.69 0.09 160);
   --chart-1: oklch(0.69 0.09 160);
   --chart-2: oklch(0.72 0.12 75);
@@ -236,6 +265,30 @@
   --editor-timeline: oklch(0.245 0.012 255);
   --editor-playhead: oklch(0.72 0.08 252);
   --editor-layer: oklch(0.33 0.04 245);
+  --document-annotation: oklch(0.74 0.11 48);
+  --document-highlight: oklch(0.74 0.11 86 / 0.3);
+  --document-citation: oklch(0.72 0.1 225);
+  --document-margin-note: oklch(0.72 0.09 150);
+  --document-selection: oklch(0.72 0.08 88 / 0.3);
+  --document-ruled-background: oklch(0.92 0.018 88 / 0.15);
+  --document-grid-background: oklch(0.92 0.018 88 / 0.1);
+  --document-quote: oklch(0.69 0.09 160);
+  --document-callout: oklch(0.74 0.11 78);
+  --ui-badge-neutral: oklch(1 0 0 / 0.12);
+  --ui-badge-info: oklch(0.32 0.06 235);
+  --ui-badge-success: oklch(0.32 0.06 155);
+  --ui-badge-warning: oklch(0.34 0.07 78);
+  --ui-badge-danger: oklch(0.34 0.07 25);
+  --ui-onboarding: oklch(0.74 0.12 252);
+  --ui-progress-track: oklch(1 0 0 / 0.12);
+  --ui-progress-fill: oklch(0.74 0.13 252);
+  --ui-celebratory-accent: oklch(0.74 0.15 302);
+  --live-active: oklch(0.74 0.13 252);
+  --live-streaming: oklch(0.74 0.14 195);
+  --live-stale: oklch(0.68 0.04 255);
+  --live-alert: oklch(0.76 0.15 35);
+  --live-healthy: oklch(0.72 0.13 155);
+  --live-syncing: oklch(0.74 0.13 285);
   --sidebar: oklch(0.2 0.018 70);
   --sidebar-foreground: oklch(0.93 0.018 88);
   --sidebar-primary: oklch(0.69 0.09 160);
@@ -247,6 +300,7 @@
   --ui-radius-control: var(--radius-md);
   --ui-radius-surface: var(--radius-lg);
   --ui-radius-overlay: var(--radius-lg);
+  --ui-radius-pill: 999px;
   --ui-control-height-xs: 1.5rem;
   --ui-control-height-sm: 1.875rem;
   --ui-control-height-md: 2.125rem;
