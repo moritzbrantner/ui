@@ -40,6 +40,19 @@ const cssFiles = {
   pulse: "pulse/styles.css",
 } as const;
 
+type ThemeMotionExtraConfig = {
+  brightness: string;
+  saturate: string;
+  interactiveShadow: string;
+  overlayShadow: string;
+  controlAnimation: string;
+  surfaceAnimation: string;
+  overlayAnimation: string;
+  statusAnimation: string;
+  progressAnimation: string;
+  focusRingShadow: string;
+};
+
 const generatedFiles = new Map<string, string>([
   [cssFiles.base, generateBaseStyles()],
   [cssFiles.styles, generateDefaultStyles()],
@@ -126,14 +139,21 @@ function generateDefaultStyles(): string {
 }
 
 function generateThemeStyles(themeName: (typeof builtInThemeNames)[number]): string {
-  return [
+  const sections = [
     generatedHeader,
     '@import "../base.css";',
     "",
     generateTokenBlock(":root", uiThemeTokenValues[themeName].light),
     "",
     generateTokenBlock(".dark", uiThemeTokenValues[themeName].dark),
-  ].join("\n");
+  ];
+  const motionExtras = generateThemeMotionExtras(themeName, ":root");
+
+  if (motionExtras) {
+    sections.push("", motionExtras);
+  }
+
+  return sections.join("\n");
 }
 
 function generateThemeScopes(): string {
@@ -154,12 +174,18 @@ function generateThemeScopes(): string {
     return generateTokenBlock(selector, uiThemeTokenValues[themeName].dark);
   });
 
+  const scopedMotionExtras = [
+    generateThemeMotionExtras("pop", '[data-ui-theme="pop"]'),
+    generateThemeMotionExtras("pulse", '[data-ui-theme="pulse"]'),
+  ].filter(Boolean);
+
   return [
     generatedHeader,
     '@import "./base.css";',
     "",
     ...lightBlocks.flatMap((block) => [block, ""]),
     ...darkBlocks.flatMap((block) => [block, ""]),
+    ...scopedMotionExtras.flatMap((block) => [block, ""]),
   ].join("\n");
 }
 
@@ -330,6 +356,225 @@ function generateTokenBlock(selector: string, tokens: UiThemeTokens): string {
 
       return `  ${token.name}: ${value};`;
     }),
+    "}",
+  ].join("\n");
+}
+
+function generateThemeMotionExtras(
+  themeName: (typeof builtInThemeNames)[number],
+  selector: string,
+): string {
+  const config: ThemeMotionExtraConfig | undefined =
+    themeName === "pop"
+      ? {
+          brightness: "1.05",
+          saturate: "1.16",
+          interactiveShadow:
+            "0 18px 34px color-mix(in oklch, var(--primary) 28%, transparent), 0 6px 18px color-mix(in oklch, var(--ring) 18%, transparent)",
+          overlayShadow:
+            "0 24px 54px color-mix(in oklch, var(--primary) 25%, transparent), 0 10px 24px color-mix(in oklch, var(--ring) 16%, transparent)",
+          controlAnimation: "ui-pop-snap 260ms cubic-bezier(0.18, 1.35, 0.28, 1) both",
+          surfaceAnimation: "ui-pop-lift 360ms cubic-bezier(0.18, 1.2, 0.28, 1) both",
+          overlayAnimation: "ui-pop-enter 360ms cubic-bezier(0.18, 1.25, 0.32, 1) both",
+          statusAnimation: "ui-pop-glint 900ms ease-out both",
+          progressAnimation: "ui-pop-track-shine 1200ms ease-out both",
+          focusRingShadow:
+            "0 0 0 var(--ui-focus-ring-width) color-mix(in oklch, var(--ring) 48%, transparent), 0 0 0 calc(var(--ui-focus-ring-width) + 4px) color-mix(in oklch, var(--primary) 22%, transparent)",
+        }
+      : themeName === "pulse"
+        ? {
+            brightness: "1.07",
+            saturate: "1.24",
+            interactiveShadow:
+              "0 18px 38px color-mix(in oklch, var(--primary) 30%, transparent), 0 7px 22px color-mix(in oklch, var(--live-streaming, var(--info)) 20%, transparent)",
+            overlayShadow:
+              "0 28px 60px color-mix(in oklch, var(--primary) 28%, transparent), 0 12px 28px color-mix(in oklch, var(--live-streaming, var(--info)) 22%, transparent)",
+            controlAnimation: "ui-pulse-pressurize 420ms cubic-bezier(0.2, 1.35, 0.28, 1) both",
+            surfaceAnimation: "ui-pulse-breathe 1400ms ease-in-out both",
+            overlayAnimation: "ui-pulse-enter 420ms cubic-bezier(0.2, 1.25, 0.28, 1) both",
+            statusAnimation: "ui-pulse-signal 1600ms ease-in-out infinite",
+            progressAnimation: "ui-pulse-flow 1300ms ease-in-out infinite",
+            focusRingShadow:
+              "0 0 0 var(--ui-focus-ring-width) color-mix(in oklch, var(--info) 42%, transparent), 0 0 0 calc(var(--ui-focus-ring-width) + 5px) color-mix(in oklch, var(--live-streaming, var(--primary)) 24%, transparent)",
+          }
+        : undefined;
+
+  if (!config) {
+    return "";
+  }
+
+  const controlSelector = `${selector} :where([data-slot="button"]:not([data-variant="link"]))`;
+  const activeControlSelector = `${selector} :where([data-slot="tabs-trigger"][data-state="active"], [data-slot="switch"][data-state="checked"])`;
+  const surfaceSelector = `${selector} :where([data-slot="card"][data-interactive="true"], [data-slot="toolbar"], [data-slot="navbar"], [data-slot="stat"], [data-slot="metric-strip"])`;
+  const overlaySelector = `${selector} :where([data-slot="dialog-content"], [data-slot="alert-dialog-content"], [data-slot="popover-content"], [data-slot="hover-card-content"], [data-slot="tooltip-content"], [data-slot="dropdown-menu-content"], [data-slot="dropdown-menu-sub-content"], [data-slot="context-menu-content"], [data-slot="context-menu-sub-content"], [data-slot="menubar-content"], [data-slot="menubar-sub-content"], [data-slot="navigation-menu-content"], [data-slot="navigation-menu-viewport"], [data-slot="select-content"], [data-slot="combobox-content"], [data-slot="command"], [data-slot="navbar-submenu"], [data-slot="toast"])`;
+  const statusSelector = `${selector} :where([data-slot="badge"]:not([data-variant="link"]), [data-slot="connection-status-action"])`;
+  const connectionStatusSelector = `${selector} :where([data-slot="connection-status"][data-status="syncing"], [data-slot="connection-status"][data-pending="true"])`;
+  const connectionStatusPartSelector = `${selector} :where([data-slot="connection-status"][data-status="syncing"], [data-slot="connection-status"][data-pending="true"]) :where([data-slot="connection-status-icon"], [data-slot="connection-status-action"])`;
+  const progressSelector = `${selector} :where([data-slot="progress-indicator"], [data-slot="loading-bar"][data-indeterminate="false"] [data-slot="loading-bar-indicator"])`;
+  const indeterminateLoadingSelector = `${selector} :where([data-slot="loading-bar"][data-indeterminate="true"] [data-slot="loading-bar-indicator"])`;
+  const popKeyframes =
+    themeName === "pop"
+      ? [
+          "  @keyframes ui-pop-snap {",
+          "    0% { transform: translateY(var(--ui-motion-hover-y)) scale(var(--ui-motion-hover-scale)); }",
+          "    45% { transform: translateY(calc(var(--ui-motion-hover-y) - 1px)) scale(1.035); }",
+          "    72% { transform: translateY(calc(var(--ui-motion-hover-y) + 0.5px)) scale(1.012); }",
+          "    100% { transform: translateY(var(--ui-motion-hover-y)) scale(var(--ui-motion-hover-scale)); }",
+          "  }",
+          "",
+          "  @keyframes ui-pop-lift {",
+          "    0% { transform: translateY(0) scale(1); filter: saturate(1) brightness(1); }",
+          "    52% { transform: translateY(calc(var(--ui-motion-hover-y) - 1px)) scale(1.012); filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness)); }",
+          "    100% { transform: translateY(var(--ui-motion-hover-y)) scale(1.006); filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness)); }",
+          "  }",
+          "",
+          "  @keyframes ui-pop-enter {",
+          "    0% { opacity: 0; transform: translateY(var(--ui-motion-enter-y)) scale(calc(var(--ui-motion-overlay-scale) - 0.02)); filter: saturate(1.05) brightness(1.02); }",
+          "    62% { opacity: 1; transform: translateY(-1px) scale(1.012); filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness)); }",
+          "    100% { opacity: 1; transform: translateY(0) scale(1); filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness)); }",
+          "  }",
+          "",
+          "  @keyframes ui-pop-glint {",
+          "    0% { background-position: -180% 0, 0 0; filter: saturate(1) brightness(1); }",
+          "    48% { background-position: 20% 0, 0 0; filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness)); }",
+          "    100% { background-position: 180% 0, 0 0; filter: saturate(1.08) brightness(1.02); }",
+          "  }",
+          "",
+          "  @keyframes ui-pop-track-shine {",
+          "    0% { background-position: -160% 0, 0 0; }",
+          "    100% { background-position: 160% 0, 0 0; }",
+          "  }",
+        ]
+      : [];
+  const pulseKeyframes =
+    themeName === "pulse"
+      ? [
+          "  @keyframes ui-pulse-pressurize {",
+          "    0% { transform: translateY(var(--ui-motion-hover-y)) scale(var(--ui-motion-hover-scale)); filter: saturate(1.08) brightness(1.02); }",
+          "    45% { transform: translateY(calc(var(--ui-motion-hover-y) - 0.5px)) scale(1.028); filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness)); }",
+          "    100% { transform: translateY(var(--ui-motion-hover-y)) scale(var(--ui-motion-hover-scale)); filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness)); }",
+          "  }",
+          "",
+          "  @keyframes ui-pulse-breathe {",
+          "    0%, 100% { filter: saturate(1.08) brightness(1.02); box-shadow: var(--ui-theme-motion-interactive-shadow); }",
+          "    50% { filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness)); box-shadow: var(--ui-theme-motion-signal-shadow); }",
+          "  }",
+          "",
+          "  @keyframes ui-pulse-enter {",
+          "    0% { opacity: 0; transform: translateY(var(--ui-motion-enter-y)) scale(calc(var(--ui-motion-overlay-scale) - 0.02)); filter: saturate(1.02) brightness(0.98); }",
+          "    68% { opacity: 1; transform: translateY(-0.5px) scale(1.006); filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness)); }",
+          "    100% { opacity: 1; transform: translateY(0) scale(1); filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness)); }",
+          "  }",
+          "",
+          "  @keyframes ui-pulse-signal {",
+          "    0%, 100% { filter: saturate(1.05) brightness(1.01); box-shadow: var(--ui-theme-motion-interactive-shadow); }",
+          "    50% { filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness)); box-shadow: var(--ui-theme-motion-signal-shadow); }",
+          "  }",
+          "",
+          "  @keyframes ui-pulse-flow {",
+          "    0% { background-position: -140% 0, 0 0; }",
+          "    100% { background-position: 140% 0, 0 0; }",
+          "  }",
+        ]
+      : [];
+  const controlMotionRules =
+    themeName === "pop"
+      ? [
+          `  ${controlSelector}:is(:hover, :focus-visible, [aria-pressed="true"], [data-selected="true"], [data-state="on"], [data-keyboard-active="true"]),`,
+          `  ${activeControlSelector}:is(:hover, :focus-visible, [data-state="active"], [data-state="checked"], [data-open]:not([data-open="false"])) {`,
+          "    filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness));",
+          "    box-shadow: var(--ui-theme-motion-interactive-shadow);",
+          "    animation: var(--ui-theme-motion-control-animation);",
+          "  }",
+        ]
+      : [
+          `  ${controlSelector}:is(:hover, :focus-visible, [aria-pressed="true"], [data-selected="true"], [data-state="on"], [data-keyboard-active="true"]) {`,
+          "    filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness));",
+          "    box-shadow: var(--ui-theme-motion-interactive-shadow);",
+          "    animation: var(--ui-theme-motion-control-animation);",
+          "  }",
+          "",
+          `  ${activeControlSelector}:is(:hover, :focus-visible, [data-state="active"], [data-state="checked"], [data-open]:not([data-open="false"])) {`,
+          "    filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness));",
+          "    box-shadow: var(--ui-theme-motion-signal-shadow);",
+          "  }",
+        ];
+
+  return [
+    `${selector} {`,
+    `  --ui-theme-motion-brightness: ${config.brightness};`,
+    `  --ui-theme-motion-saturate: ${config.saturate};`,
+    `  --ui-theme-motion-interactive-shadow: ${config.interactiveShadow};`,
+    `  --ui-theme-motion-overlay-shadow: ${config.overlayShadow};`,
+    `  --ui-theme-motion-control-animation: ${config.controlAnimation};`,
+    `  --ui-theme-motion-surface-animation: ${config.surfaceAnimation};`,
+    `  --ui-theme-motion-overlay-animation: ${config.overlayAnimation};`,
+    `  --ui-theme-motion-status-animation: ${config.statusAnimation};`,
+    `  --ui-theme-motion-progress-animation: ${config.progressAnimation};`,
+    `  --ui-theme-motion-focus-ring-shadow: ${config.focusRingShadow};`,
+    "  --ui-theme-motion-signal-shadow: 0 0 0 1px color-mix(in oklch, var(--live-active, var(--primary)) 20%, transparent), 0 0 22px color-mix(in oklch, var(--live-streaming, var(--primary)) 32%, transparent);",
+    "  --ui-theme-motion-glint-background: linear-gradient(110deg, transparent 0%, color-mix(in oklch, var(--ring) 22%, transparent) 38%, color-mix(in oklch, var(--primary) 30%, transparent) 52%, transparent 68%), linear-gradient(180deg, transparent, transparent);",
+    "  --ui-theme-motion-flow-background: linear-gradient(90deg, transparent 0%, color-mix(in oklch, var(--info, var(--primary)) 28%, transparent) 42%, color-mix(in oklch, var(--live-streaming, var(--primary)) 34%, transparent) 54%, transparent 70%), linear-gradient(180deg, transparent, transparent);",
+    "}",
+    "",
+    "@media (prefers-reduced-motion: no-preference) {",
+    ...popKeyframes,
+    ...pulseKeyframes,
+    popKeyframes.length > 0 || pulseKeyframes.length > 0 ? "" : "",
+    ...controlMotionRules,
+    "",
+    `  ${controlSelector}:focus-visible,`,
+    `  ${activeControlSelector}:focus-visible,`,
+    `  ${connectionStatusSelector}:focus-visible {`,
+    "    box-shadow: var(--ui-theme-motion-focus-ring-shadow), var(--ui-theme-motion-interactive-shadow);",
+    "  }",
+    "",
+    `  ${surfaceSelector}:is(:hover, :focus-within, [data-state="open"], [data-open]:not([data-open="false"]), [data-active]:not([data-active="false"]), [data-selected="true"]) {`,
+    "    filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness));",
+    "    box-shadow: var(--ui-theme-motion-interactive-shadow);",
+    "    animation: var(--ui-theme-motion-surface-animation);",
+    "  }",
+    "",
+    `  ${overlaySelector}:is([data-state="open"], [data-state="delayed-open"], [data-open]:not([data-open="false"])) {`,
+    "    filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness));",
+    "    box-shadow: var(--ui-theme-motion-overlay-shadow);",
+    "    animation: var(--ui-theme-motion-overlay-animation);",
+    "  }",
+    "",
+    `  ${statusSelector}:is(:hover, :focus-visible, [data-state="active"], [data-selected="true"]),`,
+    `  ${connectionStatusPartSelector} {`,
+    "    background-image: var(--ui-theme-motion-glint-background);",
+    "    background-size: 260% 100%, 100% 100%;",
+    "    background-position: -180% 0, 0 0;",
+    "    animation: var(--ui-theme-motion-status-animation);",
+    "  }",
+    "",
+    themeName === "pulse"
+      ? `  ${connectionStatusSelector} {`
+      : `  ${connectionStatusSelector}:is(:hover, :focus-visible, [data-state="active"]) {`,
+    "    filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness));",
+    themeName === "pulse"
+      ? "    box-shadow: var(--ui-theme-motion-signal-shadow);"
+      : "    box-shadow: var(--ui-theme-motion-interactive-shadow);",
+    themeName === "pulse"
+      ? "    animation: var(--ui-theme-motion-status-animation);"
+      : "    animation: var(--ui-theme-motion-surface-animation);",
+    "  }",
+    "",
+    `  ${progressSelector},`,
+    `  ${indeterminateLoadingSelector} {`,
+    "    background-image: var(--ui-theme-motion-flow-background);",
+    "    background-size: 260% 100%, 100% 100%;",
+    "    background-position: -140% 0, 0 0;",
+    "  }",
+    "",
+    `  ${progressSelector} {`,
+    "    animation: var(--ui-theme-motion-progress-animation);",
+    "  }",
+    "",
+    `  ${indeterminateLoadingSelector} {`,
+    "    animation: ui-loading-bar 1.15s ease-in-out infinite, var(--ui-theme-motion-progress-animation);",
+    "  }",
     "}",
   ].join("\n");
 }

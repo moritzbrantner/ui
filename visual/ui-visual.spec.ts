@@ -88,7 +88,7 @@ const zleekGlassStories = [
   "components-overlay-hover-preview--profile-preview",
 ] as const;
 const zleekGlassViewports = new Set(["mobile", "desktop"]);
-const uiThemes = ["bobba", "zleek", "atlas", "studio", "paper", "pulse"] as const;
+const uiThemes = ["bobba", "zleek", "atlas", "studio", "paper", "pop", "pulse"] as const;
 const colorSchemes = ["light", "dark"] as const;
 const horizontallyScrollableStories = new Set([
   "components-stable-primitive-components--overview",
@@ -169,10 +169,10 @@ for (const viewport of viewports) {
   });
 }
 
-test.describe("zleek glass motion preferences", () => {
+test.describe("glass motion preferences", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test("does not run glass shine animation when reduced motion is requested", async ({ page }) => {
+  test("does not run zleek shine animation when reduced motion is requested", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await gotoStory(page, "components-actions-button--variants", {
       designSystem: "zleek",
@@ -189,7 +189,32 @@ test.describe("zleek glass motion preferences", () => {
     expect(animationName).not.toContain("ui-glass-shine");
   });
 
-  test("does not run pulse shine animation when reduced motion is requested", async ({ page }) => {
+  test("does not run pop theme motion when reduced motion is requested", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await gotoStory(page, "components-actions-button--variants", {
+      designSystem: "pop",
+      theme: "light",
+    });
+
+    const button = page.locator('[data-slot="button"]:not([data-variant="link"])').first();
+    await button.hover();
+
+    await expectAnimationNameNotContains(button, "ui-pop-");
+
+    await gotoStory(page, "components-feedback-connection-status--states", {
+      designSystem: "pop",
+      theme: "light",
+    });
+
+    const syncingStatus = page.locator('[data-slot="connection-status"][data-status="syncing"]');
+    const pendingStatus = syncingStatus.first();
+    await pendingStatus.evaluate((element) => element.setAttribute("data-pending", "true"));
+
+    await expectAnimationNameNotContains(syncingStatus.first(), "ui-pop-");
+    await expectAnimationNameNotContains(pendingStatus, "ui-pop-");
+  });
+
+  test("does not run pulse theme motion when reduced motion is requested", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await gotoStory(page, "components-actions-button--variants", {
       designSystem: "pulse",
@@ -199,13 +224,62 @@ test.describe("zleek glass motion preferences", () => {
     const button = page.locator('[data-slot="button"]:not([data-variant="link"])').first();
     await button.hover();
 
-    const animationName = await button.evaluate(
-      (element) => window.getComputedStyle(element).animationName,
-    );
+    await expectAnimationNameNotContains(button, "ui-pulse-");
 
-    expect(animationName).not.toContain("ui-glass-shine");
+    await gotoStory(page, "components-feedback-connection-status--states", {
+      designSystem: "pulse",
+      theme: "light",
+    });
+
+    const syncingStatus = page.locator('[data-slot="connection-status"][data-status="syncing"]');
+    const pendingStatus = syncingStatus.first();
+    await pendingStatus.evaluate((element) => element.setAttribute("data-pending", "true"));
+
+    await expectAnimationNameNotContains(syncingStatus.first(), "ui-pulse-");
+    await expectAnimationNameNotContains(pendingStatus, "ui-pulse-");
+  });
+
+  test("runs pulse signal motion for syncing connection status", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await gotoStory(page, "components-feedback-connection-status--states", {
+      designSystem: "pulse",
+      theme: "light",
+    });
+
+    const syncingStatus = page
+      .locator('[data-slot="connection-status"][data-status="syncing"]')
+      .first();
+
+    await expectAnimationNameContains(syncingStatus, "ui-pulse-signal");
+  });
+
+  test("runs pop snap motion on hovered buttons", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await gotoStory(page, "components-actions-button--variants", {
+      designSystem: "pop",
+      theme: "light",
+    });
+
+    const button = page.locator('[data-slot="button"]:not([data-variant="link"])').first();
+    await button.hover();
+
+    await expectAnimationNameContains(button, "ui-pop-snap");
   });
 });
+
+async function expectAnimationNameContains(locator: Locator, expected: string) {
+  await expect
+    .poll(() => locator.evaluate((element) => window.getComputedStyle(element).animationName))
+    .toContain(expected);
+}
+
+async function expectAnimationNameNotContains(locator: Locator, expected: string) {
+  const animationName = await locator.evaluate(
+    (element) => window.getComputedStyle(element).animationName,
+  );
+
+  expect(animationName).not.toContain(expected);
+}
 
 async function gotoStory(
   page: Page,
