@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 1.1.0
+
+### Minor Changes
+
+- Add public `CelebrationCallout` and `LiveIndicator` pattern components with registry metadata, Storybook coverage, focused tests, and package contract coverage.
+- Extend generated theme CSS and token metadata with motion extras, display density roles, status aliases, overlay action tokens, and richer `pop` and `pulse` theme scopes.
+- Reuse shared `FilterBar` controls inside `DataGrid` column filters, including exported filter value helpers for text, number, date range, and boolean filtering.
+- Improve breadcrumb sizing by removing fixed minimum dimensions while preserving accessible hit targets.
+- Parallelize visual checks and centralize mobile usability report writing for faster release verification.
+
 ## 1.0.0
 
 ### Minor Changes

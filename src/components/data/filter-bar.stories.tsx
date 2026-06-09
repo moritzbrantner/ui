@@ -411,5 +411,6 @@ export const TagFilter: StoryObj<typeof TagFilterDemo> = {
     await userEvent.click(canvas.getByRole("button", { name: "Filter Labels" }));
     await userEvent.type(await screen.findByLabelText("Labels tag"), "release{enter}");
     await expect(canvas.getAllByText("design, release")[0]).toBeVisible();
+    await userEvent.keyboard("{Escape}");
   },
 };
