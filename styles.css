@@ -13,7 +13,7 @@
   --font-mono-app:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
-  --radius: 0.625rem;
+  --radius: 0.75rem;
   --glass-blur: 0px;
   --glass-reduced-blur: 0px;
   --glass-shadow: 0 10px 30px oklch(0.2 0.025 255 / 0.09);
@@ -120,9 +120,9 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --ui-radius-control: var(--radius-md);
-  --ui-radius-surface: var(--radius-lg);
-  --ui-radius-overlay: var(--radius-lg);
+  --ui-radius-control: calc(var(--radius) - 0.125rem);
+  --ui-radius-surface: calc(var(--radius) + 0.125rem);
+  --ui-radius-overlay: calc(var(--radius) + 0.25rem);
   --ui-radius-pill: 999px;
   --ui-control-height-xs: 1.5rem;
   --ui-control-height-sm: 2rem;
@@ -180,6 +180,13 @@
   --ui-tabs-list-padding: 3px;
   --ui-tabs-trigger-padding-x: 0.375rem;
   --ui-tabs-radius: var(--ui-radius-control);
+  --ui-theme-mode-switch-width: 4rem;
+  --ui-theme-mode-switch-height: 2.25rem;
+  --ui-theme-mode-switch-padding: 0.25rem;
+  --ui-theme-mode-switch-thumb-size: 1.75rem;
+  --ui-theme-mode-switch-thumb-translate: 1.75rem;
+  --ui-theme-mode-switch-radius: var(--ui-radius-pill);
+  --ui-theme-mode-switch-thumb-radius: var(--ui-radius-pill);
 }
 
 .dark {
@@ -194,7 +201,7 @@
   --font-mono-app:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
-  --radius: 0.625rem;
+  --radius: 0.75rem;
   --glass-blur: 0px;
   --glass-reduced-blur: 0px;
   --glass-shadow: 0 10px 30px oklch(0 0 0 / 0.26);
@@ -301,9 +308,9 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  --ui-radius-control: var(--radius-md);
-  --ui-radius-surface: var(--radius-lg);
-  --ui-radius-overlay: var(--radius-lg);
+  --ui-radius-control: calc(var(--radius) - 0.125rem);
+  --ui-radius-surface: calc(var(--radius) + 0.125rem);
+  --ui-radius-overlay: calc(var(--radius) + 0.25rem);
   --ui-radius-pill: 999px;
   --ui-control-height-xs: 1.5rem;
   --ui-control-height-sm: 2rem;
@@ -361,4 +368,11 @@
   --ui-tabs-list-padding: 3px;
   --ui-tabs-trigger-padding-x: 0.375rem;
   --ui-tabs-radius: var(--ui-radius-control);
+  --ui-theme-mode-switch-width: 4rem;
+  --ui-theme-mode-switch-height: 2.25rem;
+  --ui-theme-mode-switch-padding: 0.25rem;
+  --ui-theme-mode-switch-thumb-size: 1.75rem;
+  --ui-theme-mode-switch-thumb-translate: 1.75rem;
+  --ui-theme-mode-switch-radius: var(--ui-radius-pill);
+  --ui-theme-mode-switch-thumb-radius: var(--ui-radius-pill);
 }

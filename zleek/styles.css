@@ -201,6 +201,13 @@
   --ui-tabs-list-padding: 3px;
   --ui-tabs-trigger-padding-x: 0.375rem;
   --ui-tabs-radius: var(--ui-radius-control);
+  --ui-theme-mode-switch-width: 3.75rem;
+  --ui-theme-mode-switch-height: 2.125rem;
+  --ui-theme-mode-switch-padding: 0.25rem;
+  --ui-theme-mode-switch-thumb-size: 1.625rem;
+  --ui-theme-mode-switch-thumb-translate: 1.625rem;
+  --ui-theme-mode-switch-radius: var(--ui-radius-control);
+  --ui-theme-mode-switch-thumb-radius: var(--ui-radius-control);
 }
 
 .dark {
@@ -402,4 +409,11 @@
   --ui-tabs-list-padding: 3px;
   --ui-tabs-trigger-padding-x: 0.375rem;
   --ui-tabs-radius: var(--ui-radius-control);
+  --ui-theme-mode-switch-width: 3.75rem;
+  --ui-theme-mode-switch-height: 2.125rem;
+  --ui-theme-mode-switch-padding: 0.25rem;
+  --ui-theme-mode-switch-thumb-size: 1.625rem;
+  --ui-theme-mode-switch-thumb-translate: 1.625rem;
+  --ui-theme-mode-switch-radius: var(--ui-radius-control);
+  --ui-theme-mode-switch-thumb-radius: var(--ui-radius-control);
 }

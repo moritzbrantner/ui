@@ -48,16 +48,22 @@ describe("@moritzbrantner/ui mode and language switchers", () => {
     expect(onModeChange).toHaveBeenCalledWith("light");
   });
 
-  test("theme mode switch uses a compact shell control treatment", () => {
-    render(<ThemeModeSwitch defaultMode="light" />);
+  test("theme mode switch uses theme tokens for its shell and thumb treatment", () => {
+    const { container } = render(<ThemeModeSwitch defaultMode="light" />);
 
     const switchControl = screen.getByRole("switch", { name: "Color mode" });
+    const thumb = container.querySelector('[data-slot="theme-mode-switch"] > span[aria-hidden]');
 
-    expect(switchControl.className).toContain("rounded-md");
-    expect(switchControl.className).toContain("w-16");
+    expect(switchControl.className).toContain("w-[var(--ui-theme-mode-switch-width)]");
+    expect(switchControl.className).toContain("h-[var(--ui-theme-mode-switch-height)]");
+    expect(switchControl.className).toContain("rounded-[var(--ui-theme-mode-switch-radius)]");
     expect(switchControl.className).toContain("border-border");
-    expect(switchControl.className).not.toContain("rounded-full");
     expect(switchControl.className).not.toContain("bg-sky");
+    expect(thumb?.className).toContain("size-[var(--ui-theme-mode-switch-thumb-size)]");
+    expect(thumb?.className).toContain("rounded-[var(--ui-theme-mode-switch-thumb-radius)]");
+    expect(thumb?.className).toContain(
+      "group-data-[mode=dark]/theme-mode-switch:translate-x-[var(--ui-theme-mode-switch-thumb-translate)]",
+    );
   });
 
   test("theme mode switch supports controlled mode changes", () => {

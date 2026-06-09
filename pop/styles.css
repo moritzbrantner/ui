@@ -62,8 +62,8 @@
   --popover-foreground: oklch(0.18 0.035 255);
   --primary: oklch(0.58 0.2 340);
   --primary-foreground: oklch(0.99 0.01 340);
-  --secondary: oklch(0.9 0.065 190);
-  --secondary-foreground: oklch(0.22 0.055 205);
+  --secondary: oklch(0.91 0.08 195);
+  --secondary-foreground: oklch(0.2 0.06 210);
   --muted: oklch(0.94 0.035 205);
   --muted-foreground: oklch(0.47 0.045 245);
   --accent: oklch(0.9 0.115 80);
@@ -125,7 +125,7 @@
   --ui-onboarding: oklch(0.66 0.17 285);
   --ui-progress-track: oklch(0.9 0.065 190);
   --ui-progress-fill: oklch(0.58 0.2 340);
-  --ui-celebratory-accent: oklch(0.82 0.15 85);
+  --ui-celebratory-accent: oklch(0.84 0.17 82);
   --live-active: oklch(0.5 0.12 252);
   --live-streaming: oklch(0.54 0.13 195);
   --live-stale: oklch(0.58 0.06 255);
@@ -200,6 +200,13 @@
   --ui-tabs-list-padding: 3px;
   --ui-tabs-trigger-padding-x: 0.625rem;
   --ui-tabs-radius: var(--ui-radius-control);
+  --ui-theme-mode-switch-width: 4rem;
+  --ui-theme-mode-switch-height: 2.25rem;
+  --ui-theme-mode-switch-padding: 0.25rem;
+  --ui-theme-mode-switch-thumb-size: 1.75rem;
+  --ui-theme-mode-switch-thumb-translate: 1.75rem;
+  --ui-theme-mode-switch-radius: var(--ui-radius-pill);
+  --ui-theme-mode-switch-thumb-radius: var(--ui-radius-pill);
 }
 
 .dark {
@@ -256,13 +263,13 @@
   --glass-shine-duration: 720ms;
   --background: oklch(0.17 0.035 255);
   --foreground: oklch(0.97 0.012 210);
-  --card: oklch(0.23 0.04 255 / 0.86);
+  --card: oklch(0.225 0.032 255 / 0.88);
   --card-foreground: oklch(0.97 0.012 210);
-  --popover: oklch(0.24 0.045 255 / 0.94);
+  --popover: oklch(0.235 0.036 255 / 0.94);
   --popover-foreground: oklch(0.97 0.012 210);
   --primary: oklch(0.78 0.14 340);
   --primary-foreground: oklch(0.16 0.035 340);
-  --secondary: oklch(0.34 0.075 190);
+  --secondary: oklch(0.33 0.068 195);
   --secondary-foreground: oklch(0.97 0.012 210);
   --muted: oklch(0.28 0.045 245);
   --muted-foreground: oklch(0.75 0.025 220);
@@ -325,18 +332,18 @@
   --ui-onboarding: oklch(0.74 0.12 285);
   --ui-progress-track: oklch(1 0 0 / 0.12);
   --ui-progress-fill: oklch(0.78 0.14 340);
-  --ui-celebratory-accent: oklch(0.76 0.11 85);
+  --ui-celebratory-accent: oklch(0.78 0.13 82);
   --live-active: oklch(0.74 0.13 252);
   --live-streaming: oklch(0.74 0.14 195);
   --live-stale: oklch(0.68 0.04 255);
   --live-alert: oklch(0.76 0.15 35);
   --live-healthy: oklch(0.72 0.13 155);
   --live-syncing: oklch(0.74 0.13 285);
-  --sidebar: oklch(0.2 0.04 255 / 0.9);
+  --sidebar: oklch(0.2 0.032 255 / 0.9);
   --sidebar-foreground: oklch(0.97 0.012 210);
   --sidebar-primary: oklch(0.76 0.18 340);
   --sidebar-primary-foreground: oklch(0.16 0.035 340);
-  --sidebar-accent: oklch(0.74 0.16 85);
+  --sidebar-accent: oklch(0.72 0.12 85);
   --sidebar-accent-foreground: oklch(0.18 0.035 75);
   --sidebar-border: oklch(0.38 0.055 250);
   --sidebar-ring: oklch(0.78 0.16 340);
@@ -400,6 +407,13 @@
   --ui-tabs-list-padding: 3px;
   --ui-tabs-trigger-padding-x: 0.625rem;
   --ui-tabs-radius: var(--ui-radius-control);
+  --ui-theme-mode-switch-width: 4rem;
+  --ui-theme-mode-switch-height: 2.25rem;
+  --ui-theme-mode-switch-padding: 0.25rem;
+  --ui-theme-mode-switch-thumb-size: 1.75rem;
+  --ui-theme-mode-switch-thumb-translate: 1.75rem;
+  --ui-theme-mode-switch-radius: var(--ui-radius-pill);
+  --ui-theme-mode-switch-thumb-radius: var(--ui-radius-pill);
 }
 
 :root {
@@ -567,7 +581,8 @@
     :where(
       [data-slot="connection-status"][data-status="syncing"],
       [data-slot="connection-status"][data-pending="true"]
-    ):focus-visible {
+    ):focus-visible,
+  :root :where([data-slot="live-indicator"][data-pulse="true"]):focus-visible {
     box-shadow: var(--ui-theme-motion-focus-ring-shadow), var(--ui-theme-motion-interactive-shadow);
   }
 
@@ -577,7 +592,8 @@
       [data-slot="toolbar"],
       [data-slot="navbar"],
       [data-slot="stat"],
-      [data-slot="metric-strip"]
+      [data-slot="metric-strip"],
+      [data-slot="celebration-callout"]
     ):is(
       :hover,
       :focus-within,
@@ -620,14 +636,18 @@
   :root
     :where(
       [data-slot="badge"]:not([data-variant="link"]),
-      [data-slot="connection-status-action"]
+      [data-slot="connection-status-action"],
+      [data-slot="celebration-callout-accent"]
     ):is(:hover, :focus-visible, [data-state="active"], [data-selected="true"]),
   :root
     :where(
       [data-slot="connection-status"][data-status="syncing"],
       [data-slot="connection-status"][data-pending="true"]
     )
-    :where([data-slot="connection-status-icon"], [data-slot="connection-status-action"]) {
+    :where([data-slot="connection-status-icon"], [data-slot="connection-status-action"]),
+  :root
+    :where([data-slot="live-indicator"][data-pulse="true"])
+    :where([data-slot="live-indicator-dot"]) {
     background-image: var(--ui-theme-motion-glint-background);
     background-size:
       260% 100%,
@@ -642,7 +662,13 @@
     :where(
       [data-slot="connection-status"][data-status="syncing"],
       [data-slot="connection-status"][data-pending="true"]
-    ):is(:hover, :focus-visible, [data-state="active"]) {
+    ):is(:hover, :focus-visible, [data-state="active"]),
+  :root
+    :where([data-slot="live-indicator"][data-pulse="true"]):is(
+      :hover,
+      :focus-visible,
+      [data-state="active"]
+    ) {
     filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness));
     box-shadow: var(--ui-theme-motion-interactive-shadow);
     animation: var(--ui-theme-motion-surface-animation);

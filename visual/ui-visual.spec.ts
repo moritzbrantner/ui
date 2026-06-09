@@ -29,6 +29,8 @@ const storyIds = [
   "components-forms-inputs-stepper--horizontal",
   "components-navigation-shortcut-help--dialog",
   "components-feedback-connection-status--states",
+  "components-feedback-live-indicator--states",
+  "components-feedback-celebration-callout--milestone",
   "components-stable-primitive-components--overview",
   "components-overlays-dialog--open",
   "components-overlay-sheet--basic",
@@ -66,6 +68,8 @@ const storyIds = [
   "components-social-overview--social-feed",
   "components-social-overview--chat-thread-preview",
   "components-layout-workbench-layout--full-workbench",
+  "design-system-theme-showcase--pop-consumer-surface",
+  "design-system-theme-showcase--pulse-realtime-surface",
   "patterns-release-readiness--consumer-dashboard-shell-story",
   "patterns-release-readiness--forms-settings-story",
 ];
@@ -212,6 +216,16 @@ test.describe("glass motion preferences", () => {
 
     await expectAnimationNameNotContains(syncingStatus.first(), "ui-pop-");
     await expectAnimationNameNotContains(pendingStatus, "ui-pop-");
+
+    await gotoStory(page, "components-feedback-celebration-callout--milestone", {
+      designSystem: "pop",
+      theme: "light",
+    });
+
+    const callout = page.locator('[data-slot="celebration-callout"]').first();
+    await callout.hover();
+
+    await expectAnimationNameNotContains(callout, "ui-pop-");
   });
 
   test("does not run pulse theme motion when reduced motion is requested", async ({ page }) => {
@@ -237,6 +251,17 @@ test.describe("glass motion preferences", () => {
 
     await expectAnimationNameNotContains(syncingStatus.first(), "ui-pulse-");
     await expectAnimationNameNotContains(pendingStatus, "ui-pulse-");
+
+    await gotoStory(page, "components-feedback-live-indicator--states", {
+      designSystem: "pulse",
+      theme: "light",
+    });
+
+    const liveIndicator = page.locator('[data-slot="live-indicator"][data-pulse="true"]').first();
+    const liveIndicatorDot = liveIndicator.locator('[data-slot="live-indicator-dot"]');
+
+    await expectAnimationNameNotContains(liveIndicator, "ui-pulse-");
+    await expectAnimationNameNotContains(liveIndicatorDot, "ui-pulse-");
   });
 
   test("runs pulse signal motion for syncing connection status", async ({ page }) => {
@@ -253,6 +278,20 @@ test.describe("glass motion preferences", () => {
     await expectAnimationNameContains(syncingStatus, "ui-pulse-signal");
   });
 
+  test("runs pulse signal motion for pulsing live indicators", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await gotoStory(page, "components-feedback-live-indicator--states", {
+      designSystem: "pulse",
+      theme: "light",
+    });
+
+    const liveIndicator = page.locator('[data-slot="live-indicator"][data-pulse="true"]').first();
+    const liveIndicatorDot = liveIndicator.locator('[data-slot="live-indicator-dot"]');
+
+    await expectAnimationNameContains(liveIndicator, "ui-pulse-signal");
+    await expectAnimationNameContains(liveIndicatorDot, "ui-pulse-signal");
+  });
+
   test("runs pop snap motion on hovered buttons", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await gotoStory(page, "components-actions-button--variants", {
@@ -264,6 +303,19 @@ test.describe("glass motion preferences", () => {
     await button.hover();
 
     await expectAnimationNameContains(button, "ui-pop-snap");
+  });
+
+  test("runs pop lift motion on hovered celebration callouts", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await gotoStory(page, "components-feedback-celebration-callout--milestone", {
+      designSystem: "pop",
+      theme: "light",
+    });
+
+    const callout = page.locator('[data-slot="celebration-callout"]').first();
+    await callout.hover();
+
+    await expectAnimationNameContains(callout, "ui-pop-lift");
   });
 });
 

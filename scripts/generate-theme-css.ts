@@ -405,11 +405,18 @@ function generateThemeMotionExtras(
 
   const controlSelector = `${selector} :where([data-slot="button"]:not([data-variant="link"]))`;
   const activeControlSelector = `${selector} :where([data-slot="tabs-trigger"][data-state="active"], [data-slot="switch"][data-state="checked"])`;
-  const surfaceSelector = `${selector} :where([data-slot="card"][data-interactive="true"], [data-slot="toolbar"], [data-slot="navbar"], [data-slot="stat"], [data-slot="metric-strip"])`;
+  const surfaceSelector = `${selector} :where([data-slot="card"][data-interactive="true"], [data-slot="toolbar"], [data-slot="navbar"], [data-slot="stat"], [data-slot="metric-strip"], [data-slot="celebration-callout"])`;
   const overlaySelector = `${selector} :where([data-slot="dialog-content"], [data-slot="alert-dialog-content"], [data-slot="popover-content"], [data-slot="hover-card-content"], [data-slot="tooltip-content"], [data-slot="dropdown-menu-content"], [data-slot="dropdown-menu-sub-content"], [data-slot="context-menu-content"], [data-slot="context-menu-sub-content"], [data-slot="menubar-content"], [data-slot="menubar-sub-content"], [data-slot="navigation-menu-content"], [data-slot="navigation-menu-viewport"], [data-slot="select-content"], [data-slot="combobox-content"], [data-slot="command"], [data-slot="navbar-submenu"], [data-slot="toast"])`;
-  const statusSelector = `${selector} :where([data-slot="badge"]:not([data-variant="link"]), [data-slot="connection-status-action"])`;
+  const statusSelector = `${selector} :where([data-slot="badge"]:not([data-variant="link"]), [data-slot="connection-status-action"], [data-slot="celebration-callout-accent"])`;
   const connectionStatusSelector = `${selector} :where([data-slot="connection-status"][data-status="syncing"], [data-slot="connection-status"][data-pending="true"])`;
   const connectionStatusPartSelector = `${selector} :where([data-slot="connection-status"][data-status="syncing"], [data-slot="connection-status"][data-pending="true"]) :where([data-slot="connection-status-icon"], [data-slot="connection-status-action"])`;
+  const liveIndicatorSelector = `${selector} :where([data-slot="live-indicator"][data-pulse="true"])`;
+  const liveIndicatorPartSelector = `${selector} :where([data-slot="live-indicator"][data-pulse="true"]) :where([data-slot="live-indicator-dot"])`;
+  const signalInteractiveSelector = `${connectionStatusSelector}:is(:hover, :focus-visible, [data-state="active"]),\n  ${liveIndicatorSelector}:is(:hover, :focus-visible, [data-state="active"])`;
+  const signalActiveSelector =
+    themeName === "pulse"
+      ? `${connectionStatusSelector},\n  ${liveIndicatorSelector}`
+      : signalInteractiveSelector;
   const progressSelector = `${selector} :where([data-slot="progress-indicator"], [data-slot="loading-bar"][data-indeterminate="false"] [data-slot="loading-bar-indicator"])`;
   const indeterminateLoadingSelector = `${selector} :where([data-slot="loading-bar"][data-indeterminate="true"] [data-slot="loading-bar-indicator"])`;
   const popKeyframes =
@@ -525,7 +532,8 @@ function generateThemeMotionExtras(
     "",
     `  ${controlSelector}:focus-visible,`,
     `  ${activeControlSelector}:focus-visible,`,
-    `  ${connectionStatusSelector}:focus-visible {`,
+    `  ${connectionStatusSelector}:focus-visible,`,
+    `  ${liveIndicatorSelector}:focus-visible {`,
     "    box-shadow: var(--ui-theme-motion-focus-ring-shadow), var(--ui-theme-motion-interactive-shadow);",
     "  }",
     "",
@@ -542,16 +550,15 @@ function generateThemeMotionExtras(
     "  }",
     "",
     `  ${statusSelector}:is(:hover, :focus-visible, [data-state="active"], [data-selected="true"]),`,
-    `  ${connectionStatusPartSelector} {`,
+    `  ${connectionStatusPartSelector},`,
+    `  ${liveIndicatorPartSelector} {`,
     "    background-image: var(--ui-theme-motion-glint-background);",
     "    background-size: 260% 100%, 100% 100%;",
     "    background-position: -180% 0, 0 0;",
     "    animation: var(--ui-theme-motion-status-animation);",
     "  }",
     "",
-    themeName === "pulse"
-      ? `  ${connectionStatusSelector} {`
-      : `  ${connectionStatusSelector}:is(:hover, :focus-visible, [data-state="active"]) {`,
+    `  ${signalActiveSelector} {`,
     "    filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness));",
     themeName === "pulse"
       ? "    box-shadow: var(--ui-theme-motion-signal-shadow);"

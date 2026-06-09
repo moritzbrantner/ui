@@ -942,6 +942,18 @@ const componentRegistry = [
     reason: "Reusable state-light social surface available through the social API.",
   },
   {
+    name: "celebration-callout",
+    fileName: "celebration-callout",
+    tier: "patterns",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/patterns/celebration-callout",
+    storyFiles: ["src/components/patterns/celebration-callout.stories.tsx"],
+    testFiles: ["src/components/patterns/celebration-callout.test.tsx"],
+    status: "pattern",
+    reason:
+      "State-light milestone and onboarding callout backed by public celebration and progress tokens.",
+  },
+  {
     name: "command-palette",
     fileName: "command-palette",
     tier: "patterns",
@@ -1050,6 +1062,17 @@ const componentRegistry = [
     testFiles: ["src/components/patterns/hover-preview.test.tsx"],
     status: "pattern",
     reason: "Reusable state-light application pattern exported from the root API.",
+  },
+  {
+    name: "live-indicator",
+    fileName: "live-indicator",
+    tier: "patterns",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/patterns/live-indicator",
+    storyFiles: ["src/components/patterns/live-indicator.stories.tsx"],
+    testFiles: ["src/components/patterns/live-indicator.test.tsx"],
+    status: "pattern",
+    reason: "State-light realtime status indicator backed by public live theme tokens.",
   },
   {
     name: "menu-actions",

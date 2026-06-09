@@ -171,6 +171,13 @@ const uiTokenNames = [
   "--ui-tabs-list-padding",
   "--ui-tabs-trigger-padding-x",
   "--ui-tabs-radius",
+  "--ui-theme-mode-switch-width",
+  "--ui-theme-mode-switch-height",
+  "--ui-theme-mode-switch-padding",
+  "--ui-theme-mode-switch-thumb-size",
+  "--ui-theme-mode-switch-thumb-translate",
+  "--ui-theme-mode-switch-radius",
+  "--ui-theme-mode-switch-thumb-radius",
 ] as const;
 
 type UiTokenName = (typeof uiTokenNames)[number];

@@ -50,6 +50,7 @@ import {
   TableRow,
 } from "./components/stable/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/stable/tabs";
+import { ThemeModeSwitch } from "./components/stable/theme-mode-switch";
 import { UiTheme, uiThemeLabels, uiThemeProfiles, type UiThemeProfile } from "./themes";
 
 type SystemProfile = UiThemeProfile & {
@@ -227,6 +228,7 @@ function SystemProfileCard({ system, className }: { system: SystemProfile; class
       </CardHeader>
       <CardContent className="grid gap-5">
         <TokenSwatches />
+        <ThemePersonalityPreview system={system} />
         <StatusSwatches />
         <ChartSwatches />
         <Separator />
@@ -265,6 +267,113 @@ function TokenSwatches() {
       ))}
     </div>
   );
+}
+
+function ThemePersonalityPreview({ system }: { system: SystemProfile }) {
+  if (system.name === "bobba") {
+    return (
+      <div className="grid gap-3 rounded-[var(--ui-card-radius)] border bg-card p-4 text-card-foreground">
+        <div className="flex items-center justify-between gap-4">
+          <div className="grid gap-1">
+            <span className="text-sm font-medium">Rounded shell</span>
+            <span className="text-xs text-muted-foreground">Friendly default controls</span>
+          </div>
+          <ThemeModeSwitch defaultMode="light" aria-label="Bobba color mode" />
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {["Control", "Surface", "Overlay"].map((label) => (
+            <div
+              key={label}
+              className="grid h-12 place-items-center border bg-background px-2 text-xs font-medium"
+              style={{ borderRadius: `var(--ui-radius-${label.toLowerCase()})` }}
+            >
+              {label}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (system.name === "atlas") {
+    return (
+      <div className="grid gap-3 rounded-[var(--ui-card-radius)] border bg-card p-3 text-card-foreground">
+        <div className="grid grid-cols-3 gap-1 text-xs">
+          {[
+            ["Base", "var(--map-layer-base)"],
+            ["Route", "var(--map-layer-accent)"],
+            ["Alert", "var(--map-layer-critical)"],
+          ].map(([label, color]) => (
+            <div key={label} className="grid gap-1">
+              <span
+                className="h-6 rounded-[var(--ui-radius-control)]"
+                style={{ background: color }}
+              />
+              <span className="text-muted-foreground">{label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="grid divide-y rounded-[var(--ui-radius-control)] border text-xs">
+          {[
+            ["Throughput", "+12.4%", "var(--data-positive)"],
+            ["Latency", "-3.1%", "var(--data-negative)"],
+          ].map(([label, value, color]) => (
+            <div key={label} className="flex items-center justify-between px-2 py-1.5">
+              <span>{label}</span>
+              <span className="font-medium" style={{ color }}>
+                {value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (system.name === "studio") {
+    return (
+      <div className="grid gap-3 rounded-[var(--ui-card-radius)] border bg-[var(--editor-canvas)] p-3 text-card-foreground">
+        <div
+          className="relative h-20 overflow-hidden rounded-[var(--ui-radius-surface)] border"
+          style={{
+            backgroundImage:
+              "linear-gradient(var(--editor-canvas-grid) 1px, transparent 1px), linear-gradient(90deg, var(--editor-canvas-grid) 1px, transparent 1px)",
+            backgroundSize: "16px 16px",
+          }}
+        >
+          <span className="absolute inset-y-3 left-8 w-1 rounded-full bg-[var(--editor-playhead)]" />
+          <span className="absolute right-4 bottom-4 left-14 h-7 rounded-[var(--ui-radius-control)] bg-[var(--editor-layer)]" />
+          <span className="absolute top-4 right-10 left-5 h-5 rounded-[var(--ui-radius-control)] bg-[var(--editor-selection)]" />
+        </div>
+        <div className="h-3 rounded-[var(--ui-radius-control)] bg-[var(--editor-timeline)]" />
+      </div>
+    );
+  }
+
+  if (system.name === "paper") {
+    return (
+      <div
+        className="grid gap-2 rounded-[var(--ui-card-radius)] border bg-card p-4 font-body text-sm text-card-foreground"
+        style={{
+          backgroundImage: "linear-gradient(var(--document-ruled-background) 1px, transparent 1px)",
+          backgroundSize: "100% 1.5rem",
+        }}
+      >
+        <p>
+          The archive note includes a{" "}
+          <mark className="rounded-sm bg-[var(--document-highlight)] px-1 text-inherit">
+            highlighted clause
+          </mark>{" "}
+          and a cited source.
+        </p>
+        <div className="border-l-2 border-[var(--document-quote)] pl-3 text-muted-foreground">
+          Document quote and margin notes stay quiet but legible.
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 }
 
 function StatusSwatches() {

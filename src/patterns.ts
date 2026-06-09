@@ -2,6 +2,7 @@
 
 export * from "./components/patterns/action-menu";
 export * from "./components/patterns/action-sheet";
+export * from "./components/patterns/celebration-callout";
 export * from "./components/patterns/command-palette";
 export * from "./components/patterns/connection-status";
 export * from "./components/patterns/confirm-action";
@@ -10,6 +11,7 @@ export * from "./components/patterns/details-panel";
 export * from "./components/patterns/disclosure-panel";
 export * from "./components/patterns/dropzone";
 export * from "./components/patterns/hover-preview";
+export * from "./components/patterns/live-indicator";
 export * from "./components/patterns/menu-actions";
 export * from "./components/patterns/responsive-action-menu";
 export * from "./components/patterns/shortcut-help";

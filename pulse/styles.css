@@ -125,12 +125,12 @@
   --ui-progress-track: oklch(0.92 0.008 255);
   --ui-progress-fill: oklch(0.5 0.12 252);
   --ui-celebratory-accent: oklch(0.64 0.14 302);
-  --live-active: oklch(0.58 0.16 195);
-  --live-streaming: oklch(0.64 0.18 325);
-  --live-stale: oklch(0.56 0.055 245);
-  --live-alert: oklch(0.72 0.16 35);
-  --live-healthy: oklch(0.62 0.16 150);
-  --live-syncing: oklch(0.68 0.15 250);
+  --live-active: oklch(0.56 0.18 195);
+  --live-streaming: oklch(0.62 0.2 325);
+  --live-stale: oklch(0.54 0.05 245);
+  --live-alert: oklch(0.7 0.18 35);
+  --live-healthy: oklch(0.6 0.17 150);
+  --live-syncing: oklch(0.66 0.17 252);
   --sidebar: oklch(0.96 0.024 210 / 0.88);
   --sidebar-foreground: oklch(0.17 0.04 255);
   --sidebar-primary: oklch(0.58 0.16 195);
@@ -200,6 +200,13 @@
   --ui-tabs-list-padding: 3px;
   --ui-tabs-trigger-padding-x: 0.625rem;
   --ui-tabs-radius: var(--ui-radius-control);
+  --ui-theme-mode-switch-width: 4rem;
+  --ui-theme-mode-switch-height: 2.25rem;
+  --ui-theme-mode-switch-padding: 0.25rem;
+  --ui-theme-mode-switch-thumb-size: 1.75rem;
+  --ui-theme-mode-switch-thumb-translate: 1.75rem;
+  --ui-theme-mode-switch-radius: var(--ui-radius-pill);
+  --ui-theme-mode-switch-thumb-radius: var(--ui-radius-pill);
 }
 
 .dark {
@@ -330,12 +337,12 @@
   --ui-progress-track: oklch(1 0 0 / 0.12);
   --ui-progress-fill: oklch(0.74 0.13 252);
   --ui-celebratory-accent: oklch(0.74 0.15 302);
-  --live-active: oklch(0.78 0.15 195);
-  --live-streaming: oklch(0.78 0.17 325);
-  --live-stale: oklch(0.7 0.04 245);
-  --live-alert: oklch(0.78 0.15 35);
-  --live-healthy: oklch(0.75 0.14 150);
-  --live-syncing: oklch(0.72 0.15 250);
+  --live-active: oklch(0.8 0.16 195);
+  --live-streaming: oklch(0.8 0.18 325);
+  --live-stale: oklch(0.72 0.04 245);
+  --live-alert: oklch(0.8 0.16 35);
+  --live-healthy: oklch(0.77 0.15 150);
+  --live-syncing: oklch(0.74 0.16 252);
   --sidebar: oklch(0.19 0.045 255 / 0.9);
   --sidebar-foreground: oklch(0.97 0.012 205);
   --sidebar-primary: oklch(0.78 0.15 195);
@@ -404,6 +411,13 @@
   --ui-tabs-list-padding: 3px;
   --ui-tabs-trigger-padding-x: 0.625rem;
   --ui-tabs-radius: var(--ui-radius-control);
+  --ui-theme-mode-switch-width: 4rem;
+  --ui-theme-mode-switch-height: 2.25rem;
+  --ui-theme-mode-switch-padding: 0.25rem;
+  --ui-theme-mode-switch-thumb-size: 1.75rem;
+  --ui-theme-mode-switch-thumb-translate: 1.75rem;
+  --ui-theme-mode-switch-radius: var(--ui-radius-pill);
+  --ui-theme-mode-switch-thumb-radius: var(--ui-radius-pill);
 }
 
 :root {
@@ -565,7 +579,8 @@
     :where(
       [data-slot="connection-status"][data-status="syncing"],
       [data-slot="connection-status"][data-pending="true"]
-    ):focus-visible {
+    ):focus-visible,
+  :root :where([data-slot="live-indicator"][data-pulse="true"]):focus-visible {
     box-shadow: var(--ui-theme-motion-focus-ring-shadow), var(--ui-theme-motion-interactive-shadow);
   }
 
@@ -575,7 +590,8 @@
       [data-slot="toolbar"],
       [data-slot="navbar"],
       [data-slot="stat"],
-      [data-slot="metric-strip"]
+      [data-slot="metric-strip"],
+      [data-slot="celebration-callout"]
     ):is(
       :hover,
       :focus-within,
@@ -618,14 +634,18 @@
   :root
     :where(
       [data-slot="badge"]:not([data-variant="link"]),
-      [data-slot="connection-status-action"]
+      [data-slot="connection-status-action"],
+      [data-slot="celebration-callout-accent"]
     ):is(:hover, :focus-visible, [data-state="active"], [data-selected="true"]),
   :root
     :where(
       [data-slot="connection-status"][data-status="syncing"],
       [data-slot="connection-status"][data-pending="true"]
     )
-    :where([data-slot="connection-status-icon"], [data-slot="connection-status-action"]) {
+    :where([data-slot="connection-status-icon"], [data-slot="connection-status-action"]),
+  :root
+    :where([data-slot="live-indicator"][data-pulse="true"])
+    :where([data-slot="live-indicator-dot"]) {
     background-image: var(--ui-theme-motion-glint-background);
     background-size:
       260% 100%,
@@ -640,7 +660,8 @@
     :where(
       [data-slot="connection-status"][data-status="syncing"],
       [data-slot="connection-status"][data-pending="true"]
-    ) {
+    ),
+  :root :where([data-slot="live-indicator"][data-pulse="true"]) {
     filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness));
     box-shadow: var(--ui-theme-motion-signal-shadow);
     animation: var(--ui-theme-motion-status-animation);
