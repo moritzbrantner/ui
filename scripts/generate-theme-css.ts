@@ -419,6 +419,23 @@ function generateThemeMotionExtras(
       : signalInteractiveSelector;
   const progressSelector = `${selector} :where([data-slot="progress-indicator"], [data-slot="loading-bar"][data-indeterminate="false"] [data-slot="loading-bar-indicator"])`;
   const indeterminateLoadingSelector = `${selector} :where([data-slot="loading-bar"][data-indeterminate="true"] [data-slot="loading-bar-indicator"])`;
+  const stateControlSelector = `${selector} :where([data-slot="checkbox"][data-state="checked"], [data-slot="radio-group-item"][data-state="checked"])`;
+  const stateIndicatorSelector = `${selector} :where([data-slot="checkbox"][data-state="checked"] [data-slot="checkbox-indicator"], [data-slot="radio-group-item"][data-state="checked"] [data-slot="radio-group-indicator"])`;
+  const stateCheckDrawSelector = `${selector} :where([data-slot="checkbox"][data-state="checked"] [data-slot="checkbox-indicator"] svg, [data-slot$="-checkbox-item"][data-state="checked"] [data-slot$="checkbox-item-indicator"] svg, [data-slot$="-radio-item"][data-state="checked"] [data-slot$="radio-item-indicator"] svg)`;
+  const checkedSwitchSelector = `${selector} [data-slot="switch"][data-state="checked"]`;
+  const checkedSwitchThumbSelector = `${selector} [data-slot="switch"][data-state="checked"] [data-slot="switch-thumb"]`;
+  const checkedCompactSwitchThumbSelector = `${selector} [data-slot="switch"][data-size="sm"][data-state="checked"] [data-slot="switch-thumb"]`;
+  const selectedStateControlSelector = `${selector} :where([data-slot="toggle"][data-state="on"], [data-slot="toggle"][aria-pressed="true"], [data-slot="toggle-group-item"][data-state="on"], [data-slot="tabs-trigger"][data-state="active"], [data-slot="select-item"][data-state="checked"], [data-slot="command-item"][data-checked="true"], [data-slot="dropdown-menu-checkbox-item"][data-state="checked"], [data-slot="dropdown-menu-radio-item"][data-state="checked"], [data-slot="context-menu-checkbox-item"][data-state="checked"], [data-slot="context-menu-radio-item"][data-state="checked"], [data-slot="menubar-checkbox-item"][data-state="checked"], [data-slot="menubar-radio-item"][data-state="checked"])`;
+  const popStateMotionTokens =
+    themeName === "pop"
+      ? [
+          "  --ui-theme-motion-state-burst-animation: ui-pop-state-burst 420ms cubic-bezier(0.12, 1.6, 0.24, 1) both;",
+          "  --ui-theme-motion-indicator-pop-animation: ui-pop-indicator-pop 340ms cubic-bezier(0.16, 1.7, 0.28, 1) both;",
+          "  --ui-theme-motion-check-draw-animation: ui-pop-check-draw 360ms cubic-bezier(0.18, 1.1, 0.3, 1) both;",
+          "  --ui-theme-motion-thumb-spring-animation: ui-pop-thumb-spring 420ms cubic-bezier(0.15, 1.55, 0.28, 1) both;",
+          "  --ui-theme-motion-state-glow-shadow: 0 0 0 4px color-mix(in oklch, var(--primary) 18%, transparent), 0 12px 28px color-mix(in oklch, var(--primary) 34%, transparent), 0 4px 14px color-mix(in oklch, var(--ring) 22%, transparent);",
+        ]
+      : [];
   const popKeyframes =
     themeName === "pop"
       ? [
@@ -450,6 +467,33 @@ function generateThemeMotionExtras(
           "  @keyframes ui-pop-track-shine {",
           "    0% { background-position: -160% 0, 0 0; }",
           "    100% { background-position: 160% 0, 0 0; }",
+          "  }",
+          "",
+          "  @keyframes ui-pop-state-burst {",
+          "    0% { transform: scale(0.72) rotate(-8deg); filter: saturate(1.25) brightness(1.12); box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 34%, transparent); }",
+          "    42% { transform: scale(1.28) rotate(5deg); filter: saturate(1.45) brightness(1.2); box-shadow: var(--ui-theme-motion-state-glow-shadow); }",
+          "    68% { transform: scale(0.92) rotate(-2deg); }",
+          "    100% { transform: scale(1) rotate(0deg); filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness)); box-shadow: var(--ui-theme-motion-interactive-shadow); }",
+          "  }",
+          "",
+          "  @keyframes ui-pop-indicator-pop {",
+          "    0% { opacity: 0; transform: scale(0.15) rotate(-28deg); }",
+          "    52% { opacity: 1; transform: scale(1.35) rotate(8deg); }",
+          "    76% { transform: scale(0.9) rotate(-3deg); }",
+          "    100% { opacity: 1; transform: scale(1) rotate(0deg); }",
+          "  }",
+          "",
+          "  @keyframes ui-pop-check-draw {",
+          "    0% { opacity: 0; stroke-dasharray: 20; stroke-dashoffset: 20; transform: scale(0.75) rotate(-18deg); }",
+          "    55% { opacity: 1; stroke-dashoffset: 0; transform: scale(1.22) rotate(8deg); }",
+          "    100% { opacity: 1; stroke-dashoffset: 0; transform: scale(1) rotate(0deg); }",
+          "  }",
+          "",
+          "  @keyframes ui-pop-thumb-spring {",
+          "    0% { translate: var(--ui-pop-switch-thumb-rest, 0) 0; transform: scale(0.82); }",
+          "    48% { translate: var(--ui-pop-switch-thumb-checked) 0; transform: scale(1.22); }",
+          "    72% { translate: calc(var(--ui-pop-switch-thumb-checked) - 3px) 0; transform: scale(0.92); }",
+          "    100% { translate: var(--ui-pop-switch-thumb-checked) 0; transform: scale(1); }",
           "  }",
         ]
       : [];
@@ -506,6 +550,51 @@ function generateThemeMotionExtras(
           "    box-shadow: var(--ui-theme-motion-signal-shadow);",
           "  }",
         ];
+  const popStateControlMotionRules =
+    themeName === "pop"
+      ? [
+          "",
+          `  ${stateControlSelector} {`,
+          "    filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness));",
+          "    box-shadow: var(--ui-theme-motion-interactive-shadow);",
+          "    animation: var(--ui-theme-motion-state-burst-animation);",
+          "  }",
+          "",
+          `  ${stateIndicatorSelector} {`,
+          "    transform-origin: center;",
+          "    animation: var(--ui-theme-motion-indicator-pop-animation);",
+          "  }",
+          "",
+          `  ${stateCheckDrawSelector} {`,
+          "    stroke-dasharray: 20;",
+          "    stroke-dashoffset: 0;",
+          "    transform-origin: center;",
+          "    animation: var(--ui-theme-motion-check-draw-animation);",
+          "  }",
+          "",
+          `  ${checkedSwitchSelector} {`,
+          "    filter: saturate(1.28) brightness(1.12);",
+          "    box-shadow: var(--ui-theme-motion-interactive-shadow);",
+          "    animation: var(--ui-theme-motion-state-burst-animation);",
+          "  }",
+          "",
+          `  ${checkedSwitchThumbSelector} {`,
+          "    --ui-pop-switch-thumb-checked: 30px;",
+          "    transform-origin: center;",
+          "    animation: var(--ui-theme-motion-thumb-spring-animation);",
+          "  }",
+          "",
+          `  ${checkedCompactSwitchThumbSelector} {`,
+          "    --ui-pop-switch-thumb-checked: 26px;",
+          "  }",
+          "",
+          `  ${selectedStateControlSelector} {`,
+          "    filter: saturate(var(--ui-theme-motion-saturate)) brightness(var(--ui-theme-motion-brightness));",
+          "    box-shadow: var(--ui-theme-motion-interactive-shadow);",
+          "    animation: var(--ui-theme-motion-control-animation);",
+          "  }",
+        ]
+      : [];
 
   return [
     `${selector} {`,
@@ -519,6 +608,7 @@ function generateThemeMotionExtras(
     `  --ui-theme-motion-status-animation: ${config.statusAnimation};`,
     `  --ui-theme-motion-progress-animation: ${config.progressAnimation};`,
     `  --ui-theme-motion-focus-ring-shadow: ${config.focusRingShadow};`,
+    ...popStateMotionTokens,
     "  --ui-theme-motion-signal-shadow: 0 0 0 1px color-mix(in oklch, var(--live-active, var(--primary)) 20%, transparent), 0 0 22px color-mix(in oklch, var(--live-streaming, var(--primary)) 32%, transparent);",
     "  --ui-theme-motion-glint-background: linear-gradient(110deg, transparent 0%, color-mix(in oklch, var(--ring) 22%, transparent) 38%, color-mix(in oklch, var(--primary) 30%, transparent) 52%, transparent 68%), linear-gradient(180deg, transparent, transparent);",
     "  --ui-theme-motion-flow-background: linear-gradient(90deg, transparent 0%, color-mix(in oklch, var(--info, var(--primary)) 28%, transparent) 42%, color-mix(in oklch, var(--live-streaming, var(--primary)) 34%, transparent) 54%, transparent 70%), linear-gradient(180deg, transparent, transparent);",
@@ -529,6 +619,7 @@ function generateThemeMotionExtras(
     ...pulseKeyframes,
     popKeyframes.length > 0 || pulseKeyframes.length > 0 ? "" : "",
     ...controlMotionRules,
+    ...popStateControlMotionRules,
     "",
     `  ${controlSelector}:focus-visible,`,
     `  ${activeControlSelector}:focus-visible,`,

@@ -226,6 +226,25 @@ test.describe("glass motion preferences", () => {
     await callout.hover();
 
     await expectAnimationNameNotContains(callout, "ui-pop-");
+
+    await gotoStory(page, "components-forms-inputs-form-controls--basic", {
+      designSystem: "pop",
+      theme: "light",
+    });
+
+    const checkbox = page.locator('[data-slot="checkbox"][data-state="checked"]').first();
+    const checkboxIndicator = checkbox.locator('[data-slot="checkbox-indicator"]');
+    const checkedRadio = page
+      .locator('[data-slot="radio-group-item"][data-state="checked"]')
+      .first();
+    const checkedSwitch = page.locator('[data-slot="switch"][data-state="checked"]').first();
+    const checkedSwitchThumb = checkedSwitch.locator('[data-slot="switch-thumb"]');
+
+    await expectAnimationNameNotContains(checkbox, "ui-pop-");
+    await expectAnimationNameNotContains(checkboxIndicator, "ui-pop-");
+    await expectAnimationNameNotContains(checkedRadio, "ui-pop-");
+    await expectAnimationNameNotContains(checkedSwitch, "ui-pop-");
+    await expectAnimationNameNotContains(checkedSwitchThumb, "ui-pop-");
   });
 
   test("does not run pulse theme motion when reduced motion is requested", async ({ page }) => {
@@ -316,6 +335,30 @@ test.describe("glass motion preferences", () => {
     await callout.hover();
 
     await expectAnimationNameContains(callout, "ui-pop-lift");
+  });
+
+  test("runs pop state motion on checked form controls", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await gotoStory(page, "components-forms-inputs-form-controls--basic", {
+      designSystem: "pop",
+      theme: "light",
+    });
+
+    const checkbox = page.locator('[data-slot="checkbox"][data-state="checked"]').first();
+    const checkboxIndicator = checkbox.locator('[data-slot="checkbox-indicator"]');
+    const checkboxIcon = checkboxIndicator.locator("svg");
+    const checkedRadio = page
+      .locator('[data-slot="radio-group-item"][data-state="checked"]')
+      .first();
+    const checkedSwitch = page.locator('[data-slot="switch"][data-state="checked"]').first();
+    const checkedSwitchThumb = checkedSwitch.locator('[data-slot="switch-thumb"]');
+
+    await expectAnimationNameContains(checkbox, "ui-pop-state-burst");
+    await expectAnimationNameContains(checkboxIndicator, "ui-pop-indicator-pop");
+    await expectAnimationNameContains(checkboxIcon, "ui-pop-check-draw");
+    await expectAnimationNameContains(checkedRadio, "ui-pop-state-burst");
+    await expectAnimationNameContains(checkedSwitch, "ui-pop-state-burst");
+    await expectAnimationNameContains(checkedSwitchThumb, "ui-pop-thumb-spring");
   });
 });
 
