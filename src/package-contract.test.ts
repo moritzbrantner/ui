@@ -138,12 +138,20 @@ import {
 import * as RootExports from ".";
 import * as ThemeExports from "./themes";
 import {
+  BooleanFilterControl,
   DataGrid,
   DataGridColumnHeader,
+  DateRangeFilterControl,
+  EnumFilterControl,
   FilterBar,
+  FilterBarControls,
   FilterChip,
+  NumberFilterControl,
   SearchField,
   SelectionToolbar,
+  TagFilterControl,
+  TextFilterControl,
+  isEmptyFilterValue,
 } from "./data";
 import {
   ActionBar,
@@ -179,7 +187,10 @@ import { ActionSheet as SubpathActionSheet } from "./components/patterns/action-
 import { ContextActionMenu as SubpathContextActionMenu } from "./components/patterns/context-action-menu";
 import { DataGrid as SubpathDataGrid } from "./components/data/data-grid";
 import { Dialog as SubpathDialog } from "./components/stable/dialog";
-import { FilterBar as SubpathFilterBar } from "./components/data/filter-bar";
+import {
+  FilterBar as SubpathFilterBar,
+  TextFilterControl as SubpathTextFilterControl,
+} from "./components/data/filter-bar";
 import { HoverPreview as SubpathHoverPreview } from "./components/patterns/hover-preview";
 import { Navbar as SubpathNavbar } from "./components/shell/navbar";
 import { NavbarActions as SubpathNavbarActions } from "./components/shell/navbar-actions";
@@ -783,6 +794,7 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(SubpathDataGrid).toBe(DataGrid);
     expect(SubpathDialog).toBe(Dialog);
     expect(SubpathFilterBar).toBe(FilterBar);
+    expect(SubpathTextFilterControl).toBe(TextFilterControl);
     expect(SubpathHoverPreview).toBe(HoverPreview);
     expect(SubpathNavbar).toBe(Navbar);
     expect(SubpathNavbarActions).toBe(NavbarActions);
@@ -794,6 +806,14 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(SubpathImageThumbnailStrip).toBe(ImageThumbnailStrip);
     expect(subpathGetMenuActionItemText({ id: "contract", label: "Contract" })).toBe("Contract");
     expect(typeof FilterChip).toBe("function");
+    expect(typeof FilterBarControls).toBe("function");
+    expect(typeof TextFilterControl).toBe("function");
+    expect(typeof NumberFilterControl).toBe("function");
+    expect(typeof DateRangeFilterControl).toBe("function");
+    expect(typeof BooleanFilterControl).toBe("function");
+    expect(typeof EnumFilterControl).toBe("function");
+    expect(typeof TagFilterControl).toBe("function");
+    expect(isEmptyFilterValue({ kind: "number", min: "1" })).toBe(false);
     expect(typeof ActionMenu).toBe("function");
     expect(typeof ContextActionMenu).toBe("function");
     expect(typeof ActionSheet).toBe("function");

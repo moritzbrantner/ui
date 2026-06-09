@@ -50,9 +50,23 @@ import {
   DropdownMenuTrigger,
 } from "../../stable/dropdown-menu";
 import { Input } from "../../stable/input";
-import { Label } from "../../stable/label";
-import { SelectDropdown } from "../../stable/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../stable/table";
+import {
+  BooleanFilterControl,
+  DateRangeFilterControl,
+  NumberFilterControl,
+  TextFilterControl,
+  coerceFilterBoolean,
+  coerceFilterDateTimestamp,
+  coerceFilterNumber,
+  isEmptyFilterValue,
+  normalizeFilterText,
+  type BooleanFilterValue,
+  type DateRangeFilterValue,
+  type FilterOption,
+  type NumberFilterValue,
+  type TextFilterValue,
+} from "../filter-bar";
 
 type DataGridDensity = "compact" | "comfortable" | "spacious";
 type DataGridStatus = "idle" | "loading" | "error" | "empty";
@@ -62,35 +76,12 @@ type DataGridColumnFilterMeta = {
   dataGridFilter?: DataGridColumnFilterKind | false;
 };
 
-type DataGridTextFilterValue = {
-  kind: "text";
-  value?: string;
-  values?: string[];
-};
-
-type DataGridNumberFilterValue = {
-  kind: "number";
-  min?: string;
-  max?: string;
-};
-
-type DataGridDateFilterValue = {
-  kind: "date";
-  from?: string;
-  to?: string;
-};
-
-type DataGridBooleanFilterValue = {
-  kind: "boolean";
-  value?: "true" | "false";
-};
-
 type DataGridColumnFilterValue =
   | string
-  | DataGridTextFilterValue
-  | DataGridNumberFilterValue
-  | DataGridDateFilterValue
-  | DataGridBooleanFilterValue;
+  | TextFilterValue
+  | NumberFilterValue
+  | DateRangeFilterValue
+  | BooleanFilterValue;
 
 type DataGridControlledState = {
   sorting?: SortingState;
@@ -175,16 +166,16 @@ const densityClasses: Record<DataGridDensity, string> = {
 };
 
 const dataGridFilterFn: FilterFn<RowData> = (row, columnId, filterValue) => {
-  if (isEmptyColumnFilterValue(filterValue)) {
+  if (isEmptyFilterValue(filterValue)) {
     return true;
   }
 
   const cellValue = row.getValue(columnId);
 
   if (isDataGridNumberFilterValue(filterValue)) {
-    const numericValue = coerceNumber(cellValue);
-    const min = coerceNumber(filterValue.min);
-    const max = coerceNumber(filterValue.max);
+    const numericValue = coerceFilterNumber(cellValue);
+    const min = coerceFilterNumber(filterValue.min);
+    const max = coerceFilterNumber(filterValue.max);
 
     if (numericValue === undefined) {
       return false;
@@ -194,9 +185,9 @@ const dataGridFilterFn: FilterFn<RowData> = (row, columnId, filterValue) => {
   }
 
   if (isDataGridDateFilterValue(filterValue)) {
-    const timestamp = coerceDateTimestamp(cellValue);
-    const from = coerceDateTimestamp(filterValue.from);
-    const to = coerceDateTimestamp(filterValue.to, true);
+    const timestamp = coerceFilterDateTimestamp(cellValue);
+    const from = coerceFilterDateTimestamp(filterValue.from);
+    const to = coerceFilterDateTimestamp(filterValue.to, true);
 
     if (timestamp === undefined) {
       return false;
@@ -206,7 +197,7 @@ const dataGridFilterFn: FilterFn<RowData> = (row, columnId, filterValue) => {
   }
 
   if (isDataGridBooleanFilterValue(filterValue)) {
-    const booleanValue = coerceBoolean(cellValue);
+    const booleanValue = coerceFilterBoolean(cellValue);
 
     return booleanValue !== undefined && String(booleanValue) === filterValue.value;
   }
@@ -226,7 +217,7 @@ const dataGridFilterFn: FilterFn<RowData> = (row, columnId, filterValue) => {
   return normalizeFilterText(cellValue).includes(normalizeFilterText(filterValue));
 };
 
-dataGridFilterFn.autoRemove = isEmptyColumnFilterValue;
+dataGridFilterFn.autoRemove = isEmptyFilterValue;
 
 function DataGrid<TData, TValue = unknown>({
   columns,
@@ -667,18 +658,6 @@ function DataGridColumnFilterMenu<TData, TValue>({
       ) : (
         <DataGridTextFilter column={column} filterValue={filterValue} label={label} />
       )}
-      <div className="pt-1">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="w-full justify-center"
-          disabled={!column.getIsFiltered()}
-          onClick={() => column.setFilterValue(undefined)}
-        >
-          Clear filter
-        </Button>
-      </div>
     </div>
   );
 }
@@ -696,63 +675,13 @@ function DataGridTextFilter<TData, TValue>({
   const options = getTextFilterOptions(column);
 
   return (
-    <div className="space-y-2">
-      <Label className="grid gap-1 text-xs text-muted-foreground">
-        Contains
-        <Input
-          aria-label={`Filter ${label}`}
-          value={textFilter.value ?? ""}
-          placeholder="Contains..."
-          onChange={(event) =>
-            column.setFilterValue(
-              cleanColumnFilterValue({
-                ...textFilter,
-                kind: "text",
-                value: event.target.value,
-              }),
-            )
-          }
-        />
-      </Label>
-      {options.length ? (
-        <div className="space-y-1">
-          <p className="px-0 text-xs font-medium text-muted-foreground">Values</p>
-          <div className="max-h-44 space-y-1 overflow-y-auto pr-1">
-            {options.map((option) => {
-              const checked = textFilter.values?.includes(option.value) ?? false;
-
-              return (
-                <Label
-                  key={option.value}
-                  className="flex min-h-7 items-center gap-2 rounded-md px-1.5 text-sm font-normal hover:bg-accent"
-                >
-                  <Checkbox
-                    aria-label={`Filter ${label} by ${option.label}`}
-                    checked={checked}
-                    onCheckedChange={(value) => {
-                      const currentValues = textFilter.values ?? [];
-                      const nextValues = value
-                        ? [...currentValues, option.value]
-                        : currentValues.filter((currentValue) => currentValue !== option.value);
-
-                      column.setFilterValue(
-                        cleanColumnFilterValue({
-                          ...textFilter,
-                          kind: "text",
-                          values: nextValues,
-                        }),
-                      );
-                    }}
-                  />
-                  <span className="min-w-0 flex-1 truncate">{option.label}</span>
-                  <span className="text-xs text-muted-foreground">{option.count}</span>
-                </Label>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-    </div>
+    <TextFilterControl
+      presentation="inline"
+      label={label}
+      value={textFilter}
+      options={options}
+      onValueChange={(value) => column.setFilterValue(value)}
+    />
   );
 }
 
@@ -770,42 +699,12 @@ function DataGridNumberFilter<TData, TValue>({
     : { kind: "number" as const };
 
   return (
-    <div className="grid grid-cols-2 gap-2">
-      <Label className="grid gap-1 text-xs text-muted-foreground">
-        Min
-        <Input
-          aria-label={`Minimum ${label}`}
-          type="number"
-          value={numberFilter.min ?? ""}
-          onChange={(event) =>
-            column.setFilterValue(
-              cleanColumnFilterValue({
-                ...numberFilter,
-                kind: "number",
-                min: event.target.value,
-              }),
-            )
-          }
-        />
-      </Label>
-      <Label className="grid gap-1 text-xs text-muted-foreground">
-        Max
-        <Input
-          aria-label={`Maximum ${label}`}
-          type="number"
-          value={numberFilter.max ?? ""}
-          onChange={(event) =>
-            column.setFilterValue(
-              cleanColumnFilterValue({
-                ...numberFilter,
-                kind: "number",
-                max: event.target.value,
-              }),
-            )
-          }
-        />
-      </Label>
-    </div>
+    <NumberFilterControl
+      presentation="inline"
+      label={label}
+      value={numberFilter}
+      onValueChange={(value) => column.setFilterValue(value)}
+    />
   );
 }
 
@@ -823,42 +722,12 @@ function DataGridDateFilter<TData, TValue>({
     : { kind: "date" as const };
 
   return (
-    <div className="grid grid-cols-2 gap-2">
-      <Label className="grid gap-1 text-xs text-muted-foreground">
-        From
-        <Input
-          aria-label={`From ${label}`}
-          type="date"
-          value={dateFilter.from ?? ""}
-          onChange={(event) =>
-            column.setFilterValue(
-              cleanColumnFilterValue({
-                ...dateFilter,
-                kind: "date",
-                from: event.target.value,
-              }),
-            )
-          }
-        />
-      </Label>
-      <Label className="grid gap-1 text-xs text-muted-foreground">
-        To
-        <Input
-          aria-label={`To ${label}`}
-          type="date"
-          value={dateFilter.to ?? ""}
-          onChange={(event) =>
-            column.setFilterValue(
-              cleanColumnFilterValue({
-                ...dateFilter,
-                kind: "date",
-                to: event.target.value,
-              }),
-            )
-          }
-        />
-      </Label>
-    </div>
+    <DateRangeFilterControl
+      presentation="inline"
+      label={label}
+      value={dateFilter}
+      onValueChange={(value) => column.setFilterValue(value)}
+    />
   );
 }
 
@@ -876,27 +745,12 @@ function DataGridBooleanFilter<TData, TValue>({
     : { kind: "boolean" as const };
 
   return (
-    <Label className="grid gap-1 text-xs text-muted-foreground">
-      Value
-      <SelectDropdown
-        aria-label={`Filter ${label}`}
-        size="sm"
-        value={booleanFilter.value ?? "all"}
-        onValueChange={(value) =>
-          column.setFilterValue(
-            cleanColumnFilterValue({
-              kind: "boolean",
-              value: value === "true" || value === "false" ? value : undefined,
-            }),
-          )
-        }
-        options={[
-          { label: "All", value: "all" },
-          { label: "True", value: "true" },
-          { label: "False", value: "false" },
-        ]}
-      />
-    </Label>
+    <BooleanFilterControl
+      presentation="inline"
+      label={label}
+      value={booleanFilter}
+      onValueChange={(value) => column.setFilterValue(value)}
+    />
   );
 }
 
@@ -963,11 +817,11 @@ function getColumnFilterKind<TData, TValue>(
     return "text";
   }
 
-  if (values.every((value) => coerceBoolean(value) !== undefined)) {
+  if (values.every((value) => coerceFilterBoolean(value) !== undefined)) {
     return "boolean";
   }
 
-  if (values.every((value) => coerceNumber(value) !== undefined)) {
+  if (values.every((value) => coerceFilterNumber(value) !== undefined)) {
     return "number";
   }
 
@@ -992,7 +846,7 @@ function getColumnSampleValues<TData, TValue>(column: Column<TData, TValue>) {
     .slice(0, 25);
 }
 
-function getTextFilterOptions<TData, TValue>(column: Column<TData, TValue>) {
+function getTextFilterOptions<TData, TValue>(column: Column<TData, TValue>): FilterOption[] {
   const uniqueValues = column.getFacetedUniqueValues();
   const options =
     uniqueValues.size <= 12
@@ -1019,7 +873,7 @@ function hasDataGridFilterMeta<TData>(column: ColumnDef<TData, unknown>): boolea
   return column.meta?.dataGridFilter !== false;
 }
 
-function getTextFilterValue(filterValue: unknown): DataGridTextFilterValue {
+function getTextFilterValue(filterValue: unknown): TextFilterValue {
   if (isDataGridTextFilterValue(filterValue)) {
     return filterValue;
   }
@@ -1031,55 +885,19 @@ function getTextFilterValue(filterValue: unknown): DataGridTextFilterValue {
   return { kind: "text" };
 }
 
-function cleanColumnFilterValue(filterValue: DataGridColumnFilterValue) {
-  return isEmptyColumnFilterValue(filterValue) ? undefined : filterValue;
-}
-
-function isEmptyColumnFilterValue(filterValue: unknown) {
-  if (filterValue == null) {
-    return true;
-  }
-
-  if (typeof filterValue === "string") {
-    return filterValue.trim().length === 0;
-  }
-
-  if (isDataGridTextFilterValue(filterValue)) {
-    return !filterValue.value?.trim() && !filterValue.values?.length;
-  }
-
-  if (isDataGridNumberFilterValue(filterValue)) {
-    return !filterValue.min?.trim() && !filterValue.max?.trim();
-  }
-
-  if (isDataGridDateFilterValue(filterValue)) {
-    return !filterValue.from?.trim() && !filterValue.to?.trim();
-  }
-
-  if (isDataGridBooleanFilterValue(filterValue)) {
-    return filterValue.value !== "true" && filterValue.value !== "false";
-  }
-
-  return false;
-}
-
-function isDataGridTextFilterValue(filterValue: unknown): filterValue is DataGridTextFilterValue {
+function isDataGridTextFilterValue(filterValue: unknown): filterValue is TextFilterValue {
   return isRecord(filterValue) && filterValue.kind === "text";
 }
 
-function isDataGridNumberFilterValue(
-  filterValue: unknown,
-): filterValue is DataGridNumberFilterValue {
+function isDataGridNumberFilterValue(filterValue: unknown): filterValue is NumberFilterValue {
   return isRecord(filterValue) && filterValue.kind === "number";
 }
 
-function isDataGridDateFilterValue(filterValue: unknown): filterValue is DataGridDateFilterValue {
+function isDataGridDateFilterValue(filterValue: unknown): filterValue is DateRangeFilterValue {
   return isRecord(filterValue) && filterValue.kind === "date";
 }
 
-function isDataGridBooleanFilterValue(
-  filterValue: unknown,
-): filterValue is DataGridBooleanFilterValue {
+function isDataGridBooleanFilterValue(filterValue: unknown): filterValue is BooleanFilterValue {
   return isRecord(filterValue) && filterValue.kind === "boolean";
 }
 
@@ -1091,42 +909,6 @@ function isBlankValue(value: unknown) {
   return value == null || String(value).trim().length === 0;
 }
 
-function normalizeFilterText(value: unknown) {
-  return String(value ?? "").toLocaleLowerCase();
-}
-
-function coerceNumber(value: unknown) {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return value;
-  }
-
-  if (typeof value === "string" && value.trim() !== "") {
-    const parsed = Number(value);
-
-    return Number.isFinite(parsed) ? parsed : undefined;
-  }
-
-  return undefined;
-}
-
-function coerceBoolean(value: unknown) {
-  if (typeof value === "boolean") {
-    return value;
-  }
-
-  if (typeof value === "string") {
-    if (value.toLocaleLowerCase() === "true") {
-      return true;
-    }
-
-    if (value.toLocaleLowerCase() === "false") {
-      return false;
-    }
-  }
-
-  return undefined;
-}
-
 function isDateLikeValue(value: unknown) {
   if (value instanceof Date) {
     return Number.isFinite(value.getTime());
@@ -1135,26 +917,8 @@ function isDateLikeValue(value: unknown) {
   return (
     typeof value === "string" &&
     /^\d{4}-\d{2}-\d{2}/.test(value) &&
-    coerceDateTimestamp(value) !== undefined
+    coerceFilterDateTimestamp(value) !== undefined
   );
-}
-
-function coerceDateTimestamp(value: unknown, endOfDay = false) {
-  if (value instanceof Date) {
-    const timestamp = value.getTime();
-
-    return Number.isFinite(timestamp) ? timestamp : undefined;
-  }
-
-  if (typeof value !== "string" || value.trim() === "") {
-    return undefined;
-  }
-
-  const timestamp = Date.parse(
-    endOfDay && /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T23:59:59.999` : value,
-  );
-
-  return Number.isFinite(timestamp) ? timestamp : undefined;
 }
 
 function humanizeColumnId(columnId: string) {

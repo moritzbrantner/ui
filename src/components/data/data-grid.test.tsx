@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ColumnDef } from "@tanstack/react-table";
 import * as React from "react";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   Button,
@@ -330,6 +330,10 @@ function createRect({
 }
 
 describe("@moritzbrantner/ui data-grid", () => {
+  beforeEach(() => {
+    Element.prototype.scrollIntoView = vi.fn();
+  });
+
   test("renders DataGrid workflows for filtering, sorting, selection, columns, and pagination", async () => {
     type Row = {
       id: string;
@@ -481,6 +485,78 @@ describe("@moritzbrantner/ui data-grid", () => {
       expect(screen.queryByText("Small")).toBeNull();
       expect(screen.getByText("Medium")).toBeTruthy();
       expect(screen.queryByText("Large")).toBeNull();
+    });
+  });
+
+  test("uses date inputs for date column header filters", async () => {
+    type Row = {
+      name: string;
+      created: string;
+    };
+    const columns: ColumnDef<Row>[] = [
+      { accessorKey: "name", header: "Name" },
+      { accessorKey: "created", header: "Created" },
+    ];
+
+    render(
+      <DataGrid
+        columns={columns}
+        data={[
+          { name: "Early", created: "2026-05-20" },
+          { name: "Inside", created: "2026-06-12" },
+          { name: "Late", created: "2026-07-02" },
+        ]}
+      />,
+    );
+
+    fireEvent.contextMenu(screen.getByText("Created"));
+
+    expect(await screen.findByText("Filter Created")).toBeTruthy();
+
+    fireEvent.change(screen.getByLabelText("From Created"), {
+      target: { value: "2026-06-01" },
+    });
+    fireEvent.change(screen.getByLabelText("To Created"), {
+      target: { value: "2026-06-30" },
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText("Early")).toBeNull();
+      expect(screen.getByText("Inside")).toBeTruthy();
+      expect(screen.queryByText("Late")).toBeNull();
+    });
+  });
+
+  test("uses boolean selects for boolean column header filters", async () => {
+    type Row = {
+      name: string;
+      published: boolean;
+    };
+    const columns: ColumnDef<Row>[] = [
+      { accessorKey: "name", header: "Name" },
+      { accessorKey: "published", header: "Published" },
+    ];
+
+    render(
+      <DataGrid
+        columns={columns}
+        data={[
+          { name: "Draft", published: false },
+          { name: "Live", published: true },
+        ]}
+      />,
+    );
+
+    fireEvent.contextMenu(screen.getByText("Published"));
+
+    expect(await screen.findByText("Filter Published")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("combobox", { name: "Filter Published" }));
+    fireEvent.click(await screen.findByRole("option", { name: "False" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Draft")).toBeTruthy();
+      expect(screen.queryByText("Live")).toBeNull();
     });
   });
 
