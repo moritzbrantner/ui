@@ -1,17 +1,10 @@
 import { spawnSync } from "node:child_process";
-import {
-  cpSync,
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { formatKb, getAssetSizeReport } from "./asset-size-report.js";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const consumerRoot = path.join(packageRoot, "examples", "consumer");
@@ -285,38 +278,4 @@ function buildConsumerFixture(
       `consumer ${fixture.name} build exceeded total CSS budget: ${formatKb(cssReport.totalBytes)} > ${formatKb(fixture.budget.maxCssBytes)}`,
     );
   }
-}
-
-function getAssetSizeReport(
-  assetsDir: string,
-  extension: ".css" | ".js",
-): { totalBytes: number; maxChunkBytes: number } {
-  const assetFiles = listFiles(assetsDir).filter((filePath) => filePath.endsWith(extension));
-
-  if (assetFiles.length === 0) {
-    throw new Error(`consumer build did not emit any ${extension} chunks`);
-  }
-
-  const sizes = assetFiles.map((filePath) => statSync(filePath).size);
-
-  return {
-    totalBytes: sizes.reduce((total, size) => total + size, 0),
-    maxChunkBytes: Math.max(...sizes),
-  };
-}
-
-function listFiles(directory: string): string[] {
-  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-    const filePath = path.join(directory, entry.name);
-
-    if (entry.isDirectory()) {
-      return listFiles(filePath);
-    }
-
-    return filePath;
-  });
-}
-
-function formatKb(bytes: number): string {
-  return `${Math.round(bytes / 1024)} KB`;
 }
