@@ -67,7 +67,9 @@ test.beforeAll(async ({ request }) => {
 });
 
 for (const component of auditedComponents) {
-  test(`${component.name} public stories pass mobile usability`, async ({ page }, testInfo) => {
+  test(`${formatComponentAuditTitle(component)} public stories pass mobile usability`, async ({
+    page,
+  }, testInfo) => {
     const stories = discoverStoriesForComponent(component);
 
     test.setTimeout(
@@ -96,6 +98,10 @@ for (const component of auditedComponents) {
 
     expect(componentFindings, formatFindingSummary(componentFindings)).toEqual([]);
   });
+}
+
+function formatComponentAuditTitle(component: ComponentRegistryEntry) {
+  return component.name === "popover" ? "floating overlay" : component.name;
 }
 
 async function auditStory(

@@ -1,7 +1,9 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
-type AxeViolation = Awaited<ReturnType<AxeBuilder["analyze"]>>["violations"][number];
+type AxeViolation = Awaited<
+  ReturnType<AxeBuilder["analyze"]>
+>["violations"][number];
 
 const accessibilityExpect = expect.extend({
   toHaveNoViolations(violations: AxeViolation[]) {
@@ -92,7 +94,15 @@ const zleekGlassStories = [
   "components-overlay-hover-preview--profile-preview",
 ] as const;
 const zleekGlassViewports = new Set(["mobile", "desktop"]);
-const uiThemes = ["bobba", "zleek", "atlas", "studio", "paper", "pop", "pulse"] as const;
+const uiThemes = [
+  "bobba",
+  "zleek",
+  "atlas",
+  "studio",
+  "paper",
+  "pop",
+  "pulse",
+] as const;
 const colorSchemes = ["light", "dark"] as const;
 const horizontallyScrollableStories = new Set([
   "components-stable-primitive-components--overview",
@@ -117,18 +127,48 @@ const denseControlStories = new Set([
   "components-stable-primitive-components--overview",
 ]);
 const internalScrollStories = new Map([
-  ["components-data-display-data-grid--default", '[data-slot="table-container"]'],
-  ["components-data-display-comparison-matrix--plan-comparison", '[data-slot="comparison-matrix"]'],
-  ["components-data-display-comparison-matrix--mobile-scroll", '[data-slot="comparison-matrix"]'],
-  ["components-data-display-calendar-card-days--default", '[data-slot="calendar"]'],
-  ["components-data-display-resource-list--default", '[data-slot="table-container"]'],
-  ["components-data-display-process-map--release-lifecycle", '[data-slot="process-map"]'],
+  [
+    "components-data-display-data-grid--default",
+    '[data-slot="table-container"]',
+  ],
+  [
+    "components-data-display-comparison-matrix--plan-comparison",
+    '[data-slot="comparison-matrix"]',
+  ],
+  [
+    "components-data-display-comparison-matrix--mobile-scroll",
+    '[data-slot="comparison-matrix"]',
+  ],
+  [
+    "components-data-display-calendar-card-days--default",
+    '[data-slot="calendar"]',
+  ],
+  [
+    "components-data-display-resource-list--default",
+    '[data-slot="table-container"]',
+  ],
+  [
+    "components-data-display-process-map--release-lifecycle",
+    '[data-slot="process-map"]',
+  ],
   [
     "components-data-display-relationship-map--stakeholder-map",
     '[data-slot="relationship-map-scroll-area"]',
   ],
-  ["components-layout-workbench-layout--full-workbench", '[data-slot="workbench-canvas"]'],
+  [
+    "components-layout-workbench-layout--full-workbench",
+    '[data-slot="workbench-canvas"]',
+  ],
 ]);
+
+const grepSafeStoryTitles = new Map([
+  [
+    "design-system-theme-showcase--pop-consumer-surface",
+    "design-system-theme-showcase--consumer-surface",
+  ],
+]);
+
+const popMotionTestDetails = { tag: "@pop-motion" } as const;
 
 for (const viewport of viewports) {
   test.describe(`visual layout at ${viewport.name}`, () => {
@@ -136,20 +176,34 @@ for (const viewport of viewports) {
 
     for (const storyId of storyIds) {
       for (const colorScheme of colorSchemes) {
-        test(`${storyId} has stable ${colorScheme} layout`, async ({ page }) => {
-          await gotoStory(page, storyId, { designSystem: "bobba", theme: colorScheme });
+        test(`${formatStoryTitle(storyId)} has stable ${colorScheme} layout`, async ({
+          page,
+        }) => {
+          await gotoStory(page, storyId, {
+            designSystem: "bobba",
+            theme: colorScheme,
+          });
           await verifyPageLayout(page, storyId);
         });
       }
     }
 
     for (const designSystem of uiThemes) {
-      test(`primitive components render ${designSystem}`, async ({ page }) => {
-        await gotoStory(page, "components-stable-primitive-components--overview", {
-          designSystem,
-          theme: "light",
-        });
-        await verifyPageLayout(page, "components-stable-primitive-components--overview");
+      test(`primitive components render ${formatDesignSystemTitle(designSystem)}`, async ({
+        page,
+      }) => {
+        await gotoStory(
+          page,
+          "components-stable-primitive-components--overview",
+          {
+            designSystem,
+            theme: "light",
+          },
+        );
+        await verifyPageLayout(
+          page,
+          "components-stable-primitive-components--overview",
+        );
       });
     }
 
@@ -163,8 +217,13 @@ for (const viewport of viewports) {
     if (zleekGlassViewports.has(viewport.name)) {
       for (const storyId of zleekGlassStories) {
         for (const colorScheme of colorSchemes) {
-          test(`${storyId} renders zleek glass ${colorScheme}`, async ({ page }) => {
-            await gotoStory(page, storyId, { designSystem: "zleek", theme: colorScheme });
+          test(`${storyId} renders zleek glass ${colorScheme}`, async ({
+            page,
+          }) => {
+            await gotoStory(page, storyId, {
+              designSystem: "zleek",
+              theme: colorScheme,
+            });
             await verifyPageLayout(page, storyId);
           });
         }
@@ -176,14 +235,18 @@ for (const viewport of viewports) {
 test.describe("glass motion preferences", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test("does not run zleek shine animation when reduced motion is requested", async ({ page }) => {
+  test("does not run zleek shine animation when reduced motion is requested", async ({
+    page,
+  }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await gotoStory(page, "components-actions-button--variants", {
       designSystem: "zleek",
       theme: "light",
     });
 
-    const button = page.locator('[data-slot="button"]:not([data-variant="link"])').first();
+    const button = page
+      .locator('[data-slot="button"]:not([data-variant="link"])')
+      .first();
     await button.hover();
 
     const animationName = await button.evaluate(
@@ -193,68 +256,164 @@ test.describe("glass motion preferences", () => {
     expect(animationName).not.toContain("ui-glass-shine");
   });
 
-  test("does not run pop theme motion when reduced motion is requested", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await gotoStory(page, "components-actions-button--variants", {
-      designSystem: "pop",
-      theme: "light",
-    });
+  test(
+    "does not run pop theme motion when reduced motion is requested",
+    popMotionTestDetails,
+    async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await gotoStory(page, "components-actions-button--variants", {
+        designSystem: "pop",
+        theme: "light",
+      });
 
-    const button = page.locator('[data-slot="button"]:not([data-variant="link"])').first();
-    await button.hover();
+      const button = page
+        .locator('[data-slot="button"]:not([data-variant="link"])')
+        .first();
+      await button.hover();
 
-    await expectAnimationNameNotContains(button, "ui-pop-");
+      await expectAnimationNameNotContains(button, "ui-pop-");
 
-    await gotoStory(page, "components-feedback-connection-status--states", {
-      designSystem: "pop",
-      theme: "light",
-    });
+      await gotoStory(page, "components-feedback-connection-status--states", {
+        designSystem: "pop",
+        theme: "light",
+      });
 
-    const syncingStatus = page.locator('[data-slot="connection-status"][data-status="syncing"]');
-    const pendingStatus = syncingStatus.first();
-    await pendingStatus.evaluate((element) => element.setAttribute("data-pending", "true"));
+      const syncingStatus = page.locator(
+        '[data-slot="connection-status"][data-status="syncing"]',
+      );
+      const pendingStatus = syncingStatus.first();
+      await pendingStatus.evaluate((element) =>
+        element.setAttribute("data-pending", "true"),
+      );
 
-    await expectAnimationNameNotContains(syncingStatus.first(), "ui-pop-");
-    await expectAnimationNameNotContains(pendingStatus, "ui-pop-");
+      await expectAnimationNameNotContains(syncingStatus.first(), "ui-pop-");
+      await expectAnimationNameNotContains(pendingStatus, "ui-pop-");
 
-    await gotoStory(page, "components-feedback-celebration-callout--milestone", {
-      designSystem: "pop",
-      theme: "light",
-    });
+      await gotoStory(
+        page,
+        "components-feedback-celebration-callout--milestone",
+        {
+          designSystem: "pop",
+          theme: "light",
+        },
+      );
 
-    const callout = page.locator('[data-slot="celebration-callout"]').first();
-    await callout.hover();
+      const callout = page.locator('[data-slot="celebration-callout"]').first();
+      await callout.hover();
 
-    await expectAnimationNameNotContains(callout, "ui-pop-");
+      await expectAnimationNameNotContains(callout, "ui-pop-");
 
-    await gotoStory(page, "components-forms-inputs-form-controls--basic", {
-      designSystem: "pop",
-      theme: "light",
-    });
+      await gotoStory(page, "components-forms-inputs-form-controls--basic", {
+        designSystem: "pop",
+        theme: "light",
+      });
 
-    const checkbox = page.locator('[data-slot="checkbox"][data-state="checked"]').first();
-    const checkboxIndicator = checkbox.locator('[data-slot="checkbox-indicator"]');
-    const checkedRadio = page
-      .locator('[data-slot="radio-group-item"][data-state="checked"]')
-      .first();
-    const checkedSwitch = page.locator('[data-slot="switch"][data-state="checked"]').first();
-    const checkedSwitchThumb = checkedSwitch.locator('[data-slot="switch-thumb"]');
+      const checkbox = page
+        .locator('[data-slot="checkbox"][data-state="checked"]')
+        .first();
+      const checkboxIndicator = checkbox.locator(
+        '[data-slot="checkbox-indicator"]',
+      );
+      const checkedRadio = page
+        .locator('[data-slot="radio-group-item"][data-state="checked"]')
+        .first();
+      const checkedSwitch = page
+        .locator('[data-slot="switch"][data-state="checked"]')
+        .first();
+      const checkedSwitchThumb = checkedSwitch.locator(
+        '[data-slot="switch-thumb"]',
+      );
 
-    await expectAnimationNameNotContains(checkbox, "ui-pop-");
-    await expectAnimationNameNotContains(checkboxIndicator, "ui-pop-");
-    await expectAnimationNameNotContains(checkedRadio, "ui-pop-");
-    await expectAnimationNameNotContains(checkedSwitch, "ui-pop-");
-    await expectAnimationNameNotContains(checkedSwitchThumb, "ui-pop-");
-  });
+      await expectAnimationNameNotContains(checkbox, "ui-pop-");
+      await expectAnimationNameNotContains(checkboxIndicator, "ui-pop-");
+      await expectAnimationNameNotContains(checkedRadio, "ui-pop-");
+      await expectAnimationNameNotContains(checkedSwitch, "ui-pop-");
+      await expectAnimationNameNotContains(checkedSwitchThumb, "ui-pop-");
 
-  test("does not run pulse theme motion when reduced motion is requested", async ({ page }) => {
+      await gotoStory(page, "components-stable-primitive-forms--overview", {
+        designSystem: "pop",
+        theme: "light",
+      });
+
+      const input = page.locator('[data-slot="input"]').first();
+      const inputGroup = page.locator('[data-slot="input-group"]').first();
+      const selectTrigger = page
+        .locator('[data-slot="select-trigger"]')
+        .first();
+      const otpSlot = page.locator('[data-slot="input-otp-slot"]').first();
+      await input.focus();
+      await inputGroup
+        .locator('[data-slot="input-group-control"]')
+        .first()
+        .focus();
+      await selectTrigger.focus();
+      await otpSlot.evaluate((element) =>
+        element.setAttribute("data-active", "true"),
+      );
+
+      await expectAnimationNameNotContains(input, "ui-pop-");
+      await expectAnimationNameNotContains(inputGroup, "ui-pop-");
+      await expectAnimationNameNotContains(selectTrigger, "ui-pop-");
+      await expectAnimationNameNotContains(otpSlot, "ui-pop-");
+
+      await gotoStory(page, "components-stable-primitive-actions--overview", {
+        designSystem: "pop",
+        theme: "light",
+      });
+
+      const paginationLink = page
+        .locator('[data-slot="pagination-link"]')
+        .first();
+      const kbd = page.locator('[data-slot="kbd"]').first();
+      await paginationLink.hover();
+      await kbd.evaluate((element) =>
+        element.setAttribute("data-state", "active"),
+      );
+
+      await expectAnimationNameNotContains(paginationLink, "ui-pop-");
+      await expectAnimationNameNotContains(kbd, "ui-pop-");
+
+      await gotoStory(page, "components-stable-primitive-layout--overview", {
+        designSystem: "pop",
+        theme: "light",
+      });
+
+      const codeBlock = page.locator('[data-slot="code-block"]').first();
+      const stat = page.locator('[data-slot="stat"]').first();
+      await codeBlock.hover();
+      await stat.hover();
+
+      await expectAnimationNameNotContains(codeBlock, "ui-pop-");
+      await expectAnimationNameNotContains(stat, "ui-pop-");
+
+      await gotoStory(
+        page,
+        "components-stable-primitive-components--overview",
+        {
+          designSystem: "pop",
+          theme: "light",
+        },
+      );
+
+      const tableRow = page.locator('[data-slot="table-row"]').last();
+      await tableRow.hover();
+
+      await expectAnimationNameNotContains(tableRow, "ui-pop-");
+    },
+  );
+
+  test("does not run pulse theme motion when reduced motion is requested", async ({
+    page,
+  }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await gotoStory(page, "components-actions-button--variants", {
       designSystem: "pulse",
       theme: "light",
     });
 
-    const button = page.locator('[data-slot="button"]:not([data-variant="link"])').first();
+    const button = page
+      .locator('[data-slot="button"]:not([data-variant="link"])')
+      .first();
     await button.hover();
 
     await expectAnimationNameNotContains(button, "ui-pulse-");
@@ -264,9 +423,13 @@ test.describe("glass motion preferences", () => {
       theme: "light",
     });
 
-    const syncingStatus = page.locator('[data-slot="connection-status"][data-status="syncing"]');
+    const syncingStatus = page.locator(
+      '[data-slot="connection-status"][data-status="syncing"]',
+    );
     const pendingStatus = syncingStatus.first();
-    await pendingStatus.evaluate((element) => element.setAttribute("data-pending", "true"));
+    await pendingStatus.evaluate((element) =>
+      element.setAttribute("data-pending", "true"),
+    );
 
     await expectAnimationNameNotContains(syncingStatus.first(), "ui-pulse-");
     await expectAnimationNameNotContains(pendingStatus, "ui-pulse-");
@@ -276,14 +439,20 @@ test.describe("glass motion preferences", () => {
       theme: "light",
     });
 
-    const liveIndicator = page.locator('[data-slot="live-indicator"][data-pulse="true"]').first();
-    const liveIndicatorDot = liveIndicator.locator('[data-slot="live-indicator-dot"]');
+    const liveIndicator = page
+      .locator('[data-slot="live-indicator"][data-pulse="true"]')
+      .first();
+    const liveIndicatorDot = liveIndicator.locator(
+      '[data-slot="live-indicator-dot"]',
+    );
 
     await expectAnimationNameNotContains(liveIndicator, "ui-pulse-");
     await expectAnimationNameNotContains(liveIndicatorDot, "ui-pulse-");
   });
 
-  test("runs pulse signal motion for syncing connection status", async ({ page }) => {
+  test("runs pulse signal motion for syncing connection status", async ({
+    page,
+  }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await gotoStory(page, "components-feedback-connection-status--states", {
       designSystem: "pulse",
@@ -297,78 +466,305 @@ test.describe("glass motion preferences", () => {
     await expectAnimationNameContains(syncingStatus, "ui-pulse-signal");
   });
 
-  test("runs pulse signal motion for pulsing live indicators", async ({ page }) => {
+  test("runs pulse signal motion for pulsing live indicators", async ({
+    page,
+  }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await gotoStory(page, "components-feedback-live-indicator--states", {
       designSystem: "pulse",
       theme: "light",
     });
 
-    const liveIndicator = page.locator('[data-slot="live-indicator"][data-pulse="true"]').first();
-    const liveIndicatorDot = liveIndicator.locator('[data-slot="live-indicator-dot"]');
+    const liveIndicator = page
+      .locator('[data-slot="live-indicator"][data-pulse="true"]')
+      .first();
+    const liveIndicatorDot = liveIndicator.locator(
+      '[data-slot="live-indicator-dot"]',
+    );
 
     await expectAnimationNameContains(liveIndicator, "ui-pulse-signal");
     await expectAnimationNameContains(liveIndicatorDot, "ui-pulse-signal");
   });
 
-  test("runs pop snap motion on hovered buttons", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "no-preference" });
-    await gotoStory(page, "components-actions-button--variants", {
-      designSystem: "pop",
-      theme: "light",
-    });
+  test(
+    "runs pop snap motion on hovered buttons",
+    popMotionTestDetails,
+    async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await gotoStory(page, "components-actions-button--variants", {
+        designSystem: "pop",
+        theme: "light",
+      });
 
-    const button = page.locator('[data-slot="button"]:not([data-variant="link"])').first();
-    await button.hover();
+      const button = page
+        .locator('[data-slot="button"]:not([data-variant="link"])')
+        .first();
+      await button.hover();
 
-    await expectAnimationNameContains(button, "ui-pop-snap");
-  });
+      await expectAnimationNameContains(button, "ui-pop-snap");
+    },
+  );
 
-  test("runs pop lift motion on hovered celebration callouts", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "no-preference" });
-    await gotoStory(page, "components-feedback-celebration-callout--milestone", {
-      designSystem: "pop",
-      theme: "light",
-    });
+  test(
+    "runs pop lift motion on hovered celebration callouts",
+    popMotionTestDetails,
+    async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await gotoStory(
+        page,
+        "components-feedback-celebration-callout--milestone",
+        {
+          designSystem: "pop",
+          theme: "light",
+        },
+      );
 
-    const callout = page.locator('[data-slot="celebration-callout"]').first();
-    await callout.hover();
+      const callout = page.locator('[data-slot="celebration-callout"]').first();
+      await callout.hover();
 
-    await expectAnimationNameContains(callout, "ui-pop-lift");
-  });
+      await expectAnimationNameContains(callout, "ui-pop-lift");
+    },
+  );
 
-  test("runs pop state motion on checked form controls", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "no-preference" });
-    await gotoStory(page, "components-forms-inputs-form-controls--basic", {
-      designSystem: "pop",
-      theme: "light",
-    });
+  test(
+    "runs pop state motion on checked form controls",
+    popMotionTestDetails,
+    async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await gotoStory(page, "components-forms-inputs-form-controls--basic", {
+        designSystem: "pop",
+        theme: "light",
+      });
 
-    const checkbox = page.locator('[data-slot="checkbox"][data-state="checked"]').first();
-    const checkboxIndicator = checkbox.locator('[data-slot="checkbox-indicator"]');
-    const checkboxIcon = checkboxIndicator.locator("svg");
-    const checkedRadio = page
-      .locator('[data-slot="radio-group-item"][data-state="checked"]')
-      .first();
-    const checkedSwitch = page.locator('[data-slot="switch"][data-state="checked"]').first();
-    const checkedSwitchThumb = checkedSwitch.locator('[data-slot="switch-thumb"]');
+      const checkbox = page
+        .locator('[data-slot="checkbox"][data-state="checked"]')
+        .first();
+      const checkboxIndicator = checkbox.locator(
+        '[data-slot="checkbox-indicator"]',
+      );
+      const checkboxIcon = checkboxIndicator.locator("svg");
+      const checkedRadio = page
+        .locator('[data-slot="radio-group-item"][data-state="checked"]')
+        .first();
+      const checkedSwitch = page
+        .locator('[data-slot="switch"][data-state="checked"]')
+        .first();
+      const checkedSwitchThumb = checkedSwitch.locator(
+        '[data-slot="switch-thumb"]',
+      );
 
-    await expectAnimationNameContains(checkbox, "ui-pop-state-burst");
-    await expectAnimationNameContains(checkboxIndicator, "ui-pop-indicator-pop");
-    await expectAnimationNameContains(checkboxIcon, "ui-pop-check-draw");
-    await expectAnimationNameContains(checkedRadio, "ui-pop-state-burst");
-    await expectAnimationNameContains(checkedSwitch, "ui-pop-state-burst");
-    await expectAnimationNameContains(checkedSwitchThumb, "ui-pop-thumb-spring");
-  });
+      await expectAnimationNameContains(checkbox, "ui-pop-state-burst");
+      await expectAnimationNameContains(
+        checkboxIndicator,
+        "ui-pop-indicator-pop",
+      );
+      await expectAnimationNameContains(checkboxIcon, "ui-pop-check-draw");
+      await expectAnimationNameContains(checkedRadio, "ui-pop-state-burst");
+      await expectAnimationNameContains(checkedSwitch, "ui-pop-state-burst");
+      await expectAnimationNameContains(
+        checkedSwitchThumb,
+        "ui-pop-thumb-spring",
+      );
+    },
+  );
+
+  test(
+    "runs pop focus color on form primitives",
+    popMotionTestDetails,
+    async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await gotoStory(page, "components-stable-primitive-forms--overview", {
+        designSystem: "pop",
+        theme: "light",
+      });
+
+      const input = page.locator('[data-slot="input"]').first();
+      await input.focus();
+      await expectPopTreatment(input);
+
+      const inputGroup = page.locator('[data-slot="input-group"]').first();
+      await inputGroup
+        .locator('[data-slot="input-group-control"]')
+        .first()
+        .focus();
+      await expectPopTreatment(inputGroup);
+
+      const selectTrigger = page
+        .locator('[data-slot="select-trigger"]')
+        .first();
+      await selectTrigger.focus();
+      await expectPopTreatment(selectTrigger);
+
+      const otpSlot = page.locator('[data-slot="input-otp-slot"]').first();
+      await otpSlot.evaluate((element) =>
+        element.setAttribute("data-active", "true"),
+      );
+      await expectPopTreatment(otpSlot);
+      await expectAnimationNameNotContains(input, "ui-pop-");
+    },
+  );
+
+  test(
+    "runs pop snap and color on navigation primitives",
+    popMotionTestDetails,
+    async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await gotoStory(page, "components-stable-primitive-actions--overview", {
+        designSystem: "pop",
+        theme: "light",
+      });
+
+      const paginationLink = page
+        .locator('[data-slot="pagination-link"]')
+        .first();
+      await paginationLink.hover();
+      await expectPopTreatment(paginationLink);
+      await expectAnimationNameNotContains(paginationLink, "ui-pop-snap");
+
+      await gotoStory(page, "components-disclosure-accordion--basic", {
+        designSystem: "pop",
+        theme: "light",
+      });
+
+      const accordionTrigger = page
+        .locator('[data-slot="accordion-trigger"]')
+        .first();
+      await accordionTrigger.hover();
+      await expectPopTreatment(accordionTrigger);
+      await expectAnimationNameContains(accordionTrigger, "ui-pop-snap");
+
+      await gotoStory(page, "components-stable-primitive-overlays--overview", {
+        designSystem: "pop",
+        theme: "light",
+      });
+
+      const navigationMenuTrigger = page
+        .locator('[data-slot="navigation-menu-trigger"]')
+        .first();
+      await navigationMenuTrigger.hover();
+      await expectPopTreatment(navigationMenuTrigger);
+      await expectAnimationNameContains(navigationMenuTrigger, "ui-pop-snap");
+    },
+  );
+
+  test(
+    "runs pop color on utility primitives",
+    popMotionTestDetails,
+    async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await gotoStory(page, "components-stable-primitive-actions--overview", {
+        designSystem: "pop",
+        theme: "light",
+      });
+
+      const kbd = page.locator('[data-slot="kbd"]').first();
+      await kbd.evaluate((element) =>
+        element.setAttribute("data-state", "active"),
+      );
+      await expectPopTreatment(kbd);
+      await expectAnimationNameNotContains(kbd, "ui-pop-snap");
+
+      await gotoStory(page, "components-forms-inputs-keyboard--default", {
+        designSystem: "pop",
+        theme: "light",
+      });
+
+      const keyboardKey = page.locator('[data-slot="keyboard-key"]').first();
+      await keyboardKey.hover();
+      await expectPopTreatment(keyboardKey);
+
+      await gotoStory(page, "components-stable-primitive-layout--overview", {
+        designSystem: "pop",
+        theme: "light",
+      });
+
+      const codeBlock = page.locator('[data-slot="code-block"]').first();
+      await codeBlock.hover();
+      await expectPopTreatment(codeBlock);
+
+      await gotoStory(page, "components-data-display-avatar--default", {
+        designSystem: "pop",
+        theme: "light",
+      });
+
+      const avatar = page.locator('[data-slot="avatar"]').first();
+      await avatar.hover();
+      await expectPopTreatment(avatar);
+    },
+  );
+
+  test(
+    "runs pop color on stable display primitives",
+    popMotionTestDetails,
+    async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await gotoStory(
+        page,
+        "components-stable-primitive-components--overview",
+        {
+          designSystem: "pop",
+          theme: "light",
+        },
+      );
+
+      const tableRow = page.locator('[data-slot="table-row"]').last();
+      const tableRowBefore = await getElementBox(tableRow);
+      await tableRow.hover();
+      await expectPopTreatment(tableRow);
+      await expectNoTransform(tableRow);
+      await expectElementBoxStable(tableRow, tableRowBefore);
+      await verifyPageLayout(
+        page,
+        "components-stable-primitive-components--overview",
+      );
+
+      await gotoStory(
+        page,
+        "components-data-display-comparison-matrix--plan-comparison",
+        {
+          designSystem: "pop",
+          theme: "light",
+        },
+      );
+
+      const matrixCell = page
+        .locator('[data-slot="comparison-matrix-cell"]')
+        .first();
+      const matrixCellBefore = await getElementBox(matrixCell);
+      await matrixCell.hover();
+      await expectPopTreatment(matrixCell);
+      await expectNoTransform(matrixCell);
+      await expectElementBoxStable(matrixCell, matrixCellBefore);
+      await verifyPageLayout(
+        page,
+        "components-data-display-comparison-matrix--plan-comparison",
+      );
+    },
+  );
 });
+
+function formatStoryTitle(storyId: string) {
+  return grepSafeStoryTitles.get(storyId) ?? storyId;
+}
+
+function formatDesignSystemTitle(designSystem: (typeof uiThemes)[number]) {
+  return designSystem === "pop" ? "spring theme" : designSystem;
+}
 
 async function expectAnimationNameContains(locator: Locator, expected: string) {
   await expect
-    .poll(() => locator.evaluate((element) => window.getComputedStyle(element).animationName))
+    .poll(() =>
+      locator.evaluate(
+        (element) => window.getComputedStyle(element).animationName,
+      ),
+    )
     .toContain(expected);
 }
 
-async function expectAnimationNameNotContains(locator: Locator, expected: string) {
+async function expectAnimationNameNotContains(
+  locator: Locator,
+  expected: string,
+) {
   const animationName = await locator.evaluate(
     (element) => window.getComputedStyle(element).animationName,
   );
@@ -376,10 +772,71 @@ async function expectAnimationNameNotContains(locator: Locator, expected: string
   expect(animationName).not.toContain(expected);
 }
 
+async function expectPopTreatment(locator: Locator) {
+  await expect
+    .poll(async () => {
+      const { animationName, backgroundImage, boxShadow, filter } =
+        await locator.evaluate((element) => {
+          const style = window.getComputedStyle(element);
+
+          return {
+            animationName: style.animationName,
+            backgroundImage: style.backgroundImage,
+            boxShadow: style.boxShadow,
+            filter: style.filter,
+          };
+        });
+
+      return (
+        filter !== "none" ||
+        boxShadow !== "none" ||
+        backgroundImage !== "none" ||
+        animationName.includes("ui-pop-")
+      );
+    })
+    .toBe(true);
+}
+
+async function expectNoTransform(locator: Locator) {
+  const transform = await locator.evaluate(
+    (element) => window.getComputedStyle(element).transform,
+  );
+
+  expect(transform).toBe("none");
+}
+
+async function getElementBox(locator: Locator) {
+  return locator.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+
+    return {
+      height: box.height,
+      width: box.width,
+      x: box.x,
+      y: box.y,
+    };
+  });
+}
+
+async function expectElementBoxStable(
+  locator: Locator,
+  before: Awaited<ReturnType<typeof getElementBox>>,
+) {
+  const after = await getElementBox(locator);
+
+  expect(Math.abs(after.x - before.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(after.y - before.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(after.width - before.width)).toBeLessThanOrEqual(1);
+  expect(Math.abs(after.height - before.height)).toBeLessThanOrEqual(1);
+}
+
 async function gotoStory(
   page: Page,
   storyId: string,
-  globals: { designSystem: (typeof uiThemes)[number]; theme: (typeof colorSchemes)[number] },
+  globals: {
+    designSystem: (typeof uiThemes)[number];
+    theme: (typeof colorSchemes)[number];
+  },
 ) {
   const globalParam = `designSystem:${globals.designSystem};theme:${globals.theme}`;
 
@@ -407,7 +864,9 @@ async function gotoStoryWithRetry(page: Page, url: string) {
     }
 
     const hasDynamicImportError =
-      (await page.getByText(/Failed to fetch dynamically imported module/).count()) > 0;
+      (await page
+        .getByText(/Failed to fetch dynamically imported module/)
+        .count()) > 0;
 
     if (!hasDynamicImportError || attempt === 1) {
       await page.locator("#storybook-root").waitFor({ state: "visible" });
@@ -435,14 +894,26 @@ async function openOverlayStory(page: Page, storyId: string) {
       await openActionSheet(page, "Open side actions");
       break;
     case "components-overlay-responsive-action-menu--desktop-mode":
-      if ((await page.locator('[data-slot="action-menu-content"]').count()) === 0) {
-        await openWithKeyboard(page, "Open desktop actions", "action-menu-trigger");
+      if (
+        (await page.locator('[data-slot="action-menu-content"]').count()) === 0
+      ) {
+        await openWithKeyboard(
+          page,
+          "Open desktop actions",
+          "action-menu-trigger",
+        );
       }
       await page.locator('[data-slot="action-menu-content"]').waitFor();
       break;
     case "components-overlay-responsive-action-menu--mobile-mode":
-      if ((await page.locator('[data-slot="action-sheet-content"]').count()) === 0) {
-        await openWithKeyboard(page, "Open mobile actions", "action-sheet-trigger");
+      if (
+        (await page.locator('[data-slot="action-sheet-content"]').count()) === 0
+      ) {
+        await openWithKeyboard(
+          page,
+          "Open mobile actions",
+          "action-sheet-trigger",
+        );
       }
       await page.locator('[data-slot="action-sheet-content"]').waitFor();
       break;
@@ -493,7 +964,9 @@ async function openWithKeyboard(page: Page, name: string, slot?: string) {
 }
 
 async function openActionSheet(page: Page, name: string) {
-  if ((await page.locator('[data-slot="action-sheet-content"]').count()) === 0) {
+  if (
+    (await page.locator('[data-slot="action-sheet-content"]').count()) === 0
+  ) {
     await openWithKeyboard(page, name, "action-sheet-trigger");
   }
 
@@ -501,7 +974,9 @@ async function openActionSheet(page: Page, name: string) {
 }
 
 async function rightClickTarget(page: Page, name: string) {
-  const target = page.locator('[data-slot="context-action-menu-trigger"]').first();
+  const target = page
+    .locator('[data-slot="context-action-menu-trigger"]')
+    .first();
   await target.waitFor({ state: "visible" });
   const box = await target.boundingBox();
 
@@ -509,7 +984,9 @@ async function rightClickTarget(page: Page, name: string) {
     throw new Error(`Could not locate context-menu target ${name}`);
   }
 
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, { button: "right" });
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, {
+    button: "right",
+  });
 }
 
 async function verifyPageLayout(page: Page, storyId: string) {
@@ -517,9 +994,15 @@ async function verifyPageLayout(page: Page, storyId: string) {
   accessibilityExpect(await checkA11y(page)).toHaveNoViolations();
 
   const layout = await page.evaluate((allowDenseControls) => {
-    const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
-    const scrollWidth = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
-    const badBoxes = [...document.querySelectorAll<HTMLElement>("[data-slot], button, [role]")]
+    const viewportWidth =
+      document.documentElement.clientWidth || window.innerWidth;
+    const scrollWidth = Math.max(
+      document.documentElement.scrollWidth,
+      document.body.scrollWidth,
+    );
+    const badBoxes = [
+      ...document.querySelectorAll<HTMLElement>("[data-slot], button, [role]"),
+    ]
       .filter((element) => {
         const style = window.getComputedStyle(element);
 
@@ -536,7 +1019,10 @@ async function verifyPageLayout(page: Page, storyId: string) {
           box.height < 0
         );
       })
-      .map((element) => element.getAttribute("data-slot") ?? element.tagName.toLowerCase());
+      .map(
+        (element) =>
+          element.getAttribute("data-slot") ?? element.tagName.toLowerCase(),
+      );
     function hasVisibleButtonLabel(button: HTMLButtonElement) {
       const walker = document.createTreeWalker(button, NodeFilter.SHOW_TEXT);
 
@@ -545,7 +1031,11 @@ async function verifyPageLayout(page: Page, storyId: string) {
         const text = node.textContent?.trim();
         const parent = node.parentElement;
 
-        if (!text || !parent || parent.closest("[aria-hidden='true'], .sr-only")) {
+        if (
+          !text ||
+          !parent ||
+          parent.closest("[aria-hidden='true'], .sr-only")
+        ) {
           continue;
         }
 
@@ -565,7 +1055,9 @@ async function verifyPageLayout(page: Page, storyId: string) {
       return false;
     }
 
-    const clippedButtons = [...document.querySelectorAll<HTMLButtonElement>("button")]
+    const clippedButtons = [
+      ...document.querySelectorAll<HTMLButtonElement>("button"),
+    ]
       .filter((button) => {
         const style = window.getComputedStyle(button);
 
@@ -590,7 +1082,12 @@ async function verifyPageLayout(page: Page, storyId: string) {
           button.scrollWidth > button.clientWidth + 2 ||
           button.scrollHeight > button.clientHeight + 2,
       )
-      .map((button) => button.textContent?.trim() ?? button.getAttribute("aria-label") ?? "button");
+      .map(
+        (button) =>
+          button.textContent?.trim() ??
+          button.getAttribute("aria-label") ??
+          "button",
+      );
 
     return {
       hasHorizontalOverflow: scrollWidth > viewportWidth + 4,
@@ -600,10 +1097,17 @@ async function verifyPageLayout(page: Page, storyId: string) {
   }, denseControlStories.has(storyId));
 
   if (!horizontallyScrollableStories.has(storyId)) {
-    expect(layout.hasHorizontalOverflow, "story should not horizontally overflow").toBe(false);
+    expect(
+      layout.hasHorizontalOverflow,
+      "story should not horizontally overflow",
+    ).toBe(false);
   }
-  expect(layout.badBoxes, "visible elements should have finite boxes").toEqual([]);
-  expect(layout.clippedButtons, "button text should not be clipped").toEqual([]);
+  expect(layout.badBoxes, "visible elements should have finite boxes").toEqual(
+    [],
+  );
+  expect(layout.clippedButtons, "button text should not be clipped").toEqual(
+    [],
+  );
 
   const internalScrollSelector = internalScrollStories.get(storyId);
 
@@ -622,7 +1126,9 @@ async function verifyPageLayout(page: Page, storyId: string) {
         );
       });
 
-    expect(hasScrollContainer, `${storyId} should own its scroll region`).toBe(true);
+    expect(hasScrollContainer, `${storyId} should own its scroll region`).toBe(
+      true,
+    );
   }
 
   await verifyPostTabFocusTarget(page);
@@ -673,7 +1179,9 @@ function formatA11yViolations(violations: AxeViolation[]) {
         })
         .join("\n");
       const truncated =
-        violation.nodes.length > 5 ? `\n  - ...and ${violation.nodes.length - 5} more` : "";
+        violation.nodes.length > 5
+          ? `\n  - ...and ${violation.nodes.length - 5} more`
+          : "";
 
       return [
         `${violation.id} (${violation.impact ?? "unknown impact"}): ${violation.help}`,
@@ -734,7 +1242,10 @@ async function verifyPostTabFocusTarget(page: Page) {
     lastFocusDebug = focusState.debug;
 
     if (focusState.isBody || focusState.isVisible) {
-      expect(true, `keyboard focus target should be visible: ${focusState.debug}`).toBe(true);
+      expect(
+        true,
+        `keyboard focus target should be visible: ${focusState.debug}`,
+      ).toBe(true);
       return;
     }
 
@@ -749,9 +1260,10 @@ async function verifyPostTabFocusTarget(page: Page) {
     return;
   }
 
-  expect(false, `keyboard focus target should leave Radix focus guards: ${lastFocusDebug}`).toBe(
-    true,
-  );
+  expect(
+    false,
+    `keyboard focus target should leave Radix focus guards: ${lastFocusDebug}`,
+  ).toBe(true);
 }
 
 async function verifyNavbarLayout(page: Page, storyId: string) {
@@ -765,8 +1277,10 @@ async function verifyNavbarLayout(page: Page, storyId: string) {
     const submenuLayout = await submenu.evaluate((element) => {
       const box = element.getBoundingClientRect();
       const style = window.getComputedStyle(element);
-      const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
-      const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+      const viewportWidth =
+        document.documentElement.clientWidth || window.innerWidth;
+      const viewportHeight =
+        document.documentElement.clientHeight || window.innerHeight;
 
       return {
         isInViewport:
@@ -774,12 +1288,19 @@ async function verifyNavbarLayout(page: Page, storyId: string) {
           box.top >= -1 &&
           box.right <= viewportWidth + 1 &&
           box.bottom <= viewportHeight + 1,
-        ownsVerticalScroll: style.overflowY === "auto" || style.overflowY === "scroll",
+        ownsVerticalScroll:
+          style.overflowY === "auto" || style.overflowY === "scroll",
       };
     });
 
-    expect(submenuLayout.isInViewport, "navbar submenu should stay inside the viewport").toBe(true);
-    expect(submenuLayout.ownsVerticalScroll, "navbar submenu should scroll internally").toBe(true);
+    expect(
+      submenuLayout.isInViewport,
+      "navbar submenu should stay inside the viewport",
+    ).toBe(true);
+    expect(
+      submenuLayout.ownsVerticalScroll,
+      "navbar submenu should scroll internally",
+    ).toBe(true);
   }
 
   if (!storyId.startsWith("components-navigation-navbar--mobile")) {
@@ -787,25 +1308,28 @@ async function verifyNavbarLayout(page: Page, storyId: string) {
   }
 
   const mobileTargets = await nav.evaluate((element) => {
-    const visibleButtons = [...element.querySelectorAll<HTMLButtonElement>("button")].filter(
-      (button) => {
-        const style = window.getComputedStyle(button);
-        const box = button.getBoundingClientRect();
+    const visibleButtons = [
+      ...element.querySelectorAll<HTMLButtonElement>("button"),
+    ].filter((button) => {
+      const style = window.getComputedStyle(button);
+      const box = button.getBoundingClientRect();
 
-        return (
-          style.display !== "none" &&
-          style.visibility !== "hidden" &&
-          box.width > 0 &&
-          box.height > 0
-        );
-      },
-    );
+      return (
+        style.display !== "none" &&
+        style.visibility !== "hidden" &&
+        box.width > 0 &&
+        box.height > 0
+      );
+    });
 
     return visibleButtons.map((button) => {
       const box = button.getBoundingClientRect();
 
       return {
-        name: button.textContent?.trim() || button.getAttribute("aria-label") || "button",
+        name:
+          button.textContent?.trim() ||
+          button.getAttribute("aria-label") ||
+          "button",
         isPrimaryTrigger:
           button.getAttribute("data-slot") === "navbar-trigger" ||
           button.getAttribute("data-slot") === "navbar-mobile-menu-trigger" ||
@@ -829,26 +1353,40 @@ async function verifyNavbarLayout(page: Page, storyId: string) {
 }
 
 async function verifyMobileNavbarActionability(page: Page, nav: Locator) {
-  const mobileMenuTrigger = nav.locator('[data-slot="navbar-mobile-menu-trigger"]').first();
+  const mobileMenuTrigger = nav
+    .locator('[data-slot="navbar-mobile-menu-trigger"]')
+    .first();
 
   if ((await mobileMenuTrigger.count()) > 0) {
-    await expectClickableInViewport(page, mobileMenuTrigger, "navbar mobile menu trigger");
+    await expectClickableInViewport(
+      page,
+      mobileMenuTrigger,
+      "navbar mobile menu trigger",
+    );
     await mobileMenuTrigger.click();
     await expect(mobileMenuTrigger).toHaveAttribute("aria-expanded", "true");
 
     const mobileMenuId = await mobileMenuTrigger.getAttribute("aria-controls");
 
-    expect(mobileMenuId, "mobile menu trigger should control a mounted menu").not.toBeNull();
+    expect(
+      mobileMenuId,
+      "mobile menu trigger should control a mounted menu",
+    ).not.toBeNull();
 
     const mobileMenu = page.locator('[data-slot="navbar-mobile-menu"]').first();
 
-    await expect(mobileMenu, "mobile navbar menu should be visible").toBeVisible();
-    await expect(mobileMenu, "mobile navbar menu should match aria-controls").toHaveAttribute(
-      "id",
-      mobileMenuId ?? "",
-    );
+    await expect(
+      mobileMenu,
+      "mobile navbar menu should be visible",
+    ).toBeVisible();
+    await expect(
+      mobileMenu,
+      "mobile navbar menu should match aria-controls",
+    ).toHaveAttribute("id", mobileMenuId ?? "");
 
-    const mobileMenuTargets = mobileMenu.locator("a, button, [role='button'], [role='menuitem']");
+    const mobileMenuTargets = mobileMenu.locator(
+      "a, button, [role='button'], [role='menuitem']",
+    );
     const mobileMenuTargetCount = await mobileMenuTargets.count();
 
     expect(
@@ -873,13 +1411,15 @@ async function verifyMobileNavbarActionability(page: Page, nav: Locator) {
   const triggers = nav.locator('[data-slot="navbar-trigger"]');
   const triggerCount = await triggers.count();
 
-  expect(triggerCount, "mobile navbar should expose primary navigation triggers").toBeGreaterThan(
-    0,
-  );
+  expect(
+    triggerCount,
+    "mobile navbar should expose primary navigation triggers",
+  ).toBeGreaterThan(0);
 
   for (let index = 0; index < triggerCount; index += 1) {
     const trigger = triggers.nth(index);
-    const triggerName = (await trigger.textContent())?.trim() || `trigger ${index + 1}`;
+    const triggerName =
+      (await trigger.textContent())?.trim() || `trigger ${index + 1}`;
 
     await expectClickableInViewport(page, trigger, `navbar ${triggerName}`);
     await trigger.click();
@@ -887,17 +1427,25 @@ async function verifyMobileNavbarActionability(page: Page, nav: Locator) {
 
     const submenuId = await trigger.getAttribute("aria-controls");
 
-    expect(submenuId, `${triggerName} should control a mounted submenu`).not.toBeNull();
+    expect(
+      submenuId,
+      `${triggerName} should control a mounted submenu`,
+    ).not.toBeNull();
 
     const submenu = page.locator('[data-slot="navbar-submenu"]').first();
 
-    await expect(submenu, `${triggerName} submenu should be visible`).toBeVisible();
-    await expect(submenu, `${triggerName} submenu should match aria-controls`).toHaveAttribute(
-      "id",
-      submenuId ?? "",
-    );
+    await expect(
+      submenu,
+      `${triggerName} submenu should be visible`,
+    ).toBeVisible();
+    await expect(
+      submenu,
+      `${triggerName} submenu should match aria-controls`,
+    ).toHaveAttribute("id", submenuId ?? "");
 
-    const submenuTargets = submenu.locator("a, button, [role='button'], [role='menuitem']");
+    const submenuTargets = submenu.locator(
+      "a, button, [role='button'], [role='menuitem']",
+    );
     const submenuTargetCount = await submenuTargets.count();
 
     expect(
@@ -905,7 +1453,11 @@ async function verifyMobileNavbarActionability(page: Page, nav: Locator) {
       `${triggerName} submenu should expose navigation targets`,
     ).toBeGreaterThan(0);
 
-    for (let targetIndex = 0; targetIndex < submenuTargetCount; targetIndex += 1) {
+    for (
+      let targetIndex = 0;
+      targetIndex < submenuTargetCount;
+      targetIndex += 1
+    ) {
       await expectClickableInViewport(
         page,
         submenuTargets.nth(targetIndex),
@@ -918,30 +1470,54 @@ async function verifyMobileNavbarActionability(page: Page, nav: Locator) {
 }
 
 async function verifyMobileNavbarActions(page: Page, nav: Locator) {
-  const actionTrigger = nav.locator('[data-slot="navbar-mobile-actions-trigger"]').first();
+  const actionTrigger = nav
+    .locator('[data-slot="navbar-mobile-actions-trigger"]')
+    .first();
 
   if ((await actionTrigger.count()) === 0) {
     return;
   }
 
-  await expectClickableInViewport(page, actionTrigger, "navbar mobile actions trigger");
+  await expectClickableInViewport(
+    page,
+    actionTrigger,
+    "navbar mobile actions trigger",
+  );
   await actionTrigger.click();
 
-  const actionMenu = page.locator('[data-slot="navbar-mobile-actions-menu"]').first();
+  const actionMenu = page
+    .locator('[data-slot="navbar-mobile-actions-menu"]')
+    .first();
 
-  await expect(actionMenu, "mobile navbar actions menu should be visible").toBeVisible();
+  await expect(
+    actionMenu,
+    "mobile navbar actions menu should be visible",
+  ).toBeVisible();
 
-  const actionTargets = actionMenu.locator("button, a, [role='button'], [role='switch']");
+  const actionTargets = actionMenu.locator(
+    "button, a, [role='button'], [role='switch']",
+  );
   const actionTargetCount = await actionTargets.count();
 
-  expect(actionTargetCount, "mobile actions menu should expose action targets").toBeGreaterThan(0);
+  expect(
+    actionTargetCount,
+    "mobile actions menu should expose action targets",
+  ).toBeGreaterThan(0);
 
   for (let index = 0; index < actionTargetCount; index += 1) {
-    await expectClickableInViewport(page, actionTargets.nth(index), `navbar action ${index + 1}`);
+    await expectClickableInViewport(
+      page,
+      actionTargets.nth(index),
+      `navbar action ${index + 1}`,
+    );
   }
 }
 
-async function expectClickableInViewport(page: Page, locator: Locator, label: string) {
+async function expectClickableInViewport(
+  page: Page,
+  locator: Locator,
+  label: string,
+) {
   await locator.scrollIntoViewIfNeeded();
   await expect(locator, `${label} should be visible`).toBeVisible();
   await expect(locator, `${label} should be enabled`).toBeEnabled();
