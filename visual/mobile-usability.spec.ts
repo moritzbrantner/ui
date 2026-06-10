@@ -146,8 +146,10 @@ async function auditStory(
       failedRequests,
       pageErrors,
     });
+    await waitForStableStoryDom(page);
 
     await openOverlayStory(page, story.storyId, storyFindings);
+    await waitForStableStoryDom(page);
     await verifyDocumentOverflow(page, story, storyFindings);
     await verifyInternalScroll(page, story, storyFindings);
     await verifyInteractiveTargets(page, story, storyFindings);
@@ -167,6 +169,56 @@ async function auditStory(
       contentType: "application/json",
     });
   }
+}
+
+async function waitForStableStoryDom(page: Page) {
+  await page.evaluate(
+    ({ quietMs, timeoutMs }) =>
+      new Promise<void>((resolve) => {
+        const root = document.querySelector("#storybook-root");
+
+        if (!root) {
+          resolve();
+          return;
+        }
+
+        let quietTimer: number | undefined;
+        let timeoutTimer: number | undefined;
+        const observer = new MutationObserver(() => scheduleQuietWindow());
+
+        const finish = () => {
+          observer.disconnect();
+
+          if (quietTimer !== undefined) {
+            window.clearTimeout(quietTimer);
+          }
+
+          if (timeoutTimer !== undefined) {
+            window.clearTimeout(timeoutTimer);
+          }
+
+          resolve();
+        };
+
+        const scheduleQuietWindow = () => {
+          if (quietTimer !== undefined) {
+            window.clearTimeout(quietTimer);
+          }
+
+          quietTimer = window.setTimeout(finish, quietMs);
+        };
+
+        observer.observe(root, {
+          attributes: true,
+          characterData: true,
+          childList: true,
+          subtree: true,
+        });
+        timeoutTimer = window.setTimeout(finish, timeoutMs);
+        scheduleQuietWindow();
+      }),
+    { quietMs: 150, timeoutMs: 2_500 },
+  );
 }
 
 async function gotoStory(page: Page, storyId: string) {
@@ -487,7 +539,44 @@ async function verifyInteractiveTargets(
   for (const target of targets) {
     const locator = page.locator(`[data-mobile-usability-target="${target.auditId}"]`);
 
-    await locator.scrollIntoViewIfNeeded();
+    const targetExists = await locator
+      .count()
+      .then((count) => count > 0)
+      .catch(() => false);
+
+    if (!targetExists) {
+      continue;
+    }
+
+    const scrolled = await locator
+      .scrollIntoViewIfNeeded({ timeout: 1_500 })
+      .then(() => true)
+      .catch(async (error: unknown) => {
+        const stillExists = await locator
+          .count()
+          .then((count) => count > 0)
+          .catch(() => false);
+
+        if (!stillExists) {
+          return false;
+        }
+
+        storyFindings.push(
+          createFinding(
+            story,
+            "target-actionability",
+            `Interactive target could not be scrolled into view: ${target.label}. ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+            target.selector,
+          ),
+        );
+        return false;
+      });
+
+    if (!scrolled) {
+      continue;
+    }
 
     if (!(await locator.isVisible().catch(() => false))) {
       storyFindings.push(
