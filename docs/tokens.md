@@ -4,16 +4,17 @@ Generated from `src/token-metadata.ts` by `bun run generate:tokens`.
 
 ## Themes
 
-| Theme  | Light tokens | Dark tokens |
-| ------ | -----------: | ----------: |
-| bobba  |          179 |         179 |
-| custom |          179 |         179 |
-| zleek  |          179 |         179 |
-| atlas  |          179 |         179 |
-| studio |          179 |         179 |
-| paper  |          179 |         179 |
-| pop    |          179 |         179 |
-| pulse  |          179 |         179 |
+| Theme   | Light tokens | Dark tokens |
+| ------- | -----------: | ----------: |
+| bobba   |          179 |         179 |
+| custom  |          179 |         179 |
+| zleek   |          179 |         179 |
+| atlas   |          179 |         179 |
+| studio  |          179 |         179 |
+| paper   |          179 |         179 |
+| scholia |          179 |         179 |
+| pop     |          179 |         179 |
+| pulse   |          179 |         179 |
 
 ## Tokens
 

@@ -2,7 +2,11 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
   ArrowRightIcon,
   BellIcon,
+  BookOpenIcon,
   CheckIcon,
+  FileTextIcon,
+  LibraryIcon,
+  MapPinnedIcon,
   RadioTowerIcon,
   RefreshCwIcon,
   SparklesIcon,
@@ -31,6 +35,129 @@ import {
 
 function ThemeShowcaseFrame({ children }: { children: React.ReactNode }) {
   return <div className="w-[min(980px,calc(100vw-2rem))]">{children}</div>;
+}
+
+function ScholiaArchiveDemo() {
+  const metadataRows = [
+    ["Repository", "Municipal archive"],
+    ["Date range", "1420-1435"],
+    ["Language", "Latin"],
+    ["Witnesses", "4 compared"],
+  ] as const;
+
+  return (
+    <UiTheme theme="scholia" className="rounded-[var(--ui-radius-overlay)] bg-background p-5">
+      <div className="grid gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--ui-radius-surface)] border border-border bg-card p-[var(--ui-card-padding)] shadow-[var(--ui-shadow-surface)]">
+          <div className="grid gap-1">
+            <h2 className="font-heading text-lg font-semibold leading-snug">Source collation</h2>
+            <p className="text-sm text-muted-foreground">
+              Archival reading surfaces with quiet workbench controls.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="secondary">Reviewed</Badge>
+            <Badge variant="outline">2 citations</Badge>
+            <Button size="sm">
+              <BookOpenIcon />
+              Open source
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
+          <Card data-interactive="true">
+            <CardHeader>
+              <CardTitle>Transcribed excerpt</CardTitle>
+              <CardDescription>Highlighted passages use document tokens.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <article
+                className="grid gap-3 rounded-[var(--ui-radius-surface)] border bg-card p-4 font-body text-sm leading-7 text-card-foreground"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(var(--document-ruled-background) 1px, transparent 1px)",
+                  backgroundSize: "100% 1.75rem",
+                }}
+              >
+                <p>
+                  The witness records a civic oath with a{" "}
+                  <mark className="rounded-sm bg-[var(--document-highlight)] px-1 text-inherit">
+                    rubricated obligation clause
+                  </mark>{" "}
+                  and two later corrections in the outer margin.
+                </p>
+                <blockquote className="border-l-2 border-[var(--document-quote)] pl-3 text-muted-foreground">
+                  Source readings remain legible while citations and annotations retain distinct
+                  accents.
+                </blockquote>
+                <div className="flex flex-wrap gap-2 font-control text-xs">
+                  <Badge className="bg-[var(--document-citation)] text-primary-foreground">
+                    fol. 12r
+                  </Badge>
+                  <Badge variant="outline">edition note</Badge>
+                  <Badge variant="secondary">parallel witness</Badge>
+                </div>
+              </article>
+
+              <div className="grid gap-2 rounded-[var(--ui-radius-surface)] border border-[var(--document-annotation)]/40 bg-muted/55 p-3 text-sm">
+                <div className="flex items-center gap-2 font-medium">
+                  <FileTextIcon className="size-4 text-[var(--document-annotation)]" />
+                  Annotation queue
+                </div>
+                <p className="text-muted-foreground">
+                  Two uncertain abbreviations and one place-name normalization are ready for review.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Source metadata</CardTitle>
+                <CardDescription>Compact reference facts.</CardDescription>
+              </CardHeader>
+              <CardContent className="grid text-sm">
+                {metadataRows.map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="flex items-center justify-between gap-3 border-b py-2 last:border-b-0"
+                  >
+                    <span className="text-muted-foreground">{label}</span>
+                    <span className="font-medium">{value}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Margin note</CardTitle>
+                <CardDescription>Editorial context.</CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-3 text-sm">
+                <div className="rounded-[var(--ui-radius-control)] border-l-2 border-[var(--document-margin-note)] bg-muted/50 p-3">
+                  Compare the place-name form against the regional gazetteer before finalizing the
+                  apparatus entry.
+                </div>
+                <div className="grid gap-2">
+                  <Button variant="secondary" size="sm">
+                    <LibraryIcon />
+                    View witnesses
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <MapPinnedIcon />
+                    Locate source
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </UiTheme>
+  );
 }
 
 function PopConsumerDemo() {
@@ -190,6 +317,14 @@ export const PopConsumerSurface: Story = {
   render: () => (
     <ThemeShowcaseFrame>
       <PopConsumerDemo />
+    </ThemeShowcaseFrame>
+  ),
+};
+
+export const ScholiaArchiveSurface: Story = {
+  render: () => (
+    <ThemeShowcaseFrame>
+      <ScholiaArchiveDemo />
     </ThemeShowcaseFrame>
   ),
 };

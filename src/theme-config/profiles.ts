@@ -56,6 +56,21 @@ const uiThemeProfiles = {
     motion: "quiet",
     bestFor: ["OCR", "Linguistics", "Translation and text tools"],
   },
+  scholia: {
+    name: "scholia",
+    label: "Scholarly archive style",
+    description:
+      "Serif-led, archival, and compact for historical sources, scholarly editions, citations, and research workbenches.",
+    surface: "document",
+    density: "compact",
+    motion: "quiet",
+    bestFor: [
+      "Historical sources",
+      "Scholarly editions",
+      "Source atlases",
+      "Theology and reference sites",
+    ],
+  },
   pop: {
     name: "pop",
     label: "Playful consumer style",

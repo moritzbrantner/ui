@@ -1,6 +1,14 @@
 import type { UiThemeTokens, UiTokenName } from "../token-names";
 
-type BuiltInUiThemeName = "bobba" | "zleek" | "atlas" | "studio" | "paper" | "pop" | "pulse";
+type BuiltInUiThemeName =
+  | "bobba"
+  | "zleek"
+  | "atlas"
+  | "studio"
+  | "paper"
+  | "scholia"
+  | "pop"
+  | "pulse";
 type UiThemeName = BuiltInUiThemeName | "custom";
 
 type UiThemeConfig<Name extends UiThemeName = UiThemeName> = {

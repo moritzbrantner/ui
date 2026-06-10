@@ -23,8 +23,17 @@ const maxChunkBytes = 40 * 1024;
 const maxOptimizedThemeEntryBytes = 1024;
 const maxLeanThemeEntryBytes = 1024;
 const maxSimpleThemeReachableGraphBytes = 4 * 1024;
-const optimizedThemeNames = ["zleek", "bobba", "atlas", "studio", "paper", "pop", "pulse"] as const;
-const simpleThemeNames = ["bobba", "atlas", "studio", "paper"] as const;
+const optimizedThemeNames = [
+  "zleek",
+  "bobba",
+  "atlas",
+  "studio",
+  "paper",
+  "scholia",
+  "pop",
+  "pulse",
+] as const;
+const simpleThemeNames = ["bobba", "atlas", "studio", "paper", "scholia"] as const;
 const publicEntries = [
   "index",
   "server",
@@ -34,6 +43,7 @@ const publicEntries = [
   "atlas",
   "studio",
   "paper",
+  "scholia",
   "pop",
   "pulse",
   "themes",
@@ -42,6 +52,7 @@ const publicEntries = [
   "themes/atlas",
   "themes/studio",
   "themes/paper",
+  "themes/scholia",
   "themes/pop",
   "themes/pulse",
 ];

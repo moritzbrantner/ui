@@ -121,6 +121,10 @@ const paper = await importPackage("@moritzbrantner/ui/paper");
 assert.equal(paper.uiTheme.name, "paper", "paper entry should expose paper uiTheme");
 assert.equal(typeof paper.PaperTheme, "function", "paper entry should expose PaperTheme");
 
+const scholia = await importPackage("@moritzbrantner/ui/scholia");
+assert.equal(scholia.uiTheme.name, "scholia", "scholia entry should expose scholia uiTheme");
+assert.equal(typeof scholia.ScholiaTheme, "function", "scholia entry should expose ScholiaTheme");
+
 const pop = await importPackage("@moritzbrantner/ui/pop");
 assert.equal(pop.uiTheme.name, "pop", "pop entry should expose pop uiTheme");
 assert.equal(typeof pop.PopTheme, "function", "pop entry should expose PopTheme");
@@ -135,6 +139,7 @@ for (const [specifier, module, expectedExports] of [
   ["@moritzbrantner/ui/atlas", atlas, ["AtlasTheme", "atlasTheme", "uiTheme"]],
   ["@moritzbrantner/ui/studio", studio, ["StudioTheme", "studioTheme", "uiTheme"]],
   ["@moritzbrantner/ui/paper", paper, ["PaperTheme", "paperTheme", "uiTheme"]],
+  ["@moritzbrantner/ui/scholia", scholia, ["ScholiaTheme", "scholiaTheme", "uiTheme"]],
   ["@moritzbrantner/ui/pop", pop, ["PopTheme", "popTheme", "uiTheme"]],
   ["@moritzbrantner/ui/pulse", pulse, ["PulseTheme", "pulseTheme", "uiTheme"]],
 ] as const) {
@@ -176,6 +181,11 @@ const serverThemeEntries = [
     specifier: "@moritzbrantner/ui/paper/server",
     exportName: "paperTheme",
     expectedName: "paper",
+  },
+  {
+    specifier: "@moritzbrantner/ui/scholia/server",
+    exportName: "scholiaTheme",
+    expectedName: "scholia",
   },
   {
     specifier: "@moritzbrantner/ui/pop/server",
@@ -277,6 +287,11 @@ assert.equal(themes.themeConfig.bobba.name, "bobba", "themes subpath should expo
 assert.equal(themes.themeConfig.atlas.name, "atlas", "themes subpath should expose themeConfig");
 assert.equal(themes.themeConfig.studio.name, "studio", "themes subpath should expose themeConfig");
 assert.equal(themes.themeConfig.paper.name, "paper", "themes subpath should expose themeConfig");
+assert.equal(
+  themes.themeConfig.scholia.name,
+  "scholia",
+  "themes subpath should expose themeConfig",
+);
 assert.equal(themes.themeConfig.pop.name, "pop", "themes subpath should expose themeConfig");
 assert.equal(themes.themeConfig.pulse.name, "pulse", "themes subpath should expose themeConfig");
 
@@ -286,6 +301,7 @@ const scopedThemeEntries = [
   ["@moritzbrantner/ui/themes/atlas", "AtlasTheme", "atlas"],
   ["@moritzbrantner/ui/themes/studio", "StudioTheme", "studio"],
   ["@moritzbrantner/ui/themes/paper", "PaperTheme", "paper"],
+  ["@moritzbrantner/ui/themes/scholia", "ScholiaTheme", "scholia"],
   ["@moritzbrantner/ui/themes/pop", "PopTheme", "pop"],
   ["@moritzbrantner/ui/themes/pulse", "PulseTheme", "pulse"],
 ] as const;
@@ -358,6 +374,8 @@ const requiredPackageFiles = [
   "dist/studio/server.d.ts",
   "dist/paper/server.js",
   "dist/paper/server.d.ts",
+  "dist/scholia/server.js",
+  "dist/scholia/server.d.ts",
   "dist/pop/server.js",
   "dist/pop/server.d.ts",
   "dist/pulse/server.js",
@@ -392,6 +410,8 @@ const requiredPackageFiles = [
   "dist/themes/bobba.d.ts",
   "dist/themes/paper.js",
   "dist/themes/paper.d.ts",
+  "dist/themes/scholia.js",
+  "dist/themes/scholia.d.ts",
   "dist/themes/pop.js",
   "dist/themes/pop.d.ts",
   "dist/themes/pulse.js",
@@ -409,6 +429,7 @@ const requiredPackageFiles = [
   "atlas/styles.css",
   "studio/styles.css",
   "paper/styles.css",
+  "scholia/styles.css",
   "pop/styles.css",
   "pulse/styles.css",
 ];

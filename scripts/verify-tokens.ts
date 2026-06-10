@@ -15,6 +15,7 @@ const tokenFiles = [
   "atlas/styles.css",
   "studio/styles.css",
   "paper/styles.css",
+  "scholia/styles.css",
   "pop/styles.css",
   "pulse/styles.css",
 ];
@@ -24,6 +25,7 @@ const themeStylesheets = [
   "atlas/styles.css",
   "studio/styles.css",
   "paper/styles.css",
+  "scholia/styles.css",
   "pop/styles.css",
   "pulse/styles.css",
 ];
@@ -34,7 +36,7 @@ const generatedArtifactFiles = [
   "theme-scopes.css",
   ...themeStylesheets,
 ];
-const simpleThemeNames = ["bobba", "atlas", "studio", "paper"] as const;
+const simpleThemeNames = ["bobba", "atlas", "studio", "paper", "scholia"] as const;
 const simpleThemeStylesheets = simpleThemeNames.map((themeName) => `${themeName}/styles.css`);
 const maxSimpleThemeCssBytes = 16 * 1024;
 const componentSourceDirectives = [
@@ -124,7 +126,17 @@ for (const relativeFile of tokenFiles) {
 
 const scopedThemeSource = readFileSync(path.join(packageRoot, "theme-scopes.css"), "utf8");
 
-for (const themeName of ["bobba", "zleek", "atlas", "studio", "paper", "pop", "pulse", "custom"]) {
+for (const themeName of [
+  "bobba",
+  "zleek",
+  "atlas",
+  "studio",
+  "paper",
+  "scholia",
+  "pop",
+  "pulse",
+  "custom",
+]) {
   if (!scopedThemeSource.includes(`[data-ui-theme="${themeName}"]`)) {
     errors.push(`theme-scopes.css: missing scoped selector for ${themeName}`);
   }
@@ -205,7 +217,16 @@ function escapeRegExp(value: string): string {
 }
 
 function verifyTokenContrast() {
-  const builtInThemeNames = ["bobba", "zleek", "atlas", "studio", "paper", "pop", "pulse"] as const;
+  const builtInThemeNames = [
+    "bobba",
+    "zleek",
+    "atlas",
+    "studio",
+    "paper",
+    "scholia",
+    "pop",
+    "pulse",
+  ] as const;
   const textContrastPairs = [
     ["--background", "--foreground"],
     ["--card", "--card-foreground"],

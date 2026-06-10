@@ -8,12 +8,22 @@ import { paperTheme } from "./paper";
 import { popTheme } from "./pop";
 import { uiThemeProfiles } from "./profiles";
 import { pulseTheme } from "./pulse";
+import { scholiaTheme } from "./scholia";
 import { studioTheme } from "./studio";
 import type { BuiltInUiThemeName, UiThemeConfig, UiThemeName } from "./types";
 import type { UiThemeProfile } from "./profiles";
 import { zleekTheme } from "./zleek";
 
-const builtInUiThemeNames = ["bobba", "zleek", "atlas", "studio", "paper", "pop", "pulse"] as const;
+const builtInUiThemeNames = [
+  "bobba",
+  "zleek",
+  "atlas",
+  "studio",
+  "paper",
+  "scholia",
+  "pop",
+  "pulse",
+] as const;
 const uiThemeNames = [...builtInUiThemeNames, "custom"] as const;
 
 const defaultUiThemeName = "bobba" as const satisfies BuiltInUiThemeName;
@@ -24,6 +34,7 @@ const uiThemeLabels = {
   atlas: "Atlas",
   studio: "Studio",
   paper: "Paper",
+  scholia: "Scholia",
   pop: "Pop",
   pulse: "Pulse",
   custom: "Custom",
@@ -37,6 +48,7 @@ const themeConfig = {
   atlas: atlasTheme,
   studio: studioTheme,
   paper: paperTheme,
+  scholia: scholiaTheme,
   pop: popTheme,
   pulse: pulseTheme,
   custom: customTheme,
@@ -64,6 +76,7 @@ export {
   paperTheme,
   popTheme,
   pulseTheme,
+  scholiaTheme,
   studioTheme,
   themeConfig,
   uiThemeLabels,

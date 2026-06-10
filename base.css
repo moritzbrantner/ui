@@ -198,6 +198,16 @@
   }
 }
 
+@utility ui-hover-growth-none {
+  --ui-motion-hover-y: 0px;
+  --ui-motion-hover-scale: 1;
+}
+
+[data-ui-hover-growth="none"] {
+  --ui-motion-hover-y: 0px;
+  --ui-motion-hover-scale: 1;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

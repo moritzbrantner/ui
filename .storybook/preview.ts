@@ -13,6 +13,7 @@ import bobbaStyles from "../bobba/styles.css?inline";
 import paperStyles from "../paper/styles.css?inline";
 import popStyles from "../pop/styles.css?inline";
 import pulseStyles from "../pulse/styles.css?inline";
+import scholiaStyles from "../scholia/styles.css?inline";
 import studioStyles from "../studio/styles.css?inline";
 import themeScopesStyles from "../theme-scopes.css?inline";
 import zleekStyles from "../zleek/styles.css?inline";
@@ -24,6 +25,7 @@ const designSystemStyles = {
   atlas: atlasStyles,
   studio: studioStyles,
   paper: paperStyles,
+  scholia: scholiaStyles,
   pop: popStyles,
   pulse: pulseStyles,
 } as const satisfies Record<BuiltInUiThemeName, string>;

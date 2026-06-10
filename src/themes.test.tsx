@@ -156,6 +156,7 @@ import { Button as BobbaButton, Button as ZleekButton } from "./components/stabl
 import { PaperTheme, paperTheme, uiTheme as paperUiTheme } from "./paper";
 import { PopTheme, popTheme, uiTheme as popUiTheme } from "./pop";
 import { PulseTheme, pulseTheme, uiTheme as pulseUiTheme } from "./pulse";
+import { ScholiaTheme, scholiaTheme, uiTheme as scholiaUiTheme } from "./scholia";
 import { StudioTheme, studioTheme, uiTheme as studioUiTheme } from "./studio";
 import { ZleekTheme, uiTheme as zleekUiTheme, zleekTheme } from "./zleek";
 
@@ -344,6 +345,7 @@ describe("@moritzbrantner/ui theme-contract", () => {
       "atlas",
       "studio",
       "paper",
+      "scholia",
       "pop",
       "pulse",
       "custom",
@@ -366,6 +368,9 @@ describe("@moritzbrantner/ui theme-contract", () => {
         <PaperTheme>
           <Button>Paper action</Button>
         </PaperTheme>
+        <ScholiaTheme>
+          <Button>Scholia action</Button>
+        </ScholiaTheme>
         <PopTheme>
           <Button>Pop action</Button>
         </PopTheme>
@@ -380,6 +385,7 @@ describe("@moritzbrantner/ui theme-contract", () => {
     expect(screen.getByRole("button", { name: "Atlas action" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Studio action" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Paper action" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Scholia action" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Pop action" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Pulse action" })).toBeTruthy();
     expect(Object.keys(themeConfig).sort()).toEqual([...allThemeNames].sort());
@@ -389,12 +395,14 @@ describe("@moritzbrantner/ui theme-contract", () => {
       "atlas",
       "studio",
       "paper",
+      "scholia",
       "pop",
       "pulse",
       "custom",
     ]);
     expect(defaultUiThemeName).toBe("bobba");
     expect(uiThemeLabels.paper).toBe("Paper");
+    expect(uiThemeLabels.scholia).toBe("Scholia");
     expect(uiThemeLabels.pop).toBe("Pop");
     expect(uiThemeLabels.pulse).toBe("Pulse");
     expect(uiThemeLabels.custom).toBe("Custom");
@@ -403,6 +411,7 @@ describe("@moritzbrantner/ui theme-contract", () => {
     expect(atlasTheme.name).toBe("atlas");
     expect(studioTheme.name).toBe("studio");
     expect(paperTheme.name).toBe("paper");
+    expect(scholiaTheme.name).toBe("scholia");
     expect(popTheme.name).toBe("pop");
     expect(pulseTheme.name).toBe("pulse");
     expect(zleekUiTheme).toBe(zleekTheme);
@@ -410,6 +419,7 @@ describe("@moritzbrantner/ui theme-contract", () => {
     expect(atlasUiTheme).toBe(atlasTheme);
     expect(studioUiTheme).toBe(studioTheme);
     expect(paperUiTheme).toBe(paperTheme);
+    expect(scholiaUiTheme).toBe(scholiaTheme);
     expect(popUiTheme).toBe(popTheme);
     expect(pulseUiTheme).toBe(pulseTheme);
   });
@@ -468,6 +478,7 @@ describe("@moritzbrantner/ui theme-contract", () => {
     expect(uiThemeProfiles.bobba.surface).toBe("neutral");
     expect(uiThemeProfiles.zleek.surface).toBe("glass");
     expect(uiThemeProfiles.atlas.density).toBe("compact");
+    expect(uiThemeProfiles.scholia.bestFor).toContain("Historical sources");
     expect(uiThemeProfiles.pulse.motion).toBe("energetic");
     expect(Object.hasOwn(uiThemeProfiles, "custom")).toBe(false);
   });

@@ -232,11 +232,17 @@ import * as PopEntry from "./pop";
 import { popTheme as popServerTheme, uiTheme as popServerUiTheme } from "./pop-server";
 import * as PulseEntry from "./pulse";
 import { pulseTheme as pulseServerTheme, uiTheme as pulseServerUiTheme } from "./pulse-server";
+import * as ScholiaEntry from "./scholia";
+import {
+  scholiaTheme as scholiaServerTheme,
+  uiTheme as scholiaServerUiTheme,
+} from "./scholia-server";
 import * as ScopedAtlasEntry from "./themes/atlas";
 import * as ScopedBobbaEntry from "./themes/bobba";
 import * as ScopedPaperEntry from "./themes/paper";
 import * as ScopedPopEntry from "./themes/pop";
 import * as ScopedPulseEntry from "./themes/pulse";
+import * as ScopedScholiaEntry from "./themes/scholia";
 import * as ScopedStudioEntry from "./themes/studio";
 import * as ScopedZleekEntry from "./themes/zleek";
 import {
@@ -469,6 +475,7 @@ describe("@moritzbrantner/ui package-contract", () => {
         "atlas",
         "studio",
         "paper",
+        "scholia",
         "pop",
         "pulse",
       ]),
@@ -480,6 +487,8 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./theme-scopes.css"]).toBe("./theme-scopes.css");
     expect(packageJson.exports["./zleek/styles.css"]).toBe("./zleek/styles.css");
     expect(packageJson.exports["./bobba/styles.css"]).toBe("./bobba/styles.css");
+    expect(baseStyles).toContain('data-ui-hover-growth="none"');
+    expect(baseStyles).toContain("ui-hover-growth-none");
     expect(packageJson.exports["./atlas"].import).toBe("./dist/atlas.js");
     expect(packageJson.exports["./atlas/server"].import).toBe("./dist/atlas/server.js");
     expect(packageJson.exports["./atlas/server"].types).toBe("./dist/atlas/server.d.ts");
@@ -489,13 +498,25 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./paper"].import).toBe("./dist/paper.js");
     expect(packageJson.exports["./paper/server"].import).toBe("./dist/paper/server.js");
     expect(packageJson.exports["./paper/server"].types).toBe("./dist/paper/server.d.ts");
+    expect(packageJson.exports["./scholia"].import).toBe("./dist/scholia.js");
+    expect(packageJson.exports["./scholia/server"].import).toBe("./dist/scholia/server.js");
+    expect(packageJson.exports["./scholia/server"].types).toBe("./dist/scholia/server.d.ts");
     expect(packageJson.exports["./pop"].import).toBe("./dist/pop.js");
     expect(packageJson.exports["./pop/server"].import).toBe("./dist/pop/server.js");
     expect(packageJson.exports["./pop/server"].types).toBe("./dist/pop/server.d.ts");
     expect(packageJson.exports["./pulse"].import).toBe("./dist/pulse.js");
     expect(packageJson.exports["./pulse/server"].import).toBe("./dist/pulse/server.js");
     expect(packageJson.exports["./pulse/server"].types).toBe("./dist/pulse/server.d.ts");
-    for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper", "pop", "pulse"]) {
+    for (const themeName of [
+      "zleek",
+      "bobba",
+      "atlas",
+      "studio",
+      "paper",
+      "scholia",
+      "pop",
+      "pulse",
+    ]) {
       expect(packageJson.exports[`./themes/${themeName}`].import).toBe(
         `./dist/themes/${themeName}.js`,
       );
@@ -524,6 +545,7 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./atlas/styles.css"]).toBe("./atlas/styles.css");
     expect(packageJson.exports["./studio/styles.css"]).toBe("./studio/styles.css");
     expect(packageJson.exports["./paper/styles.css"]).toBe("./paper/styles.css");
+    expect(packageJson.exports["./scholia/styles.css"]).toBe("./scholia/styles.css");
     expect(packageJson.exports["./pop/styles.css"]).toBe("./pop/styles.css");
     expect(packageJson.exports["./pulse/styles.css"]).toBe("./pulse/styles.css");
     expect(packageJson.exports["./components/*"]).toBeUndefined();
@@ -551,7 +573,16 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(themeScopesStyles).not.toMatch(/@source\s+/);
     expect(componentSources).toMatch(/@source\s+/);
 
-    for (const themeName of ["zleek", "bobba", "atlas", "studio", "paper", "pop", "pulse"]) {
+    for (const themeName of [
+      "zleek",
+      "bobba",
+      "atlas",
+      "studio",
+      "paper",
+      "scholia",
+      "pop",
+      "pulse",
+    ]) {
       const themeStyles = readFileSync(`${themeName}/styles.css`, "utf8");
 
       expect(themeStyles).toMatch(/^@import "\.\.\/base\.css";$/m);
@@ -607,6 +638,15 @@ describe("@moritzbrantner/ui package-contract", () => {
         uiTheme: PaperEntry.uiTheme,
         expectedExports: ["PaperTheme", "paperTheme", "uiTheme"],
         sourcePath: "src/paper.ts",
+      },
+      {
+        name: "scholia",
+        module: ScholiaEntry,
+        component: ScholiaEntry.ScholiaTheme,
+        theme: ScholiaEntry.scholiaTheme,
+        uiTheme: ScholiaEntry.uiTheme,
+        expectedExports: ["ScholiaTheme", "scholiaTheme", "uiTheme"],
+        sourcePath: "src/scholia.ts",
       },
       {
         name: "pop",
@@ -686,6 +726,14 @@ describe("@moritzbrantner/ui package-contract", () => {
         uiTheme: ScopedPaperEntry.uiTheme,
         expectedExports: ["PaperTheme", "paperTheme", "uiTheme"],
         sourcePath: "src/themes/paper.tsx",
+      },
+      {
+        name: "scholia",
+        module: ScopedScholiaEntry,
+        component: ScopedScholiaEntry.ScholiaTheme,
+        uiTheme: ScopedScholiaEntry.uiTheme,
+        expectedExports: ["ScholiaTheme", "scholiaTheme", "uiTheme"],
+        sourcePath: "src/themes/scholia.tsx",
       },
       {
         name: "pop",
@@ -777,8 +825,10 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(serverThemeConfig.bobba.name).toBe("bobba");
     expect(serverThemeConfig.pop.name).toBe("pop");
     expect(serverThemeConfig.pulse.name).toBe("pulse");
+    expect(serverThemeConfig.scholia.name).toBe("scholia");
     expect(uiThemeProfiles.bobba.surface).toBe("neutral");
     expect(ThemeExports.uiThemeProfiles.zleek.surface).toBe("glass");
+    expect(ThemeExports.uiThemeProfiles.scholia.density).toBe("compact");
     expect(serverUiThemeProfiles.pulse.motion).toBe("energetic");
     expect(ClientButton).toBe(Button);
     expect(ClientDialog).toBe(Dialog);
@@ -944,6 +994,12 @@ describe("@moritzbrantner/ui package-contract", () => {
         label: "Paper",
         uiTheme: paperServerUiTheme,
         theme: paperServerTheme,
+      },
+      {
+        name: "scholia",
+        label: "Scholia",
+        uiTheme: scholiaServerUiTheme,
+        theme: scholiaServerTheme,
       },
       {
         name: "pop",

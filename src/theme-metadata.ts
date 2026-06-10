@@ -8,6 +8,7 @@ export {
   paperTheme,
   popTheme,
   pulseTheme,
+  scholiaTheme,
   studioTheme,
   themeConfig,
   uiThemeLabels,

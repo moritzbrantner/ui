@@ -4,6 +4,7 @@ import {
   ActivityIcon,
   ArrowRightIcon,
   BarChart3Icon,
+  BookOpenIcon,
   FileTextIcon,
   ImageIcon,
   Layers3Icon,
@@ -63,6 +64,7 @@ const systemIcons = {
   atlas: BarChart3Icon,
   studio: ImageIcon,
   paper: FileTextIcon,
+  scholia: BookOpenIcon,
   pop: ActivityIcon,
   pulse: ActivityIcon,
 } as const satisfies Record<UiThemeProfile["name"], typeof Layers3Icon>;
@@ -123,6 +125,11 @@ export const Studio: Story = {
 export const Paper: Story = {
   globals: { designSystem: "paper" },
   render: () => <DesignSystemShowcase systemId="paper" />,
+};
+
+export const Scholia: Story = {
+  globals: { designSystem: "scholia" },
+  render: () => <DesignSystemShowcase systemId="scholia" />,
 };
 
 export const Pop: Story = {
@@ -221,7 +228,7 @@ function HeroPanel({ system }: { system: SystemProfile }) {
 
 function SystemProfileCard({ system, className }: { system: SystemProfile; className?: string }) {
   return (
-    <Card data-interactive="true" className={className}>
+    <Card data-interactive="true" data-ui-hover-growth="none" className={className}>
       <CardHeader>
         <CardTitle level={2}>System profile</CardTitle>
         <CardDescription>{surfaceDescriptions[system.surface]}</CardDescription>
@@ -350,7 +357,7 @@ function ThemePersonalityPreview({ system }: { system: SystemProfile }) {
     );
   }
 
-  if (system.name === "paper") {
+  if (system.name === "paper" || system.name === "scholia") {
     return (
       <div
         className="grid gap-2 rounded-[var(--ui-card-radius)] border bg-card p-4 font-body text-sm text-card-foreground"
@@ -426,7 +433,7 @@ function ComponentPreview({ className }: { className?: string }) {
   const [includeTables, setIncludeTables] = useState(false);
 
   return (
-    <Card data-interactive="true" className={className}>
+    <Card data-interactive="true" data-ui-hover-growth="none" className={className}>
       <CardHeader>
         <CardTitle level={2}>Controls and status</CardTitle>
         <CardDescription>

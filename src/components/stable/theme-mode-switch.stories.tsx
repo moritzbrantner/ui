@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 
-import { AtlasTheme, BobbaTheme, PaperTheme, StudioTheme } from "../../themes";
+import { AtlasTheme, BobbaTheme, PaperTheme, ScholiaTheme, StudioTheme } from "../../themes";
 import { ThemeModeSwitch } from "./theme-mode-switch";
 
 const meta = {
@@ -52,6 +52,7 @@ export const SimpleThemes: Story = {
       ["Atlas", AtlasTheme],
       ["Studio", StudioTheme],
       ["Paper", PaperTheme],
+      ["Scholia", ScholiaTheme],
     ] as const;
 
     return (

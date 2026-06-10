@@ -19,6 +19,7 @@
     "atlas",
     "studio",
     "paper",
+    "scholia",
     "pop",
     "pulse"
   ],
@@ -110,6 +111,14 @@
       "types": "./dist/paper/server.d.ts",
       "import": "./dist/paper/server.js"
     },
+    "./scholia": {
+      "types": "./dist/scholia.d.ts",
+      "import": "./dist/scholia.js"
+    },
+    "./scholia/server": {
+      "types": "./dist/scholia/server.d.ts",
+      "import": "./dist/scholia/server.js"
+    },
     "./pop": {
       "types": "./dist/pop.d.ts",
       "import": "./dist/pop.js"
@@ -149,6 +158,10 @@
     "./themes/paper": {
       "types": "./dist/themes/paper.d.ts",
       "import": "./dist/themes/paper.js"
+    },
+    "./themes/scholia": {
+      "types": "./dist/themes/scholia.d.ts",
+      "import": "./dist/themes/scholia.js"
     },
     "./themes/pop": {
       "types": "./dist/themes/pop.d.ts",
@@ -199,6 +212,7 @@
     "./atlas/styles.css": "./atlas/styles.css",
     "./studio/styles.css": "./studio/styles.css",
     "./paper/styles.css": "./paper/styles.css",
+    "./scholia/styles.css": "./scholia/styles.css",
     "./pop/styles.css": "./pop/styles.css",
     "./pulse/styles.css": "./pulse/styles.css"
   },

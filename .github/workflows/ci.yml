@@ -9,13 +9,17 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   fast-validation:
     name: Fast Validation
     permissions:
       contents: read
       packages: read
-    uses: moritzbrantner/reusable-workflows/.github/workflows/fast-validation.yml@workflow-standard-v1
+    uses: moritzbrantner/reusable-workflows/.github/workflows/fast-validation.yml@workflow-standard-v1.3
     with:
       format_command: bun run format:check
       lint_command: bun run lint
@@ -31,7 +35,7 @@ jobs:
     permissions:
       contents: read
       packages: read
-    uses: moritzbrantner/reusable-workflows/.github/workflows/integration-validation.yml@workflow-standard-v1
+    uses: moritzbrantner/reusable-workflows/.github/workflows/integration-validation.yml@workflow-standard-v1.3
     with:
       integration_command: bun run test:coverage
       package_check_command: bun run build && bun run test:package && bun run verify:consumer && bun run pack:dry
@@ -41,12 +45,15 @@ jobs:
 
   storybook-validation:
     name: Storybook Validation
+    needs:
+      - fast-validation
     permissions:
       contents: read
       packages: read
-    uses: moritzbrantner/reusable-workflows/.github/workflows/storybook-validation.yml@workflow-standard-v1
+    uses: moritzbrantner/reusable-workflows/.github/workflows/storybook-validation.yml@workflow-standard-v1.3
     with:
       install_playwright: true
+      install_playwright_browsers: chromium
       storybook_build_command: bun run build-storybook
       storybook_test_command: bun run test:storybook
       visual_command: bun run test:visual && bun run test:mobile-usability
@@ -67,9 +74,10 @@ jobs:
     permissions:
       contents: read
       packages: read
-    uses: moritzbrantner/reusable-workflows/.github/workflows/performance-validation.yml@workflow-standard-v1
+    uses: moritzbrantner/reusable-workflows/.github/workflows/performance-validation.yml@workflow-standard-v1.3
     with:
-      pre_command: bunx playwright install --with-deps chromium
+      install_playwright: true
+      install_playwright_browsers: chromium
       build_command: bun run build
       unlighthouse_command: bun run test:unlighthouse
       benchmark_command: bun run bench

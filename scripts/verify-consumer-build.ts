@@ -29,7 +29,7 @@ const singleThemeBudget = {
   maxTotalBytes: 240 * 1024,
   maxCssBytes: 80 * 1024,
 };
-const simpleThemeFixtures = ["bobba", "atlas", "studio", "paper"] as const;
+const simpleThemeFixtures = ["bobba", "atlas", "studio", "paper", "scholia"] as const;
 
 rmSync(path.join(consumerRoot, "node_modules"), { recursive: true, force: true });
 rmSync(path.join(consumerRoot, "dist"), { recursive: true, force: true });

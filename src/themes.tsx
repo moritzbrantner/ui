@@ -13,6 +13,7 @@ import {
   paperTheme,
   popTheme,
   pulseTheme,
+  scholiaTheme,
   studioTheme,
   themeConfig,
   uiThemeLabels,
@@ -62,6 +63,10 @@ function PaperTheme(props: Omit<UiThemeProps, "theme">) {
   return <UiTheme theme="paper" {...props} />;
 }
 
+function ScholiaTheme(props: Omit<UiThemeProps, "theme">) {
+  return <UiTheme theme="scholia" {...props} />;
+}
+
 function PopTheme(props: Omit<UiThemeProps, "theme">) {
   return <UiTheme theme="pop" {...props} />;
 }
@@ -76,6 +81,7 @@ export {
   PaperTheme,
   PopTheme,
   PulseTheme,
+  ScholiaTheme,
   StudioTheme,
   UiTheme,
   ZleekTheme,
@@ -88,6 +94,7 @@ export {
   paperTheme,
   popTheme,
   pulseTheme,
+  scholiaTheme,
   studioTheme,
   themeConfig,
   uiThemeLabels,

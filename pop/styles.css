@@ -1308,4 +1308,14 @@
       ui-loading-bar 1.15s ease-in-out infinite,
       var(--ui-theme-motion-progress-animation);
   }
+
+  :root
+    :where(
+      [data-ui-hover-growth="none"],
+      .ui-hover-growth-none,
+      [data-ui-hover-growth="none"] *,
+      .ui-hover-growth-none *
+    ):hover {
+    transform: translateY(0) scale(1);
+  }
 }
