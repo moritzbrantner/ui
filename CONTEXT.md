@@ -48,6 +48,10 @@ _Avoid_: Playful consumer skin, Studio replacement, campaign theme
 A published theme for kinetic interaction surfaces where movement clarifies opening, closing, expansion, collapse, and selection changes.
 _Avoid_: Realtime theme, status theme
 
+**Motion Amplitude**:
+The visible strength of theme motion for a meaningful UI event, separate from how often motion runs.
+_Avoid_: More animation, activity level, component-specific flair
+
 **Visual Contract**:
 The compatibility promise created by public styling behavior, including tokens, slots, layout behavior, and theme presentation.
 _Avoid_: Look and feel, styling detail

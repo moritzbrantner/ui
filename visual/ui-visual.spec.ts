@@ -1011,16 +1011,16 @@ async function expectPulseEnterSideProperties(locator: Locator) {
 
   switch (side) {
     case "top":
-      expect(enterY).toBe("-6px");
+      expect(enterY).toBe("-10px");
       break;
     case "bottom":
-      expect(enterY).toBe("6px");
+      expect(enterY).toBe("10px");
       break;
     case "left":
-      expect(enterX).toBe("-6px");
+      expect(enterX).toBe("-10px");
       break;
     case "right":
-      expect(enterX).toBe("6px");
+      expect(enterX).toBe("10px");
       break;
   }
 }
