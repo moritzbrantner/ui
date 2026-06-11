@@ -40,6 +40,7 @@ export type NotificationMenuProps = {
   emptyLabel?: React.ReactNode;
   markAllReadLabel?: React.ReactNode;
   markReadLabel?: React.ReactNode;
+  optimisticReadState?: boolean;
   onMarkAllRead?: () => void;
   onMarkRead?: (itemId: string, item: NotificationMenuItem) => void;
   align?: "start" | "center" | "end";
@@ -61,6 +62,7 @@ function NotificationMenu({
   emptyLabel = "No notifications",
   markAllReadLabel = "Mark all read",
   markReadLabel = "Mark read",
+  optimisticReadState = true,
   onMarkAllRead,
   onMarkRead,
   align = "end",
@@ -81,16 +83,18 @@ function NotificationMenu({
   const visibleItems = React.useMemo(
     () =>
       (typeof maxItems === "number" ? items.slice(0, maxItems) : items).map((item) =>
-        readItemIds.has(item.id) ? { ...item, unread: false } : item,
+        optimisticReadState && readItemIds.has(item.id) ? { ...item, unread: false } : item,
       ),
-    [items, maxItems, readItemIds],
+    [items, maxItems, optimisticReadState, readItemIds],
   );
-  const localReadCount = [...readItemIds].filter((itemId) => unreadItemIds.has(itemId)).length;
+  const localReadCount = optimisticReadState
+    ? [...readItemIds].filter((itemId) => unreadItemIds.has(itemId)).length
+    : 0;
   const effectiveUnreadCount = Math.max(
     0,
     unreadCount === undefined
       ? unreadItemIds.size - localReadCount
-      : unreadCount - localUnreadAdjustment,
+      : unreadCount - (optimisticReadState ? localUnreadAdjustment : 0),
   );
   const countLabel = formatNotificationMenuCount(effectiveUnreadCount, maxCount);
   const accessibleLabel =
@@ -231,7 +235,7 @@ function NotificationMenu({
                     aria-describedby={itemTitle ? getItemTitleId(item.id) : undefined}
                     title={markReadActionTitle}
                     onSelect={() => {
-                      if (!readItemIds.has(item.id)) {
+                      if (optimisticReadState && !readItemIds.has(item.id)) {
                         setReadItemIds((currentReadItemIds) => {
                           const nextReadItemIds = new Set(currentReadItemIds);
                           nextReadItemIds.add(item.id);

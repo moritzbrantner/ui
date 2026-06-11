@@ -422,8 +422,8 @@ function generateThemeMotionExtras(
             controlAnimation: "ui-pulse-pressurize 420ms cubic-bezier(0.2, 1.35, 0.28, 1) both",
             surfaceAnimation: "ui-pulse-drift 520ms cubic-bezier(0.2, 1.1, 0.28, 1) both",
             overlayAnimation: "ui-pulse-enter 420ms cubic-bezier(0.2, 1.25, 0.28, 1) both",
-            statusAnimation: "ui-pulse-signal 1600ms ease-in-out infinite",
-            progressAnimation: "ui-pulse-flow 1300ms ease-in-out infinite",
+            statusAnimation: "ui-pulse-signal 960ms ease-out both",
+            progressAnimation: "ui-pulse-flow 980ms ease-out both",
             focusRingShadow:
               "0 0 0 var(--ui-focus-ring-width) color-mix(in oklch, var(--info) 42%, transparent), 0 0 0 calc(var(--ui-focus-ring-width) + 5px) color-mix(in oklch, var(--live-streaming, var(--primary)) 24%, transparent)",
             signalShadow:

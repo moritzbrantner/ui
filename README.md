@@ -107,7 +107,7 @@ import "@moritzbrantner/ui/pop/styles.css";
 import "@moritzbrantner/ui/pulse/styles.css";
 ```
 
-Use `atlas` for dense dashboards and analytics, `studio` for creative tooling, `paper` for document or research-heavy interfaces, `pop` for playful consumer surfaces with brighter color and stronger motion, and `pulse` for energized interaction-heavy surfaces.
+Use `atlas` for dense dashboards and analytics, `studio` for creative production and editing surfaces, `paper` for document or research-heavy interfaces, `pop` for Studio-adjacent public creator surfaces with brighter color and delight-burst feedback, and `pulse` for kinetic interaction choreography across open, close, expand, collapse, and selection flows.
 
 When an app renders components from `@moritzbrantner/ui`, also import the explicit component source opt-in:
 

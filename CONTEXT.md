@@ -36,6 +36,18 @@ _Avoid_: Draft component, private component
 A supported visual contract for a concrete product surface or surface need.
 _Avoid_: Skin, preset, colorway
 
+**Studio Theme**:
+A published theme for creative production, editing, media, and generation surfaces.
+_Avoid_: Creator brand, media skin
+
+**Pop Theme**:
+A published theme that carries Studio's creative language into public-facing creator surfaces with brighter color, rounder polish, and delight-burst feedback.
+_Avoid_: Playful consumer skin, Studio replacement, campaign theme
+
+**Pulse Theme**:
+A published theme for kinetic interaction surfaces where movement clarifies opening, closing, expansion, collapse, and selection changes.
+_Avoid_: Realtime theme, status theme
+
 **Visual Contract**:
 The compatibility promise created by public styling behavior, including tokens, slots, layout behavior, and theme presentation.
 _Avoid_: Look and feel, styling detail

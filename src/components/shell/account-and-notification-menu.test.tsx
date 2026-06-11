@@ -233,6 +233,44 @@ describe("notification menu", () => {
     expect(screen.queryByRole("menuitem", { name: "Mark read" })).toBeNull();
   });
 
+  test("keeps unread presentation app-owned when optimistic read state is disabled", async () => {
+    const onMarkRead = vi.fn();
+
+    render(
+      <NotificationMenu
+        unreadCount={1}
+        optimisticReadState={false}
+        onMarkRead={onMarkRead}
+        items={[
+          {
+            id: "follow",
+            title: "Jules followed you",
+            unread: true,
+          },
+        ]}
+      />,
+    );
+
+    openMenu(screen.getByRole("button", { name: "Notifications, 1 unread" }));
+    expect(await screen.findByRole("menuitem", { name: /Jules followed you/ })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("menuitem", { name: "Mark read" }));
+
+    await waitFor(() =>
+      expect(onMarkRead).toHaveBeenCalledWith(
+        "follow",
+        expect.objectContaining({ id: "follow", title: "Jules followed you" }),
+      ),
+    );
+    expect(screen.getByRole("button", { name: "Notifications, 1 unread" })).toBeTruthy();
+
+    openMenu(screen.getByRole("button", { name: "Notifications, 1 unread" }));
+    expect(await screen.findByRole("menuitem", { name: /Jules followed you/ })).toBeTruthy();
+    expect(
+      document.body.querySelector('[data-slot="notification-menu-unread-indicator"]'),
+    ).toBeTruthy();
+  });
+
   test("calls onMarkAllRead when the action is present", async () => {
     const onMarkAllRead = vi.fn();
 

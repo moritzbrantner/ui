@@ -478,7 +478,10 @@ describe("@moritzbrantner/ui theme-contract", () => {
     expect(uiThemeProfiles.bobba.surface).toBe("neutral");
     expect(uiThemeProfiles.zleek.surface).toBe("glass");
     expect(uiThemeProfiles.atlas.density).toBe("compact");
+    expect(uiThemeProfiles.pop.label).toBe("Polished Studio style");
+    expect(uiThemeProfiles.pop.bestFor).toContain("Public creator surfaces");
     expect(uiThemeProfiles.scholia.bestFor).toContain("Historical sources");
+    expect(uiThemeProfiles.pulse.surface).toBe("kinetic");
     expect(uiThemeProfiles.pulse.motion).toBe("energetic");
     expect(Object.hasOwn(uiThemeProfiles, "custom")).toBe(false);
   });

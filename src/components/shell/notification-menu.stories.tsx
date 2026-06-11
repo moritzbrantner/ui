@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps } from "react";
-import { expect, screen } from "storybook/test";
+import * as React from "react";
+import { expect, fn, screen } from "storybook/test";
 import { AlertTriangleIcon, MessageCircleIcon, UserPlusIcon } from "lucide-react";
 
 import { NotificationMenu } from "./notification-menu";
@@ -43,8 +44,8 @@ const meta = {
     unreadCount: 2,
     titleHref: "/notifications",
     items: notifications,
-    onMarkAllRead: () => {},
-    onMarkRead: () => {},
+    onMarkAllRead: fn(),
+    onMarkRead: fn(),
   },
 } satisfies Meta<typeof NotificationMenu>;
 
@@ -74,6 +75,44 @@ export const WithDisabledItem: Story = {
         disabled: true,
       },
     ],
+  },
+};
+
+export const ControlledReadState: Story = {
+  args: {
+    unreadCount: 1,
+    items: [
+      {
+        id: "follow",
+        title: "Jules followed you",
+        description: "Open the profile page to review their public activity.",
+        unread: true,
+        meta: "2m",
+        icon: <UserPlusIcon className="size-4" />,
+      },
+    ],
+    optimisticReadState: false,
+    onMarkRead: fn(),
+  },
+  render: (args) => {
+    const [items, setItems] = React.useState(args.items);
+    const unreadCount = items?.filter((item) => item.unread).length ?? 0;
+
+    return (
+      <NotificationMenu
+        {...args}
+        unreadCount={unreadCount}
+        items={items}
+        onMarkRead={(itemId, item) => {
+          args.onMarkRead?.(itemId, item);
+          setItems((currentItems) =>
+            currentItems?.map((currentItem) =>
+              currentItem.id === itemId ? { ...currentItem, unread: false } : currentItem,
+            ),
+          );
+        }}
+      />
+    );
   },
 };
 

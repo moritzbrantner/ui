@@ -41,16 +41,20 @@ describe("Terminal", () => {
     expect(screen.getByText("~/workspace/ui")).toBeTruthy();
     expect(screen.getByText("bun run build")).toBeTruthy();
     expect(screen.getByText("Build completed")).toBeTruthy();
-    expect(container.querySelector("[data-slot='terminal']")).toBeTruthy();
+    const root = container.querySelector("[data-slot='terminal']");
+    const header = container.querySelector("[data-slot='terminal-header']");
+    const defaultLine = container.querySelector("[data-slot='terminal-line']");
+    const successLine = screen.getByText("Build completed").closest("[data-slot='terminal-line']");
+
+    expect(root).toBeTruthy();
+    expect(root?.className).toContain("bg-card");
+    expect(root?.className).toContain("border-border");
+    expect(root?.className).not.toContain("zinc-");
+    expect(header?.className).not.toContain("zinc-");
+    expect(defaultLine?.className).not.toContain("zinc-");
+    expect(successLine?.className).toContain("text-[var(--chart-2)]");
     expect(container.querySelector("[data-slot='terminal-controls']")).toBeTruthy();
-    expect(
-      container.querySelector("[data-slot='terminal-line']")?.getAttribute("data-variant"),
-    ).toBe("default");
-    expect(
-      screen
-        .getByText("Build completed")
-        .closest("[data-slot='terminal-line']")
-        ?.getAttribute("data-variant"),
-    ).toBe("success");
+    expect(defaultLine?.getAttribute("data-variant")).toBe("default");
+    expect(successLine?.getAttribute("data-variant")).toBe("success");
   });
 });

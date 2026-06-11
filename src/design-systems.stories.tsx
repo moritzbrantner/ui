@@ -76,7 +76,7 @@ const surfaceDescriptions = {
   creative: "Vivid panels with creative accents",
   document: "Paper texture with quiet controls",
   consumer: "Bright elevated cards with animated affordances",
-  realtime: "Glowing interactive cards with animated gradients",
+  kinetic: "Choreographed movement for interaction-heavy surfaces",
 } as const satisfies Record<UiThemeProfile["surface"], string>;
 
 const densityLabels = {

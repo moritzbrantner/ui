@@ -4,7 +4,7 @@ type UiThemeProfile = {
   name: BuiltInUiThemeName;
   label: string;
   description: string;
-  surface: "neutral" | "glass" | "dense" | "creative" | "document" | "consumer" | "realtime";
+  surface: "neutral" | "glass" | "dense" | "creative" | "document" | "consumer" | "kinetic";
   density: "compact" | "balanced" | "comfortable";
   motion: "quiet" | "standard" | "expressive" | "energetic";
   bestFor: readonly string[];
@@ -73,22 +73,23 @@ const uiThemeProfiles = {
   },
   pop: {
     name: "pop",
-    label: "Playful consumer style",
-    description: "Colorful, rounded, and motion-forward for polished consumer product surfaces.",
+    label: "Polished Studio style",
+    description:
+      "Studio's public-facing, colorful, rounded expression for creator onboarding, showcase, and sharing surfaces.",
     surface: "consumer",
     density: "comfortable",
     motion: "expressive",
-    bestFor: ["Consumer apps", "Creator tools", "Onboarding surfaces"],
+    bestFor: ["Creator onboarding", "Public creator surfaces", "Showcase flows"],
   },
   pulse: {
     name: "pulse",
-    label: "Energized motion style",
+    label: "Kinetic interaction style",
     description:
-      "Electric color, responsive scale, and animated affordances for surfaces where interactions should feel active.",
-    surface: "realtime",
+      "Choreographed movement for opening, closing, expansion, collapse, and spatial-feeling selection changes.",
+    surface: "kinetic",
     density: "comfortable",
     motion: "energetic",
-    bestFor: ["Realtime tools", "Launch moments", "High-touch interactions"],
+    bestFor: ["Expandable interfaces", "Open and close flows", "Selection-heavy controls"],
   },
 } as const satisfies Record<BuiltInUiThemeName, UiThemeProfile>;
 

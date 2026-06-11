@@ -48,6 +48,8 @@ import "@moritzbrantner/ui/styles.css";
 
 Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css`, `@moritzbrantner/ui/studio/styles.css`, `@moritzbrantner/ui/paper/styles.css`, and `@moritzbrantner/ui/pop/styles.css` replace the default stylesheet for product surfaces with different visual needs. Each theme stylesheet imports the shared generated `base.css` layer and only its own token blocks. Theme stylesheets provide Tailwind setup, animation helpers, component normalization, and theme tokens; they do not scan package component source strings.
 
+Use `studio` for creative production and editing surfaces, `pop` when those creator products need a public-facing polished Studio expression, and `pulse` when component movement should clarify opening, closing, expansion, collapse, and selection changes.
+
 Import `@moritzbrantner/ui/component-sources.css` when an app renders package components:
 
 ```ts

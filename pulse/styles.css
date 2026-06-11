@@ -433,8 +433,8 @@
     both;
   --ui-theme-motion-surface-animation: ui-pulse-drift 520ms cubic-bezier(0.2, 1.1, 0.28, 1) both;
   --ui-theme-motion-overlay-animation: ui-pulse-enter 420ms cubic-bezier(0.2, 1.25, 0.28, 1) both;
-  --ui-theme-motion-status-animation: ui-pulse-signal 1600ms ease-in-out infinite;
-  --ui-theme-motion-progress-animation: ui-pulse-flow 1300ms ease-in-out infinite;
+  --ui-theme-motion-status-animation: ui-pulse-signal 960ms ease-out both;
+  --ui-theme-motion-progress-animation: ui-pulse-flow 980ms ease-out both;
   --ui-theme-motion-focus-ring-shadow:
     0 0 0 var(--ui-focus-ring-width) color-mix(in oklch, var(--info) 42%, transparent),
     0 0 0 calc(var(--ui-focus-ring-width) + 5px)

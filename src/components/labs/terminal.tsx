@@ -5,12 +5,12 @@ import { cn } from "../../lib/cn";
 type TerminalLineVariant = "default" | "muted" | "success" | "warning" | "error" | "info";
 
 const terminalLineVariantClasses: Record<TerminalLineVariant, string> = {
-  default: "text-zinc-50",
-  muted: "text-zinc-400",
-  success: "text-emerald-300",
-  warning: "text-amber-300",
-  error: "text-red-300",
-  info: "text-sky-300",
+  default: "text-foreground",
+  muted: "text-muted-foreground",
+  success: "text-[var(--chart-2)]",
+  warning: "text-[var(--chart-3)]",
+  error: "text-destructive",
+  info: "text-[var(--chart-1)]",
 };
 
 function Terminal({ className, ...props }: React.ComponentProps<"figure">) {
@@ -18,7 +18,7 @@ function Terminal({ className, ...props }: React.ComponentProps<"figure">) {
     <figure
       data-slot="terminal"
       className={cn(
-        "group/terminal overflow-hidden rounded-[var(--ui-card-radius,var(--ui-radius-surface))] border border-zinc-800 bg-zinc-950 text-sm text-zinc-50 shadow-sm",
+        "group/terminal overflow-hidden rounded-[var(--ui-card-radius,var(--ui-radius-surface))] border border-border bg-card text-sm text-card-foreground shadow-sm",
         className,
       )}
       {...props}
@@ -31,7 +31,7 @@ function TerminalHeader({ className, ...props }: React.ComponentProps<"figcaptio
     <figcaption
       data-slot="terminal-header"
       className={cn(
-        "flex min-h-10 items-center justify-between gap-3 border-b border-zinc-800 bg-zinc-900 px-3 py-2",
+        "flex min-h-10 items-center justify-between gap-3 border-b border-border bg-muted/40 px-3 py-2",
         className,
       )}
       {...props}
@@ -54,9 +54,9 @@ function TerminalControls({
     >
       {children ?? (
         <>
-          <span className="size-2.5 rounded-full bg-red-400" />
-          <span className="size-2.5 rounded-full bg-amber-400" />
-          <span className="size-2.5 rounded-full bg-emerald-400" />
+          <span className="size-2.5 rounded-full bg-destructive" />
+          <span className="size-2.5 rounded-full bg-[var(--chart-3)]" />
+          <span className="size-2.5 rounded-full bg-[var(--chart-2)]" />
         </>
       )}
     </div>
@@ -67,7 +67,10 @@ function TerminalTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="terminal-title"
-      className={cn("min-w-0 truncate font-mono text-xs font-medium text-zinc-300", className)}
+      className={cn(
+        "min-w-0 truncate font-mono text-xs font-medium text-muted-foreground",
+        className,
+      )}
       {...props}
     />
   );
@@ -124,7 +127,7 @@ function TerminalPrompt({ className, children = "$", ...props }: React.Component
   return (
     <span
       data-slot="terminal-prompt"
-      className={cn("mr-2 select-none text-emerald-300", className)}
+      className={cn("mr-2 select-none text-[var(--chart-2)]", className)}
       {...props}
     >
       {children}
@@ -136,7 +139,7 @@ function TerminalCommand({ className, ...props }: React.ComponentProps<"code">) 
   return (
     <code
       data-slot="terminal-command"
-      className={cn("font-mono text-zinc-50", className)}
+      className={cn("font-mono text-foreground", className)}
       {...props}
     />
   );
@@ -146,7 +149,7 @@ function TerminalOutput({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="terminal-output"
-      className={cn("font-mono text-zinc-300", className)}
+      className={cn("font-mono text-muted-foreground", className)}
       {...props}
     />
   );
@@ -162,7 +165,7 @@ function TerminalCursor({
     <span
       data-slot="terminal-cursor"
       className={cn(
-        "ml-1 inline-block h-4 w-2 animate-pulse bg-zinc-50 align-[-0.125em]",
+        "ml-1 inline-block h-4 w-2 animate-pulse bg-foreground align-[-0.125em]",
         className,
       )}
       aria-hidden={ariaHidden}
