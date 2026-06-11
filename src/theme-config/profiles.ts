@@ -23,11 +23,12 @@ const uiThemeProfiles = {
   zleek: {
     name: "zleek",
     label: "Glass interface style",
-    description: "Sharper translucent surfaces for polished application shells and launch tools.",
+    description:
+      "Sharper translucent surfaces for command centers, launch tools, and polished shells.",
     surface: "glass",
     density: "balanced",
     motion: "expressive",
-    bestFor: ["Command centers", "Launch screens", "Presentation surfaces"],
+    bestFor: ["Command centers", "Launch tools", "Polished shells"],
   },
   atlas: {
     name: "atlas",
@@ -41,11 +42,11 @@ const uiThemeProfiles = {
   studio: {
     name: "studio",
     label: "Creative tooling style",
-    description: "Expressive color and stronger emphasis for media and generation workflows.",
+    description: "Expressive color and stronger emphasis for media, generation, and editing tools.",
     surface: "creative",
     density: "comfortable",
     motion: "expressive",
-    bestFor: ["Media tools", "Storytelling", "Image and video workflows"],
+    bestFor: ["Media tools", "Generation tools", "Editing workflows"],
   },
   paper: {
     name: "paper",
@@ -54,7 +55,7 @@ const uiThemeProfiles = {
     surface: "document",
     density: "compact",
     motion: "quiet",
-    bestFor: ["OCR", "Linguistics", "Translation and text tools"],
+    bestFor: ["OCR", "Translation", "Text-heavy research"],
   },
   scholia: {
     name: "scholia",
@@ -64,12 +65,7 @@ const uiThemeProfiles = {
     surface: "document",
     density: "compact",
     motion: "quiet",
-    bestFor: [
-      "Historical sources",
-      "Scholarly editions",
-      "Source atlases",
-      "Theology and reference sites",
-    ],
+    bestFor: ["Historical sources", "Scholarly editions", "Reference workbenches"],
   },
   pop: {
     name: "pop",
@@ -79,7 +75,7 @@ const uiThemeProfiles = {
     surface: "consumer",
     density: "comfortable",
     motion: "expressive",
-    bestFor: ["Creator onboarding", "Public creator surfaces", "Showcase flows"],
+    bestFor: ["Creator onboarding", "Public creator surfaces", "Showcases"],
   },
   pulse: {
     name: "pulse",
@@ -89,7 +85,7 @@ const uiThemeProfiles = {
     surface: "kinetic",
     density: "comfortable",
     motion: "energetic",
-    bestFor: ["Expandable interfaces", "Open and close flows", "Selection-heavy controls"],
+    bestFor: ["Expand and collapse flows", "Selection-heavy controls", "Spatial interfaces"],
   },
 } as const satisfies Record<BuiltInUiThemeName, UiThemeProfile>;
 

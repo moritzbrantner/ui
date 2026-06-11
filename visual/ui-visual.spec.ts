@@ -70,7 +70,7 @@ const storyIds = [
   "components-layout-workbench-layout--full-workbench",
   "design-system-theme-showcase--scholia-archive-surface",
   "design-system-theme-showcase--pop-consumer-surface",
-  "design-system-theme-showcase--pulse-realtime-surface",
+  "design-system-theme-showcase--pulse-kinetic-interaction-surface",
   "patterns-release-readiness--consumer-dashboard-shell-story",
   "patterns-release-readiness--forms-settings-story",
 ];

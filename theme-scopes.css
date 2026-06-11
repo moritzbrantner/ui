@@ -1149,9 +1149,9 @@
 [data-ui-theme="scholia"] {
   --font-sans-app:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-body-app: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-body-app: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
   --font-control-app: var(--font-sans-app);
-  --font-heading-app: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-heading-app: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
   --font-mono-app:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
@@ -1230,15 +1230,15 @@
   --editor-timeline: oklch(0.94 0.024 82);
   --editor-playhead: oklch(0.38 0.105 28);
   --editor-layer: oklch(0.9 0.04 52);
-  --document-annotation: oklch(0.43 0.13 30);
-  --document-highlight: oklch(0.86 0.12 82 / 0.62);
-  --document-citation: oklch(0.4 0.08 232);
-  --document-margin-note: oklch(0.42 0.075 145);
-  --document-selection: oklch(0.72 0.08 42 / 0.45);
-  --document-ruled-background: oklch(0.68 0.034 82 / 0.58);
-  --document-grid-background: oklch(0.68 0.034 82 / 0.38);
-  --document-quote: oklch(0.34 0.06 145);
-  --document-callout: oklch(0.55 0.105 72);
+  --document-annotation: oklch(0.4 0.13 28);
+  --document-highlight: oklch(0.84 0.13 78 / 0.68);
+  --document-citation: oklch(0.36 0.075 238);
+  --document-margin-note: oklch(0.38 0.075 142);
+  --document-selection: oklch(0.7 0.09 38 / 0.48);
+  --document-ruled-background: oklch(0.62 0.032 78 / 0.62);
+  --document-grid-background: oklch(0.62 0.032 78 / 0.42);
+  --document-quote: oklch(0.3 0.06 142);
+  --document-callout: oklch(0.5 0.105 68);
   --ui-badge-neutral: oklch(0.925 0.022 82);
   --ui-badge-info: oklch(0.86 0.05 232);
   --ui-badge-success: oklch(0.86 0.055 145);
@@ -2901,9 +2901,9 @@
 [data-ui-theme="scholia"].dark {
   --font-sans-app:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-body-app: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-body-app: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
   --font-control-app: var(--font-sans-app);
-  --font-heading-app: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-heading-app: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
   --font-mono-app:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
@@ -2982,15 +2982,15 @@
   --editor-timeline: oklch(0.27 0.023 64);
   --editor-playhead: oklch(0.68 0.13 30);
   --editor-layer: oklch(0.34 0.065 52);
-  --document-annotation: oklch(0.72 0.13 32);
-  --document-highlight: oklch(0.76 0.12 82 / 0.34);
-  --document-citation: oklch(0.72 0.1 232);
-  --document-margin-note: oklch(0.7 0.09 145);
-  --document-selection: oklch(0.72 0.08 42 / 0.3);
-  --document-ruled-background: oklch(0.9 0.018 82 / 0.18);
-  --document-grid-background: oklch(0.9 0.018 82 / 0.12);
-  --document-quote: oklch(0.72 0.09 145);
-  --document-callout: oklch(0.76 0.12 72);
+  --document-annotation: oklch(0.74 0.13 30);
+  --document-highlight: oklch(0.76 0.13 78 / 0.38);
+  --document-citation: oklch(0.74 0.1 238);
+  --document-margin-note: oklch(0.72 0.09 142);
+  --document-selection: oklch(0.72 0.09 38 / 0.34);
+  --document-ruled-background: oklch(0.9 0.018 78 / 0.2);
+  --document-grid-background: oklch(0.9 0.018 78 / 0.14);
+  --document-quote: oklch(0.74 0.09 142);
+  --document-callout: oklch(0.78 0.12 68);
   --ui-badge-neutral: oklch(0.9 0.018 82 / 0.12);
   --ui-badge-info: oklch(0.34 0.06 232);
   --ui-badge-success: oklch(0.34 0.06 145);

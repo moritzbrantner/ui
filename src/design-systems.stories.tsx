@@ -5,6 +5,7 @@ import {
   ArrowRightIcon,
   BarChart3Icon,
   BookOpenIcon,
+  GaugeIcon,
   FileTextIcon,
   ImageIcon,
   Layers3Icon,
@@ -66,7 +67,7 @@ const systemIcons = {
   paper: FileTextIcon,
   scholia: BookOpenIcon,
   pop: ActivityIcon,
-  pulse: ActivityIcon,
+  pulse: GaugeIcon,
 } as const satisfies Record<UiThemeProfile["name"], typeof Layers3Icon>;
 
 const surfaceDescriptions = {

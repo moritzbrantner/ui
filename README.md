@@ -103,11 +103,12 @@ Additional visual systems are available for specific product surfaces:
 import "@moritzbrantner/ui/atlas/styles.css";
 import "@moritzbrantner/ui/studio/styles.css";
 import "@moritzbrantner/ui/paper/styles.css";
+import "@moritzbrantner/ui/scholia/styles.css";
 import "@moritzbrantner/ui/pop/styles.css";
 import "@moritzbrantner/ui/pulse/styles.css";
 ```
 
-Use `atlas` for dense dashboards and analytics, `studio` for creative production and editing surfaces, `paper` for document or research-heavy interfaces, `pop` for Studio-adjacent public creator surfaces with brighter color and delight-burst feedback, and `pulse` for kinetic interaction choreography across open, close, expand, collapse, and selection flows.
+Use `bobba` for default platform apps, `zleek` for polished glass shells, `atlas` for dense dashboards and analytics, `studio` for creative production and editing surfaces, `paper` for document or research-heavy interfaces, `scholia` for scholarly archives and reference workbenches, `pop` for Studio-adjacent public creator surfaces with brighter color and delight-burst feedback, and `pulse` for kinetic interaction choreography across open, close, expand, collapse, and selection flows.
 
 When an app renders components from `@moritzbrantner/ui`, also import the explicit component source opt-in:
 
@@ -235,7 +236,7 @@ Use the server entrypoint for `cn`, `themeConfig`, `createUiTheme`, and theme me
 import { cn, createUiTheme, themeConfig } from "@moritzbrantner/ui/server";
 ```
 
-Every app should import one concrete theme stylesheet, usually `@moritzbrantner/ui/styles.css`. Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css`, `@moritzbrantner/ui/pop/styles.css`, and `@moritzbrantner/ui/pulse/styles.css` replace that default when a product surface needs a different visual system. Add `@moritzbrantner/ui/component-sources.css` when the app renders package components. Use `@moritzbrantner/ui/theme-scopes.css` only when multiple built-in themes must coexist in one document.
+Every app should import one concrete theme stylesheet, usually `@moritzbrantner/ui/styles.css`. Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css`, `@moritzbrantner/ui/scholia/styles.css`, `@moritzbrantner/ui/pop/styles.css`, and `@moritzbrantner/ui/pulse/styles.css` replace that default when a product surface needs a different visual system. Add `@moritzbrantner/ui/component-sources.css` when the app renders package components. Use `@moritzbrantner/ui/theme-scopes.css` only when multiple built-in themes must coexist in one document.
 
 ## Do Not Put Here
 
@@ -337,7 +338,7 @@ These components render UI state and slots only. Keep fetching, routing, upload 
 
 ## Theme Metadata
 
-`UiTheme`, `BobbaTheme`, `ZleekTheme`, `AtlasTheme`, `StudioTheme`, `PaperTheme`, `PopTheme`, and `PulseTheme` add theme metadata classes and `data-ui-theme` attributes around a subtree. They do not scope CSS tokens by themselves; the active visual theme still comes from the single stylesheet imported by the app.
+`UiTheme`, `BobbaTheme`, `ZleekTheme`, `AtlasTheme`, `StudioTheme`, `PaperTheme`, `ScholiaTheme`, `PopTheme`, and `PulseTheme` add theme metadata classes and `data-ui-theme` attributes around a subtree. They do not scope CSS tokens by themselves; the active visual theme still comes from the single stylesheet imported by the app.
 
 ```tsx
 import { UiTheme, type UiThemeName } from "@moritzbrantner/ui";
@@ -356,6 +357,7 @@ Theme metadata is also available from subpaths. Use single-theme subpaths for bu
 ```ts
 import { themeConfig, uiThemeNames } from "@moritzbrantner/ui/themes";
 import { AtlasTheme, uiTheme as atlasTheme } from "@moritzbrantner/ui/atlas";
+import { ScholiaTheme, uiTheme as scholiaTheme } from "@moritzbrantner/ui/themes/scholia";
 import { PopTheme, uiTheme as popTheme } from "@moritzbrantner/ui/themes/pop";
 import { PulseTheme, uiTheme as pulseTheme } from "@moritzbrantner/ui/themes/pulse";
 ```
@@ -375,6 +377,7 @@ import { uiTheme as bobbaTheme } from "@moritzbrantner/ui/bobba";
 import { uiTheme as atlasTheme } from "@moritzbrantner/ui/atlas";
 import { uiTheme as studioTheme } from "@moritzbrantner/ui/studio";
 import { uiTheme as paperTheme } from "@moritzbrantner/ui/paper";
+import { uiTheme as scholiaTheme } from "@moritzbrantner/ui/scholia";
 import { uiTheme as popTheme } from "@moritzbrantner/ui/pop";
 import { uiTheme as pulseTheme } from "@moritzbrantner/ui/pulse";
 ```
@@ -387,6 +390,7 @@ import { uiTheme as bobbaTheme } from "@moritzbrantner/ui/bobba/server";
 import { uiTheme as atlasTheme } from "@moritzbrantner/ui/atlas/server";
 import { uiTheme as studioTheme } from "@moritzbrantner/ui/studio/server";
 import { uiTheme as paperTheme } from "@moritzbrantner/ui/paper/server";
+import { uiTheme as scholiaTheme } from "@moritzbrantner/ui/scholia/server";
 import { uiTheme as popTheme } from "@moritzbrantner/ui/pop/server";
 import { uiTheme as pulseTheme } from "@moritzbrantner/ui/pulse/server";
 ```

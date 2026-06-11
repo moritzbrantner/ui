@@ -7,7 +7,7 @@ Run `bun run generate:tokens` after changing token metadata. The generator updat
 - `styles.css`
 - `base.css`
 - `component-sources.css`
-- theme CSS files under `zleek/`, `bobba/`, `atlas/`, `studio/`, `paper/`, `pop/`, and `pulse/`
+- theme CSS files under `zleek/`, `bobba/`, `atlas/`, `studio/`, `paper/`, `scholia/`, `pop/`, and `pulse/`
 - `theme-scopes.css`
 - `docs/tokens.md`
 

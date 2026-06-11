@@ -1,18 +1,18 @@
 {
   "status": "passed",
-  "timestamp": "2026-06-09T13:36:40.278Z",
+  "timestamp": "2026-06-11T08:37:58.239Z",
   "distDir": "dist",
   "budgets": {
     "maxTotalBytes": 901120,
     "maxEntryBytes": 35840,
     "maxChunkBytes": 40960
   },
-  "totalBytes": 568721,
+  "totalBytes": 570387,
   "entries": [
     {
       "name": "index",
       "relativePath": "dist/index.js",
-      "bytes": 18753,
+      "bytes": 18840,
       "budgetBytes": 35840,
       "passed": true,
       "owner": "shared"
@@ -20,7 +20,7 @@
     {
       "name": "server",
       "relativePath": "dist/server.js",
-      "bytes": 717,
+      "bytes": 770,
       "budgetBytes": 35840,
       "passed": true,
       "owner": "shared"
@@ -28,7 +28,7 @@
     {
       "name": "client",
       "relativePath": "dist/client.js",
-      "bytes": 18748,
+      "bytes": 18835,
       "budgetBytes": 35840,
       "passed": true,
       "owner": "shared"
@@ -74,6 +74,14 @@
       "owner": "shared"
     },
     {
+      "name": "scholia",
+      "relativePath": "dist/scholia.js",
+      "bytes": 214,
+      "budgetBytes": 35840,
+      "passed": true,
+      "owner": "shared"
+    },
+    {
       "name": "pop",
       "relativePath": "dist/pop.js",
       "bytes": 206,
@@ -92,7 +100,7 @@
     {
       "name": "themes",
       "relativePath": "dist/themes.js",
-      "bytes": 923,
+      "bytes": 1006,
       "budgetBytes": 35840,
       "passed": true,
       "owner": "shared"
@@ -138,6 +146,14 @@
       "owner": "shared"
     },
     {
+      "name": "themes/scholia",
+      "relativePath": "dist/themes/scholia.js",
+      "bytes": 213,
+      "budgetBytes": 35840,
+      "passed": true,
+      "owner": "shared"
+    },
+    {
       "name": "themes/pop",
       "relativePath": "dist/themes/pop.js",
       "bytes": 205,
@@ -157,14 +173,14 @@
   "chunks": [
     {
       "relativePath": "dist/index.js",
-      "bytes": 18753,
+      "bytes": 18840,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
     },
     {
       "relativePath": "dist/client.js",
-      "bytes": 18748,
+      "bytes": 18835,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
@@ -184,7 +200,7 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-6O4D5XKA.js",
+      "relativePath": "dist/chunk-AZCYGFA4.js",
       "bytes": 13786,
       "budgetBytes": 40960,
       "passed": true,
@@ -212,14 +228,14 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-L3UGW5LF.js",
+      "relativePath": "dist/chunk-3SMNBXH6.js",
       "bytes": 10918,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-JYECDWES.js",
+      "relativePath": "dist/chunk-GB5X5YEV.js",
       "bytes": 10690,
       "budgetBytes": 40960,
       "passed": true,
@@ -261,7 +277,7 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-LMRS6WD7.js",
+      "relativePath": "dist/chunk-YVA2IY7P.js",
       "bytes": 7429,
       "budgetBytes": 40960,
       "passed": true,
@@ -282,6 +298,13 @@
       "owner": "shared"
     },
     {
+      "relativePath": "dist/chunk-OE4CUOTR.js",
+      "bytes": 6970,
+      "budgetBytes": 40960,
+      "passed": true,
+      "owner": "shared"
+    },
+    {
       "relativePath": "dist/chunk-23E5NRNQ.js",
       "bytes": 6816,
       "budgetBytes": 40960,
@@ -296,15 +319,8 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-5S2RAKS7.js",
+      "relativePath": "dist/chunk-BV3PQEDR.js",
       "bytes": 6661,
-      "budgetBytes": 40960,
-      "passed": true,
-      "owner": "shared"
-    },
-    {
-      "relativePath": "dist/chunk-FNKGPG3U.js",
-      "bytes": 6534,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
@@ -331,7 +347,7 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-DWKU2344.js",
+      "relativePath": "dist/chunk-MMK5NDXR.js",
       "bytes": 5802,
       "budgetBytes": 40960,
       "passed": true,
@@ -359,7 +375,7 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-ZRYLJVLN.js",
+      "relativePath": "dist/chunk-NHZTCECJ.js",
       "bytes": 5554,
       "budgetBytes": 40960,
       "passed": true,
@@ -408,15 +424,15 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-Q2RPOBQ7.js",
+      "relativePath": "dist/chunk-4MXAEVXH.js",
       "bytes": 4511,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-APYFKPF6.js",
-      "bytes": 4063,
+      "relativePath": "dist/chunk-WZO6DWE2.js",
+      "bytes": 4109,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
@@ -464,8 +480,8 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-CY6FULLO.js",
-      "bytes": 3410,
+      "relativePath": "dist/chunk-WGK6WYI4.js",
+      "bytes": 3414,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
@@ -513,7 +529,7 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-46SNOJOV.js",
+      "relativePath": "dist/chunk-ENUDYI6Y.js",
       "bytes": 3142,
       "budgetBytes": 40960,
       "passed": true,
@@ -562,7 +578,7 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-XNU6ZZX5.js",
+      "relativePath": "dist/chunk-E3GG3X73.js",
       "bytes": 2926,
       "budgetBytes": 40960,
       "passed": true,
@@ -646,6 +662,13 @@
       "owner": "shared"
     },
     {
+      "relativePath": "dist/chunk-DKIUZBXI.js",
+      "bytes": 2595,
+      "budgetBytes": 40960,
+      "passed": true,
+      "owner": "shared"
+    },
+    {
       "relativePath": "dist/chunk-PFIAKCDA.js",
       "bytes": 2532,
       "budgetBytes": 40960,
@@ -653,14 +676,7 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-MZCVHWXB.js",
-      "bytes": 2516,
-      "budgetBytes": 40960,
-      "passed": true,
-      "owner": "shared"
-    },
-    {
-      "relativePath": "dist/chunk-XAUUQZJT.js",
+      "relativePath": "dist/chunk-MA446UNN.js",
       "bytes": 2514,
       "budgetBytes": 40960,
       "passed": true,
@@ -695,7 +711,7 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-LN7UFCZ4.js",
+      "relativePath": "dist/chunk-XCO5FPPQ.js",
       "bytes": 2240,
       "budgetBytes": 40960,
       "passed": true,
@@ -737,7 +753,7 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-7FG5K67D.js",
+      "relativePath": "dist/chunk-3ZIWRGGY.js",
       "bytes": 1971,
       "budgetBytes": 40960,
       "passed": true,
@@ -828,7 +844,7 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-KSSJVPFX.js",
+      "relativePath": "dist/chunk-FSK75R2R.js",
       "bytes": 1701,
       "budgetBytes": 40960,
       "passed": true,
@@ -940,21 +956,21 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-AOAZMX5N.js",
+      "relativePath": "dist/chunk-KYXBM2OW.js",
       "bytes": 1390,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-A34GPGZ5.js",
+      "relativePath": "dist/chunk-OPCPTBAD.js",
       "bytes": 1347,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-36U3IUNQ.js",
+      "relativePath": "dist/chunk-FKO7EO32.js",
       "bytes": 1345,
       "budgetBytes": 40960,
       "passed": true,
@@ -1031,7 +1047,7 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-A4ZOPYKH.js",
+      "relativePath": "dist/chunk-Q4UXRHKO.js",
       "bytes": 1043,
       "budgetBytes": 40960,
       "passed": true,
@@ -1040,6 +1056,13 @@
     {
       "relativePath": "dist/chunk-5ERVMMKX.js",
       "bytes": 1030,
+      "budgetBytes": 40960,
+      "passed": true,
+      "owner": "shared"
+    },
+    {
+      "relativePath": "dist/themes.js",
+      "bytes": 1006,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
@@ -1059,13 +1082,6 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/themes.js",
-      "bytes": 923,
-      "budgetBytes": 40960,
-      "passed": true,
-      "owner": "shared"
-    },
-    {
       "relativePath": "dist/media.js",
       "bytes": 887,
       "budgetBytes": 40960,
@@ -1080,6 +1096,13 @@
       "owner": "shared"
     },
     {
+      "relativePath": "dist/server.js",
+      "bytes": 770,
+      "budgetBytes": 40960,
+      "passed": true,
+      "owner": "shared"
+    },
+    {
       "relativePath": "dist/components/social/social-feed.js",
       "bytes": 754,
       "budgetBytes": 40960,
@@ -1087,7 +1110,7 @@
       "owner": "shared"
     },
     {
-      "relativePath": "dist/chunk-C45N6UDD.js",
+      "relativePath": "dist/chunk-YE5KH5EP.js",
       "bytes": 734,
       "budgetBytes": 40960,
       "passed": true,
@@ -1115,13 +1138,6 @@
       "owner": "DataGrid"
     },
     {
-      "relativePath": "dist/server.js",
-      "bytes": 717,
-      "budgetBytes": 40960,
-      "passed": true,
-      "owner": "shared"
-    },
-    {
       "relativePath": "dist/components/data/resource-list.js",
       "bytes": 702,
       "budgetBytes": 40960,
@@ -1136,6 +1152,13 @@
       "owner": "shared"
     },
     {
+      "relativePath": "dist/chunk-ULERLOV7.js",
+      "bytes": 692,
+      "budgetBytes": 40960,
+      "passed": true,
+      "owner": "shared"
+    },
+    {
       "relativePath": "dist/chunk-UKPEEFUL.js",
       "bytes": 676,
       "budgetBytes": 40960,
@@ -1145,13 +1168,6 @@
     {
       "relativePath": "dist/chunk-5V5ZWN36.js",
       "bytes": 660,
-      "budgetBytes": 40960,
-      "passed": true,
-      "owner": "shared"
-    },
-    {
-      "relativePath": "dist/chunk-K7KT6VKH.js",
-      "bytes": 636,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"
@@ -1689,6 +1705,20 @@
       "owner": "shared"
     },
     {
+      "relativePath": "dist/scholia.js",
+      "bytes": 214,
+      "budgetBytes": 40960,
+      "passed": true,
+      "owner": "shared"
+    },
+    {
+      "relativePath": "dist/themes/scholia.js",
+      "bytes": 213,
+      "budgetBytes": 40960,
+      "passed": true,
+      "owner": "shared"
+    },
+    {
       "relativePath": "dist/studio.js",
       "bytes": 212,
       "budgetBytes": 40960,
@@ -2102,6 +2132,13 @@
       "owner": "shared"
     },
     {
+      "relativePath": "dist/chunk-NHDWSEP3.js",
+      "bytes": 118,
+      "budgetBytes": 40960,
+      "passed": true,
+      "owner": "shared"
+    },
+    {
       "relativePath": "dist/components/stable/kbd.js",
       "bytes": 118,
       "budgetBytes": 40960,
@@ -2221,6 +2258,13 @@
       "owner": "shared"
     },
     {
+      "relativePath": "dist/chunk-M2AAPTCT.js",
+      "bytes": 101,
+      "budgetBytes": 40960,
+      "passed": true,
+      "owner": "shared"
+    },
+    {
       "relativePath": "dist/chunk-7VYZ5XG3.js",
       "bytes": 98,
       "budgetBytes": 40960,
@@ -2279,6 +2323,13 @@
     {
       "relativePath": "dist/chunk-VD2DHVLS.js",
       "bytes": 90,
+      "budgetBytes": 40960,
+      "passed": true,
+      "owner": "shared"
+    },
+    {
+      "relativePath": "dist/scholia/server.js",
+      "bytes": 89,
       "budgetBytes": 40960,
       "passed": true,
       "owner": "shared"

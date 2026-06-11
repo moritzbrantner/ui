@@ -46,9 +46,22 @@ Import exactly one concrete global stylesheet in an app:
 import "@moritzbrantner/ui/styles.css";
 ```
 
-Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css`, `@moritzbrantner/ui/studio/styles.css`, `@moritzbrantner/ui/paper/styles.css`, and `@moritzbrantner/ui/pop/styles.css` replace the default stylesheet for product surfaces with different visual needs. Each theme stylesheet imports the shared generated `base.css` layer and only its own token blocks. Theme stylesheets provide Tailwind setup, animation helpers, component normalization, and theme tokens; they do not scan package component source strings.
+Theme-specific stylesheets such as `@moritzbrantner/ui/atlas/styles.css`, `@moritzbrantner/ui/studio/styles.css`, `@moritzbrantner/ui/paper/styles.css`, `@moritzbrantner/ui/scholia/styles.css`, and `@moritzbrantner/ui/pop/styles.css` replace the default stylesheet for product surfaces with different visual needs. Each theme stylesheet imports the shared generated `base.css` layer and only its own token blocks. Theme stylesheets provide Tailwind setup, animation helpers, component normalization, and theme tokens; they do not scan package component source strings.
 
-Use `studio` for creative production and editing surfaces, `pop` when those creator products need a public-facing polished Studio expression, and `pulse` when component movement should clarify opening, closing, expansion, collapse, and selection changes.
+Use `bobba` for default platform apps, `zleek` for polished glass shells, `atlas` for dense dashboards and analytics, `studio` for creative production and editing surfaces, `paper` for document or research-heavy interfaces, `scholia` for scholarly archives and reference workbenches, `pop` when Studio-adjacent creator products need a public-facing expression, and `pulse` when component movement should clarify opening, closing, expansion, collapse, and selection changes.
+
+### Theme Selection Matrix
+
+| Theme   | Role                        | Primary Surfaces                                                        | Density     | Motion     | Avoid Using For                                              |
+| ------- | --------------------------- | ----------------------------------------------------------------------- | ----------- | ---------- | ------------------------------------------------------------ |
+| Bobba   | Default platform style      | Shared apps, admin, core components                                     | Balanced    | Standard   | Highly branded or highly dense surfaces                      |
+| Zleek   | Glass shell style           | Command centers, launch tools, polished shells                          | Balanced    | Expressive | Dense tables or long-form reading                            |
+| Atlas   | Dense operational style     | Maps, analytics, tables, dashboards                                     | Compact     | Quiet      | Public marketing or celebratory flows                        |
+| Studio  | Creative production style   | Media, generation, editing tools                                        | Comfortable | Expressive | Dense back-office dashboards                                 |
+| Paper   | Document and research style | OCR, translation, text-heavy tools                                      | Compact     | Quiet      | Kinetic or showcase experiences                              |
+| Scholia | Scholarly archive style     | Source editions, citations, reference workbenches                       | Compact     | Quiet      | Generic document apps without archival needs                 |
+| Pop     | Studio public expression    | Creator onboarding, public creator surfaces, showcases                  | Comfortable | Expressive | Operational admin or dense data pages                        |
+| Pulse   | Kinetic interaction style   | Expand and collapse flows, selection-heavy controls, spatial interfaces | Comfortable | Energetic  | Long reading, quiet admin, reduced-motion-critical workflows |
 
 Import `@moritzbrantner/ui/component-sources.css` when an app renders package components:
 
@@ -74,6 +87,14 @@ Import classes are intentionally split:
 - Server-only metadata: `@moritzbrantner/ui/<theme>/server` and `@moritzbrantner/ui/server`.
 
 Apps should still import exactly one concrete stylesheet such as `@moritzbrantner/ui/styles.css`, `@moritzbrantner/ui/atlas/styles.css`, or `@moritzbrantner/ui/pop/styles.css`. Add `@moritzbrantner/ui/component-sources.css` when rendering package components. Use `@moritzbrantner/ui/theme-scopes.css` only for explicit multi-theme coexistence.
+
+Theme import recipes:
+
+- Default platform app: import `@moritzbrantner/ui/styles.css` and `@moritzbrantner/ui/component-sources.css`.
+- Single specialized app: import one stylesheet such as `@moritzbrantner/ui/atlas/styles.css`, add `@moritzbrantner/ui/component-sources.css` when package components render, and import `AtlasTheme` or `uiTheme` from `@moritzbrantner/ui/atlas`.
+- Server metadata: import `uiTheme` from `@moritzbrantner/ui/<theme>/server`.
+- Multi-theme coexistence: import `@moritzbrantner/ui/theme-scopes.css`, wrap subtrees with `UiTheme` or a specific theme wrapper, and add `component-sources.css` only when package components render.
+- Custom theme override: render `UiTheme theme="custom"` with `createUiTheme({ ...tokens })`; unknown token names are ignored.
 
 ## App Recipes
 

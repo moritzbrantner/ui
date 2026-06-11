@@ -228,20 +228,22 @@ function PopConsumerDemo() {
   );
 }
 
-function PulseRealtimeDemo() {
+function PulseKineticDemo() {
   return (
     <UiTheme theme="pulse" className="rounded-[var(--ui-radius-overlay)] bg-background p-5">
       <div className="grid gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--ui-radius-surface)] border border-border/60 bg-card p-[var(--ui-card-padding)] shadow-[var(--ui-shadow-surface)]">
           <div className="grid gap-1">
-            <h2 className="text-lg font-semibold leading-snug">Realtime command surface</h2>
-            <p className="text-sm text-muted-foreground">Active controls backed by live tokens.</p>
+            <h2 className="text-lg font-semibold leading-snug">Kinetic interaction surface</h2>
+            <p className="text-sm text-muted-foreground">
+              Choreographed controls for opening, closing, expansion, and selection changes.
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <LiveIndicator status="streaming" label="Stream" detail="1.2k/min" />
+            <LiveIndicator status="streaming" label="Flow" detail="1.2k/min" />
             <Button>
               <RefreshCwIcon />
-              Sync now
+              Refresh motion
             </Button>
           </div>
         </div>
@@ -283,8 +285,10 @@ function PulseRealtimeDemo() {
         </div>
         <Card data-interactive="true">
           <CardHeader>
-            <CardTitle>Live activity</CardTitle>
-            <CardDescription>Continuous motion is reserved for active status.</CardDescription>
+            <CardTitle>Spatial state changes</CardTitle>
+            <CardDescription>
+              Motion is reserved for active selections and meaningful transitions.
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3">
             <div className="grid gap-2 sm:grid-cols-2">
@@ -329,10 +333,10 @@ export const ScholiaArchiveSurface: Story = {
   ),
 };
 
-export const PulseRealtimeSurface: Story = {
+export const PulseKineticInteractionSurface: Story = {
   render: () => (
     <ThemeShowcaseFrame>
-      <PulseRealtimeDemo />
+      <PulseKineticDemo />
     </ThemeShowcaseFrame>
   ),
 };
@@ -341,7 +345,7 @@ export const SideBySide: Story = {
   render: () => (
     <div className="grid w-[min(1180px,calc(100vw-2rem))] gap-4 xl:grid-cols-2">
       <PopConsumerDemo />
-      <PulseRealtimeDemo />
+      <PulseKineticDemo />
     </div>
   ),
 };
