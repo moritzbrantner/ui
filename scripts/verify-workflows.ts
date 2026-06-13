@@ -136,6 +136,7 @@ function verifyWorkflow(workflowPath: string) {
     verifyCallInputs(relativeWorkflowPath, jobName, job, remoteWorkflow);
     verifyCallSecrets(relativeWorkflowPath, jobName, job, remoteWorkflow);
     verifyCallPermissions(relativeWorkflowPath, workflow, jobName, job, remoteWorkflow);
+    verifyProjectRuntimePrerequisites(relativeWorkflowPath, jobName, job, reusableWorkflowRef);
   }
 }
 
@@ -228,6 +229,40 @@ function verifyCallPermissions(
       }
     }
   }
+}
+
+function verifyProjectRuntimePrerequisites(
+  workflowPath: string,
+  jobName: string,
+  job: WorkflowJob,
+  reusableWorkflowRef: ReusableWorkflowRef,
+) {
+  if (reusableWorkflowRef.workflowPath !== ".github/workflows/performance-validation.yml") {
+    return;
+  }
+
+  const unlighthouseCommand = stringInput(job.with?.unlighthouse_command);
+
+  if (!unlighthouseCommand) {
+    return;
+  }
+
+  const prerequisiteCommands = [
+    stringInput(job.with?.pre_command),
+    stringInput(job.with?.build_command),
+    unlighthouseCommand,
+  ].join("\n");
+
+  if (
+    !/playwright\s+install/.test(prerequisiteCommands) ||
+    !/\bchromium\b/.test(prerequisiteCommands)
+  ) {
+    errors.push(`${workflowPath}:${jobName} runs Unlighthouse without installing Chromium first`);
+  }
+}
+
+function stringInput(value: unknown): string {
+  return typeof value === "string" ? value : "";
 }
 
 function parseWorkflow(workflowPath: string): Workflow {
