@@ -33,7 +33,13 @@ type WorkflowJob = {
   with?: Record<string, unknown>;
   secrets?: Record<string, unknown> | "inherit";
   permissions?: Permissions;
+  steps?: WorkflowStep[];
   jobs?: never;
+};
+
+type WorkflowStep = {
+  name?: string;
+  run?: string;
 };
 
 type Permissions = Record<string, string> | "read-all" | "write-all";
@@ -106,6 +112,8 @@ function verifyWorkflow(workflowPath: string) {
   const relativeWorkflowPath = path.relative(packageRoot, workflowPath);
 
   for (const [jobName, job] of Object.entries(jobs)) {
+    verifyDirectJobSteps(relativeWorkflowPath, jobName, job);
+
     if (!job.uses) {
       continue;
     }
@@ -137,6 +145,7 @@ function verifyWorkflow(workflowPath: string) {
     verifyCallSecrets(relativeWorkflowPath, jobName, job, remoteWorkflow);
     verifyCallPermissions(relativeWorkflowPath, workflow, jobName, job, remoteWorkflow);
     verifyProjectRuntimePrerequisites(relativeWorkflowPath, jobName, job, reusableWorkflowRef);
+    verifyPlaywrightInstallMode(relativeWorkflowPath, jobName, job);
   }
 }
 
@@ -237,13 +246,16 @@ function verifyProjectRuntimePrerequisites(
   job: WorkflowJob,
   reusableWorkflowRef: ReusableWorkflowRef,
 ) {
-  if (reusableWorkflowRef.workflowPath !== ".github/workflows/performance-validation.yml") {
-    return;
-  }
+  const unlighthouseCommand =
+    reusableWorkflowRef.workflowPath === ".github/workflows/performance-validation.yml"
+      ? stringInput(job.with?.unlighthouse_command)
+      : "";
+  const visualCommand =
+    reusableWorkflowRef.workflowPath === ".github/workflows/storybook-validation.yml"
+      ? stringInput(job.with?.visual_command)
+      : "";
 
-  const unlighthouseCommand = stringInput(job.with?.unlighthouse_command);
-
-  if (!unlighthouseCommand) {
+  if (!unlighthouseCommand && !visualCommand) {
     return;
   }
 
@@ -251,13 +263,57 @@ function verifyProjectRuntimePrerequisites(
     stringInput(job.with?.pre_command),
     stringInput(job.with?.build_command),
     unlighthouseCommand,
+    visualCommand,
   ].join("\n");
 
   if (
     !/playwright\s+install/.test(prerequisiteCommands) ||
     !/\bchromium\b/.test(prerequisiteCommands)
   ) {
-    errors.push(`${workflowPath}:${jobName} runs Unlighthouse without installing Chromium first`);
+    errors.push(
+      `${workflowPath}:${jobName} runs browser-based checks without installing Chromium first`,
+    );
+  }
+}
+
+function verifyPlaywrightInstallMode(workflowPath: string, jobName: string, job: WorkflowJob) {
+  const workflowCommands = [
+    stringInput(job.with?.install_command),
+    stringInput(job.with?.pre_command),
+    stringInput(job.with?.build_command),
+    stringInput(job.with?.storybook_build_command),
+    stringInput(job.with?.storybook_test_command),
+    stringInput(job.with?.visual_command),
+    stringInput(job.with?.unlighthouse_command),
+    stringInput(job.with?.benchmark_command),
+    stringInput(job.with?.bundle_size_command),
+    stringInput(job.with?.post_command),
+  ].join("\n");
+
+  if (/playwright\s+install\s+.*--with-deps/.test(workflowCommands)) {
+    errors.push(
+      `${workflowPath}:${jobName} uses playwright install --with-deps, which can fail on hosted runner apt repositories`,
+    );
+  }
+
+  if (job.with?.install_playwright === true) {
+    errors.push(
+      `${workflowPath}:${jobName} enables reusable install_playwright, which currently runs playwright install --with-deps`,
+    );
+  }
+}
+
+function verifyDirectJobSteps(workflowPath: string, jobName: string, job: WorkflowJob) {
+  for (const [stepIndex, step] of (job.steps ?? []).entries()) {
+    if (!step.run || !/playwright\s+install\s+.*--with-deps/.test(step.run)) {
+      continue;
+    }
+
+    const stepName = step.name ?? `step ${stepIndex + 1}`;
+
+    errors.push(
+      `${workflowPath}:${jobName}:${stepName} uses playwright install --with-deps, which can fail on hosted runner apt repositories`,
+    );
   }
 }
 
