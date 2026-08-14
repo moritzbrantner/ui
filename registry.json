@@ -1,0 +1,6 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "moritzbrantner",
+  "homepage": "https://github.com/moritzbrantner/ui",
+  "include": ["registry/default/registry.json"]
+}

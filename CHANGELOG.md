@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Minor Changes
+
+- Add a shadcn-compatible source registry as an opt-in distribution path alongside the npm package, with seven pilot items, deterministic source synchronization, upstream schema validation, and GitHub Pages publishing.
+
 ## 1.1.0
 
 ### Minor Changes

@@ -179,6 +179,18 @@ import { Timeline } from "@moritzbrantner/ui/components/labs/timeline";
 
 Data, shell, social, and media components are exposed through `@moritzbrantner/ui/<tier>` and `@moritzbrantner/ui/components/<tier>/*`; they are not root-exported.
 
+### Source-owned installation
+
+The package also publishes a shadcn-compatible source registry for apps that should own and adapt component implementations:
+
+```sh
+bunx shadcn@4.18.0 add moritzbrantner/ui/button
+```
+
+This is a distribution choice, not a separate visual system. Registry items preserve the same semantic tokens, restrained surfaces, state-light ownership boundary, and component contracts as the npm package. The initial catalog includes foundational controls plus `DescriptionList` and `MetricStrip`, which encode the preferred alternatives to repeated information cards.
+
+See [the source registry guide](./docs/registry.md) for the catalog, maintainer workflow, and migration policy.
+
 Migration examples:
 
 | Old                                           | New                                                 |

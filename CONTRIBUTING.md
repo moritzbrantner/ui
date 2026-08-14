@@ -53,6 +53,22 @@ Tier policy:
 
 New component subpaths must be tiered, for example `@moritzbrantner/ui/components/stable/button` or `@moritzbrantner/ui/components/data/data-grid`. Do not add compatibility wrappers for the removed flat `@moritzbrantner/ui/components/*` paths.
 
+## Registry checklist
+
+Registry distribution is opt-in. A component can remain package-only until its dependency graph and local-ownership story are clear.
+
+Before adding a registry item:
+
+- Keep `src/` as the canonical implementation.
+- Add the source mapping to `scripts/sync-registry.ts`.
+- Declare the item, npm dependencies, registry dependencies, and target placeholder in `registry/default/registry.json`.
+- Use `@ui/`, `@lib/`, or `@hooks/` targets so consumer aliases remain configurable.
+- Run `bun run sync:registry` after changing mapped source.
+- Run `bun run verify:registry` to reject drift and validate the upstream schema through the pinned shadcn CLI.
+- Install the built item into a disposable consumer before expanding a complex dependency graph.
+
+Do not hand-edit generated files in `registry/default/lib` or `registry/default/ui`.
+
 ## Storybook checklist
 
 Every release-blocking public tier component must appear in Storybook through a registry-listed file.
