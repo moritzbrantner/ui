@@ -4,6 +4,8 @@
 
 ## Import Boundaries
 
+The design system has two distribution modes. Package imports provide centralized upgrades and stable entrypoints. The [source registry](./registry.md) installs component source into an app for local ownership. Choose distribution per component; do not fork the visual language or product ownership boundary.
+
 Use `@moritzbrantner/ui` for `stable` and generic `patterns` components, `cn`, and theme client APIs. Use `@moritzbrantner/ui/client` as the matching client convenience barrel. Neither root nor client exports focused tiers or `labs`.
 
 Use tiered component subpaths for bundle-sensitive comprehensive apps. Use `@moritzbrantner/ui/server` for server-safe helpers and theme metadata such as `cn`, `themeConfig`, `uiThemeNames`, and `createUiTheme`.

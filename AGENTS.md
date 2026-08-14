@@ -10,6 +10,8 @@ Keep product workflows, routing, auth/session state, backend contracts, settings
 
 - `src/components/`: reusable React components, component tests, and component stories. Public components should accept `className`, forward DOM props, use `data-slot`, and be exported from `src/index.ts`.
 - `src/`: package entrypoints, theme metadata, hooks, helpers, and package-level tests.
+- `registry.json`, `registry/default/registry.json`: shadcn-compatible registry catalog and dependency graph.
+- `registry/default/lib/`, `registry/default/ui/`: committed, generated registry source. Update package source and run `bun run sync:registry`; do not edit these files directly.
 - `styles.css`, `theme-scopes.css`, `zleek/`, `bobba/`, `atlas/`, `studio/`, `paper/`, `pop/`, `pulse/`: published global styles and theme-specific CSS entrypoints.
 - `.storybook/`: Storybook configuration and preview theme wiring.
 - `scripts/`: local verification, package-contract, coverage, benchmark, and hygiene scripts.
@@ -34,6 +36,9 @@ Keep product workflows, routing, auth/session state, backend contracts, settings
 - Consumer example verification: `bun run verify:consumer`
 - Visual tests only: `bun run test:visual`
 - Storybook build: `bun run build-storybook`
+- Synchronize shadcn registry source: `bun run sync:registry`
+- Validate and build the registry: `bun run verify:registry`
+- Build static registry JSON: `bun run build:registry`
 - Repo hygiene report: `bun run check:hygiene`
 
 Before running visual tests locally for the first time, install the Chromium browser with `bunx playwright install chromium`. CI uses `bunx playwright install --with-deps chromium`.
@@ -52,11 +57,13 @@ Before tagging, dispatching, or publishing manually, run `bun run verify:release
 - `playwright-report/`
 - `test-results/`
 - `storybook-static/`
+- `public/r/`
 - `*.tgz`
 - `bun.lock` except through Bun dependency/install operations
 - `examples/consumer/bun.lock` except through Bun operations inside `examples/consumer/`
 
 Do not hand-edit generated package output in `dist/`; change source files and run `bun run build`.
+Do not hand-edit generated source under `registry/default/lib/` or `registry/default/ui/`; change the mapped package source and run `bun run sync:registry`.
 
 ## Generated And Expensive Artifacts
 

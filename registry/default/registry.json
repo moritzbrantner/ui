@@ -1,0 +1,131 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "items": [
+    {
+      "name": "cn",
+      "type": "registry:lib",
+      "title": "Class Name Utility",
+      "description": "Merges conditional class names and resolves Tailwind conflicts.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [
+        {
+          "path": "lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn.ts"
+        }
+      ]
+    },
+    {
+      "name": "moritz-theme",
+      "type": "registry:theme",
+      "title": "Moritz UI Foundation",
+      "description": "The compact control, radius, focus, motion, and interaction tokens used by Moritz UI components.",
+      "cssVars": {
+        "light": {
+          "ui-radius-control": "calc(var(--radius) - 0.125rem)",
+          "ui-control-height-xs": "1.5rem",
+          "ui-control-height-sm": "2rem",
+          "ui-control-height-md": "2.25rem",
+          "ui-control-height-lg": "2.5rem",
+          "ui-control-padding-x-sm": "0.75rem",
+          "ui-control-padding-x-md": "1rem",
+          "ui-control-gap": "0.5rem",
+          "ui-focus-ring-width": "3px",
+          "ui-motion-hover-y": "-1px",
+          "ui-motion-hover-scale": "1.012",
+          "ui-motion-press-scale": "0.985",
+          "ui-motion-duration-base": "150ms",
+          "ui-motion-ease-standard": "cubic-bezier(0.2, 0, 0, 1)",
+          "ui-shadow-interactive": "0 10px 24px oklch(0.22 0.035 255 / 0.12)",
+          "ui-button-height-xs": "var(--ui-control-height-xs)",
+          "ui-button-height-sm": "var(--ui-control-height-sm)",
+          "ui-button-height-md": "var(--ui-control-height-md)",
+          "ui-button-height-lg": "var(--ui-control-height-lg)",
+          "ui-button-padding-x-xs": "0.5rem",
+          "ui-button-padding-x-sm": "var(--ui-control-padding-x-sm)",
+          "ui-button-padding-x-md": "var(--ui-control-padding-x-md)",
+          "ui-button-padding-x-lg": "1.5rem",
+          "ui-button-radius": "var(--ui-radius-control)",
+          "ui-input-height": "var(--ui-control-height-md)",
+          "ui-input-padding-x": "var(--ui-control-padding-x-sm)",
+          "ui-input-radius": "var(--ui-radius-control)"
+        },
+        "dark": {
+          "ui-shadow-interactive": "0 10px 24px oklch(0.05 0.02 255 / 0.32)"
+        }
+      }
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "An accessible action control with intentional variants, compact sizes, and restrained motion.",
+      "dependencies": ["class-variance-authority", "radix-ui"],
+      "registryDependencies": ["moritzbrantner/ui/cn", "moritzbrantner/ui/moritz-theme"],
+      "files": [
+        {
+          "path": "ui/button.tsx",
+          "type": "registry:ui",
+          "target": "@ui/button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "A compact text input with semantic focus and invalid states.",
+      "registryDependencies": ["moritzbrantner/ui/cn", "moritzbrantner/ui/moritz-theme"],
+      "files": [
+        {
+          "path": "ui/input.tsx",
+          "type": "registry:ui",
+          "target": "@ui/input.tsx"
+        }
+      ]
+    },
+    {
+      "name": "label",
+      "type": "registry:ui",
+      "title": "Label",
+      "description": "An accessible form label with disabled-state propagation.",
+      "dependencies": ["radix-ui"],
+      "registryDependencies": ["moritzbrantner/ui/cn"],
+      "files": [
+        {
+          "path": "ui/label.tsx",
+          "type": "registry:ui",
+          "target": "@ui/label.tsx"
+        }
+      ]
+    },
+    {
+      "name": "description-list",
+      "type": "registry:ui",
+      "title": "Description List",
+      "description": "A dense semantic facts layout that avoids turning each value into a card.",
+      "registryDependencies": ["moritzbrantner/ui/cn"],
+      "files": [
+        {
+          "path": "ui/description-list.tsx",
+          "type": "registry:ui",
+          "target": "@ui/description-list.tsx"
+        }
+      ]
+    },
+    {
+      "name": "metric-strip",
+      "type": "registry:ui",
+      "title": "Metric Strip",
+      "description": "A single contextual metric surface for decision-relevant values, comparisons, and trends.",
+      "registryDependencies": ["moritzbrantner/ui/cn"],
+      "files": [
+        {
+          "path": "ui/metric-strip.tsx",
+          "type": "registry:ui",
+          "target": "@ui/metric-strip.tsx"
+        }
+      ]
+    }
+  ]
+}
