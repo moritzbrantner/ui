@@ -12,7 +12,7 @@ Keep product workflows, routing, auth/session state, backend contracts, settings
 - `src/`: package entrypoints, theme metadata, hooks, helpers, and package-level tests.
 - `registry.json`, `registry/default/registry.json`: shadcn-compatible registry catalog and dependency graph.
 - `registry/default/lib/`, `registry/default/ui/`: committed, generated registry source. Update package source and run `bun run sync:registry`; do not edit these files directly.
-- `styles.css`, `theme-scopes.css`, `zleek/`, `bobba/`, `atlas/`, `studio/`, `paper/`, `pop/`, `pulse/`: published global styles and theme-specific CSS entrypoints.
+- `styles.css`, `theme-scopes.css`, `zleek/`, `bobba/`, `atlas/`, `studio/`, `paper/`, `scholia/`, `pop/`, `pulse/`: published global styles and theme-specific CSS entrypoints.
 - `.storybook/`: Storybook configuration and preview theme wiring.
 - `scripts/`: local verification, package-contract, coverage, benchmark, and hygiene scripts.
 - `visual/`: Playwright visual/layout checks. These start Storybook on port `6007`.
@@ -63,7 +63,7 @@ Before tagging, dispatching, or publishing manually, run `bun run verify:release
 - `examples/consumer/bun.lock` except through Bun operations inside `examples/consumer/`
 
 Do not hand-edit generated package output in `dist/`; change source files and run `bun run build`.
-Do not hand-edit generated source under `registry/default/lib/` or `registry/default/ui/`; change the mapped package source and run `bun run sync:registry`.
+Do not hand-edit generated source under `registry/default/lib/`, `registry/default/styles/`, or `registry/default/ui/`; change the mapped package source and run `bun run sync:registry`.
 
 ## Generated And Expensive Artifacts
 

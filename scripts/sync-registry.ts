@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 type RegistrySource = {
   source: string;
   target: string;
+  replacements?: readonly (readonly [from: string, to: string])[];
 };
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -24,15 +25,42 @@ const registrySources: readonly RegistrySource[] = [
     source: "src/components/stable/metric-strip.tsx",
     target: "registry/default/ui/metric-strip.tsx",
   },
+  {
+    source: "src/components/patterns/source-passage.tsx",
+    target: "registry/default/ui/source-passage.tsx",
+  },
+  {
+    source: "src/components/patterns/apparatus-list.tsx",
+    target: "registry/default/ui/apparatus-list.tsx",
+  },
+  {
+    source: "src/components/patterns/scholarly-note.tsx",
+    target: "registry/default/ui/scholarly-note.tsx",
+  },
+  {
+    source: "src/components/patterns/scholia-source-workbench.tsx",
+    target: "registry/default/ui/scholia-source-workbench.tsx",
+    replacements: [
+      ['from "./apparatus-list"', 'from "@/registry/default/ui/apparatus-list"'],
+      ['from "./scholarly-note"', 'from "@/registry/default/ui/scholarly-note"'],
+      ['from "./source-passage"', 'from "@/registry/default/ui/source-passage"'],
+    ],
+  },
+  { source: "base.css", target: "registry/default/styles/moritz-base.css" },
+  {
+    source: "scholia/styles.css",
+    target: "registry/default/styles/scholia.css",
+    replacements: [['@import "../base.css";', '@import "./moritz-base.css";']],
+  },
 ];
 const expectedTargets = new Set(registrySources.map(({ target }) => target));
 const errors: string[] = [];
 let updated = 0;
 
-for (const { source, target } of registrySources) {
+for (const { source, target, replacements } of registrySources) {
   const sourcePath = path.join(packageRoot, source);
   const targetPath = path.join(packageRoot, target);
-  const expected = toRegistrySource(readFileSync(sourcePath, "utf8"));
+  const expected = toRegistrySource(readFileSync(sourcePath, "utf8"), replacements);
   const current = existsSync(targetPath) ? readFileSync(targetPath, "utf8") : null;
 
   if (current === expected) {
@@ -49,7 +77,11 @@ for (const { source, target } of registrySources) {
   updated += 1;
 }
 
-for (const directory of ["registry/default/lib", "registry/default/ui"]) {
+for (const directory of [
+  "registry/default/lib",
+  "registry/default/styles",
+  "registry/default/ui",
+]) {
   const directoryPath = path.join(packageRoot, directory);
 
   if (!existsSync(directoryPath)) {
@@ -57,7 +89,7 @@ for (const directory of ["registry/default/lib", "registry/default/ui"]) {
   }
 
   for (const entryName of readdirSync(directoryPath)) {
-    if (!entryName.endsWith(".ts") && !entryName.endsWith(".tsx")) {
+    if (!entryName.endsWith(".css") && !entryName.endsWith(".ts") && !entryName.endsWith(".tsx")) {
       continue;
     }
 
@@ -86,6 +118,15 @@ if (checkOnly) {
   console.log(`Synchronized ${registrySources.length} registry source files (${updated} updated).`);
 }
 
-function toRegistrySource(source: string): string {
-  return source.replaceAll('from "../../lib/cn"', 'from "@/registry/default/lib/cn"');
+function toRegistrySource(
+  source: string,
+  replacements: RegistrySource["replacements"] = [],
+): string {
+  let result = source.replaceAll('from "../../lib/cn"', 'from "@/registry/default/lib/cn"');
+
+  for (const [from, to] of replacements) {
+    result = result.replaceAll(from, to);
+  }
+
+  return result;
 }
