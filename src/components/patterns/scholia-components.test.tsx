@@ -74,6 +74,9 @@ describe("Scholia source components", () => {
     expect(screen.getByTestId("note").tagName).toBe("ASIDE");
     expect(screen.getByTestId("note").getAttribute("data-tone")).toBe("translation");
     expect(screen.getByTestId("note").className).toContain("custom-note");
+    expect(screen.getByTestId("note").className).toContain(
+      "border-l-[color:var(--document-citation)]",
+    );
   });
 
   test("composes source data without owning corpus workflow state", () => {
@@ -115,11 +118,25 @@ describe("Scholia source components", () => {
       />,
     );
 
-    expect(screen.getByTestId("workbench").getAttribute("data-slot")).toBe(
-      "scholia-source-workbench",
+    const workbench = screen.getByTestId("workbench");
+    expect(workbench.getAttribute("data-slot")).toBe("scholia-source-workbench");
+    expect(workbench.querySelector('[data-slot="scholia-source-workbench-main"]')?.tagName).toBe(
+      "DIV",
     );
     expect(screen.getByRole("heading", { name: "Critical apparatus" })).toBeTruthy();
     expect(screen.getByText("Keep the weakest faithful reading")).toBeTruthy();
     expect(screen.getByText("Reference text")).toBeTruthy();
+  });
+
+  test("uses the full passage width when no translation is supplied", () => {
+    render(<ScholiaSourceWorkbench title="Fragment" original="λόγος" data-testid="workbench" />);
+
+    const workbench = screen.getByTestId("workbench");
+    expect(workbench.querySelector('[data-slot="source-passage-columns"]')?.className).toContain(
+      "md:grid-cols-1",
+    );
+    expect(workbench.querySelector('[data-slot="source-passage-text"]')?.className).toContain(
+      "md:px-0",
+    );
   });
 });

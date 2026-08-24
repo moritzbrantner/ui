@@ -14,10 +14,10 @@ type ScholarlyNoteProps = Omit<React.ComponentPropsWithoutRef<"aside">, "title">
 };
 
 const toneClassNames = {
-  annotation: "border-l-[var(--document-annotation)]",
-  commentary: "border-l-[var(--document-margin-note)]",
-  translation: "border-l-[var(--document-citation)]",
-  variant: "border-l-[var(--document-callout)]",
+  annotation: "border-l-[color:var(--document-annotation)]",
+  commentary: "border-l-[color:var(--document-margin-note)]",
+  translation: "border-l-[color:var(--document-citation)]",
+  variant: "border-l-[color:var(--document-callout)]",
 } satisfies Record<ScholarlyNoteTone, string>;
 
 function ScholarlyNote({

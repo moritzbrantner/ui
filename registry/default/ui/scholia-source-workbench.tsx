@@ -116,18 +116,21 @@ function ScholiaSourceWorkbench({
           metadata || notes.length > 0 ? "lg:grid-cols-[minmax(0,1fr)_18rem]" : undefined,
         )}
       >
-        <main data-slot="scholia-source-workbench-main" className="grid min-w-0 gap-5 p-4 md:p-5">
+        <div data-slot="scholia-source-workbench-main" className="grid min-w-0 gap-5 p-4 md:p-5">
           <SourcePassage>
             <SourcePassageHeader>
               <SourcePassageTitle>{title}</SourcePassageTitle>
               {locator ? <SourcePassageLocator>{locator}</SourcePassageLocator> : null}
             </SourcePassageHeader>
-            <SourcePassageColumns>
+            <SourcePassageColumns
+              className={translation ? undefined : "md:grid-cols-1 md:divide-x-0"}
+            >
               <SourcePassageText
                 label={originalLabel}
                 language={originalLanguage}
                 lang={originalLanguageCode}
                 dir={originalDirection}
+                className={translation ? undefined : "md:px-0"}
               >
                 {original}
               </SourcePassageText>
@@ -148,7 +151,7 @@ function ScholiaSourceWorkbench({
               <ApparatusList entries={apparatus} />
             </section>
           ) : null}
-        </main>
+        </div>
         {metadata || notes.length > 0 ? (
           <aside
             data-slot="scholia-source-workbench-sidebar"
