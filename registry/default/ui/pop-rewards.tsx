@@ -11,7 +11,7 @@ import {
 } from "motion/react";
 
 import { cn } from "@/registry/default/lib/cn";
-import { UiMotionProvider } from "./theme-motion";
+import { UiMotionProvider } from "@/registry/default/ui/theme-motion";
 
 type PopRewardLevel = "subtle" | "satisfying" | "celebration";
 
