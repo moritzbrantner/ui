@@ -66,11 +66,23 @@ describe("Pop rewards", () => {
     expect(screen.getByRole("status").getAttribute("data-reward-level")).toBe("satisfying");
   });
 
+  test("formats counters with an explicit deterministic locale", () => {
+    render(
+      <CelebrationProvider reducedMotion="always">
+        <AnimatedCounter value={1000} />
+        <AnimatedCounter value={1000} locale="de-DE" />
+      </CelebrationProvider>,
+    );
+
+    expect(screen.getAllByText("1,000")).toHaveLength(2);
+    expect(screen.getAllByText("1.000")).toHaveLength(2);
+  });
+
   test("announces counters and exposes accessible progress semantics", () => {
     const { rerender } = render(
       <CelebrationProvider reducedMotion="always">
         <AnimatedCounter value={2} data-testid="counter" />
-        <ProgressPop value={30} max={60} label="Collection progress" />
+        <ProgressPop value={30} max={60} label={<span>Collection progress</span>} />
       </CelebrationProvider>,
     );
 

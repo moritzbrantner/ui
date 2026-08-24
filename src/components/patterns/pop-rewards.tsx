@@ -256,14 +256,22 @@ function SuccessPop({
 type AnimatedCounterProps = Omit<React.ComponentProps<"span">, "children"> & {
   value: number;
   format?: (value: number) => React.ReactNode;
+  locale?: string | string[];
   level?: PopRewardLevel;
 };
 
-function AnimatedCounter({ value, format, level, className, ...props }: AnimatedCounterProps) {
+function AnimatedCounter({
+  value,
+  format,
+  locale = "en-US",
+  level,
+  className,
+  ...props
+}: AnimatedCounterProps) {
   const reward = usePopReward(level);
   const previousValue = React.useRef(value);
   const direction = value >= previousValue.current ? 1 : -1;
-  const renderedValue = format ? format(value) : value.toLocaleString();
+  const renderedValue = format ? format(value) : value.toLocaleString(locale);
 
   React.useEffect(() => {
     previousValue.current = value;
@@ -325,6 +333,7 @@ function ProgressPop({
   ...props
 }: ProgressPopProps) {
   const reward = usePopReward(level);
+  const labelId = React.useId();
   const safeMax = max > 0 ? max : 1;
   const clampedValue = Math.min(Math.max(value, 0), safeMax);
   const percentage = Math.round((clampedValue / safeMax) * 100);
@@ -338,7 +347,9 @@ function ProgressPop({
       {...props}
     >
       <div className="flex items-center justify-between gap-3 text-sm">
-        <span className="font-medium text-foreground">{label}</span>
+        <span id={labelId} className="font-medium text-foreground">
+          {label}
+        </span>
         {showValue ? (
           <span className="tabular-nums text-muted-foreground">{percentage}%</span>
         ) : null}
@@ -346,7 +357,7 @@ function ProgressPop({
       <div
         data-slot="progress-pop-track"
         role="progressbar"
-        aria-label={typeof label === "string" ? label : "Progress"}
+        aria-labelledby={labelId}
         aria-valuemin={0}
         aria-valuemax={safeMax}
         aria-valuenow={clampedValue}
