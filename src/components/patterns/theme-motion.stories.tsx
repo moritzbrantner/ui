@@ -23,6 +23,7 @@ function MotionProfileDemo({ profile }: { profile: UiMotionProfileName }) {
     <UiTheme
       theme={profile}
       data-slot={`${profile}-motion-demo`}
+      data-testid={`${profile}-motion-demo`}
       className="grid min-h-[430px] gap-5 rounded-[var(--ui-radius-overlay)] border bg-background p-5 shadow-[var(--ui-shadow-surface)]"
     >
       <UiMotionProvider profile={profile}>
@@ -74,7 +75,7 @@ function MotionProfileDemo({ profile }: { profile: UiMotionProfileName }) {
             </MotionTabsContent>
           </MotionTabs>
 
-          <div className="mt-auto min-h-28" aria-label={`${profile} notification preview`}>
+          <div className="mt-auto min-h-28">
             <MotionToast
               open={toastOpen}
               onOpenChange={setToastOpen}
@@ -124,7 +125,7 @@ type Story = StoryObj<typeof meta>;
 
 export const SideBySide: Story = {
   play: async ({ canvas, userEvent }) => {
-    const pulseDemo = within(canvas.getByLabelText("pulse notification preview").parentElement!);
+    const pulseDemo = within(canvas.getByTestId("pulse-motion-demo"));
     const tokensTab = pulseDemo.getByRole("tab", { name: "Tokens" });
 
     await userEvent.click(tokensTab);
