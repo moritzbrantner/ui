@@ -50,10 +50,16 @@ function MotionProfileDemo({ profile }: { profile: UiMotionProfileName }) {
           </div>
 
           <MotionTabs defaultValue="motion">
-            <MotionTabsList>
-              <MotionTabsTrigger value="motion">Motion</MotionTabsTrigger>
-              <MotionTabsTrigger value="tokens">Tokens</MotionTabsTrigger>
-              <MotionTabsTrigger value="accessibility">Accessibility</MotionTabsTrigger>
+            <MotionTabsList className="w-full">
+              <MotionTabsTrigger value="motion" className="px-2">
+                Motion
+              </MotionTabsTrigger>
+              <MotionTabsTrigger value="tokens" className="px-2">
+                Tokens
+              </MotionTabsTrigger>
+              <MotionTabsTrigger value="accessibility" className="px-2">
+                A11y
+              </MotionTabsTrigger>
             </MotionTabsList>
             <MotionTabsContent
               value="motion"
