@@ -118,7 +118,9 @@ export const AristotleChangePassage: Story = {
     </div>
   ),
   play: async ({ canvas }) => {
-    await expect(canvas.getByText("Change as actuality")).toBeVisible();
+    await expect(
+      canvas.getByRole("heading", { level: 1, name: "Change as actuality" }),
+    ).toBeVisible();
     await expect(canvas.getByText("Weakest faithful reading")).toBeVisible();
     await expect(canvas.getByRole("heading", { name: "Critical apparatus" })).toBeVisible();
     await expect(canvas.getByRole("button", { name: "Compare readings" })).toBeVisible();
