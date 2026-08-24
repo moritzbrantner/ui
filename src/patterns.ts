@@ -14,6 +14,7 @@ export * from "./components/patterns/dropzone";
 export * from "./components/patterns/hover-preview";
 export * from "./components/patterns/live-indicator";
 export * from "./components/patterns/menu-actions";
+export * from "./components/patterns/theme-motion";
 export * from "./components/patterns/responsive-action-menu";
 export * from "./components/patterns/scholarly-note";
 export * from "./components/patterns/scholia-source-workbench";

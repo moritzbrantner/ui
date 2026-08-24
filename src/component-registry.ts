@@ -1098,6 +1098,18 @@ const componentRegistry = [
     reason: "Reusable state-light application pattern exported from the root API.",
   },
   {
+    name: "theme-motion",
+    fileName: "theme-motion",
+    tier: "patterns",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/patterns/theme-motion",
+    storyFiles: ["src/components/patterns/theme-motion.stories.tsx"],
+    testFiles: ["src/components/patterns/theme-motion.test.tsx"],
+    status: "pattern",
+    reason:
+      "Explicit Motion-enhanced interaction patterns for the Pop and Pulse theme personalities.",
+  },
+  {
     name: "notification-menu",
     fileName: "notification-menu",
     tier: "shell",

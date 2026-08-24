@@ -212,6 +212,56 @@ registry components, and blocks. Import it from `@moritzbrantner/ui/scholia/serv
 
 See [the source registry guide](./docs/registry.md) for the catalog, maintainer workflow, and migration policy.
 
+### Pop and Pulse motion
+
+The stable primitives keep their lightweight CSS interaction states. Apps that want richer,
+interruptible UI movement can opt into the explicit Motion patterns for `pop` or `pulse`:
+
+```tsx
+import "@moritzbrantner/ui/pop/styles.css";
+import {
+  MotionButton,
+  MotionTabs,
+  MotionTabsContent,
+  MotionTabsList,
+  MotionTabsTrigger,
+  MotionToast,
+  UiMotionProvider,
+} from "@moritzbrantner/ui/components/patterns/theme-motion";
+
+export function MotionExample() {
+  return (
+    <UiMotionProvider profile="pop">
+      <MotionButton>Start creating</MotionButton>
+      <MotionTabs defaultValue="draft">
+        <MotionTabsList>
+          <MotionTabsTrigger value="draft">Draft</MotionTabsTrigger>
+          <MotionTabsTrigger value="share">Share</MotionTabsTrigger>
+        </MotionTabsList>
+        <MotionTabsContent value="draft">Draft content</MotionTabsContent>
+        <MotionTabsContent value="share">Share content</MotionTabsContent>
+      </MotionTabs>
+      <MotionToast open title="Creator kit ready" />
+    </UiMotionProvider>
+  );
+}
+```
+
+`UiMotionProvider` defaults to `reducedMotion="user"`. Pop uses playful lift and spring feedback;
+Pulse uses faster spatial movement for selection-heavy interfaces. Product page transitions,
+route choreography, fetching, persistence, and notification queues remain app-owned.
+
+Source-own the same primitives and install Motion transitively through the registry:
+
+```sh
+bunx shadcn@4.18.0 add moritzbrantner/ui/pop-theme
+bunx shadcn@4.18.0 add moritzbrantner/ui/theme-motion
+```
+
+Use `pulse-theme` instead when the consuming surface needs the Pulse motion personality.
+`popThemeManifest` and `pulseThemeManifest` connect each stylesheet, Motion profile, and registry
+item for tooling and templates.
+
 Migration examples:
 
 | Old                                           | New                                                 |

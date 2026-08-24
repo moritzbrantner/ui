@@ -15,6 +15,7 @@ const checkOnly = process.argv.includes("--check");
 const registrySources: readonly RegistrySource[] = [
   { source: "src/lib/cn.ts", target: "registry/default/lib/cn.ts" },
   { source: "src/components/stable/button.tsx", target: "registry/default/ui/button.tsx" },
+  { source: "src/components/stable/tabs.tsx", target: "registry/default/ui/tabs.tsx" },
   { source: "src/components/stable/input.tsx", target: "registry/default/ui/input.tsx" },
   { source: "src/components/stable/label.tsx", target: "registry/default/ui/label.tsx" },
   {
@@ -46,10 +47,28 @@ const registrySources: readonly RegistrySource[] = [
       ['from "./source-passage"', 'from "@/registry/default/ui/source-passage"'],
     ],
   },
+  {
+    source: "src/components/patterns/theme-motion.tsx",
+    target: "registry/default/ui/theme-motion.tsx",
+    replacements: [
+      ['from "../stable/button"', 'from "@/registry/default/ui/button"'],
+      ['from "../stable/tabs"', 'from "@/registry/default/ui/tabs"'],
+    ],
+  },
   { source: "base.css", target: "registry/default/styles/moritz-base.css" },
   {
     source: "scholia/styles.css",
     target: "registry/default/styles/scholia.css",
+    replacements: [['@import "../base.css";', '@import "./moritz-base.css";']],
+  },
+  {
+    source: "pop/styles.css",
+    target: "registry/default/styles/pop.css",
+    replacements: [['@import "../base.css";', '@import "./moritz-base.css";']],
+  },
+  {
+    source: "pulse/styles.css",
+    target: "registry/default/styles/pulse.css",
     replacements: [['@import "../base.css";', '@import "./moritz-base.css";']],
   },
 ];

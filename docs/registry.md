@@ -54,6 +54,33 @@ The CLI installs transitive registry items such as `cn` and `moritz-theme`. Same
 | `label`            | Accessible form labeling.                                       |
 | `description-list` | Dense semantic facts without card repetition.                   |
 | `metric-strip`     | One contextual surface for decision-relevant metrics.           |
+| `tabs`             | Accessible tabs used by source-owned motion patterns.           |
+
+## Pop and Pulse motion slice
+
+Pop and Pulse retain their generated CSS motion tokens as the lightweight baseline. The optional
+`theme-motion` item installs Motion-enhanced Button, Tabs, and state-controlled Toast patterns for
+interfaces that need interruptible springs, shared layout movement, and presence transitions.
+
+| Item           | Type      | Purpose                                                              |
+| -------------- | --------- | -------------------------------------------------------------------- |
+| `pop-theme`    | Theme     | Pop foundation, light/dark tokens, and expressive CSS motion values. |
+| `pulse-theme`  | Theme     | Pulse foundation, light/dark tokens, and kinetic CSS motion values.  |
+| `tabs`         | Component | Source-owned accessible tab primitive.                               |
+| `theme-motion` | Component | Pop/Pulse provider, Button, Tabs, and accessible Toast patterns.     |
+
+Install one style and the shared Motion source:
+
+```sh
+bunx shadcn@4.18.0 add moritzbrantner/ui/pop-theme
+bunx shadcn@4.18.0 add moritzbrantner/ui/theme-motion
+```
+
+Replace `pop-theme` with `pulse-theme` for kinetic interfaces. The `theme-motion` item declares
+`motion` as an npm dependency and installs its Button and Tabs registry dependencies. The typed
+`popThemeManifest` and `pulseThemeManifest` expose the same relationship to templates and tooling.
+Reduced-motion handling defaults to the user's device preference, and continuous animation remains
+reserved for meaningful live or loading state.
 
 ## Scholia themed slice
 

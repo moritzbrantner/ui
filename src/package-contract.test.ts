@@ -463,6 +463,7 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.private).toBe(false);
     expect(packageJson.peerDependencies.react).toBeTruthy();
     expect(packageJson.peerDependencies["react-dom"]).toBeTruthy();
+    expect(packageJson.dependencies.motion).toBeTruthy();
     expect(packageJson.files).toEqual(
       expect.arrayContaining([
         "dist",
@@ -803,6 +804,10 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(indexSource).not.toContain('export * from "./shell";');
     expect(indexSource).not.toContain('export * from "./media";');
     expect(indexSource).not.toContain('export * from "./labs";');
+    expect(Object.hasOwn(RootExports, "MotionButton")).toBe(true);
+    expect(Object.hasOwn(RootExports, "MotionTabs")).toBe(true);
+    expect(Object.hasOwn(RootExports, "MotionToast")).toBe(true);
+    expect(Object.hasOwn(RootExports, "UiMotionProvider")).toBe(true);
     expect(Object.hasOwn(RootExports, "DataTable")).toBe(false);
     expect(Object.hasOwn(RootExports, "DataGrid")).toBe(false);
     expect(Object.hasOwn(RootExports, "Navbar")).toBe(false);
