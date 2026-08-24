@@ -65,6 +65,26 @@ Use `bobba` for default platform apps, `zleek` for polished glass shells, `atlas
 | Pop     | Studio public expression    | Creator onboarding, public creator surfaces, showcases                  | Comfortable | Expressive | Operational admin or dense data pages                        |
 | Pulse   | Kinetic interaction style   | Expand and collapse flows, selection-heavy controls, spatial interfaces | Comfortable | Energetic  | Long reading, quiet admin, reduced-motion-critical workflows |
 
+### Theme manifests
+
+Typed theme manifests connect a published theme's intent and defining tokens to the source-registry
+items that express it. They are deliberately incremental: a theme appears in `uiThemeManifests`
+only after its theme item, components, and at least one coherent block have been reviewed.
+
+Scholia is the first complete slice:
+
+```ts
+import { scholiaThemeManifest } from "@moritzbrantner/ui/scholia/server";
+
+scholiaThemeManifest.registry.theme.install;
+scholiaThemeManifest.registry.components;
+scholiaThemeManifest.registry.blocks;
+```
+
+Its `SourcePassage`, `ApparatusList`, and `ScholarlyNote` patterns remain reusable outside Scholia,
+while the manifest identifies them as defining parts of the Scholia design language. The
+`ScholiaSourceWorkbench` block composes them without owning corpus or interpretation workflows.
+
 Import `@moritzbrantner/ui/component-sources.css` when an app renders package components:
 
 ```ts

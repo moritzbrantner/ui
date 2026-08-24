@@ -2,6 +2,7 @@
 
 export * from "./components/patterns/action-menu";
 export * from "./components/patterns/action-sheet";
+export * from "./components/patterns/apparatus-list";
 export * from "./components/patterns/celebration-callout";
 export * from "./components/patterns/command-palette";
 export * from "./components/patterns/connection-status";
@@ -14,7 +15,10 @@ export * from "./components/patterns/hover-preview";
 export * from "./components/patterns/live-indicator";
 export * from "./components/patterns/menu-actions";
 export * from "./components/patterns/responsive-action-menu";
+export * from "./components/patterns/scholarly-note";
+export * from "./components/patterns/scholia-source-workbench";
 export * from "./components/patterns/shortcut-help";
+export * from "./components/patterns/source-passage";
 export * from "./components/patterns/state-view";
 export * from "./components/patterns/stepper";
 export * from "./components/patterns/upload-queue";

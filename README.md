@@ -189,6 +189,27 @@ bunx shadcn@4.18.0 add moritzbrantner/ui/button
 
 This is a distribution choice, not a separate visual system. Registry items preserve the same semantic tokens, restrained surfaces, state-light ownership boundary, and component contracts as the npm package. The initial catalog includes foundational controls plus `DescriptionList` and `MetricStrip`, which encode the preferred alternatives to repeated information cards.
 
+Scholia is the first complete themed slice. Install its source-first workbench and transitive theme
+and component dependencies with:
+
+```sh
+bunx shadcn@4.18.0 add moritzbrantner/ui/scholia-source-workbench
+```
+
+Install the complete theme or individual scholarly components independently when a consuming app
+needs a smaller source-owned surface:
+
+```sh
+bunx shadcn@4.18.0 add moritzbrantner/ui/scholia-theme
+bunx shadcn@4.18.0 add moritzbrantner/ui/source-passage
+bunx shadcn@4.18.0 add moritzbrantner/ui/apparatus-list
+bunx shadcn@4.18.0 add moritzbrantner/ui/scholarly-note
+```
+
+`scholiaThemeManifest` provides the matching typed contract for theme intent, defining tokens,
+registry components, and blocks. Import it from `@moritzbrantner/ui/scholia/server`,
+`@moritzbrantner/ui/server`, or the shared theme metadata entrypoints.
+
 See [the source registry guide](./docs/registry.md) for the catalog, maintainer workflow, and migration policy.
 
 Migration examples:

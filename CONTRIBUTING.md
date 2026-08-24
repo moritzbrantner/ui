@@ -67,7 +67,15 @@ Before adding a registry item:
 - Run `bun run verify:registry` to reject drift and validate the upstream schema through the pinned shadcn CLI.
 - Install the built item into a disposable consumer before expanding a complex dependency graph.
 
-Do not hand-edit generated files in `registry/default/lib` or `registry/default/ui`.
+Do not hand-edit generated files in `registry/default/lib`, `registry/default/styles`, or `registry/default/ui`.
+
+Before adding a themed registry slice:
+
+- Add a typed manifest that connects theme intent, defining tokens, components, and blocks.
+- Include the complete generated theme contract rather than a hand-maintained token subset.
+- Keep theme components state-light and independently installable where practical.
+- Include at least one coherent `registry:block` composition.
+- Document which workflow and data responsibilities remain in consuming applications.
 
 ## Storybook checklist
 

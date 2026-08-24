@@ -5,6 +5,7 @@
 ### Minor Changes
 
 - Add a shadcn-compatible source registry as an opt-in distribution path alongside the npm package, with seven pilot items, deterministic source synchronization, upstream schema validation, and GitHub Pages publishing.
+- Add the first theme-owned registry slice for Scholia, with a typed theme manifest, complete source-installable theme styles, source passage, critical apparatus, scholarly note components, and a source workbench block.
 
 ## 1.1.0
 

@@ -56,6 +56,25 @@
       }
     },
     {
+      "name": "scholia-theme",
+      "type": "registry:theme",
+      "title": "Scholia Theme",
+      "description": "The complete source-first scholarly theme, including Tailwind foundations and light/dark document tokens.",
+      "dependencies": ["tw-animate-css"],
+      "files": [
+        {
+          "path": "styles/moritz-base.css",
+          "type": "registry:style",
+          "target": "@/styles/moritz-base.css"
+        },
+        {
+          "path": "styles/scholia.css",
+          "type": "registry:style",
+          "target": "@/styles/scholia.css"
+        }
+      ]
+    },
+    {
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
@@ -124,6 +143,68 @@
           "path": "ui/metric-strip.tsx",
           "type": "registry:ui",
           "target": "@ui/metric-strip.tsx"
+        }
+      ]
+    },
+    {
+      "name": "source-passage",
+      "type": "registry:ui",
+      "title": "Source Passage",
+      "description": "A parallel source and translation surface with locator, language, and highlight slots.",
+      "registryDependencies": ["moritzbrantner/ui/cn", "moritzbrantner/ui/scholia-theme"],
+      "files": [
+        {
+          "path": "ui/source-passage.tsx",
+          "type": "registry:ui",
+          "target": "@ui/source-passage.tsx"
+        }
+      ]
+    },
+    {
+      "name": "apparatus-list",
+      "type": "registry:ui",
+      "title": "Apparatus List",
+      "description": "A compact critical apparatus for witnesses, readings, locators, and editorial notes.",
+      "registryDependencies": ["moritzbrantner/ui/cn", "moritzbrantner/ui/scholia-theme"],
+      "files": [
+        {
+          "path": "ui/apparatus-list.tsx",
+          "type": "registry:ui",
+          "target": "@ui/apparatus-list.tsx"
+        }
+      ]
+    },
+    {
+      "name": "scholarly-note",
+      "type": "registry:ui",
+      "title": "Scholarly Note",
+      "description": "A note surface for annotation, commentary, translation, and textual variants.",
+      "registryDependencies": ["moritzbrantner/ui/cn", "moritzbrantner/ui/scholia-theme"],
+      "files": [
+        {
+          "path": "ui/scholarly-note.tsx",
+          "type": "registry:ui",
+          "target": "@ui/scholarly-note.tsx"
+        }
+      ]
+    },
+    {
+      "name": "scholia-source-workbench",
+      "type": "registry:block",
+      "title": "Scholia Source Workbench",
+      "description": "A source-first scholarly workbench that composes text, translation, apparatus, metadata, and notes without owning corpus workflows.",
+      "registryDependencies": [
+        "moritzbrantner/ui/apparatus-list",
+        "moritzbrantner/ui/cn",
+        "moritzbrantner/ui/scholarly-note",
+        "moritzbrantner/ui/scholia-theme",
+        "moritzbrantner/ui/source-passage"
+      ],
+      "files": [
+        {
+          "path": "ui/scholia-source-workbench.tsx",
+          "type": "registry:block",
+          "target": "@ui/scholia-source-workbench.tsx"
         }
       ]
     }
