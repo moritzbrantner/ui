@@ -285,7 +285,7 @@ function MotionToast({
           {...props}
         >
           <div className="text-sm font-semibold">{title}</div>
-          {description ? <div className="text-sm text-foreground/80">{description}</div> : null}
+          {description ? <div className="text-sm text-muted-foreground">{description}</div> : null}
           {action ? <div className="mt-2 flex items-center gap-2">{action}</div> : null}
           {onOpenChange ? (
             <button

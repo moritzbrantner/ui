@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CheckIcon, SparklesIcon, ZapIcon } from "lucide-react";
 import * as React from "react";
-import { expect, within } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 
 import { UiTheme } from "../../themes";
 import {
@@ -82,7 +82,7 @@ function MotionProfileDemo({ profile }: { profile: UiMotionProfileName }) {
               title={`${isPop ? "Creator kit" : "Interaction flow"} ready`}
               description="Motion remains state-driven, interruptible, and local to the component."
               action={
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-primary">
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-foreground">
                   <CheckIcon className="size-3.5" />
                   Motion confirmed
                 </span>
@@ -133,6 +133,8 @@ export const SideBySide: Story = {
     await expect(pulseDemo.getByText(/mirrors the style-owned CSS motion tokens/)).toBeVisible();
 
     await userEvent.click(pulseDemo.getByRole("button", { name: "Show pulse toast" }));
-    await expect(pulseDemo.getByRole("status")).toHaveTextContent("Interaction flow ready");
+    const toast = pulseDemo.getByRole("status");
+    await expect(toast).toHaveTextContent("Interaction flow ready");
+    await waitFor(() => expect(toast).toHaveStyle({ opacity: "1" }));
   },
 };
