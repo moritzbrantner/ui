@@ -20,7 +20,25 @@ type UiThemeManifest<Name extends BuiltInUiThemeName = BuiltInUiThemeName> = {
     components: readonly UiThemeRegistryItem[];
     blocks: readonly UiThemeRegistryItem[];
   };
+  motion?: {
+    profile: "pop" | "pulse";
+    packageImport: "@moritzbrantner/ui/components/patterns/theme-motion";
+    registryItem: "moritzbrantner/ui/theme-motion";
+  };
 };
+
+const motionTokenNames = [
+  "--ui-motion-hover-y",
+  "--ui-motion-hover-scale",
+  "--ui-motion-press-scale",
+  "--ui-motion-duration-fast",
+  "--ui-motion-duration-base",
+  "--ui-motion-duration-slow",
+  "--ui-motion-ease-standard",
+  "--ui-motion-ease-emphasized",
+  "--ui-motion-enter-y",
+  "--ui-motion-overlay-scale",
+] as const satisfies readonly UiTokenName[];
 
 const scholiaThemeManifest = {
   name: "scholia",
@@ -81,9 +99,71 @@ const scholiaThemeManifest = {
   },
 } as const satisfies UiThemeManifest<"scholia">;
 
+const popThemeManifest = {
+  name: "pop",
+  intent:
+    "Playful creator-facing interfaces with spring feedback, rounded surfaces, and intentional celebration moments.",
+  packageStylesheet: "@moritzbrantner/ui/pop/styles.css",
+  tokenNames: motionTokenNames,
+  registry: {
+    theme: {
+      name: "pop-theme",
+      role: "theme",
+      description: "Complete Pop Tailwind foundation and expressive motion token contract.",
+      install: "moritzbrantner/ui/pop-theme",
+    },
+    components: [
+      {
+        name: "theme-motion",
+        role: "component",
+        description: "Motion-enhanced Button, Tabs, and Toast patterns configured for Pop.",
+        install: "moritzbrantner/ui/theme-motion",
+      },
+    ],
+    blocks: [],
+  },
+  motion: {
+    profile: "pop",
+    packageImport: "@moritzbrantner/ui/components/patterns/theme-motion",
+    registryItem: "moritzbrantner/ui/theme-motion",
+  },
+} as const satisfies UiThemeManifest<"pop">;
+
+const pulseThemeManifest = {
+  name: "pulse",
+  intent:
+    "Kinetic interaction surfaces with faster spatial feedback for selection, expansion, and live state changes.",
+  packageStylesheet: "@moritzbrantner/ui/pulse/styles.css",
+  tokenNames: motionTokenNames,
+  registry: {
+    theme: {
+      name: "pulse-theme",
+      role: "theme",
+      description: "Complete Pulse Tailwind foundation and kinetic motion token contract.",
+      install: "moritzbrantner/ui/pulse-theme",
+    },
+    components: [
+      {
+        name: "theme-motion",
+        role: "component",
+        description: "Motion-enhanced Button, Tabs, and Toast patterns configured for Pulse.",
+        install: "moritzbrantner/ui/theme-motion",
+      },
+    ],
+    blocks: [],
+  },
+  motion: {
+    profile: "pulse",
+    packageImport: "@moritzbrantner/ui/components/patterns/theme-motion",
+    registryItem: "moritzbrantner/ui/theme-motion",
+  },
+} as const satisfies UiThemeManifest<"pulse">;
+
 const uiThemeManifests = {
   scholia: scholiaThemeManifest,
+  pop: popThemeManifest,
+  pulse: pulseThemeManifest,
 } as const satisfies Partial<Record<BuiltInUiThemeName, UiThemeManifest>>;
 
-export { scholiaThemeManifest, uiThemeManifests };
+export { popThemeManifest, pulseThemeManifest, scholiaThemeManifest, uiThemeManifests };
 export type { UiThemeManifest, UiThemeRegistryItem, UiThemeRegistryItemRole };

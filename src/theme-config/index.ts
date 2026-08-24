@@ -6,7 +6,12 @@ import { bobbaTheme } from "./bobba";
 import { customTheme } from "./custom";
 import { paperTheme } from "./paper";
 import { popTheme } from "./pop";
-import { scholiaThemeManifest, uiThemeManifests } from "./manifests";
+import {
+  popThemeManifest,
+  pulseThemeManifest,
+  scholiaThemeManifest,
+  uiThemeManifests,
+} from "./manifests";
 import { uiThemeProfiles } from "./profiles";
 import { pulseTheme } from "./pulse";
 import { scholiaTheme } from "./scholia";
@@ -76,7 +81,9 @@ export {
   defaultUiThemeName,
   paperTheme,
   popTheme,
+  popThemeManifest,
   pulseTheme,
+  pulseThemeManifest,
   scholiaTheme,
   scholiaThemeManifest,
   studioTheme,

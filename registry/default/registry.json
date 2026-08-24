@@ -75,6 +75,44 @@
       ]
     },
     {
+      "name": "pop-theme",
+      "type": "registry:theme",
+      "title": "Pop Theme",
+      "description": "The complete creator-facing Pop theme, including its expressive CSS motion token contract.",
+      "dependencies": ["tw-animate-css"],
+      "files": [
+        {
+          "path": "styles/moritz-base.css",
+          "type": "registry:style",
+          "target": "@/styles/moritz-base.css"
+        },
+        {
+          "path": "styles/pop.css",
+          "type": "registry:style",
+          "target": "@/styles/pop.css"
+        }
+      ]
+    },
+    {
+      "name": "pulse-theme",
+      "type": "registry:theme",
+      "title": "Pulse Theme",
+      "description": "The complete kinetic Pulse theme, including its energetic CSS motion token contract.",
+      "dependencies": ["tw-animate-css"],
+      "files": [
+        {
+          "path": "styles/moritz-base.css",
+          "type": "registry:style",
+          "target": "@/styles/moritz-base.css"
+        },
+        {
+          "path": "styles/pulse.css",
+          "type": "registry:style",
+          "target": "@/styles/pulse.css"
+        }
+      ]
+    },
+    {
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
@@ -86,6 +124,36 @@
           "path": "ui/button.tsx",
           "type": "registry:ui",
           "target": "@ui/button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "Accessible tabs with compact token-backed sizing and line or contained variants.",
+      "dependencies": ["class-variance-authority", "radix-ui"],
+      "registryDependencies": ["moritzbrantner/ui/cn", "moritzbrantner/ui/moritz-theme"],
+      "files": [
+        {
+          "path": "ui/tabs.tsx",
+          "type": "registry:ui",
+          "target": "@ui/tabs.tsx"
+        }
+      ]
+    },
+    {
+      "name": "theme-motion",
+      "type": "registry:ui",
+      "title": "Pop and Pulse Motion",
+      "description": "Motion-enhanced Button, Tabs, and state-controlled Toast patterns with explicit Pop and Pulse profiles and reduced-motion support.",
+      "dependencies": ["lucide-react", "motion"],
+      "registryDependencies": ["moritzbrantner/ui/button", "moritzbrantner/ui/tabs"],
+      "files": [
+        {
+          "path": "ui/theme-motion.tsx",
+          "type": "registry:ui",
+          "target": "@ui/theme-motion.tsx"
         }
       ]
     },
