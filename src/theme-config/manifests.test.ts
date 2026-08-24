@@ -34,7 +34,13 @@ describe("theme manifests", () => {
     expect(pulseThemeManifest.motion?.profile).toBe("pulse");
     expect(popThemeManifest.registry.theme.name).toBe("pop-theme");
     expect(pulseThemeManifest.registry.theme.name).toBe("pulse-theme");
-    expect(popThemeManifest.registry.components.map((item) => item.name)).toEqual(["theme-motion"]);
+    expect(popThemeManifest.registry.components.map((item) => item.name)).toEqual([
+      "theme-motion",
+      "pop-rewards",
+    ]);
+    expect(pulseThemeManifest.registry.components.map((item) => item.name)).toEqual([
+      "theme-motion",
+    ]);
     expect(pulseThemeManifest.tokenNames).toContain("--ui-motion-ease-emphasized");
   });
 });

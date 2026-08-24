@@ -262,6 +262,61 @@ Use `pulse-theme` instead when the consuming surface needs the Pulse motion pers
 `popThemeManifest` and `pulseThemeManifest` connect each stylesheet, Motion profile, and registry
 item for tooling and templates.
 
+#### Earned Pop rewards
+
+Pop also provides an event-driven reward layer for interactions that deserve more than routine
+press feedback. The application owns the achievement, lifetime, and reward key; the UI package
+only renders deterministic feedback:
+
+```tsx
+import {
+  AnimatedCounter,
+  CelebrationProvider,
+  ProgressPop,
+  RewardBurst,
+  SuccessPop,
+} from "@moritzbrantner/ui/components/patterns/pop-rewards";
+
+export function ProjectReward({
+  completed,
+  rewardKey,
+  taskCount,
+}: {
+  completed: boolean;
+  rewardKey: number | null;
+  taskCount: number;
+}) {
+  return (
+    <CelebrationProvider level="satisfying">
+      <RewardBurst rewardKey={rewardKey}>
+        <button type="button">Complete task</button>
+      </RewardBurst>
+      <AnimatedCounter value={taskCount} />
+      <ProgressPop value={taskCount} max={10} rewardKey={rewardKey} label="Project progress" />
+      <SuccessPop
+        open={completed}
+        title="Task completed"
+        description="That moved the project forward."
+      />
+    </CelebrationProvider>
+  );
+}
+```
+
+Use `subtle` for routine acknowledgement, `satisfying` for meaningful completion, and
+`celebration` only for genuine milestones. `RewardBurst` is decorative, `SuccessPop` is announced
+as status, counters and progress expose semantic values, and reduced-motion preferences remove
+spatial reward effects. Avoid random rewards, artificial streak pressure, manufactured urgency,
+and continuous celebration.
+
+Install the complete source-owned Pop reward slice with:
+
+```sh
+bunx shadcn@4.18.0 add moritzbrantner/ui/pop-rewards
+```
+
+This transitively installs `pop-theme` and `theme-motion`.
+
 Migration examples:
 
 | Old                                           | New                                                 |

@@ -158,6 +158,21 @@
       ]
     },
     {
+      "name": "pop-rewards",
+      "type": "registry:ui",
+      "title": "Pop Rewards",
+      "description": "Event-driven Pop reward feedback with subtle, satisfying, and celebration intensity for earned product moments.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["moritzbrantner/ui/pop-theme", "moritzbrantner/ui/theme-motion"],
+      "files": [
+        {
+          "path": "ui/pop-rewards.tsx",
+          "type": "registry:ui",
+          "target": "@ui/pop-rewards.tsx"
+        }
+      ]
+    },
+    {
       "name": "input",
       "type": "registry:ui",
       "title": "Input",

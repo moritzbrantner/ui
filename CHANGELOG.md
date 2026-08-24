@@ -7,6 +7,7 @@
 - Add a shadcn-compatible source registry as an opt-in distribution path alongside the npm package, with seven pilot items, deterministic source synchronization, upstream schema validation, and GitHub Pages publishing.
 - Add the first theme-owned registry slice for Scholia, with a typed theme manifest, complete source-installable theme styles, source passage, critical apparatus, scholarly note components, and a source workbench block.
 - Add explicit Motion-powered Pop and Pulse profiles with reduced-motion policy, motion-enhanced Button, Tabs, and Toast patterns, Storybook demos, typed theme manifests, and source-installable registry themes.
+- Add an event-driven Pop reward system with three intensity levels, bursts, success feedback, animated counters, progress rewards, collection entry motion, and an interactive Storybook playground.
 
 ## 1.1.0
 

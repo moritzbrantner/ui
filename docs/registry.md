@@ -68,6 +68,7 @@ interfaces that need interruptible springs, shared layout movement, and presence
 | `pulse-theme`  | Theme     | Pulse foundation, light/dark tokens, and kinetic CSS motion values.  |
 | `tabs`         | Component | Source-owned accessible tab primitive.                               |
 | `theme-motion` | Component | Pop/Pulse provider, Button, Tabs, and accessible Toast patterns.     |
+| `pop-rewards`  | Component | Earned reward feedback with three event-driven intensity levels.     |
 
 Install one style and the shared Motion source:
 
@@ -75,6 +76,17 @@ Install one style and the shared Motion source:
 bunx shadcn@4.18.0 add moritzbrantner/ui/pop-theme
 bunx shadcn@4.18.0 add moritzbrantner/ui/theme-motion
 ```
+
+Install the complete Pop reward slice—including the Pop theme and shared Motion source—with:
+
+```sh
+bunx shadcn@4.18.0 add moritzbrantner/ui/pop-rewards
+```
+
+The item provides `CelebrationProvider`, `RewardBurst`, `SuccessPop`, `AnimatedCounter`,
+`ProgressPop`, and `AddToCollection`. Consuming applications own achievement rules, persistence,
+timers, sounds, haptics, and notification queues. The components accept explicit state and reward
+keys so feedback remains interruptible, testable, and tied to real user accomplishments.
 
 Replace `pop-theme` with `pulse-theme` for kinetic interfaces. The `theme-motion` item declares
 `motion` as an npm dependency and installs its Button and Tabs registry dependencies. The typed

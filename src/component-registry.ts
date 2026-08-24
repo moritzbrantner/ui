@@ -1098,6 +1098,18 @@ const componentRegistry = [
     reason: "Reusable state-light application pattern exported from the root API.",
   },
   {
+    name: "pop-rewards",
+    fileName: "pop-rewards",
+    tier: "patterns",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/patterns/pop-rewards",
+    storyFiles: ["src/components/patterns/pop-rewards.stories.tsx"],
+    testFiles: ["src/components/patterns/pop-rewards.test.tsx"],
+    status: "pattern",
+    reason:
+      "Event-driven, state-light reward feedback that expresses the Pop theme without owning product incentives.",
+  },
+  {
     name: "theme-motion",
     fileName: "theme-motion",
     tier: "patterns",
