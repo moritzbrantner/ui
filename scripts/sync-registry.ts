@@ -48,6 +48,11 @@ const registrySources: readonly RegistrySource[] = [
     ],
   },
   {
+    source: "src/components/patterns/pop-rewards.tsx",
+    target: "registry/default/ui/pop-rewards.tsx",
+    replacements: [['from "./theme-motion"', 'from "@/registry/default/ui/theme-motion"']],
+  },
+  {
     source: "src/components/patterns/theme-motion.tsx",
     target: "registry/default/ui/theme-motion.tsx",
     replacements: [

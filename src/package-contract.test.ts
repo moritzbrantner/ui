@@ -808,6 +808,12 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(Object.hasOwn(RootExports, "MotionTabs")).toBe(true);
     expect(Object.hasOwn(RootExports, "MotionToast")).toBe(true);
     expect(Object.hasOwn(RootExports, "UiMotionProvider")).toBe(true);
+    expect(Object.hasOwn(RootExports, "CelebrationProvider")).toBe(true);
+    expect(Object.hasOwn(RootExports, "RewardBurst")).toBe(true);
+    expect(Object.hasOwn(RootExports, "SuccessPop")).toBe(true);
+    expect(Object.hasOwn(RootExports, "AnimatedCounter")).toBe(true);
+    expect(Object.hasOwn(RootExports, "ProgressPop")).toBe(true);
+    expect(Object.hasOwn(RootExports, "AddToCollection")).toBe(true);
     expect(Object.hasOwn(RootExports, "DataTable")).toBe(false);
     expect(Object.hasOwn(RootExports, "DataGrid")).toBe(false);
     expect(Object.hasOwn(RootExports, "Navbar")).toBe(false);

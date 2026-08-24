@@ -119,6 +119,13 @@ const popThemeManifest = {
         description: "Motion-enhanced Button, Tabs, and Toast patterns configured for Pop.",
         install: "moritzbrantner/ui/theme-motion",
       },
+      {
+        name: "pop-rewards",
+        role: "component",
+        description:
+          "Event-driven reward bursts, success feedback, counters, progress, and collection entry motion for Pop.",
+        install: "moritzbrantner/ui/pop-rewards",
+      },
     ],
     blocks: [],
   },
