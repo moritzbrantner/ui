@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import {
+  FlowButton,
+  KineticAccordion,
   MotionButton,
   MotionTabs,
   MotionTabsContent,
@@ -32,6 +34,20 @@ describe("theme motion", () => {
     expect(button.getAttribute("data-motion-profile")).toBe("pulse");
   });
 
+  test("keeps FlowButton explicitly Pulse-owned while preserving Button variants", () => {
+    render(
+      <UiMotionProvider profile="pop" reducedMotion="always">
+        <FlowButton variant="outline">Follow pointer</FlowButton>
+      </UiMotionProvider>,
+    );
+
+    const button = screen.getByRole("button", { name: "Follow pointer" });
+
+    expect(button.getAttribute("data-slot")).toBe("flow-button");
+    expect(button.getAttribute("data-motion-profile")).toBe("pulse");
+    expect(document.querySelector('[data-slot="flow-button-highlight"]')).toBeTruthy();
+  });
+
   test("moves the shared indicator with controlled Radix tab state", () => {
     render(
       <UiMotionProvider profile="pop">
@@ -53,6 +69,35 @@ describe("theme motion", () => {
     expect(tokensTab.getAttribute("data-state")).toBe("active");
     expect(screen.getByText("Token content")).toBeTruthy();
     expect(document.querySelectorAll('[data-slot="motion-tabs-indicator"]')).toHaveLength(1);
+  });
+
+  test("expands kinetic content while leaving ownership of open state optional", () => {
+    const onOpenChange = vi.fn();
+
+    render(
+      <UiMotionProvider profile="pulse" reducedMotion="always">
+        <KineticAccordion
+          title="Advanced motion"
+          description="Continuous expansion"
+          onOpenChange={onOpenChange}
+        >
+          Kinetic content
+        </KineticAccordion>
+      </UiMotionProvider>,
+    );
+
+    const trigger = screen.getByRole("button", { name: /Advanced motion/ });
+
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("region")).toBeNull();
+
+    fireEvent.click(trigger);
+
+    expect(onOpenChange).toHaveBeenCalledWith(true);
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("region", { name: /Advanced motion/ }).textContent).toContain(
+      "Kinetic content",
+    );
   });
 
   test("renders and closes a state-controlled accessible motion toast", () => {
