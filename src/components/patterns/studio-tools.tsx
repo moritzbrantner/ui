@@ -110,7 +110,14 @@ type TimelineTrackProps = React.ComponentProps<"div"> & {
   onSelect?: (id: React.Key) => void;
 };
 
-function TimelineTrack({ duration, segments, selectedId = null, onSelect, className, ...props }: TimelineTrackProps) {
+function TimelineTrack({
+  duration,
+  segments,
+  selectedId = null,
+  onSelect,
+  className,
+  ...props
+}: TimelineTrackProps) {
   const safeDuration = duration > 0 ? duration : 1;
 
   return (
@@ -125,7 +132,8 @@ function TimelineTrack({ duration, segments, selectedId = null, onSelect, classN
       {segments.map((segment) => {
         const left = (Math.max(0, segment.start) / safeDuration) * 100;
         const width =
-          ((Math.max(segment.end, segment.start) - Math.max(0, segment.start)) / safeDuration) * 100;
+          ((Math.max(segment.end, segment.start) - Math.max(0, segment.start)) / safeDuration) *
+          100;
         const selected = selectedId === segment.id;
         return (
           <button
@@ -175,7 +183,15 @@ type ScrubberProps = Omit<React.ComponentProps<"input">, "type" | "value" | "onC
   onValueChange?: (value: number) => void;
 };
 
-function Scrubber({ value, onValueChange, className, min = 0, max = 1, step = "any", ...props }: ScrubberProps) {
+function Scrubber({
+  value,
+  onValueChange,
+  className,
+  min = 0,
+  max = 1,
+  step = "any",
+  ...props
+}: ScrubberProps) {
   return (
     <input
       data-slot="scrubber"
@@ -289,7 +305,9 @@ function InspectorPanel({ title = "Inspector", groups, className, ...props }: In
       <h2 className="text-sm font-semibold">{title}</h2>
       {groups.map((group) => (
         <section key={group.id} className="grid gap-2 border-t pt-2 first:border-t-0 first:pt-0">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{group.label}</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {group.label}
+          </h3>
           <div className="grid gap-2">{group.content}</div>
         </section>
       ))}
@@ -310,7 +328,13 @@ type ToolShelfProps = React.ComponentProps<"div"> & {
   onToolChange?: (tool: string) => void;
 };
 
-function ToolShelf({ tools, activeTool = null, onToolChange, className, ...props }: ToolShelfProps) {
+function ToolShelf({
+  tools,
+  activeTool = null,
+  onToolChange,
+  className,
+  ...props
+}: ToolShelfProps) {
   return (
     <div
       data-slot="tool-shelf"
@@ -384,8 +408,12 @@ function BeforeAfter({
           className="pointer-events-none absolute inset-y-0 w-px bg-[var(--editor-playhead)]"
           style={{ left: `${resolved}%` }}
         />
-        <span className="absolute top-2 left-2 rounded bg-background/80 px-1.5 py-0.5 text-xs">{beforeLabel}</span>
-        <span className="absolute top-2 right-2 rounded bg-background/80 px-1.5 py-0.5 text-xs">{afterLabel}</span>
+        <span className="absolute top-2 left-2 rounded bg-background/80 px-1.5 py-0.5 text-xs">
+          {beforeLabel}
+        </span>
+        <span className="absolute top-2 right-2 rounded bg-background/80 px-1.5 py-0.5 text-xs">
+          {afterLabel}
+        </span>
       </div>
       <input
         aria-label="Before and after comparison"
@@ -400,7 +428,16 @@ function BeforeAfter({
   );
 }
 
-export { BeforeAfter, InspectorPanel, LayerStack, MediaTransport, Playhead, Scrubber, TimelineTrack, ToolShelf };
+export {
+  BeforeAfter,
+  InspectorPanel,
+  LayerStack,
+  MediaTransport,
+  Playhead,
+  Scrubber,
+  TimelineTrack,
+  ToolShelf,
+};
 export type {
   BeforeAfterProps,
   InspectorGroup,

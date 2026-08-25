@@ -10,7 +10,14 @@ type DocumentPageProps = React.ComponentProps<"article"> & {
   footer?: React.ReactNode;
 };
 
-function DocumentPage({ pageNumber, header, footer, className, children, ...props }: DocumentPageProps) {
+function DocumentPage({
+  pageNumber,
+  header,
+  footer,
+  className,
+  children,
+  ...props
+}: DocumentPageProps) {
   return (
     <article
       data-slot="document-page"
@@ -46,7 +53,13 @@ type PageThumbnailRailProps = React.ComponentProps<"nav"> & {
   onSelect?: (id: React.Key) => void;
 };
 
-function PageThumbnailRail({ pages, selectedId = null, onSelect, className, ...props }: PageThumbnailRailProps) {
+function PageThumbnailRail({
+  pages,
+  selectedId = null,
+  onSelect,
+  className,
+  ...props
+}: PageThumbnailRailProps) {
   return (
     <nav
       data-slot="page-thumbnail-rail"
@@ -134,7 +147,9 @@ function OcrDiff({
                     differs && "bg-[var(--document-highlight)]",
                   )}
                 >
-                  <span className="border-r px-2 text-right text-muted-foreground">{index + 1}</span>
+                  <span className="border-r px-2 text-right text-muted-foreground">
+                    {index + 1}
+                  </span>
                   <span className="whitespace-pre-wrap break-words px-2">{line || " "}</span>
                 </div>
               );
@@ -171,7 +186,9 @@ function TranslationPair({
       {...props}
     >
       <section className="grid content-start gap-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{sourceLanguage}</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {sourceLanguage}
+        </h3>
         <div className="leading-7">{source}</div>
       </section>
       <section className="grid content-start gap-2 border-t pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-5">
@@ -197,7 +214,13 @@ type DocumentOutlineProps = React.ComponentProps<"nav"> & {
   onSelect?: (id: string) => void;
 };
 
-function DocumentOutline({ items, activeId = null, onSelect, className, ...props }: DocumentOutlineProps) {
+function DocumentOutline({
+  items,
+  activeId = null,
+  onSelect,
+  className,
+  ...props
+}: DocumentOutlineProps) {
   return (
     <nav
       data-slot="document-outline"
@@ -221,7 +244,9 @@ function DocumentOutline({ items, activeId = null, onSelect, className, ...props
           >
             <span className="truncate">{item.label}</span>
             {item.page ? (
-              <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{item.page}</span>
+              <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                {item.page}
+              </span>
             ) : null}
           </button>
         );
@@ -242,7 +267,12 @@ type AnnotationThreadProps = React.ComponentProps<"section"> & {
   title?: React.ReactNode;
 };
 
-function AnnotationThread({ entries, title = "Annotations", className, ...props }: AnnotationThreadProps) {
+function AnnotationThread({
+  entries,
+  title = "Annotations",
+  className,
+  ...props
+}: AnnotationThreadProps) {
   return (
     <section
       data-slot="annotation-thread"
@@ -261,7 +291,9 @@ function AnnotationThread({ entries, title = "Annotations", className, ...props 
           >
             <div className="flex flex-wrap items-baseline justify-between gap-2 text-xs">
               <span className="font-semibold">{entry.author ?? "Note"}</span>
-              {entry.timestamp ? <time className="text-muted-foreground">{entry.timestamp}</time> : null}
+              {entry.timestamp ? (
+                <time className="text-muted-foreground">{entry.timestamp}</time>
+              ) : null}
             </div>
             <div className="text-sm leading-relaxed">{entry.body}</div>
           </li>
@@ -271,7 +303,14 @@ function AnnotationThread({ entries, title = "Annotations", className, ...props 
   );
 }
 
-export { AnnotationThread, DocumentOutline, DocumentPage, OcrDiff, PageThumbnailRail, TranslationPair };
+export {
+  AnnotationThread,
+  DocumentOutline,
+  DocumentPage,
+  OcrDiff,
+  PageThumbnailRail,
+  TranslationPair,
+};
 export type {
   AnnotationEntry,
   AnnotationThreadProps,

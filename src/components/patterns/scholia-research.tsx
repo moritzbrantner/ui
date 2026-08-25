@@ -26,11 +26,15 @@ function MarginaliaRail({ notes, title = "Marginalia", className, ...props }: Ma
       )}
       {...props}
     >
-      <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h2>
+      <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </h2>
       {notes.map((note) => (
         <article key={note.id} className="grid gap-1 text-sm">
           <div className="flex flex-wrap items-baseline justify-between gap-2 text-xs">
-            <span className="font-semibold text-[var(--document-annotation)]">{note.label ?? "Note"}</span>
+            <span className="font-semibold text-[var(--document-annotation)]">
+              {note.label ?? "Note"}
+            </span>
             {note.locator ? <span className="text-muted-foreground">{note.locator}</span> : null}
           </div>
           <div>{note.children}</div>
@@ -74,7 +78,10 @@ function CitationTrail({ items, className, ...props }: CitationTrailProps) {
             {item.locator ? <span className="text-muted-foreground"> {item.locator}</span> : null}
           </li>
           {index < items.length - 1 ? (
-            <li aria-hidden="true" className="grid place-items-center px-1 text-xs text-muted-foreground">
+            <li
+              aria-hidden="true"
+              className="grid place-items-center px-1 text-xs text-muted-foreground"
+            >
               {item.relation ?? "→"}
             </li>
           ) : null}
@@ -98,7 +105,11 @@ type InterpretationCompareProps = React.ComponentProps<"div"> & {
 
 function InterpretationCompare({ readings, className, ...props }: InterpretationCompareProps) {
   return (
-    <div data-slot="interpretation-compare" className={cn("grid gap-3 md:grid-cols-2", className)} {...props}>
+    <div
+      data-slot="interpretation-compare"
+      className={cn("grid gap-3 md:grid-cols-2", className)}
+      {...props}
+    >
       {readings.map((reading) => (
         <article
           key={reading.id}
@@ -117,7 +128,9 @@ function InterpretationCompare({ readings, className, ...props }: Interpretation
             ) : null}
           </div>
           <div className="text-sm leading-relaxed">{reading.children}</div>
-          {reading.source ? <footer className="text-xs text-muted-foreground">{reading.source}</footer> : null}
+          {reading.source ? (
+            <footer className="text-xs text-muted-foreground">{reading.source}</footer>
+          ) : null}
         </article>
       ))}
     </div>
@@ -165,7 +178,11 @@ function PassageNavigator({
         <div className="flex min-w-0 flex-wrap items-center gap-1">
           {crumbs.map((crumb, index) => (
             <React.Fragment key={index}>
-              {index > 0 ? <span aria-hidden="true" className="text-muted-foreground">/</span> : null}
+              {index > 0 ? (
+                <span aria-hidden="true" className="text-muted-foreground">
+                  /
+                </span>
+              ) : null}
               <span className="truncate">{crumb}</span>
             </React.Fragment>
           ))}
@@ -210,7 +227,9 @@ function WitnessMatrix({ witnesses, rows, caption, className, ...props }: Witnes
         {caption ? <caption className="sr-only">{caption}</caption> : null}
         <thead>
           <tr className="bg-muted/45">
-            <th scope="col" className="border-b px-2 py-1.5 text-left text-xs">Lemma</th>
+            <th scope="col" className="border-b px-2 py-1.5 text-left text-xs">
+              Lemma
+            </th>
             {witnesses.map((witness) => (
               <th
                 key={witness}
@@ -232,7 +251,9 @@ function WitnessMatrix({ witnesses, rows, caption, className, ...props }: Witnes
                 {row.lemma}
               </th>
               {witnesses.map((witness) => (
-                <td key={witness} className="border-l px-2 py-1.5">{row.readings[witness] ?? "—"}</td>
+                <td key={witness} className="border-l px-2 py-1.5">
+                  {row.readings[witness] ?? "—"}
+                </td>
               ))}
             </tr>
           ))}
@@ -248,7 +269,14 @@ type LemmaAnchorProps = React.ComponentProps<"mark"> & {
   active?: boolean;
 };
 
-function LemmaAnchor({ lemmaId, noteCount, active = false, className, children, ...props }: LemmaAnchorProps) {
+function LemmaAnchor({
+  lemmaId,
+  noteCount,
+  active = false,
+  className,
+  children,
+  ...props
+}: LemmaAnchorProps) {
   return (
     <mark
       data-slot="lemma-anchor"
@@ -263,13 +291,22 @@ function LemmaAnchor({ lemmaId, noteCount, active = false, className, children, 
     >
       {children}
       {noteCount ? (
-        <sup className="ml-0.5 font-sans text-[0.65em] font-semibold text-[var(--document-citation)]">{noteCount}</sup>
+        <sup className="ml-0.5 font-sans text-[0.65em] font-semibold text-[var(--document-citation)]">
+          {noteCount}
+        </sup>
       ) : null}
     </mark>
   );
 }
 
-export { CitationTrail, InterpretationCompare, LemmaAnchor, MarginaliaRail, PassageNavigator, WitnessMatrix };
+export {
+  CitationTrail,
+  InterpretationCompare,
+  LemmaAnchor,
+  MarginaliaRail,
+  PassageNavigator,
+  WitnessMatrix,
+};
 export type {
   CitationTrailItem,
   CitationTrailProps,

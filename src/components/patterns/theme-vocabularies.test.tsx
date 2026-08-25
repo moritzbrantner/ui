@@ -82,7 +82,9 @@ describe("theme vocabulary components", () => {
     );
 
     expect(screen.getByText("Actuality reading")).toBeTruthy();
-    expect(document.querySelector('[data-slot="lemma-anchor"]')?.textContent).toContain("actuality");
+    expect(document.querySelector('[data-slot="lemma-anchor"]')?.textContent).toContain(
+      "actuality",
+    );
   });
 
   test("marks Paper OCR lines that differ", () => {

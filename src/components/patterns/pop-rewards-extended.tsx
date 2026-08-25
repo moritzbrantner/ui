@@ -66,15 +66,28 @@ type StreakIndicatorProps = React.ComponentProps<"div"> & {
   best?: number;
 };
 
-function StreakIndicator({ days, label = "day streak", best, className, ...props }: StreakIndicatorProps) {
+function StreakIndicator({
+  days,
+  label = "day streak",
+  best,
+  className,
+  ...props
+}: StreakIndicatorProps) {
   return (
     <div
       data-slot="streak-indicator"
-      className={cn("inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1.5", className)}
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1.5",
+        className,
+      )}
       {...props}
     >
-      <span aria-hidden="true" className="text-lg">🔥</span>
-      <strong className="tabular-nums"><AnimatedCounter value={days} /></strong>
+      <span aria-hidden="true" className="text-lg">
+        🔥
+      </span>
+      <strong className="tabular-nums">
+        <AnimatedCounter value={days} />
+      </strong>
       <span className="text-sm">{label}</span>
       {best !== undefined ? (
         <span className="border-l pl-2 text-xs text-muted-foreground">best {best}</span>
@@ -90,7 +103,14 @@ type CompletionRingProps = React.ComponentProps<"div"> & {
   size?: number;
 };
 
-function CompletionRing({ value, max = 100, label = "Complete", size = 88, className, ...props }: CompletionRingProps) {
+function CompletionRing({
+  value,
+  max = 100,
+  label = "Complete",
+  size = 88,
+  className,
+  ...props
+}: CompletionRingProps) {
   const safeMax = max > 0 ? max : 1;
   const clamped = Math.min(Math.max(value, 0), safeMax);
   const percentage = Math.round((clamped / safeMax) * 100);
@@ -109,7 +129,14 @@ function CompletionRing({ value, max = 100, label = "Complete", size = 88, class
       {...props}
     >
       <svg aria-hidden="true" viewBox="0 0 80 80" className="absolute inset-0 size-full -rotate-90">
-        <circle cx="40" cy="40" r={radius} fill="none" stroke="var(--ui-progress-track)" strokeWidth="7" />
+        <circle
+          cx="40"
+          cy="40"
+          r={radius}
+          fill="none"
+          stroke="var(--ui-progress-track)"
+          strokeWidth="7"
+        />
         <motion.circle
           cx="40"
           cy="40"
@@ -144,7 +171,13 @@ type RewardChecklistProps = React.ComponentProps<"div"> & {
   title?: React.ReactNode;
 };
 
-function RewardChecklist({ items, onCheckedChange, title = "Checklist", className, ...props }: RewardChecklistProps) {
+function RewardChecklist({
+  items,
+  onCheckedChange,
+  title = "Checklist",
+  className,
+  ...props
+}: RewardChecklistProps) {
   const completeCount = items.filter((item) => item.checked).length;
   const allComplete = items.length > 0 && completeCount === items.length;
   return (
@@ -190,7 +223,14 @@ type ShareSuccessCardProps = React.ComponentProps<"article"> & {
   actions?: React.ReactNode;
 };
 
-function ShareSuccessCard({ title, description, preview, actions, className, ...props }: ShareSuccessCardProps) {
+function ShareSuccessCard({
+  title,
+  description,
+  preview,
+  actions,
+  className,
+  ...props
+}: ShareSuccessCardProps) {
   return (
     <article
       data-slot="share-success-card"
@@ -202,7 +242,9 @@ function ShareSuccessCard({ title, description, preview, actions, className, ...
     >
       {preview ? <div className="min-h-36 bg-muted">{preview}</div> : null}
       <div className="grid gap-2 p-4">
-        <div className="text-xs font-semibold uppercase tracking-wide text-[var(--success)]">Ready to share</div>
+        <div className="text-xs font-semibold uppercase tracking-wide text-[var(--success)]">
+          Ready to share
+        </div>
         <h2 className="text-lg font-semibold">{title}</h2>
         {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
         {actions ? <div className="flex flex-wrap gap-2 pt-1">{actions}</div> : null}
@@ -217,7 +259,14 @@ type ReactionBurstProps = React.ComponentProps<"button"> & {
   active?: boolean;
 };
 
-function ReactionBurst({ reaction, count, active = false, className, children, ...props }: ReactionBurstProps) {
+function ReactionBurst({
+  reaction,
+  count,
+  active = false,
+  className,
+  children,
+  ...props
+}: ReactionBurstProps) {
   return (
     <RewardBurst rewardKey={active ? count : null} level="subtle">
       <button
@@ -239,7 +288,14 @@ function ReactionBurst({ reaction, count, active = false, className, children, .
   );
 }
 
-export { AchievementUnlock, CompletionRing, ReactionBurst, RewardChecklist, ShareSuccessCard, StreakIndicator };
+export {
+  AchievementUnlock,
+  CompletionRing,
+  ReactionBurst,
+  RewardChecklist,
+  ShareSuccessCard,
+  StreakIndicator,
+};
 export type {
   AchievementUnlockProps,
   CompletionRingProps,

@@ -53,7 +53,9 @@ function KpiStrip({ items, className, ...props }: KpiStripProps) {
               </span>
             ) : null}
           </dd>
-          {item.meta ? <div className="truncate text-xs text-muted-foreground">{item.meta}</div> : null}
+          {item.meta ? (
+            <div className="truncate text-xs text-muted-foreground">{item.meta}</div>
+          ) : null}
         </div>
       ))}
     </dl>
@@ -67,7 +69,14 @@ type DeltaCellProps = React.ComponentProps<"span"> & {
   precision?: number;
 };
 
-function DeltaCell({ value, delta, suffix = "%", precision = 1, className, ...props }: DeltaCellProps) {
+function DeltaCell({
+  value,
+  delta,
+  suffix = "%",
+  precision = 1,
+  className,
+  ...props
+}: DeltaCellProps) {
   const tone: AtlasTone = delta > 0 ? "positive" : delta < 0 ? "negative" : "neutral";
   const symbol = delta > 0 ? "↑" : delta < 0 ? "↓" : "→";
 
@@ -101,7 +110,13 @@ type MapLegendProps = React.ComponentProps<"div"> & {
   title?: React.ReactNode;
 };
 
-function MapLegend({ items, onVisibilityChange, title = "Legend", className, ...props }: MapLegendProps) {
+function MapLegend({
+  items,
+  onVisibilityChange,
+  title = "Legend",
+  className,
+  ...props
+}: MapLegendProps) {
   return (
     <div
       data-slot="map-legend"
@@ -111,7 +126,9 @@ function MapLegend({ items, onVisibilityChange, title = "Legend", className, ...
       )}
       {...props}
     >
-      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</div>
+      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </div>
       <div className="grid gap-1">
         {items.map((item) => {
           const visible = item.visible ?? true;
@@ -134,7 +151,9 @@ function MapLegend({ items, onVisibilityChange, title = "Legend", className, ...
               <span className="min-w-0">
                 <span className="block truncate font-medium">{item.label}</span>
                 {item.description ? (
-                  <span className="block truncate text-xs text-muted-foreground">{item.description}</span>
+                  <span className="block truncate text-xs text-muted-foreground">
+                    {item.description}
+                  </span>
                 ) : null}
               </span>
             </label>
@@ -190,7 +209,11 @@ function OperationalTable({ columns, rows, caption, className, ...props }: Opera
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.id} data-tone={row.tone} className="border-b last:border-b-0 hover:bg-muted/35">
+            <tr
+              key={row.id}
+              data-tone={row.tone}
+              className="border-b last:border-b-0 hover:bg-muted/35"
+            >
               {columns.map((column, index) => (
                 <td
                   key={column.key}
@@ -240,7 +263,11 @@ function AlertRail({ items, className, ...props }: AlertRailProps) {
             className="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-2 border-l-2 px-2 py-1.5"
             style={{ borderColor: color }}
           >
-            <span aria-hidden="true" className="mt-1.5 size-1.5 rounded-full" style={{ background: color }} />
+            <span
+              aria-hidden="true"
+              className="mt-1.5 size-1.5 rounded-full"
+              style={{ background: color }}
+            />
             <span className="min-w-0">
               <span className="block truncate text-sm font-medium">{item.title}</span>
               {item.detail ? (
@@ -287,7 +314,11 @@ function SparklineCell({
     .join(" ");
 
   return (
-    <div data-slot="sparkline-cell" className={cn("inline-flex items-center gap-2", className)} {...props}>
+    <div
+      data-slot="sparkline-cell"
+      className={cn("inline-flex items-center gap-2", className)}
+      {...props}
+    >
       <svg
         aria-label={typeof label === "string" ? label : "Trend"}
         role="img"

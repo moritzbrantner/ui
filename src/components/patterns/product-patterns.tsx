@@ -10,7 +10,14 @@ type SettingsSectionProps = React.ComponentProps<"section"> & {
   actions?: React.ReactNode;
 };
 
-function SettingsSection({ title, description, actions, className, children, ...props }: SettingsSectionProps) {
+function SettingsSection({
+  title,
+  description,
+  actions,
+  className,
+  children,
+  ...props
+}: SettingsSectionProps) {
   return (
     <section
       data-slot="settings-section"
@@ -38,7 +45,15 @@ type EmptyStateProps = React.ComponentProps<"section"> & {
   secondaryAction?: React.ReactNode;
 };
 
-function EmptyState({ icon, title, description, action, secondaryAction, className, ...props }: EmptyStateProps) {
+function EmptyState({
+  icon,
+  title,
+  description,
+  action,
+  secondaryAction,
+  className,
+  ...props
+}: EmptyStateProps) {
   return (
     <section
       data-slot="empty-state"
@@ -49,7 +64,9 @@ function EmptyState({ icon, title, description, action, secondaryAction, classNa
       {...props}
     >
       <div className="grid max-w-md justify-items-center gap-3">
-        {icon ? <div className="grid size-10 place-items-center rounded-full bg-muted">{icon}</div> : null}
+        {icon ? (
+          <div className="grid size-10 place-items-center rounded-full bg-muted">{icon}</div>
+        ) : null}
         <div className="grid gap-1">
           <h2 className="font-semibold">{title}</h2>
           {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
@@ -72,7 +89,14 @@ type FormActionsProps = React.ComponentProps<"div"> & {
   sticky?: boolean;
 };
 
-function FormActions({ primary, secondary, tertiary, sticky = false, className, ...props }: FormActionsProps) {
+function FormActions({
+  primary,
+  secondary,
+  tertiary,
+  sticky = false,
+  className,
+  ...props
+}: FormActionsProps) {
   return (
     <div
       data-slot="form-actions"
@@ -122,7 +146,11 @@ function InlineEdit({
 
   if (!editing) {
     return (
-      <div data-slot="inline-edit" className={cn("group inline-flex min-w-0 items-center gap-2", className)} {...props}>
+      <div
+        data-slot="inline-edit"
+        className={cn("group inline-flex min-w-0 items-center gap-2", className)}
+        {...props}
+      >
         <span className="truncate">{value || placeholder}</span>
         <button
           type="button"
@@ -136,7 +164,11 @@ function InlineEdit({
   }
 
   return (
-    <div data-slot="inline-edit" className={cn("inline-flex min-w-0 items-center gap-1.5", className)} {...props}>
+    <div
+      data-slot="inline-edit"
+      className={cn("inline-flex min-w-0 items-center gap-1.5", className)}
+      {...props}
+    >
       <input
         aria-label={label}
         autoFocus
@@ -173,7 +205,13 @@ type ResponsiveToolbarProps = React.ComponentProps<"div"> & {
   overflow?: React.ReactNode;
 };
 
-function ResponsiveToolbar({ primary, secondary, overflow, className, ...props }: ResponsiveToolbarProps) {
+function ResponsiveToolbar({
+  primary,
+  secondary,
+  overflow,
+  className,
+  ...props
+}: ResponsiveToolbarProps) {
   return (
     <div
       data-slot="responsive-toolbar"
@@ -200,7 +238,16 @@ type ResourceCardProps = React.ComponentProps<"article"> & {
   href?: string;
 };
 
-function ResourceCard({ title, description, meta, media, actions, href, className, ...props }: ResourceCardProps) {
+function ResourceCard({
+  title,
+  description,
+  meta,
+  media,
+  actions,
+  href,
+  className,
+  ...props
+}: ResourceCardProps) {
   const titleContent = href ? (
     <a href={href} className="underline-offset-4 hover:underline">
       {title}
@@ -222,7 +269,9 @@ function ResourceCard({ title, description, meta, media, actions, href, classNam
       <div className="grid min-w-0 content-start gap-2 p-4">
         <div className="grid gap-1">
           <h2 className="truncate font-semibold">{titleContent}</h2>
-          {description ? <p className="line-clamp-2 text-sm text-muted-foreground">{description}</p> : null}
+          {description ? (
+            <p className="line-clamp-2 text-sm text-muted-foreground">{description}</p>
+          ) : null}
         </div>
         {meta ? <div className="text-xs text-muted-foreground">{meta}</div> : null}
         {actions ? <div className="flex flex-wrap gap-2 pt-1">{actions}</div> : null}

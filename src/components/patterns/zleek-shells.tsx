@@ -72,7 +72,11 @@ function CommandDeck({ items, onCommand, className, ...props }: CommandDeckProps
   return (
     <div
       data-slot="command-deck"
-      className={cn("grid overflow-hidden rounded-[var(--ui-radius-overlay)] p-1.5", glassSurface, className)}
+      className={cn(
+        "grid overflow-hidden rounded-[var(--ui-radius-overlay)] p-1.5",
+        glassSurface,
+        className,
+      )}
       {...props}
     >
       {items.map((item) => (
@@ -86,7 +90,9 @@ function CommandDeck({ items, onCommand, className, ...props }: CommandDeckProps
           <span className="min-w-0">
             <span className="block truncate text-sm font-medium">{item.label}</span>
             {item.description ? (
-              <span className="block truncate text-xs text-muted-foreground">{item.description}</span>
+              <span className="block truncate text-xs text-muted-foreground">
+                {item.description}
+              </span>
             ) : null}
           </span>
           {item.shortcut ? (
@@ -106,7 +112,13 @@ type StatusCapsuleProps = React.ComponentProps<"div"> & {
   detail?: React.ReactNode;
 };
 
-function StatusCapsule({ status = "healthy", label, detail, className, ...props }: StatusCapsuleProps) {
+function StatusCapsule({
+  status = "healthy",
+  label,
+  detail,
+  className,
+  ...props
+}: StatusCapsuleProps) {
   const color =
     status === "critical"
       ? "var(--live-alert)"
@@ -119,7 +131,11 @@ function StatusCapsule({ status = "healthy", label, detail, className, ...props 
     <div
       data-slot="status-capsule"
       data-status={status}
-      className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1.5", glassSurface, className)}
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full px-3 py-1.5",
+        glassSurface,
+        className,
+      )}
       {...props}
     >
       <span
@@ -141,7 +157,15 @@ type LaunchCardProps = React.ComponentProps<"article"> & {
   media?: React.ReactNode;
 };
 
-function LaunchCard({ eyebrow, title, description, action, media, className, ...props }: LaunchCardProps) {
+function LaunchCard({
+  eyebrow,
+  title,
+  description,
+  action,
+  media,
+  className,
+  ...props
+}: LaunchCardProps) {
   return (
     <article
       data-slot="launch-card"
@@ -155,10 +179,14 @@ function LaunchCard({ eyebrow, title, description, action, media, className, ...
       {media ? <div className="absolute inset-0 -z-10 opacity-40">{media}</div> : null}
       <div className="mt-auto grid gap-2">
         {eyebrow ? (
-          <div className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{eyebrow}</div>
+          <div className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            {eyebrow}
+          </div>
         ) : null}
         <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
-        {description ? <p className="max-w-xl text-sm text-muted-foreground">{description}</p> : null}
+        {description ? (
+          <p className="max-w-xl text-sm text-muted-foreground">{description}</p>
+        ) : null}
         {action ? <div className="pt-2">{action}</div> : null}
       </div>
     </article>
@@ -218,7 +246,9 @@ function QuickSwitcher({
               )}
             >
               <span className="truncate font-medium">{item.label}</span>
-              {item.detail ? <span className="text-xs text-muted-foreground">{item.detail}</span> : null}
+              {item.detail ? (
+                <span className="text-xs text-muted-foreground">{item.detail}</span>
+              ) : null}
             </button>
           );
         })}
@@ -247,7 +277,9 @@ function HudPanel({ title = "HUD", metrics, footer, className, ...props }: HudPa
       {...props}
     >
       <header className="flex items-center justify-between gap-3 border-b border-white/10 pb-2">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{title}</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          {title}
+        </h2>
         <span
           aria-hidden="true"
           className="size-1.5 rounded-full bg-[var(--live-active)] shadow-[0_0_10px_var(--live-active)]"
@@ -256,12 +288,18 @@ function HudPanel({ title = "HUD", metrics, footer, className, ...props }: HudPa
       <dl className="grid grid-cols-2 gap-2">
         {metrics.map((metric) => (
           <div key={metric.id} className="grid gap-0.5">
-            <dt className="text-[0.65rem] uppercase tracking-wide text-muted-foreground">{metric.label}</dt>
+            <dt className="text-[0.65rem] uppercase tracking-wide text-muted-foreground">
+              {metric.label}
+            </dt>
             <dd className="text-lg font-semibold tabular-nums">{metric.value}</dd>
           </div>
         ))}
       </dl>
-      {footer ? <footer className="border-t border-white/10 pt-2 text-xs text-muted-foreground">{footer}</footer> : null}
+      {footer ? (
+        <footer className="border-t border-white/10 pt-2 text-xs text-muted-foreground">
+          {footer}
+        </footer>
+      ) : null}
     </section>
   );
 }

@@ -78,8 +78,12 @@ function MorphingDialog({
                 className="grid w-full max-w-lg gap-4 rounded-[var(--ui-radius-overlay)] border bg-card p-5 shadow-[var(--ui-shadow-interactive)]"
               >
                 <div className="grid gap-1">
-                  <h2 id={titleId} className="text-lg font-semibold">{title}</h2>
-                  {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
+                  <h2 id={titleId} className="text-lg font-semibold">
+                    {title}
+                  </h2>
+                  {description ? (
+                    <p className="text-sm text-muted-foreground">{description}</p>
+                  ) : null}
                 </div>
                 <div>{children}</div>
                 <div className="flex flex-wrap justify-end gap-2">
@@ -147,7 +151,13 @@ type SpatialSegmentedControlProps = React.ComponentProps<"div"> & {
   onValueChange?: (value: string) => void;
 };
 
-function SpatialSegmentedControl({ items, value, onValueChange, className, ...props }: SpatialSegmentedControlProps) {
+function SpatialSegmentedControl({
+  items,
+  value,
+  onValueChange,
+  className,
+  ...props
+}: SpatialSegmentedControlProps) {
   const reduce = useReducedMotion();
   return (
     <div
@@ -174,7 +184,9 @@ function SpatialSegmentedControl({ items, value, onValueChange, className, ...pr
               <motion.span
                 layoutId="pulse-spatial-segment"
                 className="absolute inset-0 -z-10 rounded-[var(--ui-radius-control)] bg-background shadow-sm"
-                transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 540, damping: 34 }}
+                transition={
+                  reduce ? { duration: 0 } : { type: "spring", stiffness: 540, damping: 34 }
+                }
               />
             ) : null}
             {item.label}
@@ -230,7 +242,9 @@ function ExpandingCard({
           <span className="font-semibold">{title}</span>
           {summary ? <span className="text-sm text-muted-foreground">{summary}</span> : null}
         </span>
-        <motion.span aria-hidden="true" animate={{ rotate: resolved ? 180 : 0 }}>⌄</motion.span>
+        <motion.span aria-hidden="true" animate={{ rotate: resolved ? 180 : 0 }}>
+          ⌄
+        </motion.span>
       </button>
       <AnimatePresence initial={false}>
         {resolved ? (
@@ -273,7 +287,11 @@ function KineticBreadcrumbs({ items, onSelect, className, ...props }: KineticBre
         <AnimatePresence initial={false}>
           {items.map((item, index) => (
             <motion.div key={item.id} layout className="inline-flex min-w-0 items-center gap-1">
-              {index > 0 ? <span aria-hidden="true" className="text-muted-foreground">›</span> : null}
+              {index > 0 ? (
+                <span aria-hidden="true" className="text-muted-foreground">
+                  ›
+                </span>
+              ) : null}
               <button
                 type="button"
                 onClick={() => onSelect?.(item.id)}
@@ -306,7 +324,13 @@ type PanelStackProps = React.ComponentProps<"div"> & {
   onActiveIndexChange?: (index: number) => void;
 };
 
-function PanelStack({ panels, activeIndex, onActiveIndexChange, className, ...props }: PanelStackProps) {
+function PanelStack({
+  panels,
+  activeIndex,
+  onActiveIndexChange,
+  className,
+  ...props
+}: PanelStackProps) {
   const reduce = useReducedMotion();
   const clamped = Math.min(Math.max(activeIndex, 0), Math.max(panels.length - 1, 0));
   const panel = panels[clamped];
@@ -355,7 +379,14 @@ function PanelStack({ panels, activeIndex, onActiveIndexChange, className, ...pr
   );
 }
 
-export { ExpandingCard, KineticBreadcrumbs, KineticList, MorphingDialog, PanelStack, SpatialSegmentedControl };
+export {
+  ExpandingCard,
+  KineticBreadcrumbs,
+  KineticList,
+  MorphingDialog,
+  PanelStack,
+  SpatialSegmentedControl,
+};
 export type {
   ExpandingCardProps,
   KineticBreadcrumb,
