@@ -1,0 +1,86 @@
+name: Fix PR7 Compatibility
+
+on:
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.event.pull_request.head.ref == 'work/theme-vocabulary-components'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.12
+      - run: bun install --frozen-lockfile
+      - name: Apply compatibility fixes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          for name in ["zleek", "atlas", "studio", "paper", "scholia", "pop", "pulse"]:
+              path = Path(f"src/{name}.ts")
+              text = path.read_text()
+              lines = [line for line in text.splitlines() if not line.startswith('export * from "./components/patterns/')]
+              path.write_text("\n".join(lines) + "\n")
+
+          path = Path("src/components/patterns/product-patterns.tsx")
+          text = path.read_text()
+          text = text.replace("EmptyStateProps", "ProductEmptyStateProps")
+          text = text.replace("EmptyState", "ProductEmptyState")
+          text = text.replace("FormActionsProps", "ProductFormActionsProps")
+          text = text.replace("FormActions", "ProductFormActions")
+          path.write_text(text)
+
+          for file in [
+              "src/components/patterns/theme-vocabularies.stories.tsx",
+              "src/components/patterns/theme-vocabularies.test.tsx",
+          ]:
+              path = Path(file)
+              text = path.read_text()
+              text = text.replace("EmptyState", "ProductEmptyState")
+              text = text.replace("FormActions", "ProductFormActions")
+              path.write_text(text)
+
+          path = Path("src/components/patterns/pulse-spatial.tsx")
+          text = path.read_text().replace(
+              'type ExpandingCardProps = HTMLMotionProps<"article"> & {',
+              'type ExpandingCardProps = Omit<HTMLMotionProps<"article">, "children"> & {',
+          )
+          path.write_text(text)
+
+          path = Path("src/components/patterns/studio-tools.tsx")
+          text = path.read_text().replace(
+              'type LayerStackProps = React.ComponentProps<"div"> & {',
+              'type LayerStackProps = Omit<React.ComponentProps<"div">, "onSelect"> & {',
+          )
+          path.write_text(text)
+          PY
+          bunx oxfmt --write src/zleek.ts src/atlas.ts src/studio.ts src/paper.ts src/scholia.ts src/pop.ts src/pulse.ts \
+            src/components/patterns/product-patterns.tsx \
+            src/components/patterns/theme-vocabularies.stories.tsx \
+            src/components/patterns/theme-vocabularies.test.tsx \
+            src/components/patterns/pulse-spatial.tsx \
+            src/components/patterns/studio-tools.tsx
+          bun run sync:registry
+          bunx oxfmt --write registry/default/ui/product-patterns.tsx registry/default/ui/pulse-spatial.tsx registry/default/ui/studio-tools.tsx
+      - name: Verify focused contracts
+        run: |
+          bun run format:check
+          bun run check-types
+          bun run test:unit -- src/package-contract.test.ts src/components/patterns/state-view.test.tsx src/components/patterns/theme-vocabularies.test.tsx
+          bun run verify:registry
+      - name: Commit fixes
+        env:
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src registry/default/ui
+          git diff --cached --quiet || git commit -m "Fix theme vocabulary package compatibility"
+          git push origin "HEAD:$BRANCH"
