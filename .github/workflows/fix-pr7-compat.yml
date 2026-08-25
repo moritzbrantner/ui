@@ -50,7 +50,7 @@ jobs:
           path = Path("src/components/patterns/pulse-spatial.tsx")
           text = path.read_text().replace(
               'type ExpandingCardProps = HTMLMotionProps<"article"> & {',
-              'type ExpandingCardProps = Omit<HTMLMotionProps<"article">, "children"> & {',
+              'type ExpandingCardProps = Omit<HTMLMotionProps<"article">, "children"> & {\n  children?: React.ReactNode;',
           )
           path.write_text(text)
 
