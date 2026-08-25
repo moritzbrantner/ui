@@ -12,7 +12,7 @@ import {
   type TargetAndTransition,
   type Transition,
 } from "motion/react";
-import { XIcon } from "lucide-react";
+import { ChevronDownIcon, XIcon } from "lucide-react";
 
 import { cn } from "@/registry/default/lib/cn";
 import { buttonVariants } from "@/registry/default/ui/button";
@@ -139,6 +139,97 @@ function MotionButton({
   );
 }
 
+type FlowButtonProps = HTMLMotionProps<"button"> & VariantProps<typeof buttonVariants>;
+
+function FlowButton({
+  className,
+  variant = "default",
+  size = "default",
+  disabled,
+  children,
+  onPointerEnter,
+  onPointerMove,
+  onPointerLeave,
+  style,
+  ...props
+}: FlowButtonProps) {
+  const { recipe } = useUiMotionRecipe("pulse");
+  const shouldReduceMotion = useReducedMotion();
+  const [flowPoint, setFlowPoint] = React.useState({ x: 50, y: 50 });
+  const [active, setActive] = React.useState(false);
+
+  const updateFlowPoint = React.useCallback((event: React.PointerEvent<HTMLButtonElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = bounds.width > 0 ? ((event.clientX - bounds.left) / bounds.width) * 100 : 50;
+    const y = bounds.height > 0 ? ((event.clientY - bounds.top) / bounds.height) * 100 : 50;
+
+    setFlowPoint({
+      x: Math.min(Math.max(x, 0), 100),
+      y: Math.min(Math.max(y, 0), 100),
+    });
+  }, []);
+
+  return (
+    <motion.button
+      data-slot="flow-button"
+      data-motion-profile="pulse"
+      data-variant={variant}
+      data-size={size}
+      className={cn("relative isolate overflow-hidden", buttonVariants({ variant, size, className }))}
+      disabled={disabled}
+      initial={false}
+      whileHover={disabled ? undefined : recipe.button.hover}
+      whileTap={disabled ? undefined : recipe.button.tap}
+      transition={recipe.button.transition}
+      style={
+        {
+          ...style,
+          "--flow-x": `${flowPoint.x}%`,
+          "--flow-y": `${flowPoint.y}%`,
+        } as React.CSSProperties
+      }
+      onPointerEnter={(event) => {
+        if (!disabled) {
+          updateFlowPoint(event);
+          setActive(true);
+        }
+        onPointerEnter?.(event);
+      }}
+      onPointerMove={(event) => {
+        if (!disabled) {
+          updateFlowPoint(event);
+        }
+        onPointerMove?.(event);
+      }}
+      onPointerLeave={(event) => {
+        setActive(false);
+        setFlowPoint({ x: 50, y: 50 });
+        onPointerLeave?.(event);
+      }}
+      {...props}
+    >
+      <motion.span
+        data-slot="flow-button-highlight"
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(circle at var(--flow-x) var(--flow-y), color-mix(in oklch,currentColor 22%,transparent) 0%, color-mix(in oklch,currentColor 8%,transparent) 24%, transparent 58%)",
+        }}
+        initial={false}
+        animate={{
+          opacity: active ? 1 : 0,
+          scale: shouldReduceMotion ? 1 : active ? 1.08 : 0.94,
+        }}
+        transition={shouldReduceMotion ? { duration: 0 } : recipe.indicator.transition}
+      />
+      <span className="relative z-10 inline-flex items-center gap-[var(--ui-control-gap)]">
+        {children}
+      </span>
+    </motion.button>
+  );
+}
+
 type MotionTabsContextValue = {
   indicatorId: string;
   profile: UiMotionProfileName;
@@ -241,6 +332,122 @@ function MotionTabsContent({ className, ...props }: MotionTabsContentProps) {
   return <TabsContent data-slot="motion-tabs-content" className={className} {...props} />;
 }
 
+type KineticAccordionProps = Omit<HTMLMotionProps<"section">, "title"> & {
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  disabled?: boolean;
+};
+
+function KineticAccordion({
+  title,
+  description,
+  open,
+  defaultOpen = false,
+  onOpenChange,
+  disabled = false,
+  className,
+  children,
+  ...props
+}: KineticAccordionProps) {
+  const { recipe } = useUiMotionRecipe("pulse");
+  const shouldReduceMotion = useReducedMotion();
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
+  const triggerId = React.useId();
+  const contentId = React.useId();
+  const controlled = open !== undefined;
+  const resolvedOpen = controlled ? open : uncontrolledOpen;
+
+  const setOpen = React.useCallback(
+    (nextOpen: boolean) => {
+      if (!controlled) {
+        setUncontrolledOpen(nextOpen);
+      }
+      onOpenChange?.(nextOpen);
+    },
+    [controlled, onOpenChange],
+  );
+
+  return (
+    <motion.section
+      data-slot="kinetic-accordion"
+      data-motion-profile="pulse"
+      data-state={resolvedOpen ? "open" : "closed"}
+      layout={!shouldReduceMotion}
+      className={cn(
+        "overflow-hidden rounded-[var(--ui-radius-surface)] border bg-card text-card-foreground shadow-xs",
+        className,
+      )}
+      transition={recipe.indicator.transition}
+      {...props}
+    >
+      <button
+        id={triggerId}
+        type="button"
+        data-slot="kinetic-accordion-trigger"
+        aria-expanded={resolvedOpen}
+        aria-controls={contentId}
+        disabled={disabled}
+        className="group relative flex w-full items-center gap-3 px-4 py-3 text-left outline-none transition-colors hover:bg-muted/45 focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50"
+        onClick={() => setOpen(!resolvedOpen)}
+      >
+        <motion.span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-primary/6"
+          initial={false}
+          animate={{ opacity: resolvedOpen ? 1 : 0 }}
+          transition={shouldReduceMotion ? { duration: 0 } : recipe.indicator.transition}
+        />
+        <span className="relative z-10 min-w-0 flex-1">
+          <span className="block text-sm font-semibold">{title}</span>
+          {description ? (
+            <span className="mt-0.5 block text-sm font-normal text-muted-foreground">
+              {description}
+            </span>
+          ) : null}
+        </span>
+        <motion.span
+          data-slot="kinetic-accordion-icon"
+          aria-hidden="true"
+          className="relative z-10 grid size-7 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground"
+          initial={false}
+          animate={{ rotate: shouldReduceMotion ? 0 : resolvedOpen ? 180 : 0 }}
+          transition={shouldReduceMotion ? { duration: 0 } : recipe.indicator.transition}
+        >
+          <ChevronDownIcon className="size-4" />
+        </motion.span>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {resolvedOpen ? (
+          <motion.div
+            key="content"
+            id={contentId}
+            data-slot="kinetic-accordion-content"
+            role="region"
+            aria-labelledby={triggerId}
+            className="overflow-hidden"
+            initial={shouldReduceMotion ? { opacity: 0 } : { height: 0, opacity: 0, y: -8 }}
+            animate={shouldReduceMotion ? { opacity: 1 } : { height: "auto", opacity: 1, y: 0 }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { height: 0, opacity: 0, y: -6 }}
+            transition={shouldReduceMotion ? { duration: 0 } : recipe.indicator.transition}
+          >
+            <motion.div
+              layout={!shouldReduceMotion}
+              className="border-t px-4 py-3 text-sm text-muted-foreground"
+              transition={recipe.indicator.transition}
+            >
+              {children}
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </motion.section>
+  );
+}
+
 type MotionToastProps = Omit<HTMLMotionProps<"div">, "title"> & {
   open: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -305,6 +512,8 @@ function MotionToast({
 }
 
 export {
+  FlowButton,
+  KineticAccordion,
   MotionButton,
   MotionTabs,
   MotionTabsContent,
@@ -315,6 +524,8 @@ export {
   uiMotionRecipes,
 };
 export type {
+  FlowButtonProps,
+  KineticAccordionProps,
   MotionButtonProps,
   MotionTabsContentProps,
   MotionTabsListProps,
