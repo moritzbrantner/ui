@@ -582,9 +582,7 @@ function RewardLoader({
                 viewBox="0 0 24 24"
                 className="size-5 text-primary"
                 initial={{ opacity: 0 }}
-                animate={
-                  reward.shouldReduceMotion ? { opacity: 1 } : { opacity: 1, rotate: 360 }
-                }
+                animate={reward.shouldReduceMotion ? { opacity: 1 } : { opacity: 1, rotate: 360 }}
                 exit={{ opacity: 0, scale: reward.shouldReduceMotion ? 1 : 0.84 }}
                 transition={
                   reward.shouldReduceMotion

@@ -175,7 +175,10 @@ function FlowButton({
       data-motion-profile="pulse"
       data-variant={variant}
       data-size={size}
-      className={cn("relative isolate overflow-hidden", buttonVariants({ variant, size, className }))}
+      className={cn(
+        "relative isolate overflow-hidden",
+        buttonVariants({ variant, size, className }),
+      )}
       disabled={disabled}
       initial={false}
       whileHover={disabled ? undefined : recipe.button.hover}
