@@ -5,6 +5,8 @@ import { expect, waitFor, within } from "storybook/test";
 
 import { UiTheme } from "../../themes";
 import {
+  FlowButton,
+  KineticAccordion,
   MotionButton,
   MotionTabs,
   MotionTabsContent,
@@ -40,13 +42,17 @@ function MotionProfileDemo({ profile }: { profile: UiMotionProfileName }) {
             <p className="text-sm text-muted-foreground">
               {isPop
                 ? "Playful lift and spring feedback for creator-facing surfaces."
-                : "Faster spatial movement for selection-heavy and kinetic interfaces."}
+                : "Continuous spatial movement for selection, expansion, and kinetic interfaces."}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-2">
             <MotionButton onClick={() => setToastOpen(true)}>Show {profile} toast</MotionButton>
-            <MotionButton variant="outline">Hover and press</MotionButton>
+            {isPop ? (
+              <MotionButton variant="outline">Hover and press</MotionButton>
+            ) : (
+              <FlowButton variant="outline">Follow the pointer</FlowButton>
+            )}
           </div>
 
           <MotionTabs defaultValue="motion">
@@ -80,6 +86,17 @@ function MotionProfileDemo({ profile }: { profile: UiMotionProfileName }) {
               Reduced-motion preferences keep opacity feedback while removing spatial movement.
             </MotionTabsContent>
           </MotionTabs>
+
+          {!isPop ? (
+            <KineticAccordion
+              title="Kinetic details"
+              description="Expand without breaking spatial continuity."
+              data-testid="kinetic-accordion"
+            >
+              The surface grows from the trigger, the disclosure icon turns with the state change,
+              and surrounding layout follows the same transition.
+            </KineticAccordion>
+          ) : null}
 
           <div className="mt-auto min-h-28">
             <MotionToast
@@ -119,7 +136,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Motion-enhanced Button, Tabs, and Toast patterns for the Pop and Pulse styles. The stable CSS primitives remain the lightweight baseline.",
+          "Motion-enhanced Button, Tabs, and Toast patterns for Pop plus pointer-responsive FlowButton and geometry-preserving KineticAccordion for Pulse. The stable CSS primitives remain the lightweight baseline.",
       },
     },
   },
@@ -137,6 +154,14 @@ export const SideBySide: Story = {
     await userEvent.click(tokensTab);
     await expect(tokensTab).toHaveAttribute("data-state", "active");
     await expect(pulseDemo.getByText(/mirrors the style-owned CSS motion tokens/)).toBeVisible();
+
+    await expect(pulseDemo.getByRole("button", { name: "Follow the pointer" })).toHaveAttribute(
+      "data-slot",
+      "flow-button",
+    );
+
+    await userEvent.click(pulseDemo.getByRole("button", { name: /Kinetic details/ }));
+    await expect(pulseDemo.getByRole("region", { name: /Kinetic details/ })).toBeVisible();
 
     await userEvent.click(pulseDemo.getByRole("button", { name: "Show pulse toast" }));
     const toast = pulseDemo.getByRole("status");
