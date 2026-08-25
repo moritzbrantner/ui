@@ -186,15 +186,15 @@ function TranslationPair({
       {...props}
     >
       <section className="grid content-start gap-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {sourceLanguage}
-        </h3>
+        </div>
         <div className="leading-7">{source}</div>
       </section>
       <section className="grid content-start gap-2 border-t pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-5">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {translationLanguage}
-        </h3>
+        </div>
         <div className="leading-7">{translation}</div>
       </section>
     </div>
