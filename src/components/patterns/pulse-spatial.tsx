@@ -197,7 +197,8 @@ function SpatialSegmentedControl({
   );
 }
 
-type ExpandingCardProps = HTMLMotionProps<"article"> & {
+type ExpandingCardProps = Omit<HTMLMotionProps<"article">, "children"> & {
+  children?: React.ReactNode;
   expanded?: boolean;
   defaultExpanded?: boolean;
   onExpandedChange?: (expanded: boolean) => void;

@@ -215,7 +215,7 @@ type StudioLayer = {
   depth?: number;
 };
 
-type LayerStackProps = React.ComponentProps<"div"> & {
+type LayerStackProps = Omit<React.ComponentProps<"div">, "onSelect"> & {
   layers: readonly StudioLayer[];
   selectedId?: React.Key | null;
   onSelect?: (id: React.Key) => void;

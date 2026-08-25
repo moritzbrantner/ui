@@ -26,8 +26,8 @@ import {
   StreakIndicator,
 } from "./pop-rewards-extended";
 import {
-  EmptyState,
-  FormActions,
+  ProductEmptyState,
+  ProductFormActions,
   InlineEdit,
   ResourceCard,
   ResponsiveToolbar,
@@ -478,7 +478,7 @@ export const ProductPatterns: Story = {
             Name
             <input className="rounded border bg-background px-2 py-1.5" defaultValue="Example" />
           </label>
-          <FormActions
+          <ProductFormActions
             primary={
               <button
                 type="button"
@@ -500,7 +500,7 @@ export const ProductPatterns: Story = {
             description="Reusable resource presentation rather than a Bobba-specific component."
             meta="Updated today"
           />
-          <EmptyState
+          <ProductEmptyState
             title="No archived projects"
             description="Create or import a project to see it here."
             action={

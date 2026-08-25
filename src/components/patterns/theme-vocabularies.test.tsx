@@ -4,7 +4,7 @@ import { describe, expect, test, vi } from "vitest";
 import { KpiStrip, OperationalTable } from "./atlas-operations";
 import { OcrDiff } from "./paper-documents";
 import { CompletionRing, RewardChecklist } from "./pop-rewards-extended";
-import { EmptyState, InlineEdit } from "./product-patterns";
+import { ProductEmptyState, InlineEdit } from "./product-patterns";
 import { ExpandingCard, SpatialSegmentedControl } from "./pulse-spatial";
 import { InterpretationCompare, LemmaAnchor } from "./scholia-research";
 import { MediaTransport } from "./studio-tools";
@@ -115,7 +115,7 @@ describe("theme vocabulary components", () => {
     const onCommit = vi.fn();
     render(
       <>
-        <EmptyState title="Nothing here yet" />
+        <ProductEmptyState title="Nothing here yet" />
         <InlineEdit value="Original" onCommit={onCommit} />
       </>,
     );
