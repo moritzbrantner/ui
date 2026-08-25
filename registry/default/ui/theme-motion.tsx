@@ -395,7 +395,7 @@ function KineticAccordion({
       >
         <motion.span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-primary/6"
+          className="pointer-events-none absolute inset-0 bg-primary/10"
           initial={false}
           animate={{ opacity: resolvedOpen ? 1 : 0 }}
           transition={shouldReduceMotion ? { duration: 0 } : recipe.indicator.transition}
