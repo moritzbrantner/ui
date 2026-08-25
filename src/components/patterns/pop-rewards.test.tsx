@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
 import {
@@ -152,7 +152,7 @@ describe("Pop rewards", () => {
     ).toBe("upcoming");
   });
 
-  test("resolves a loading spinner into accessible success feedback", () => {
+  test("resolves a loading spinner into accessible success feedback", async () => {
     const { rerender } = render(
       <CelebrationProvider reducedMotion="always">
         <RewardLoader
@@ -180,7 +180,9 @@ describe("Pop rewards", () => {
 
     expect(screen.getByTestId("reward-loader").getAttribute("data-status")).toBe("success");
     expect(screen.getByText("Changes saved")).toBeTruthy();
-    expect(document.querySelector('[data-slot="reward-loader-success"]')).toBeTruthy();
+    await waitFor(() => {
+      expect(document.querySelector('[data-slot="reward-loader-success"]')).toBeTruthy();
+    });
   });
 
   test("marks newly added collection items without owning collection state", () => {
