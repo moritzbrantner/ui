@@ -37,7 +37,7 @@ function SettingsSection({
   );
 }
 
-type ProductProductEmptyStateProps = React.ComponentProps<"section"> & {
+type ProductEmptyStateProps = React.ComponentProps<"section"> & {
   icon?: React.ReactNode;
   title: React.ReactNode;
   description?: React.ReactNode;
@@ -53,7 +53,7 @@ function ProductEmptyState({
   secondaryAction,
   className,
   ...props
-}: ProductProductEmptyStateProps) {
+}: ProductEmptyStateProps) {
   return (
     <section
       data-slot="empty-state"
@@ -82,7 +82,7 @@ function ProductEmptyState({
   );
 }
 
-type ProductProductFormActionsProps = React.ComponentProps<"div"> & {
+type ProductFormActionsProps = React.ComponentProps<"div"> & {
   primary?: React.ReactNode;
   secondary?: React.ReactNode;
   tertiary?: React.ReactNode;
@@ -96,7 +96,7 @@ function ProductFormActions({
   sticky = false,
   className,
   ...props
-}: ProductProductFormActionsProps) {
+}: ProductFormActionsProps) {
   return (
     <div
       data-slot="form-actions"
@@ -289,8 +289,8 @@ export {
   SettingsSection,
 };
 export type {
-  ProductProductEmptyStateProps,
-  ProductProductFormActionsProps,
+  ProductEmptyStateProps,
+  ProductFormActionsProps,
   InlineEditProps,
   ResourceCardProps,
   ResponsiveToolbarProps,
