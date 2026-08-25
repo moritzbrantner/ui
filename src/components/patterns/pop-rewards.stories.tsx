@@ -237,7 +237,7 @@ export const Playground: Story = {
     await waitFor(() => expect(playground.getByTestId("idea-3")).toHaveStyle({ opacity: "1" }));
 
     await userEvent.click(playground.getByRole("button", { name: "Complete goal" }));
-    await expect(playground.getByText("Goal completed")).toBeVisible();
+    await waitFor(() => expect(playground.getByText("Goal completed")).toBeVisible());
 
     await userEvent.click(playground.getByRole("button", { name: "Resolve loader" }));
     await expect(playground.getByTestId("reward-loader")).toHaveAttribute("data-status", "success");
