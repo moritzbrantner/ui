@@ -40,22 +40,24 @@ function KpiStrip({ items, className, ...props }: KpiStripProps) {
       {items.map((item) => (
         <div key={item.id} className="grid min-w-0 gap-1 px-3 py-2.5">
           <dt className="truncate text-xs font-medium text-muted-foreground">{item.label}</dt>
-          <dd className="flex min-w-0 items-baseline justify-between gap-2">
-            <span className="truncate text-lg font-semibold tabular-nums">{item.value}</span>
-            {item.delta ? (
-              <span
-                className={cn(
-                  "shrink-0 text-xs font-medium tabular-nums",
-                  toneClassNames[item.tone ?? "neutral"],
-                )}
-              >
-                {item.delta}
-              </span>
+          <dd className="grid min-w-0 gap-1">
+            <span className="flex min-w-0 items-baseline justify-between gap-2">
+              <span className="truncate text-lg font-semibold tabular-nums">{item.value}</span>
+              {item.delta ? (
+                <span
+                  className={cn(
+                    "shrink-0 text-xs font-medium tabular-nums",
+                    toneClassNames[item.tone ?? "neutral"],
+                  )}
+                >
+                  {item.delta}
+                </span>
+              ) : null}
+            </span>
+            {item.meta ? (
+              <span className="truncate text-xs text-muted-foreground">{item.meta}</span>
             ) : null}
           </dd>
-          {item.meta ? (
-            <div className="truncate text-xs text-muted-foreground">{item.meta}</div>
-          ) : null}
         </div>
       ))}
     </dl>
