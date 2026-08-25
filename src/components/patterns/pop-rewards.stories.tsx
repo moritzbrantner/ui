@@ -9,8 +9,9 @@ import {
   AddToCollection,
   AnimatedCounter,
   CelebrationProvider,
-  ProgressPop,
+  MilestoneProgress,
   RewardBurst,
+  RewardLoader,
   SuccessPop,
   type PopRewardLevel,
 } from "./pop-rewards";
@@ -32,6 +33,7 @@ function PopRewardPlayground() {
     { id: 2, label: "Name the core interaction" },
   ]);
   const [progress, setProgress] = React.useState(40);
+  const [loaderStatus, setLoaderStatus] = React.useState<"loading" | "success">("loading");
   const [success, setSuccess] = React.useState<{
     title: string;
     description: string;
@@ -62,6 +64,7 @@ function PopRewardPlayground() {
 
   const celebrateMilestone = () => {
     setProgress(100);
+    setLoaderStatus("success");
     setSuccess({
       title: "Milestone reached",
       description: "Celebration intensity is reserved for something the person genuinely achieved.",
@@ -144,11 +147,7 @@ function PopRewardPlayground() {
               <h3 className="font-semibold">Project momentum</h3>
             </div>
 
-            <ProgressPop
-              value={progress}
-              label="Reward system progress"
-              rewardKey={rewardTarget === "milestone" ? rewardKey : null}
-            />
+            <MilestoneProgress value={progress} label="Reward system progress" />
 
             <div className="flex flex-wrap gap-2">
               <RewardBurst
@@ -170,6 +169,25 @@ function PopRewardPlayground() {
                   Reach milestone
                 </MotionButton>
               </RewardBurst>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--ui-radius-control)] bg-muted/45 p-3">
+              <RewardLoader
+                status={loaderStatus}
+                label="Publishing milestone"
+                successLabel="Milestone published"
+                data-testid="reward-loader"
+              />
+              <MotionButton
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() =>
+                  setLoaderStatus((current) => (current === "loading" ? "success" : "loading"))
+                }
+              >
+                {loaderStatus === "loading" ? "Resolve loader" : "Reset loader"}
+              </MotionButton>
             </div>
 
             <SuccessPop
@@ -200,7 +218,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Event-driven Pop reward primitives with subtle, satisfying, and celebration intensity. Product state, reward timing, and whether an achievement is meaningful remain app-owned.",
+          "Event-driven Pop reward primitives with milestone-aware progress and resolving loaders alongside subtle, satisfying, and celebration intensity. Product state and whether an achievement is meaningful remain app-owned.",
       },
     },
   },
@@ -219,8 +237,9 @@ export const Playground: Story = {
     await waitFor(() => expect(playground.getByTestId("idea-3")).toHaveStyle({ opacity: "1" }));
 
     await userEvent.click(playground.getByRole("button", { name: "Complete goal" }));
-    const success = playground.getByRole("status");
-    await expect(success).toHaveTextContent("Goal completed");
-    await waitFor(() => expect(success).toHaveStyle({ opacity: "1" }));
+    await expect(playground.getByText("Goal completed")).toBeVisible();
+
+    await userEvent.click(playground.getByRole("button", { name: "Resolve loader" }));
+    await expect(playground.getByTestId("reward-loader")).toHaveAttribute("data-status", "success");
   },
 };
