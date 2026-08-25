@@ -139,7 +139,10 @@ function MotionButton({
   );
 }
 
-type FlowButtonProps = HTMLMotionProps<"button"> & VariantProps<typeof buttonVariants>;
+type FlowButtonProps = Omit<HTMLMotionProps<"button">, "children"> &
+  VariantProps<typeof buttonVariants> & {
+    children?: React.ReactNode;
+  };
 
 function FlowButton({
   className,
