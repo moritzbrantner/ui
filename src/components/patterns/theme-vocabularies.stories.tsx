@@ -400,7 +400,10 @@ export const ZleekShells: Story = {
             title="Launch production"
             description="A focused glass surface for high-value actions."
             action={
-              <button type="button" className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground">
+              <button
+                type="button"
+                className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground"
+              >
                 Launch
               </button>
             }
@@ -477,7 +480,10 @@ export const ProductPatterns: Story = {
           </label>
           <FormActions
             primary={
-              <button type="button" className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground">
+              <button
+                type="button"
+                className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground"
+              >
                 Save
               </button>
             }
@@ -498,7 +504,10 @@ export const ProductPatterns: Story = {
             title="No archived projects"
             description="Create or import a project to see it here."
             action={
-              <button type="button" className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground">
+              <button
+                type="button"
+                className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground"
+              >
                 Create project
               </button>
             }
@@ -545,7 +554,10 @@ export const PopRewardsExtended: Story = {
             description="Invite people into the moment rather than ending on a neutral toast."
             preview={<div className="grid h-full place-items-center bg-primary/10">Preview</div>}
             actions={
-              <button type="button" className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground">
+              <button
+                type="button"
+                className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground"
+              >
                 Share now
               </button>
             }

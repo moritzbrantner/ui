@@ -69,7 +69,8 @@ const zleekThemeManifest = {
       {
         name: "zleek-shells",
         role: "component",
-        description: "Glass docks, command decks, status capsules, launch cards, switchers, and HUD panels.",
+        description:
+          "Glass docks, command decks, status capsules, launch cards, switchers, and HUD panels.",
         install: "moritzbrantner/ui/zleek-shells",
       },
     ],
@@ -135,7 +136,8 @@ const atlasThemeManifest = {
       {
         name: "atlas-operations",
         role: "component",
-        description: "KPI strips, delta cells, map legends, operational tables, alert rails, and sparklines.",
+        description:
+          "KPI strips, delta cells, map legends, operational tables, alert rails, and sparklines.",
         install: "moritzbrantner/ui/atlas-operations",
       },
     ],
@@ -167,7 +169,8 @@ const studioThemeManifest = {
       {
         name: "studio-tools",
         role: "component",
-        description: "Media transport, timeline, playhead, scrubber, layers, inspector, tool shelf, and before/after tools.",
+        description:
+          "Media transport, timeline, playhead, scrubber, layers, inspector, tool shelf, and before/after tools.",
         install: "moritzbrantner/ui/studio-tools",
       },
     ],
@@ -195,14 +198,16 @@ const paperThemeManifest = {
     theme: {
       name: "paper-theme",
       role: "theme",
-      description: "Complete Paper document and research foundation with light/dark document tokens.",
+      description:
+        "Complete Paper document and research foundation with light/dark document tokens.",
       install: "moritzbrantner/ui/paper-theme",
     },
     components: [
       {
         name: "paper-documents",
         role: "component",
-        description: "Document pages, page rails, OCR diffing, translation pairs, outlines, and annotation threads.",
+        description:
+          "Document pages, page rails, OCR diffing, translation pairs, outlines, and annotation threads.",
         install: "moritzbrantner/ui/paper-documents",
       },
     ],
@@ -239,13 +244,15 @@ const scholiaThemeManifest = {
       {
         name: "source-passage",
         role: "component",
-        description: "Parallel source and translation presentation with locator and highlight slots.",
+        description:
+          "Parallel source and translation presentation with locator and highlight slots.",
         install: "moritzbrantner/ui/source-passage",
       },
       {
         name: "apparatus-list",
         role: "component",
-        description: "Compact critical-apparatus readings with witness, locator, and note semantics.",
+        description:
+          "Compact critical-apparatus readings with witness, locator, and note semantics.",
         install: "moritzbrantner/ui/apparatus-list",
       },
       {
@@ -257,7 +264,8 @@ const scholiaThemeManifest = {
       {
         name: "scholia-research",
         role: "component",
-        description: "Marginalia, citation trails, interpretation comparison, passage navigation, witnesses, and lemma anchors.",
+        description:
+          "Marginalia, citation trails, interpretation comparison, passage navigation, witnesses, and lemma anchors.",
         install: "moritzbrantner/ui/scholia-research",
       },
     ],
@@ -265,7 +273,8 @@ const scholiaThemeManifest = {
       {
         name: "scholia-source-workbench",
         role: "block",
-        description: "Source-first workbench composition for text, translation, apparatus, and notes.",
+        description:
+          "Source-first workbench composition for text, translation, apparatus, and notes.",
         install: "moritzbrantner/ui/scholia-source-workbench",
       },
     ],
@@ -295,13 +304,15 @@ const popThemeManifest = {
       {
         name: "pop-rewards",
         role: "component",
-        description: "Event-driven reward bursts, success feedback, counters, progress, and collection entry motion for Pop.",
+        description:
+          "Event-driven reward bursts, success feedback, counters, progress, and collection entry motion for Pop.",
         install: "moritzbrantner/ui/pop-rewards",
       },
       {
         name: "pop-rewards-extended",
         role: "component",
-        description: "Achievements, streaks, completion rings, reward checklists, share success, and reaction bursts.",
+        description:
+          "Achievements, streaks, completion rings, reward checklists, share success, and reaction bursts.",
         install: "moritzbrantner/ui/pop-rewards-extended",
       },
     ],
@@ -337,7 +348,8 @@ const pulseThemeManifest = {
       {
         name: "pulse-spatial",
         role: "component",
-        description: "Morphing dialogs, kinetic lists, spatial selection, expanding cards, breadcrumbs, and panel stacks.",
+        description:
+          "Morphing dialogs, kinetic lists, spatial selection, expanding cards, breadcrumbs, and panel stacks.",
         install: "moritzbrantner/ui/pulse-spatial",
       },
     ],
