@@ -243,7 +243,7 @@ function SuccessPop({
           <div className="min-w-0">
             <div className="text-sm font-semibold">{title}</div>
             {description ? (
-              <div className="mt-0.5 text-sm text-muted-foreground">{description}</div>
+              <div className="mt-0.5 text-sm text-foreground">{description}</div>
             ) : null}
             {action ? <div className="mt-2 flex flex-wrap items-center gap-2">{action}</div> : null}
           </div>
