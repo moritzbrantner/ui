@@ -1,12 +1,14 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
 import {
   AddToCollection,
   AnimatedCounter,
   CelebrationProvider,
+  MilestoneProgress,
   ProgressPop,
   RewardBurst,
+  RewardLoader,
   SuccessPop,
   popRewardRecipes,
 } from "./pop-rewards";
@@ -107,6 +109,80 @@ describe("Pop rewards", () => {
         .getByRole("progressbar", { name: "Collection progress" })
         .getAttribute("aria-valuenow"),
     ).toBe("60");
+  });
+
+  test("rewards crossed progress milestones without celebrating initial state", () => {
+    const { rerender } = render(
+      <CelebrationProvider reducedMotion="always">
+        <MilestoneProgress
+          value={20}
+          label="Launch progress"
+          milestones={[25, 50, 75, 100]}
+          data-testid="milestone-progress"
+        />
+      </CelebrationProvider>,
+    );
+
+    expect(screen.getByTestId("milestone-progress").hasAttribute("data-milestone")).toBe(false);
+
+    rerender(
+      <CelebrationProvider reducedMotion="always">
+        <MilestoneProgress
+          value={30}
+          label="Launch progress"
+          milestones={[25, 50, 75, 100]}
+          data-testid="milestone-progress"
+        />
+      </CelebrationProvider>,
+    );
+
+    expect(screen.getByTestId("milestone-progress").getAttribute("data-milestone")).toBe("25");
+    expect(
+      screen.getByRole("progressbar", { name: "Launch progress" }).getAttribute("aria-valuetext"),
+    ).toBe("30% complete");
+    expect(
+      document
+        .querySelector('[data-slot="milestone-progress-marker"][data-milestone="25"]')
+        ?.getAttribute("data-state"),
+    ).toBe("reached");
+    expect(
+      document
+        .querySelector('[data-slot="milestone-progress-marker"][data-milestone="50"]')
+        ?.getAttribute("data-state"),
+    ).toBe("upcoming");
+  });
+
+  test("resolves a loading spinner into accessible success feedback", async () => {
+    const { rerender } = render(
+      <CelebrationProvider reducedMotion="always">
+        <RewardLoader
+          status="loading"
+          label="Saving changes"
+          successLabel="Changes saved"
+          data-testid="reward-loader"
+        />
+      </CelebrationProvider>,
+    );
+
+    expect(screen.getByTestId("reward-loader").getAttribute("data-status")).toBe("loading");
+    expect(screen.getByText("Saving changes")).toBeTruthy();
+
+    rerender(
+      <CelebrationProvider reducedMotion="always">
+        <RewardLoader
+          status="success"
+          label="Saving changes"
+          successLabel="Changes saved"
+          data-testid="reward-loader"
+        />
+      </CelebrationProvider>,
+    );
+
+    expect(screen.getByTestId("reward-loader").getAttribute("data-status")).toBe("success");
+    expect(screen.getByText("Changes saved")).toBeTruthy();
+    await waitFor(() => {
+      expect(document.querySelector('[data-slot="reward-loader-success"]')).toBeTruthy();
+    });
   });
 
   test("marks newly added collection items without owning collection state", () => {

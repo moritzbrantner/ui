@@ -243,7 +243,7 @@ function SuccessPop({
           <div className="min-w-0">
             <div className="text-sm font-semibold">{title}</div>
             {description ? (
-              <div className="mt-0.5 text-sm text-muted-foreground">{description}</div>
+              <div className="mt-0.5 text-sm text-foreground">{description}</div>
             ) : null}
             {action ? <div className="mt-2 flex flex-wrap items-center gap-2">{action}</div> : null}
           </div>
@@ -388,6 +388,264 @@ function ProgressPop({
   );
 }
 
+const defaultMilestones = [25, 50, 75, 100] as const;
+
+type MilestoneProgressProps = Omit<React.ComponentProps<"div">, "children"> & {
+  value: number;
+  max?: number;
+  label?: React.ReactNode;
+  milestones?: readonly number[];
+  level?: PopRewardLevel;
+  showValue?: boolean;
+};
+
+function MilestoneProgress({
+  value,
+  max = 100,
+  label = "Progress",
+  milestones = defaultMilestones,
+  level,
+  showValue = true,
+  className,
+  ...props
+}: MilestoneProgressProps) {
+  const reward = usePopReward(level);
+  const labelId = React.useId();
+  const safeMax = max > 0 ? max : 1;
+  const clampedValue = Math.min(Math.max(value, 0), safeMax);
+  const percentage = Math.round((clampedValue / safeMax) * 100);
+  const normalizedMilestones = React.useMemo(
+    () =>
+      [...new Set(milestones.map((milestone) => Math.min(Math.max(milestone, 0), 100)))]
+        .filter((milestone) => milestone > 0)
+        .sort((a, b) => a - b),
+    [milestones],
+  );
+  const previousPercentage = React.useRef(percentage);
+  const [celebratedMilestone, setCelebratedMilestone] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    const crossedMilestone = normalizedMilestones
+      .filter((milestone) => previousPercentage.current < milestone && percentage >= milestone)
+      .at(-1);
+
+    if (crossedMilestone !== undefined) {
+      setCelebratedMilestone(crossedMilestone);
+    }
+
+    previousPercentage.current = percentage;
+  }, [normalizedMilestones, percentage]);
+
+  return (
+    <div
+      data-slot="milestone-progress"
+      data-reward-level={reward.level}
+      data-milestone={celebratedMilestone ?? undefined}
+      className={cn("grid gap-2.5", className)}
+      {...props}
+    >
+      <div className="flex items-center justify-between gap-3 text-sm">
+        <span id={labelId} className="font-medium text-foreground">
+          {label}
+        </span>
+        {showValue ? (
+          <span className="tabular-nums text-muted-foreground">{percentage}%</span>
+        ) : null}
+      </div>
+
+      <div
+        data-slot="milestone-progress-track"
+        role="progressbar"
+        aria-labelledby={labelId}
+        aria-valuemin={0}
+        aria-valuemax={safeMax}
+        aria-valuenow={clampedValue}
+        aria-valuetext={`${percentage}% complete`}
+        className="relative h-3 rounded-full bg-muted"
+      >
+        <div className="absolute inset-0 overflow-hidden rounded-full">
+          <motion.div
+            data-slot="milestone-progress-fill"
+            className="absolute inset-y-0 left-0 rounded-full bg-primary"
+            initial={false}
+            animate={{ width: `${percentage}%` }}
+            transition={reward.shouldReduceMotion ? { duration: 0 } : reward.recipe.transition}
+          />
+          <AnimatePresence initial={false}>
+            {reward.enabled &&
+            !reward.shouldReduceMotion &&
+            celebratedMilestone !== null &&
+            percentage >= celebratedMilestone ? (
+              <motion.span
+                key={celebratedMilestone}
+                data-slot="milestone-progress-sweep"
+                aria-hidden="true"
+                className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-primary-foreground/75 to-transparent"
+                initial={{ left: "-35%", opacity: 0 }}
+                animate={{ left: "105%", opacity: [0, 1, 0] }}
+                transition={{ duration: reward.recipe.particleDuration, ease: "easeOut" }}
+              />
+            ) : null}
+          </AnimatePresence>
+        </div>
+
+        {normalizedMilestones.map((milestone) => {
+          const reached = percentage >= milestone;
+          const active = celebratedMilestone === milestone && reached;
+
+          return (
+            <motion.span
+              key={milestone}
+              data-slot="milestone-progress-marker"
+              data-milestone={milestone}
+              data-state={reached ? "reached" : "upcoming"}
+              aria-hidden="true"
+              className={cn(
+                "absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background bg-muted-foreground/35 shadow-xs",
+                reached && "bg-primary",
+              )}
+              style={{ left: `${milestone}%` }}
+              initial={false}
+              animate={
+                active && reward.enabled && !reward.shouldReduceMotion
+                  ? {
+                      scale: [1, reward.recipe.overshootScale * 1.45, 1],
+                      boxShadow: [
+                        "0 0 0 0 color-mix(in oklch,var(--primary)_0%,transparent)",
+                        "0 0 0 7px color-mix(in oklch,var(--primary)_22%,transparent)",
+                        "0 0 0 0 color-mix(in oklch,var(--primary)_0%,transparent)",
+                      ],
+                    }
+                  : { scale: 1 }
+              }
+              transition={reward.recipe.transition}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+type RewardLoaderStatus = "loading" | "success";
+
+type RewardLoaderProps = Omit<React.ComponentProps<"span">, "children"> & {
+  status: RewardLoaderStatus;
+  label?: React.ReactNode;
+  successLabel?: React.ReactNode;
+  level?: PopRewardLevel;
+  showLabel?: boolean;
+};
+
+function RewardLoader({
+  status,
+  label = "Loading",
+  successLabel = "Complete",
+  level,
+  showLabel = true,
+  className,
+  ...props
+}: RewardLoaderProps) {
+  const reward = usePopReward(level);
+  const previousStatus = React.useRef(status);
+  const [completionKey, setCompletionKey] = React.useState(0);
+
+  React.useEffect(() => {
+    if (previousStatus.current === "loading" && status === "success") {
+      setCompletionKey((current) => current + 1);
+    }
+
+    previousStatus.current = status;
+  }, [status]);
+
+  const renderedLabel = status === "success" ? successLabel : label;
+  const rewardKey = status === "success" && completionKey > 0 ? completionKey : null;
+
+  return (
+    <span
+      data-slot="reward-loader"
+      data-status={status}
+      data-reward-level={reward.level}
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      className={cn("inline-flex items-center gap-2 text-sm font-medium", className)}
+      {...props}
+    >
+      <RewardBurst rewardKey={rewardKey} level={level}>
+        <span className="relative grid size-6 place-items-center" aria-hidden="true">
+          <AnimatePresence initial={false} mode="wait">
+            {status === "loading" ? (
+              <motion.svg
+                key="loading"
+                data-slot="reward-loader-spinner"
+                viewBox="0 0 24 24"
+                className="size-5 text-primary"
+                initial={{ opacity: 0 }}
+                animate={reward.shouldReduceMotion ? { opacity: 1 } : { opacity: 1, rotate: 360 }}
+                exit={{ opacity: 0, scale: reward.shouldReduceMotion ? 1 : 0.84 }}
+                transition={
+                  reward.shouldReduceMotion
+                    ? { duration: 0 }
+                    : {
+                        rotate: { duration: 0.8, ease: "linear", repeat: Infinity },
+                        opacity: { duration: 0.12 },
+                      }
+                }
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="8"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeDasharray="34 18"
+                />
+              </motion.svg>
+            ) : (
+              <motion.svg
+                key="success"
+                data-slot="reward-loader-success"
+                viewBox="0 0 24 24"
+                className="size-6 rounded-full bg-primary p-1 text-primary-foreground"
+                initial={reward.shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.72 }}
+                animate={
+                  reward.shouldReduceMotion
+                    ? { opacity: 1 }
+                    : {
+                        opacity: 1,
+                        scale: [0.72, reward.recipe.overshootScale * 1.08, 1],
+                      }
+                }
+                transition={reward.recipe.transition}
+              >
+                <motion.path
+                  d="m6.5 12.5 3.3 3.2 7.7-8"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2.5"
+                  initial={reward.shouldReduceMotion ? false : { pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{
+                    duration: reward.shouldReduceMotion ? 0 : reward.recipe.particleDuration,
+                    ease: "easeOut",
+                  }}
+                />
+              </motion.svg>
+            )}
+          </AnimatePresence>
+        </span>
+      </RewardBurst>
+
+      {showLabel ? <span>{renderedLabel}</span> : <span className="sr-only">{renderedLabel}</span>}
+    </span>
+  );
+}
+
 type AddToCollectionProps = HTMLMotionProps<"div"> & {
   itemKey: React.Key;
   level?: PopRewardLevel;
@@ -434,8 +692,10 @@ export {
   AddToCollection,
   AnimatedCounter,
   CelebrationProvider,
+  MilestoneProgress,
   ProgressPop,
   RewardBurst,
+  RewardLoader,
   SuccessPop,
   popRewardRecipes,
 };
@@ -443,9 +703,12 @@ export type {
   AddToCollectionProps,
   AnimatedCounterProps,
   CelebrationProviderProps,
+  MilestoneProgressProps,
   PopRewardLevel,
   PopRewardRecipe,
   ProgressPopProps,
   RewardBurstProps,
+  RewardLoaderProps,
+  RewardLoaderStatus,
   SuccessPopProps,
 };
