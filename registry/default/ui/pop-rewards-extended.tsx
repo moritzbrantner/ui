@@ -121,9 +121,11 @@ function CompletionRing({
     <div
       data-slot="completion-ring"
       role="progressbar"
+      aria-label={typeof label === "string" ? label : "Completion"}
       aria-valuemin={0}
       aria-valuemax={safeMax}
       aria-valuenow={clamped}
+      aria-valuetext={`${percentage}% complete`}
       className={cn("relative inline-grid place-items-center", className)}
       style={{ width: size, height: size }}
       {...props}
@@ -242,7 +244,7 @@ function ShareSuccessCard({
     >
       {preview ? <div className="min-h-36 bg-muted">{preview}</div> : null}
       <div className="grid gap-2 p-4">
-        <div className="text-xs font-semibold uppercase tracking-wide text-[var(--success)]">
+        <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
           Ready to share
         </div>
         <h2 className="text-lg font-semibold">{title}</h2>
