@@ -161,7 +161,9 @@ export const SideBySide: Story = {
     );
 
     await userEvent.click(pulseDemo.getByRole("button", { name: /Kinetic details/ }));
-    await expect(pulseDemo.getByRole("region", { name: /Kinetic details/ })).toBeVisible();
+    await waitFor(() =>
+      expect(pulseDemo.getByRole("region", { name: /Kinetic details/ })).toBeVisible(),
+    );
 
     await userEvent.click(pulseDemo.getByRole("button", { name: "Show pulse toast" }));
     const toast = pulseDemo.getByRole("status");
