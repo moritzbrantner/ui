@@ -1,0 +1,48 @@
+name: Format Theme Vocabularies
+
+on:
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.12
+      - run: bun install --frozen-lockfile
+      - name: Format theme vocabulary files
+        run: |
+          bunx oxfmt --write \
+            src/components/patterns/atlas-operations.tsx \
+            src/components/patterns/studio-tools.tsx \
+            src/components/patterns/scholia-research.tsx \
+            src/components/patterns/paper-documents.tsx \
+            src/components/patterns/zleek-shells.tsx \
+            src/components/patterns/product-patterns.tsx \
+            src/components/patterns/pop-rewards-extended.tsx \
+            src/components/patterns/pulse-spatial.tsx \
+            src/components/patterns/theme-vocabularies.test.tsx
+      - name: Commit formatting
+        env:
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/patterns/atlas-operations.tsx \
+            src/components/patterns/studio-tools.tsx \
+            src/components/patterns/scholia-research.tsx \
+            src/components/patterns/paper-documents.tsx \
+            src/components/patterns/zleek-shells.tsx \
+            src/components/patterns/product-patterns.tsx \
+            src/components/patterns/pop-rewards-extended.tsx \
+            src/components/patterns/pulse-spatial.tsx \
+            src/components/patterns/theme-vocabularies.test.tsx
+          git diff --cached --quiet || git commit -m "Format theme vocabulary components"
+          git push origin "HEAD:$BRANCH"
