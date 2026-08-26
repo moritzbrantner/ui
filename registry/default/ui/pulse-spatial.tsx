@@ -17,7 +17,7 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
-} from "@/registry/default/ui/dialog";
+} from "../stable/dialog";
 
 type MorphingDialogProps = Omit<React.ComponentProps<"div">, "title"> & {
   open?: boolean;

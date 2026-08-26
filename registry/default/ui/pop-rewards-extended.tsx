@@ -109,6 +109,7 @@ function CompletionRing({
   label = "Complete",
   size = 88,
   className,
+  style,
   ...props
 }: CompletionRingProps) {
   const safeMax = max > 0 ? max : 1;
@@ -127,7 +128,7 @@ function CompletionRing({
       aria-valuenow={clamped}
       aria-valuetext={`${percentage}% complete`}
       className={cn("relative inline-grid place-items-center", className)}
-      style={{ width: size, height: size }}
+      style={{ ...style, width: size, height: size }}
       {...props}
     >
       <svg aria-hidden="true" viewBox="0 0 80 80" className="absolute inset-0 size-full -rotate-90">
