@@ -10,8 +10,16 @@ import {
 } from "motion/react";
 
 import { cn } from "../../lib/cn";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "../stable/dialog";
 
-type MorphingDialogProps = React.ComponentProps<"div"> & {
+type MorphingDialogProps = Omit<React.ComponentProps<"div">, "title"> & {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -36,70 +44,64 @@ function MorphingDialog({
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
   const resolvedOpen = open ?? internalOpen;
   const reduce = useReducedMotion();
+  const instanceId = React.useId();
+  const layoutId = `pulse-morphing-dialog-${instanceId}`;
+  const titleId = `pulse-morphing-dialog-title-${instanceId}`;
+  const descriptionId = `pulse-morphing-dialog-description-${instanceId}`;
   const setOpen = (next: boolean) => {
     if (open === undefined) setInternalOpen(next);
     onOpenChange?.(next);
   };
-  const titleId = React.useId();
 
   return (
     <LayoutGroup>
       <div data-slot="morphing-dialog" className={className} {...props}>
-        <motion.button
-          type="button"
-          layoutId="pulse-morphing-dialog"
-          aria-haspopup="dialog"
-          aria-expanded={resolvedOpen}
-          onClick={() => setOpen(true)}
-          className="rounded-[var(--ui-radius-control)] border bg-card px-3 py-2 text-sm font-medium"
-        >
-          {trigger}
-        </motion.button>
-        <AnimatePresence>
-          {resolvedOpen ? (
-            <motion.div
-              className="fixed inset-0 z-50 grid place-items-center bg-background/60 p-4 backdrop-blur-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onMouseDown={(event) => {
-                if (event.currentTarget === event.target) setOpen(false);
-              }}
+        <Dialog open={resolvedOpen} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <motion.button
+              type="button"
+              layoutId={layoutId}
+              className="rounded-[var(--ui-radius-control)] border bg-card px-3 py-2 text-sm font-medium"
             >
-              <motion.section
-                layoutId="pulse-morphing-dialog"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby={titleId}
-                initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.94 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
-                transition={{ type: "spring", stiffness: 460, damping: 32 }}
-                className="grid w-full max-w-lg gap-4 rounded-[var(--ui-radius-overlay)] border bg-card p-5 shadow-[var(--ui-shadow-interactive)]"
-              >
-                <div className="grid gap-1">
-                  <h2 id={titleId} className="text-lg font-semibold">
-                    {title}
-                  </h2>
-                  {description ? (
-                    <p className="text-sm text-muted-foreground">{description}</p>
-                  ) : null}
-                </div>
-                <div>{children}</div>
-                <div className="flex flex-wrap justify-end gap-2">
+              {trigger}
+            </motion.button>
+          </DialogTrigger>
+          <DialogContent
+            asChild
+            showCloseButton={false}
+            aria-labelledby={titleId}
+            aria-describedby={description ? descriptionId : undefined}
+            className="w-full max-w-lg gap-4 border bg-card p-5 shadow-[var(--ui-shadow-interactive)] sm:max-w-lg"
+          >
+            <motion.section
+              layoutId={layoutId}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", stiffness: 460, damping: 32 }}
+            >
+              <div className="grid gap-1">
+                <DialogTitle id={titleId} className="text-lg font-semibold">
+                  {title}
+                </DialogTitle>
+                {description ? (
+                  <DialogDescription id={descriptionId}>{description}</DialogDescription>
+                ) : null}
+              </div>
+              <div>{children}</div>
+              <div className="flex flex-wrap justify-end gap-2">
+                <DialogClose asChild>
                   <button
                     type="button"
                     className="h-9 rounded-[var(--ui-radius-control)] border px-3 text-sm"
-                    onClick={() => setOpen(false)}
                   >
                     Close
                   </button>
-                  {actions}
-                </div>
-              </motion.section>
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+                </DialogClose>
+                {actions}
+              </div>
+            </motion.section>
+          </DialogContent>
+        </Dialog>
       </div>
     </LayoutGroup>
   );
@@ -159,6 +161,8 @@ function SpatialSegmentedControl({
   ...props
 }: SpatialSegmentedControlProps) {
   const reduce = useReducedMotion();
+  const instanceId = React.useId();
+  const layoutId = `pulse-spatial-segment-${instanceId}`;
   return (
     <div
       data-slot="spatial-segmented-control"
@@ -182,7 +186,7 @@ function SpatialSegmentedControl({
           >
             {active ? (
               <motion.span
-                layoutId="pulse-spatial-segment"
+                layoutId={layoutId}
                 className="absolute inset-0 -z-10 rounded-[var(--ui-radius-control)] bg-background shadow-sm"
                 transition={
                   reduce ? { duration: 0 } : { type: "spring", stiffness: 540, damping: 34 }
@@ -197,7 +201,7 @@ function SpatialSegmentedControl({
   );
 }
 
-type ExpandingCardProps = Omit<HTMLMotionProps<"article">, "children"> & {
+type ExpandingCardProps = Omit<HTMLMotionProps<"article">, "children" | "title"> & {
   children?: React.ReactNode;
   expanded?: boolean;
   defaultExpanded?: boolean;
