@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { cn } from "@/registry/default/lib/cn";
 
-type SettingsSectionProps = React.ComponentProps<"section"> & {
+type SettingsSectionProps = Omit<React.ComponentProps<"section">, "title"> & {
   title: React.ReactNode;
   description?: React.ReactNode;
   actions?: React.ReactNode;
@@ -37,7 +37,7 @@ function SettingsSection({
   );
 }
 
-type ProductEmptyStateProps = React.ComponentProps<"section"> & {
+type ProductEmptyStateProps = Omit<React.ComponentProps<"section">, "title"> & {
   icon?: React.ReactNode;
   title: React.ReactNode;
   description?: React.ReactNode;
@@ -229,7 +229,7 @@ function ResponsiveToolbar({
   );
 }
 
-type ResourceCardProps = React.ComponentProps<"article"> & {
+type ResourceCardProps = Omit<React.ComponentProps<"article">, "title"> & {
   title: React.ReactNode;
   description?: React.ReactNode;
   meta?: React.ReactNode;
