@@ -11,13 +11,23 @@ import {
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const catalogPath = path.join(packageRoot, "docs", "components.md");
 const checkOnly = process.argv.includes("--check");
-const tiers = ["stable", "patterns", "data", "shell", "social", "media", "labs"] as const;
+const tiers = [
+  "stable",
+  "patterns",
+  "data",
+  "shell",
+  "social",
+  "collaboration",
+  "media",
+  "labs",
+] as const;
 const tierLabels = {
   stable: "Stable",
   patterns: "Patterns",
   data: "Data",
   shell: "Shell",
   social: "Social",
+  collaboration: "Collaboration",
   media: "Media",
   labs: "Labs",
 } as const satisfies Record<ComponentTier, string>;
