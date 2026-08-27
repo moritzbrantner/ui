@@ -266,9 +266,9 @@ function QuestionnaireQuestion({
                 className={cn(
                   "relative outline-none transition-[background-color,border-color,box-shadow,transform] duration-[var(--ui-motion-duration-base)] ease-[var(--ui-motion-ease-standard)] peer-focus-visible:ring-[var(--ui-focus-ring-width)] peer-focus-visible:ring-ring/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 motion-reduce:transition-none",
                   variant === "cards" &&
-                    "grid min-h-24 cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 rounded-[var(--ui-card-radius,var(--ui-radius-surface))] border border-border bg-background p-4 shadow-[var(--ui-shadow-surface)] hover:-translate-y-px hover:border-primary/40 hover:bg-accent/30 data-[selected=true]:border-primary data-[selected=true]:bg-primary/5 data-[selected=true]:shadow-[var(--ui-shadow-interactive)] motion-reduce:hover:translate-y-0",
+                    "flex min-h-24 cursor-pointer items-start gap-3 rounded-[var(--ui-card-radius,var(--ui-radius-surface))] border border-border bg-background p-4 shadow-[var(--ui-shadow-surface)] hover:-translate-y-px hover:border-primary/40 hover:bg-accent/30 data-[selected=true]:border-primary data-[selected=true]:bg-primary/5 data-[selected=true]:shadow-[var(--ui-shadow-interactive)] motion-reduce:hover:translate-y-0",
                   variant === "list" &&
-                    "grid min-h-12 cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[var(--ui-radius-control)] border border-border bg-background px-3 py-2.5 hover:border-primary/40 hover:bg-accent/40 data-[selected=true]:border-primary data-[selected=true]:bg-primary/5",
+                    "flex min-h-12 cursor-pointer items-center gap-3 rounded-[var(--ui-radius-control)] border border-border bg-background px-3 py-2.5 hover:border-primary/40 hover:bg-accent/40 data-[selected=true]:border-primary data-[selected=true]:bg-primary/5",
                   variant === "scale" &&
                     "flex min-h-12 cursor-pointer items-center justify-center rounded-[var(--ui-radius-control)] border border-border bg-background px-2 py-2 text-center text-sm font-medium hover:border-primary/50 hover:bg-accent data-[selected=true]:border-primary data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground data-[selected=true]:shadow-[var(--ui-shadow-interactive)]",
                 )}
@@ -302,7 +302,7 @@ function QuestionnaireQuestion({
 
                 <span
                   data-slot="questionnaire-option-content"
-                  className={cn("min-w-0", variant !== "scale" && "grid gap-0.5")}
+                  className={cn("min-w-0", variant !== "scale" && "grid flex-1 gap-0.5")}
                 >
                   <span
                     data-slot="questionnaire-option-title"
