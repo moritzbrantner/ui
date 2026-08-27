@@ -25,7 +25,7 @@ describe("questionnaire", () => {
   test("renders progress, heading, content, footer, and forwarded props", () => {
     render(
       <Questionnaire
-        title="Preference setup"
+        title={<span>Preference setup</span>}
         description="Tell us what works for you."
         currentStep={2}
         totalSteps={4}
