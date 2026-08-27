@@ -46,7 +46,7 @@ function MediaTransport({
       <div className="flex items-center gap-1">
         <button
           type="button"
-          className="h-10 rounded-[var(--ui-radius-control)] border px-2 text-xs"
+          className="h-10 min-w-10 rounded-[var(--ui-radius-control)] border px-2 text-xs"
           onClick={() => onStep?.(-1)}
         >
           −1f
@@ -60,7 +60,7 @@ function MediaTransport({
         </button>
         <button
           type="button"
-          className="h-10 rounded-[var(--ui-radius-control)] border px-2 text-xs"
+          className="h-10 min-w-10 rounded-[var(--ui-radius-control)] border px-2 text-xs"
           onClick={() => onStep?.(1)}
         >
           +1f
@@ -355,7 +355,7 @@ function ToolShelf({
             title={tool.shortcut ? `${tool.label} (${tool.shortcut})` : tool.label}
             onClick={() => onToolChange?.(tool.id)}
             className={cn(
-              "inline-flex h-10 items-center gap-1.5 rounded-[var(--ui-radius-control)] px-2 text-xs font-medium",
+              "inline-flex h-10 min-w-10 items-center gap-1.5 rounded-[var(--ui-radius-control)] px-2 text-xs font-medium",
               active ? "bg-primary text-primary-foreground" : "hover:bg-muted",
             )}
           >

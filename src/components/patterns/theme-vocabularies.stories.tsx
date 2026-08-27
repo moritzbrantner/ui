@@ -229,7 +229,7 @@ export const StudioTools: Story = {
                   content: (
                     <label className="grid gap-1 text-xs">
                       Scale
-                      <input type="range" defaultValue="70" />
+                      <input type="range" defaultValue="70" className="h-9 w-full" />
                     </label>
                   ),
                 },
@@ -239,7 +239,7 @@ export const StudioTools: Story = {
                   content: (
                     <label className="grid gap-1 text-xs">
                       Opacity
-                      <input type="range" defaultValue="100" />
+                      <input type="range" defaultValue="100" className="h-9 w-full" />
                     </label>
                   ),
                 },
@@ -476,7 +476,10 @@ export const ProductPatterns: Story = {
         >
           <label className="grid gap-1 text-sm">
             Name
-            <input className="rounded border bg-background px-2 py-1.5" defaultValue="Example" />
+            <input
+              className="h-9 rounded border bg-background px-2 py-1.5"
+              defaultValue="Example"
+            />
           </label>
           <ProductFormActions
             primary={
