@@ -43,9 +43,11 @@ function MessageStatus({
       )}
       {...props}
     >
-      <span data-slot="message-status-icon" aria-hidden="true" className="shrink-0">
-        {icon ?? <Icon className="size-3.5" />}
-      </span>
+      {icon !== null ? (
+        <span data-slot="message-status-icon" aria-hidden="true" className="shrink-0">
+          {icon === undefined ? <Icon className="size-3.5" /> : icon}
+        </span>
+      ) : null}
       <span className={cn("min-w-0 truncate", compact && "sr-only")}>{label}</span>
       {detail ? <span className="min-w-0 truncate">{detail}</span> : null}
     </span>

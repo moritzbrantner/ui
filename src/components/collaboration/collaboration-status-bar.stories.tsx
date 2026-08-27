@@ -34,6 +34,26 @@ export const Synced: Story = {
   ),
 };
 
+export const Syncing: Story = {
+  render: () => (
+    <CollaborationStatusBar className="max-w-3xl">
+      <CollaborationConnection status="connected" label="Connected" detail="Realtime" />
+      <CollaborationSyncStatus state="syncing" label="Syncing changes" />
+      <CollaborationParticipants participants={participants} />
+    </CollaborationStatusBar>
+  ),
+};
+
+export const PendingOffline: Story = {
+  render: () => (
+    <CollaborationStatusBar className="max-w-3xl">
+      <CollaborationConnection status="disconnected" label="Offline" detail="Working locally" />
+      <CollaborationSyncStatus state="pending" label="Changes pending" />
+      <CollaborationParticipants participants={participants} />
+    </CollaborationStatusBar>
+  ),
+};
+
 export const ErrorWithAction: Story = {
   render: () => (
     <CollaborationStatusBar className="max-w-3xl">

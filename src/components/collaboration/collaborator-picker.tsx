@@ -24,11 +24,8 @@ type CollaboratorPickerParticipant = {
   disabled?: boolean;
 };
 
-export type CollaboratorPickerProps = Omit<React.ComponentProps<"div">, "onChange"> & {
+type CollaboratorPickerBaseProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   participants: readonly CollaboratorPickerParticipant[];
-  selectedIds: readonly string[];
-  onSelectedIdsChange: (selectedIds: string[]) => void;
-  multiple?: boolean;
   inputLabel: string;
   getRemoveLabel: (participant: CollaboratorPickerParticipant) => string;
   placeholder?: string;
@@ -37,20 +34,56 @@ export type CollaboratorPickerProps = Omit<React.ComponentProps<"div">, "onChang
   loading?: boolean;
 };
 
-function CollaboratorPicker({
-  participants,
-  selectedIds,
-  onSelectedIdsChange,
-  multiple = false,
-  inputLabel,
-  getRemoveLabel,
-  placeholder,
-  emptyContent,
-  loadingContent,
-  loading = false,
-  className,
-  ...props
-}: CollaboratorPickerProps) {
+type CollaboratorPickerSingleProps = CollaboratorPickerBaseProps & {
+  multiple?: false;
+  selectedId: string | null;
+  onSelectedIdChange: (selectedId: string | null) => void;
+};
+
+type CollaboratorPickerMultipleProps = CollaboratorPickerBaseProps & {
+  multiple: true;
+  selectedIds: readonly string[];
+  onSelectedIdsChange: (selectedIds: string[]) => void;
+};
+
+export type CollaboratorPickerProps =
+  | CollaboratorPickerSingleProps
+  | CollaboratorPickerMultipleProps;
+
+function resolveSelectionProps(props: CollaboratorPickerProps) {
+  if (props.multiple) {
+    const { multiple, selectedIds, onSelectedIdsChange, ...baseProps } = props;
+    return {
+      multiple,
+      selectedIds,
+      onSelectedIdsChange,
+      baseProps,
+    };
+  }
+
+  const { multiple, selectedId, onSelectedIdChange, ...baseProps } = props;
+  return {
+    multiple: false as const,
+    selectedIds: selectedId ? [selectedId] : [],
+    onSelectedIdsChange: (selectedIds: string[]) => onSelectedIdChange(selectedIds[0] ?? null),
+    baseProps,
+  };
+}
+
+function CollaboratorPicker(pickerProps: CollaboratorPickerProps) {
+  const { multiple, selectedIds, onSelectedIdsChange, baseProps } =
+    resolveSelectionProps(pickerProps);
+  const {
+    participants,
+    inputLabel,
+    getRemoveLabel,
+    placeholder,
+    emptyContent,
+    loadingContent,
+    loading = false,
+    className,
+    ...props
+  } = baseProps;
   const selected = new Set(selectedIds);
   const selectedParticipants = participants.filter((participant) => selected.has(participant.id));
 
@@ -137,7 +170,7 @@ function CollaboratorPicker({
               ))
             )}
           </ComboboxList>
-          <ComboboxEmpty>{emptyContent}</ComboboxEmpty>
+          {loading ? null : <ComboboxEmpty>{emptyContent}</ComboboxEmpty>}
         </ComboboxContent>
       </Combobox>
     </div>

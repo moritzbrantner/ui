@@ -11,12 +11,18 @@ describe("reaction controls", () => {
     const onClick = vi.fn();
     render(
       <ReactionGroup aria-label="Message reactions">
-        <ReactionButton active reaction="👏" label="Applaud" count={3} onClick={onClick} />
+        <ReactionButton
+          active
+          reaction="👏"
+          label="Applaud, 3 reactions"
+          count="3"
+          onClick={onClick}
+        />
         <ReactionButton active={false} reaction={<span>Custom</span>} label="Custom reaction" />
       </ReactionGroup>,
     );
 
-    const active = screen.getByRole("button", { name: "Applaud 3" });
+    const active = screen.getByRole("button", { name: "Applaud, 3 reactions" });
     expect(active.getAttribute("aria-pressed")).toBe("true");
     expect(
       screen.getByRole("button", { name: "Custom reaction" }).getAttribute("aria-pressed"),
@@ -72,5 +78,11 @@ describe("message status and receipts", () => {
 
     expect(screen.getByLabelText("Read by Ada")).toBeTruthy();
     expect(screen.getByLabelText("1 more readers")).toBeTruthy();
+  });
+
+  test("supports a text-only message status", () => {
+    render(<MessageStatus state="delivered" label="Delivered" icon={null} />);
+    const status = screen.getByText("Delivered").closest('[data-slot="message-status"]');
+    expect(status?.querySelector('[data-slot="message-status-icon"]')).toBeNull();
   });
 });

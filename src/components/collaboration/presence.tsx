@@ -7,7 +7,7 @@ type PresenceState = "online" | "away" | "busy" | "offline";
 
 const presenceTone: Record<PresenceState, string> = {
   online: "bg-primary",
-  away: "bg-amber-500",
+  away: "bg-[var(--warning)]",
   busy: "bg-destructive",
   offline: "bg-muted-foreground",
 };
@@ -42,21 +42,23 @@ function PresenceAvatar({ status, statusLabel, className, ...props }: PresenceAv
   return (
     <span data-slot="presence-avatar" className="relative inline-flex shrink-0">
       <Avatar className={className} {...props} />
-      <PresenceIndicator status={status} aria-label={statusLabel} />
+      <PresenceIndicator status={status} label={statusLabel} />
     </span>
   );
 }
 
-type PresenceIndicatorProps = React.ComponentProps<"span"> & {
+type PresenceIndicatorProps = Omit<React.ComponentProps<"span">, "aria-label"> & {
   status: PresenceState;
+  label: string;
 };
 
-function PresenceIndicator({ status, className, ...props }: PresenceIndicatorProps) {
+function PresenceIndicator({ status, label, className, ...props }: PresenceIndicatorProps) {
   return (
     <span
       data-slot="presence-indicator"
       data-status={status}
       role="img"
+      aria-label={label}
       className={cn(
         "absolute right-0 bottom-0 size-2.5 rounded-full ring-2 ring-background",
         presenceTone[status],

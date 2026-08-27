@@ -28,6 +28,24 @@ function MentionHarness({ onSelect = () => undefined }: { onSelect?: (label: str
   );
 }
 
+function ExternalUpdateHarness() {
+  const [value, setValue] = React.useState("");
+  return (
+    <>
+      <MentionTextarea
+        aria-label="Comment"
+        value={value}
+        candidates={candidates}
+        onValueChange={setValue}
+        suggestionsLabel="Mention suggestions"
+      />
+      <button type="button" onClick={() => setValue("")}>
+        Clear externally
+      </button>
+    </>
+  );
+}
+
 describe("mention range helpers", () => {
   test("detects the mention active at the caret across multiple mentions", () => {
     const value = "Thanks @Ada, please ask @Gra";
@@ -49,6 +67,9 @@ describe("MentionTextarea", () => {
 
     const textarea = screen.getByRole("textbox", { name: "Comment" });
     await user.type(textarea, "Hello @G");
+    expect(
+      screen.getByRole("combobox", { name: "Mention suggestions" }).getAttribute("aria-expanded"),
+    ).toBe("true");
     expect(textarea.getAttribute("aria-controls")).toBeTruthy();
     await user.keyboard("{ArrowDown}{Enter}");
 
@@ -75,5 +96,18 @@ describe("MentionTextarea", () => {
     await user.type(textarea, "@A");
     await user.click(screen.getByRole("option", { name: /Ada/ }));
     expect((textarea as HTMLTextAreaElement).value).toBe("@Ada ");
+  });
+
+  test("closes stale suggestions after an external value replacement", async () => {
+    const user = userEvent.setup();
+    render(<ExternalUpdateHarness />);
+
+    await user.type(screen.getByRole("textbox", { name: "Comment" }), "@A");
+    expect(screen.getByRole("listbox", { name: "Mention suggestions" })).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "Clear externally" }));
+    expect(screen.queryByRole("listbox", { name: "Mention suggestions" })).toBeNull();
+    expect(
+      screen.getByRole("combobox", { name: "Mention suggestions" }).getAttribute("aria-expanded"),
+    ).toBe("false");
   });
 });

@@ -33,6 +33,7 @@ const meta = {
     participants: [],
     selectedIds: [],
     onSelectedIdsChange: () => undefined,
+    multiple: true,
     inputLabel: "Find collaborators",
     getRemoveLabel: (participant) => `Remove ${participant.name}`,
   },
@@ -41,13 +42,24 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const MultiSelect: Story = { render: () => <PickerExample /> };
+export const MultiSelect: Story = {
+  args: {
+    participants: [],
+    selectedIds: [],
+    onSelectedIdsChange: () => undefined,
+    multiple: true,
+    inputLabel: "Find collaborators",
+    getRemoveLabel: (participant) => `Remove ${participant.name}`,
+  },
+  render: () => <PickerExample />,
+};
 
 export const Loading: Story = {
   args: {
     participants: [],
     selectedIds: [],
     onSelectedIdsChange: () => undefined,
+    multiple: true,
     inputLabel: "Find collaborators",
     getRemoveLabel: (participant) => `Remove ${participant.name}`,
     loading: true,

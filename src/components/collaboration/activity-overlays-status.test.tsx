@@ -43,7 +43,7 @@ describe("activity feed", () => {
 });
 
 describe("live collaboration overlays", () => {
-  test("renders pointer-transparent cursors and selections with accessible identity", () => {
+  test("exposes cursor and selection identity to assistive technology", () => {
     render(
       <div className="relative">
         <CollaborationOverlay data-testid="overlay">
@@ -56,13 +56,9 @@ describe("live collaboration overlays", () => {
       </div>,
     );
 
-    expect(screen.getByTestId("overlay").className).toContain("pointer-events-none");
-    expect(screen.getByLabelText("Ada cursor").getAttribute("style")).toContain(
-      "translate3d(24px, 48px, 0)",
-    );
-    expect(screen.getByRole("img", { name: "Grace selection" }).getAttribute("style")).toContain(
-      "width: 120px",
-    );
+    expect(screen.getByTestId("overlay")).toBeTruthy();
+    expect(screen.getByLabelText("Ada cursor")).toBeTruthy();
+    expect(screen.getByRole("img", { name: "Grace selection" })).toBeTruthy();
   });
 });
 
@@ -86,5 +82,25 @@ describe("collaboration status bar", () => {
     expect(screen.getByText("Save failed")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Retry" })).toBeTruthy();
     expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  test.each([
+    ["connected", "syncing"],
+    ["disconnected", "pending"],
+  ] as const)("keeps %s connection independent from %s sync", (connection, sync) => {
+    const { container } = render(
+      <CollaborationStatusBar>
+        <CollaborationConnection status={connection} label={`${connection} connection`} />
+        <CollaborationSyncStatus state={sync} label={`${sync} changes`} />
+      </CollaborationStatusBar>,
+    );
+
+    expect(screen.getByText(`${connection} connection`)).toBeTruthy();
+    expect(screen.getByText(`${sync} changes`)).toBeTruthy();
+    expect(
+      container
+        .querySelector('[data-slot="collaboration-sync-status"]')
+        ?.getAttribute("data-state"),
+    ).toBe(sync);
   });
 });

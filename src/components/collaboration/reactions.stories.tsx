@@ -8,9 +8,14 @@ function ReactionExample() {
   return (
     <ReactionGroup aria-label="Message reactions" className="max-w-72">
       {[
-        { key: "applaud", reaction: "👏", label: "Applaud", count: 8 },
-        { key: "heart", reaction: "❤️", label: "Heart", count: 4 },
-        { key: "idea", reaction: "💡", label: "Good idea", count: 2 },
+        {
+          key: "applaud",
+          reaction: "👏",
+          label: "Applaud, 8 reactions",
+          count: "8",
+        },
+        { key: "heart", reaction: "❤️", label: "Heart, 4 reactions", count: "4" },
+        { key: "idea", reaction: "💡", label: "Good idea, 2 reactions", count: "2" },
       ].map((item) => (
         <ReactionButton
           key={item.key}

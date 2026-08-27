@@ -19,7 +19,7 @@ function ReactionGroup({ className, ...props }: React.ComponentProps<"div">) {
 
 export type ReactionButtonProps = Omit<React.ComponentProps<typeof Button>, "children"> & {
   active: boolean;
-  count?: number;
+  count?: React.ReactNode;
   reaction: React.ReactNode;
   label: string;
 };
@@ -33,15 +33,13 @@ function ReactionButton({
   variant,
   ...props
 }: ReactionButtonProps) {
-  const countLabel = count === undefined ? "" : ` ${count}`;
-
   return (
     <Button
       data-slot="reaction-button"
       type="button"
       size="sm"
       variant={variant ?? (active ? "secondary" : "outline")}
-      aria-label={`${label}${countLabel}`}
+      aria-label={label}
       aria-pressed={active}
       className={cn("h-10 min-h-10 min-w-11 rounded-full px-2.5", className)}
       {...props}
@@ -84,7 +82,7 @@ function ReactionPicker({ options, label, trigger, onSelect, ...props }: Reactio
         </Button>
       </PopoverTrigger>
       <PopoverContent data-slot="reaction-picker" className="w-auto p-2" aria-label={label}>
-        <div role="listbox" className="flex flex-wrap gap-1">
+        <div role="listbox" aria-label={label} className="flex flex-wrap gap-1">
           {options.map((option) => (
             <Button
               key={option.key}

@@ -22,10 +22,10 @@ export const SharedCanvas: Story = {
         <RemoteSelection
           bounds={{ x: 72, y: 82, width: 180, height: 72 }}
           label="Grace selection"
-          color="var(--primary)"
+          tone="warning"
         />
-        <LiveCursor x={260} y={96} label="Ada" color="var(--primary)" />
-        <LiveCursor x={580} y={220} label="Linus at viewport edge" color="var(--destructive)" />
+        <LiveCursor x={260} y={96} label="Ada" />
+        <LiveCursor x={580} y={220} label="Linus at viewport edge" tone="destructive" />
       </CollaborationOverlay>
     </div>
   ),

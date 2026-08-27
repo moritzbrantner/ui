@@ -11,14 +11,14 @@ const participants = [
   { id: "blocked", name: "Disabled Person", disabled: true },
 ] as const;
 
-function PickerHarness({ multiple = true }: { multiple?: boolean }) {
+function PickerHarness() {
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
   return (
     <CollaboratorPicker
       participants={participants}
       selectedIds={selectedIds}
       onSelectedIdsChange={setSelectedIds}
-      multiple={multiple}
+      multiple
       inputLabel="Find collaborators"
       getRemoveLabel={(participant) => `Remove ${participant.name}`}
       placeholder="Search people"
@@ -49,8 +49,8 @@ describe("CollaboratorPicker", () => {
         <CollaboratorPicker
           data-testid="picker"
           participants={participants}
-          selectedIds={[]}
-          onSelectedIdsChange={() => undefined}
+          selectedId={null}
+          onSelectedIdChange={() => undefined}
           inputLabel="Pick one"
           getRemoveLabel={(participant) => `Remove ${participant.name}`}
         />
@@ -64,5 +64,25 @@ describe("CollaboratorPicker", () => {
       ),
     ).toBe(true);
     expect(screen.getByTestId("picker")).toBeTruthy();
+  });
+
+  test("keeps loading distinct from no results", async () => {
+    const user = userEvent.setup();
+    render(
+      <CollaboratorPicker
+        participants={[]}
+        selectedId={null}
+        onSelectedIdChange={() => undefined}
+        inputLabel="Pick one"
+        getRemoveLabel={(participant) => `Remove ${participant.name}`}
+        loading
+        loadingContent="Loading collaborators"
+        emptyContent="No collaborators"
+      />,
+    );
+
+    await user.click(screen.getByRole("combobox", { name: "Pick one" }));
+    expect(await screen.findByText("Loading collaborators")).toBeTruthy();
+    expect(screen.queryByText("No collaborators")).toBeNull();
   });
 });

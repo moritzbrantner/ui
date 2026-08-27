@@ -78,6 +78,14 @@ function MentionTextarea({
   const activeCandidate = enabledCandidates[activeIndex] ?? null;
   const listboxId = React.useId();
 
+  React.useEffect(() => {
+    if (range && value.slice(range.start, range.end) !== `@${range.query}`) {
+      setRange(null);
+      setActiveIndex(0);
+      onMentionQueryChange?.(null);
+    }
+  }, [onMentionQueryChange, range, value]);
+
   const updateRange = (element: HTMLTextAreaElement, nextValue = element.value) => {
     const nextRange = getActiveMention(nextValue, element.selectionStart ?? nextValue.length);
     setRange(nextRange);
@@ -102,7 +110,15 @@ function MentionTextarea({
   };
 
   return (
-    <div data-slot="mention-textarea" className={cn("relative grid gap-1", className)}>
+    <div
+      data-slot="mention-textarea"
+      role="combobox"
+      aria-label={suggestionsLabel}
+      aria-expanded={open}
+      aria-haspopup="listbox"
+      aria-controls={open ? listboxId : undefined}
+      className={cn("relative grid gap-1", className)}
+    >
       <Textarea
         ref={textareaRef}
         value={value}

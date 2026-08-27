@@ -1,7 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import { Presence, PresenceAvatar, PresenceGroup } from "./presence";
+import { Presence, PresenceAvatar, PresenceGroup, PresenceIndicator } from "./presence";
 import { TypingIndicator } from "./typing-indicator";
 
 describe("collaboration presence", () => {
@@ -38,6 +38,11 @@ describe("collaboration presence", () => {
     const group = screen.getByTestId("group");
     expect(group.getAttribute("aria-label")).toBe("Active collaborators");
     expect(within(group).getByLabelText("1 more collaborators")).toBeTruthy();
+  });
+
+  test("requires direct indicators to expose textual status", () => {
+    render(<PresenceIndicator status="online" label="Online" />);
+    expect(screen.getByRole("img", { name: "Online" })).toBeTruthy();
   });
 });
 
