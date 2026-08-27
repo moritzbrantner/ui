@@ -27,7 +27,7 @@ export type QuestionnairePollResult = {
   ariaLabel?: string;
 };
 
-export type QuestionnaireProps = React.ComponentProps<"section"> & {
+export type QuestionnaireProps = Omit<React.ComponentProps<"section">, "title"> & {
   title?: React.ReactNode;
   description?: React.ReactNode;
   titleLevel?: HeadingLevel;
