@@ -1,12 +1,24 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 
-import { Questionnaire, QuestionnaireQuestion } from "./questionnaire";
+import {
+  Questionnaire,
+  QuestionnairePollResults,
+  QuestionnaireQuestion,
+  QuestionnaireSingleChoice,
+  QuestionnaireTextAnswer,
+} from "./questionnaire";
 
 const options = [
   { value: "focused", label: "Focused", description: "Keep the decision narrow." },
   { value: "balanced", label: "Balanced", description: "Show a few useful alternatives." },
   { value: "broad", label: "Broad", description: "Show a wider range." },
+];
+
+const pollResults = [
+  { value: "yes", label: "Yes", count: 62 },
+  { value: "maybe", label: "Maybe", count: 25 },
+  { value: "no", label: "No", count: 13 },
 ];
 
 describe("questionnaire", () => {
@@ -55,16 +67,11 @@ describe("questionnaire", () => {
     ).toBe("3");
   });
 
-  test("supports uncontrolled answer selection and reports value changes", () => {
-    const onValueChange = vi.fn();
-
+  test("composes native single-choice answers inside the question shell", () => {
     render(
-      <QuestionnaireQuestion
-        legend="How much choice do you want?"
-        options={options}
-        defaultValue="balanced"
-        onValueChange={onValueChange}
-      />,
+      <QuestionnaireQuestion legend="How much choice do you want?">
+        <QuestionnaireSingleChoice options={options} defaultValue="balanced" />
+      </QuestionnaireQuestion>,
     );
 
     const focused = screen.getByRole("radio", { name: /Focused/ }) as HTMLInputElement;
@@ -77,48 +84,110 @@ describe("questionnaire", () => {
 
     expect(focused.checked).toBe(true);
     expect(balanced.checked).toBe(false);
-    expect(onValueChange).toHaveBeenCalledWith("focused");
   });
 
-  test("supports controlled value and all three presentation variants", () => {
+  test("supports card, list, scale, pop, and pulse answer presentations", () => {
     const { rerender } = render(
-      <QuestionnaireQuestion legend="Cards" options={options} value="focused" variant="cards" />,
+      <QuestionnaireSingleChoice data-testid="choice" options={options} variant="cards" />,
     );
 
-    expect(screen.getByRole("group", { name: "Cards" }).getAttribute("data-variant")).toBe("cards");
-    expect((screen.getByRole("radio", { name: /Focused/ }) as HTMLInputElement).checked).toBe(true);
+    expect(screen.getByTestId("choice").getAttribute("data-variant")).toBe("cards");
+
+    rerender(<QuestionnaireSingleChoice data-testid="choice" options={options} variant="list" />);
+    expect(screen.getByTestId("choice").getAttribute("data-variant")).toBe("list");
 
     rerender(
-      <QuestionnaireQuestion legend="List" options={options} value="balanced" variant="list" />,
-    );
-
-    expect(screen.getByRole("group", { name: "List" }).getAttribute("data-variant")).toBe("list");
-
-    rerender(
-      <QuestionnaireQuestion
-        legend="Scale"
+      <QuestionnaireSingleChoice
+        data-testid="choice"
         options={options}
-        value="broad"
         variant="scale"
         scaleStartLabel="Low"
         scaleEndLabel="High"
       />,
     );
-
-    expect(screen.getByRole("group", { name: "Scale" }).getAttribute("data-variant")).toBe("scale");
+    expect(screen.getByTestId("choice").getAttribute("data-variant")).toBe("scale");
     expect(screen.getByText("Low")).toBeTruthy();
     expect(screen.getByText("High")).toBeTruthy();
+
+    rerender(<QuestionnaireSingleChoice data-testid="choice" options={options} variant="pop" />);
+    expect(screen.getByTestId("choice").getAttribute("data-variant")).toBe("pop");
+
+    rerender(<QuestionnaireSingleChoice data-testid="choice" options={options} variant="pulse" />);
+    expect(screen.getByTestId("choice").getAttribute("data-variant")).toBe("pulse");
   });
 
-  test("exposes descriptions and validation errors to assistive technology", () => {
+  test("renders an accessible open-ended answer field", () => {
+    render(
+      <QuestionnaireQuestion legend="Tell us more">
+        <QuestionnaireTextAnswer
+          label="Your answer"
+          name="details"
+          hint="Optional context helps us understand your answer."
+          defaultValue="Initial thought"
+        />
+      </QuestionnaireQuestion>,
+    );
+
+    const answer = screen.getByRole("textbox", { name: "Your answer" }) as HTMLTextAreaElement;
+    const describedBy = answer.getAttribute("aria-describedby") ?? "";
+
+    expect(answer.value).toBe("Initial thought");
+    expect(describedBy).toContain("hint");
+    expect(screen.getByText("Optional context helps us understand your answer.")).toBeTruthy();
+  });
+
+  test("renders poll percentages as a composable child of a question", () => {
+    render(
+      <QuestionnaireQuestion legend="Would you use it again?" data-testid="question">
+        <QuestionnaireSingleChoice options={options} defaultValue="focused" />
+        <QuestionnairePollResults
+          results={pollResults}
+          selectedValue="yes"
+          caption="100 responses"
+          variant="pulse"
+        />
+      </QuestionnaireQuestion>,
+    );
+
+    const question = screen.getByTestId("question");
+    const yesResult = screen.getByRole("progressbar", { name: "Yes" });
+
+    expect(question.contains(yesResult)).toBe(true);
+    expect(yesResult.getAttribute("aria-valuenow")).toBe("62");
+    expect(screen.getByRole("progressbar", { name: "Maybe" }).getAttribute("aria-valuenow")).toBe(
+      "25",
+    );
+    expect(screen.getByRole("progressbar", { name: "No" }).getAttribute("aria-valuenow")).toBe("13");
+    expect(screen.getByText("100 responses")).toBeTruthy();
+  });
+
+  test("uses explicit percentages when supplied and clamps unsafe values", () => {
+    render(
+      <QuestionnairePollResults
+        results={[
+          { value: "high", label: "High", count: Number.NaN, percentage: 140 },
+          { value: "low", label: "Low", count: -5, percentage: -20 },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole("progressbar", { name: "High" }).getAttribute("aria-valuenow")).toBe(
+      "100",
+    );
+    expect(screen.getByRole("progressbar", { name: "Low" }).getAttribute("aria-valuenow")).toBe(
+      "0",
+    );
+  });
+
+  test("exposes question descriptions and validation errors to assistive technology", () => {
     render(
       <QuestionnaireQuestion
         legend="Required choice"
         description="Choose the closest answer."
-        options={options}
-        required
         error="Select one option to continue."
-      />,
+      >
+        <QuestionnaireSingleChoice options={options} required />
+      </QuestionnaireQuestion>,
     );
 
     const group = screen.getByRole("group", { name: "Required choice" });
