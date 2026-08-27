@@ -4,20 +4,24 @@ import { uiTokenNames, type UiThemeTokens, type UiTokenName } from "../token-nam
 import { atlasTheme } from "./atlas";
 import { bobbaTheme } from "./bobba";
 import { customTheme } from "./custom";
-import { paperTheme } from "./paper";
-import { popTheme } from "./pop";
 import {
+  atlasThemeManifest,
+  bobbaThemeManifest,
+  paperThemeManifest,
   popThemeManifest,
   pulseThemeManifest,
   scholiaThemeManifest,
+  studioThemeManifest,
   uiThemeManifests,
+  zleekThemeManifest,
 } from "./manifests";
-import { uiThemeProfiles } from "./profiles";
+import { paperTheme } from "./paper";
+import { popTheme } from "./pop";
+import { uiThemeProfiles, type UiThemeProfile } from "./profiles";
 import { pulseTheme } from "./pulse";
 import { scholiaTheme } from "./scholia";
 import { studioTheme } from "./studio";
 import type { BuiltInUiThemeName, UiThemeConfig, UiThemeName } from "./types";
-import type { UiThemeProfile } from "./profiles";
 import { zleekTheme } from "./zleek";
 
 const builtInUiThemeNames = [
@@ -74,12 +78,15 @@ function createUiTheme(tokens: UiThemeTokens): React.CSSProperties {
 
 export {
   atlasTheme,
+  atlasThemeManifest,
   bobbaTheme,
+  bobbaThemeManifest,
   builtInUiThemeNames,
   createUiTheme,
   customTheme,
   defaultUiThemeName,
   paperTheme,
+  paperThemeManifest,
   popTheme,
   popThemeManifest,
   pulseTheme,
@@ -87,6 +94,7 @@ export {
   scholiaTheme,
   scholiaThemeManifest,
   studioTheme,
+  studioThemeManifest,
   themeConfig,
   uiThemeLabels,
   uiThemeManifests,
@@ -94,6 +102,7 @@ export {
   uiThemeProfiles,
   uiTokenNames,
   zleekTheme,
+  zleekThemeManifest,
 };
 export type {
   BuiltInUiThemeName,
