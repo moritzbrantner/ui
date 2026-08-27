@@ -239,6 +239,8 @@ function QuestionnaireQuestion({
           const optionId = `${generatedId}-${index}`;
           const selected = option.value === selectedValue;
           const optionDisabled = Boolean(disabled || option.disabled);
+          const accessibleLabel =
+            option.ariaLabel ?? (typeof option.label === "string" ? option.label : undefined);
 
           return (
             <div key={option.value} data-slot="questionnaire-option" className="min-w-0">
@@ -252,7 +254,7 @@ function QuestionnaireQuestion({
                 checked={selected}
                 disabled={optionDisabled}
                 required={required}
-                aria-label={option.ariaLabel}
+                aria-label={accessibleLabel}
                 aria-invalid={error ? true : undefined}
                 onChange={() => selectValue(option.value)}
               />
