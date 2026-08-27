@@ -1,82 +1,42 @@
 # Agent Instructions
 
-## Project Purpose
+## Purpose and ownership
 
-`@moritzbrantner/ui` is a publishable Bun/TypeScript React design-system package. It owns shared Tailwind 4 styles, theme metadata, primitive components, composed state-light components, Storybook coverage, and package-consumption checks for the wider `moritzbrantner` platform packages workspace.
+`@moritzbrantner/ui` is a publishable Bun/TypeScript React design-system package. It owns shared Tailwind 4 tokens and themes, state-light components, public package contracts, Storybook coverage, and source-owned registry distribution.
 
-Keep product workflows, routing, auth/session state, backend contracts, settings/profile/admin screens, and other app-specific behavior in consuming app packages.
+Keep routing, auth and permissions, server state, persistence, product workflows, product copy, and side effects in consuming applications.
 
-## Key Directories
+## Source contract
 
-- `src/components/`: reusable React components, component tests, and component stories. Public components should accept `className`, forward DOM props, use `data-slot`, and be exported from `src/index.ts`.
-- `src/`: package entrypoints, theme metadata, hooks, helpers, and package-level tests.
-- `registry.json`, `registry/default/registry.json`: shadcn-compatible registry catalog and dependency graph.
-- `registry/default/lib/`, `registry/default/ui/`: committed, generated registry source. Update package source and run `bun run sync:registry`; do not edit these files directly.
-- `styles.css`, `theme-scopes.css`, `zleek/`, `bobba/`, `atlas/`, `studio/`, `paper/`, `scholia/`, `pop/`, `pulse/`: published global styles and theme-specific CSS entrypoints.
-- `.storybook/`: Storybook configuration and preview theme wiring.
-- `scripts/`: local verification, package-contract, coverage, benchmark, and hygiene scripts.
-- `visual/`: Playwright visual/layout checks. These start Storybook on port `6007`.
-- `examples/consumer/`: minimal external-app package used to verify public package consumption.
-- `bench/baselines/`: checked-in benchmark baselines. Update with `bun run bench:update` only when intentionally accepting benchmark changes.
-- `.github/workflows/`: CI, Storybook Pages deploy, and package publish workflows.
+- `src/` is canonical package source. Respect the stable, patterns, data, shell, social, media, and labs public tiers and their existing export boundaries.
+- Public components accept `className`, forward applicable DOM props, expose stable `data-slot` hooks, use semantic tokens, and express deliberate visual choices through named variants.
+- Keep focused component tests and stories beside the component at the narrowest useful scope.
+- Token names, categories, and built-in values live in `src/token-metadata.ts`. Run `bun run generate:tokens` after token changes.
+- Registry distribution is opt-in. Change mapped package source and `scripts/sync-registry.ts`, then run `bun run sync:registry`; never edit generated registry source directly.
+- Update benchmark baselines with `bun run bench:update` only when intentionally accepting a measured change.
 
-## Commands
+## Generated and protected paths
 
-- Install dependencies: `bun install --frozen-lockfile`
-- Start local development Storybook: `bun run dev`
-- Fast tests: `bun run test`
-- Type check: `bun run check-types`
-- Static package checks: `bun run lint`
-- Format files: `bun run format`
-- Check formatting without mutation: `bun run format:check`
-- Production package build: `bun run build`
-- Full local verification: `bun run verify`
-- CI/release confidence contract: `bun run verify:release`
-- Package dry run: `bun run pack:dry`
-- Consumer example verification: `bun run verify:consumer`
-- Visual tests only: `bun run test:visual`
-- Storybook build: `bun run build-storybook`
-- Synchronize shadcn registry source: `bun run sync:registry`
-- Validate and build the registry: `bun run verify:registry`
-- Build static registry JSON: `bun run build:registry`
-- Repo hygiene report: `bun run check:hygiene`
+Do not hand-edit:
 
-Before running visual tests locally for the first time, install the Chromium browser with `bunx playwright install chromium`. CI uses `bunx playwright install --with-deps chromium`.
+- `dist/`, `coverage/`, `storybook-static/`, `playwright-report/`, `test-results/`, `public/r/`, `.cache/`, or package archives;
+- `registry/default/lib/`, `registry/default/styles/`, or `registry/default/ui/`;
+- `bun.lock` or `examples/consumer/bun.lock` outside Bun dependency operations.
 
-## Release Flow
+## Validation
 
-This package is published directly to the public package registry for the `@moritzbrantner` scope. Use `bun run publish:registry` for a local publish after authenticating for the registry. `.github/workflows/publish.yml` can also publish on `v*` tags or manual workflow dispatch when `NPM_TOKEN` is configured.
+- Install: `bun install --frozen-lockfile`
+- Focused unit tests: `bun run test`
+- Types: `bun run check-types`
+- Static package and generated-contract checks: `bun run lint`
+- Formatting check: `bun run format:check`
+- Build: `bun run build`
+- Full confidence contract: `bun run verify`
 
-Before tagging, dispatching, or publishing manually, run `bun run verify:release` and inspect `bun pm pack --dry-run --ignore-scripts` output through `bun run pack:dry`.
+Validate progressively: run the narrowest affected test first, then types, lint, build, and broader browser or release checks when their surfaces are affected. `bun run verify:release` is expensive and includes Storybook, coverage, Playwright visual/mobile checks, Unlighthouse, consumer verification, build-size checks, benchmarks, and package dry-run validation.
 
-## Do Not Edit Manually
+Visual tests require Chromium and start Storybook on port 6007. Install the browser once with `bunx playwright install chromium`.
 
-- `node_modules/`, `.bun/`, `.cache/`, `.turbo/`, `.vite/`
-- `dist/`
-- `coverage/`
-- `playwright-report/`
-- `test-results/`
-- `storybook-static/`
-- `public/r/`
-- `*.tgz`
-- `bun.lock` except through Bun dependency/install operations
-- `examples/consumer/bun.lock` except through Bun operations inside `examples/consumer/`
+## Release boundary
 
-Do not hand-edit generated package output in `dist/`; change source files and run `bun run build`.
-Do not hand-edit generated source under `registry/default/lib/`, `registry/default/styles/`, or `registry/default/ui/`; change the mapped package source and run `bun run sync:registry`.
-
-## Generated And Expensive Artifacts
-
-- `dist/` is generated by `bun run build`.
-- `coverage/` is generated by `bun run test:coverage`.
-- `storybook-static/` is generated by `bun run build-storybook`.
-- `playwright-report/` and `test-results/` are generated by Playwright.
-- `bun run verify:release` is expensive: it type-checks, runs package checks, unit tests, build, package tests, Storybook tests, coverage, visual tests, consumer build, build-size checks, benchmarks, and a Bun package dry run.
-- `bun run test:visual` starts Storybook and is slower than unit tests.
-
-## Search And Orientation
-
-- Prefer `rg --files` to list files and `rg "<pattern>"` for text search.
-- Use focused reads such as `sed -n '1,220p' <file>` after search results.
-- Use `git status --short --branch` before edits and before final reporting.
-- When semantic search is available, use `semble search "<query>"` from the repo root, or the Semble MCP search tool with `repo: "."`.
+Implementation and publication are separate. Before a release or tag, run `bun run verify:release`, inspect `bun run pack:dry`, and ensure the version and changelog describe the intended release. Use `bun run publish:registry` only for an explicitly authorized registry release.
