@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 
 import { cn } from "../../lib/cn";
@@ -7,8 +5,10 @@ import { cn } from "../../lib/cn";
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 type HeadingTag = `h${HeadingLevel}`;
 
-type QuestionnaireQuestionVariant = "cards" | "list" | "scale";
+type QuestionnaireChoiceVariant = "cards" | "list" | "scale" | "pop" | "pulse";
 type QuestionnaireQuestionColumns = 1 | 2 | 3;
+type QuestionnairePollResultsVariant = "default" | "pop" | "pulse";
+type QuestionnaireTextAnswerVariant = "default" | "pop" | "pulse";
 
 export type QuestionnaireOption = {
   value: string;
@@ -17,6 +17,13 @@ export type QuestionnaireOption = {
   leading?: React.ReactNode;
   disabled?: boolean;
   ariaLabel?: string;
+};
+
+export type QuestionnairePollResult = {
+  value: string;
+  label: React.ReactNode;
+  count: number;
+  percentage?: number;
 };
 
 export type QuestionnaireProps = React.ComponentProps<"section"> & {
@@ -136,73 +143,33 @@ function Questionnaire({
   );
 }
 
-export type QuestionnaireQuestionProps = Omit<
-  React.ComponentProps<"fieldset">,
-  "children" | "onChange"
-> & {
+export type QuestionnaireQuestionProps = React.ComponentProps<"fieldset"> & {
   legend: React.ReactNode;
   description?: React.ReactNode;
-  options: readonly QuestionnaireOption[];
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
-  name?: string;
-  variant?: QuestionnaireQuestionVariant;
-  columns?: QuestionnaireQuestionColumns;
-  required?: boolean;
   error?: React.ReactNode;
-  scaleStartLabel?: React.ReactNode;
-  scaleEndLabel?: React.ReactNode;
 };
 
 function QuestionnaireQuestion({
   className,
   legend,
   description,
-  options,
-  value,
-  defaultValue,
-  onValueChange,
-  name,
-  variant = "cards",
-  columns = 1,
-  required = false,
   error,
-  scaleStartLabel,
-  scaleEndLabel,
-  disabled,
+  children,
   "aria-describedby": ariaDescribedBy,
   ...props
 }: QuestionnaireQuestionProps) {
   const generatedId = React.useId();
-  const generatedName = `questionnaire-${generatedId}`;
-  const resolvedName = name ?? generatedName;
   const descriptionId = `${generatedId}-description`;
   const errorId = `${generatedId}-error`;
-  const [internalValue, setInternalValue] = React.useState(defaultValue);
-  const selectedValue = value ?? internalValue;
   const describedBy =
     [description ? descriptionId : null, error ? errorId : null, ariaDescribedBy]
       .filter(Boolean)
       .join(" ") || undefined;
 
-  const selectValue = React.useCallback(
-    (nextValue: string) => {
-      if (value === undefined) {
-        setInternalValue(nextValue);
-      }
-
-      onValueChange?.(nextValue);
-    },
-    [onValueChange, value],
-  );
-
   return (
     <fieldset
       data-slot="questionnaire-question"
-      data-variant={variant}
       className={cn("min-w-0 border-0 p-0", className)}
-      disabled={disabled}
       aria-describedby={describedBy}
       aria-invalid={error ? true : undefined}
       {...props}
@@ -224,131 +191,9 @@ function QuestionnaireQuestion({
         </div>
       )}
 
-      <div
-        data-slot="questionnaire-options"
-        data-variant={variant}
-        data-columns={columns}
-        className={cn(
-          "mt-5 min-w-0",
-          variant === "cards" &&
-            "grid grid-cols-1 gap-3 sm:data-[columns=2]:grid-cols-2 sm:data-[columns=3]:grid-cols-3",
-          variant === "list" && "grid gap-2",
-          variant === "scale" && "grid grid-cols-[repeat(auto-fit,minmax(3rem,1fr))] gap-2",
-        )}
-      >
-        {options.map((option, index) => {
-          const optionId = `${generatedId}-${index}`;
-          const selected = option.value === selectedValue;
-          const optionDisabled = Boolean(disabled || option.disabled);
-          const accessibleLabel =
-            option.ariaLabel ?? (typeof option.label === "string" ? option.label : undefined);
-
-          return (
-            <div key={option.value} data-slot="questionnaire-option" className="min-w-0">
-              <input
-                id={optionId}
-                data-slot="questionnaire-input"
-                className="peer sr-only"
-                type="radio"
-                name={resolvedName}
-                value={option.value}
-                checked={selected}
-                disabled={optionDisabled}
-                required={required}
-                aria-label={accessibleLabel}
-                aria-invalid={error ? true : undefined}
-                onChange={() => selectValue(option.value)}
-              />
-              <label
-                htmlFor={optionId}
-                data-slot="questionnaire-option-label"
-                data-selected={selected ? "true" : "false"}
-                data-disabled={optionDisabled ? "true" : undefined}
-                className={cn(
-                  "relative outline-none transition-[background-color,border-color,box-shadow,transform] duration-[var(--ui-motion-duration-base)] ease-[var(--ui-motion-ease-standard)] peer-focus-visible:ring-[var(--ui-focus-ring-width)] peer-focus-visible:ring-ring/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 motion-reduce:transition-none",
-                  variant === "cards" &&
-                    "flex min-h-24 cursor-pointer items-start gap-3 rounded-[var(--ui-card-radius,var(--ui-radius-surface))] border border-border bg-background p-4 shadow-[var(--ui-shadow-surface)] hover:-translate-y-px hover:border-primary/40 hover:bg-accent/30 data-[selected=true]:border-primary data-[selected=true]:bg-primary/5 data-[selected=true]:shadow-[var(--ui-shadow-interactive)] motion-reduce:hover:translate-y-0",
-                  variant === "list" &&
-                    "flex min-h-12 cursor-pointer items-center gap-3 rounded-[var(--ui-radius-control)] border border-border bg-background px-3 py-2.5 hover:border-primary/40 hover:bg-accent/40 data-[selected=true]:border-primary data-[selected=true]:bg-primary/5",
-                  variant === "scale" &&
-                    "flex min-h-12 cursor-pointer items-center justify-center rounded-[var(--ui-radius-control)] border border-border bg-background px-2 py-2 text-center text-sm font-medium hover:border-primary/50 hover:bg-accent data-[selected=true]:border-primary data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground data-[selected=true]:shadow-[var(--ui-shadow-interactive)]",
-                )}
-              >
-                {variant !== "scale" && (
-                  <span
-                    aria-hidden="true"
-                    data-slot="questionnaire-option-marker"
-                    data-state={selected ? "checked" : "unchecked"}
-                    className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border border-input bg-background transition-colors data-[state=checked]:border-primary data-[state=checked]:bg-primary"
-                  >
-                    <span
-                      data-slot="questionnaire-option-dot"
-                      className={cn(
-                        "size-2 rounded-full bg-primary-foreground transition-transform duration-[var(--ui-motion-duration-fast)] motion-reduce:transition-none",
-                        selected ? "scale-100" : "scale-0",
-                      )}
-                    />
-                  </span>
-                )}
-
-                {variant !== "scale" && option.leading && (
-                  <span
-                    aria-hidden="true"
-                    data-slot="questionnaire-option-leading"
-                    className="flex size-8 shrink-0 items-center justify-center rounded-[var(--ui-radius-control)] bg-muted text-muted-foreground [&_svg]:size-4"
-                  >
-                    {option.leading}
-                  </span>
-                )}
-
-                <span
-                  data-slot="questionnaire-option-content"
-                  className={cn("min-w-0", variant !== "scale" && "grid flex-1 gap-0.5")}
-                >
-                  <span
-                    data-slot="questionnaire-option-title"
-                    className={cn(
-                      "font-medium",
-                      variant === "cards" && "leading-snug",
-                      variant === "list" && "text-sm leading-snug",
-                    )}
-                  >
-                    {option.label}
-                  </span>
-                  {variant !== "scale" && option.description && (
-                    <span
-                      data-slot="questionnaire-option-description"
-                      className="text-sm leading-5 text-muted-foreground"
-                    >
-                      {option.description}
-                    </span>
-                  )}
-                </span>
-
-                {variant !== "scale" && selected && (
-                  <span
-                    aria-hidden="true"
-                    data-slot="questionnaire-option-selected"
-                    className="self-center text-xs font-medium text-primary"
-                  >
-                    ✓
-                  </span>
-                )}
-              </label>
-            </div>
-          );
-        })}
+      <div data-slot="questionnaire-question-content" className="mt-5 grid min-w-0 gap-4">
+        {children}
       </div>
-
-      {variant === "scale" && (scaleStartLabel || scaleEndLabel) && (
-        <div
-          data-slot="questionnaire-scale-labels"
-          className="mt-2 flex items-start justify-between gap-4 text-xs leading-5 text-muted-foreground"
-        >
-          <span>{scaleStartLabel}</span>
-          <span className="text-right">{scaleEndLabel}</span>
-        </div>
-      )}
 
       {error && (
         <div
@@ -364,5 +209,341 @@ function QuestionnaireQuestion({
   );
 }
 
-export { Questionnaire, QuestionnaireQuestion };
-export type { HeadingLevel, QuestionnaireQuestionColumns, QuestionnaireQuestionVariant };
+export type QuestionnaireSingleChoiceProps = Omit<React.ComponentProps<"div">, "children"> & {
+  options: readonly QuestionnaireOption[];
+  name?: string;
+  defaultValue?: string;
+  variant?: QuestionnaireChoiceVariant;
+  columns?: QuestionnaireQuestionColumns;
+  required?: boolean;
+  disabled?: boolean;
+  scaleStartLabel?: React.ReactNode;
+  scaleEndLabel?: React.ReactNode;
+};
+
+function QuestionnaireSingleChoice({
+  className,
+  options,
+  name,
+  defaultValue,
+  variant = "cards",
+  columns = 1,
+  required = false,
+  disabled = false,
+  scaleStartLabel,
+  scaleEndLabel,
+  ...props
+}: QuestionnaireSingleChoiceProps) {
+  const generatedId = React.useId();
+  const resolvedName = name ?? `questionnaire-${generatedId}`;
+  const isScale = variant === "scale";
+  const isCardLayout = variant === "cards" || variant === "pop";
+
+  return (
+    <div
+      data-slot="questionnaire-single-choice"
+      data-variant={variant}
+      data-columns={columns}
+      className={cn("min-w-0", className)}
+      {...props}
+    >
+      <div
+        data-slot="questionnaire-options"
+        data-variant={variant}
+        data-columns={columns}
+        className={cn(
+          "min-w-0",
+          isCardLayout &&
+            "grid grid-cols-1 gap-3 sm:data-[columns=2]:grid-cols-2 sm:data-[columns=3]:grid-cols-3",
+          (variant === "list" || variant === "pulse") && "grid gap-2",
+          isScale && "grid grid-cols-[repeat(auto-fit,minmax(3rem,1fr))] gap-2",
+        )}
+      >
+        {options.map((option, index) => {
+          const optionId = `${generatedId}-${index}`;
+          const optionDisabled = Boolean(disabled || option.disabled);
+          const accessibleLabel =
+            option.ariaLabel ?? (typeof option.label === "string" ? option.label : undefined);
+
+          return (
+            <div
+              key={option.value}
+              data-slot="questionnaire-option"
+              className="relative min-w-0"
+            >
+              <input
+                id={optionId}
+                data-slot="questionnaire-input"
+                className="peer sr-only"
+                type="radio"
+                name={resolvedName}
+                value={option.value}
+                defaultChecked={option.value === defaultValue}
+                disabled={optionDisabled}
+                required={required}
+                aria-label={accessibleLabel}
+              />
+
+              {!isScale && (
+                <span
+                  aria-hidden="true"
+                  data-slot="questionnaire-option-marker"
+                  className={cn(
+                    "pointer-events-none absolute z-10 flex size-5 items-center justify-center rounded-full border border-input bg-background after:size-2 after:scale-0 after:rounded-full after:bg-primary-foreground after:content-[''] peer-checked:border-primary peer-checked:bg-primary peer-checked:after:scale-100 peer-disabled:opacity-50",
+                    variant === "list" || variant === "pulse" ? "top-3.5 left-3" : "top-4 left-4",
+                  )}
+                />
+              )}
+
+              <label
+                htmlFor={optionId}
+                data-slot="questionnaire-option-label"
+                className={cn(
+                  "relative outline-none transition-[background-color,border-color,box-shadow,transform] duration-[var(--ui-motion-duration-base)] ease-[var(--ui-motion-ease-standard)] peer-focus-visible:ring-[var(--ui-focus-ring-width)] peer-focus-visible:ring-ring/50 peer-disabled:pointer-events-none peer-disabled:opacity-50 motion-reduce:transition-none",
+                  variant === "cards" &&
+                    "flex min-h-24 cursor-pointer items-start gap-3 rounded-[var(--ui-card-radius,var(--ui-radius-surface))] border border-border bg-background p-4 pl-12 shadow-[var(--ui-shadow-surface)] hover:-translate-y-px hover:border-primary/40 hover:bg-accent/30 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:shadow-[var(--ui-shadow-interactive)] motion-reduce:hover:translate-y-0",
+                  variant === "pop" &&
+                    "flex min-h-24 cursor-pointer items-start gap-3 rounded-[var(--ui-card-radius,var(--ui-radius-surface))] border border-border bg-background p-4 pl-12 shadow-[var(--ui-shadow-surface)] hover:-translate-y-1 hover:border-primary/50 hover:bg-accent/40 active:scale-[0.99] peer-checked:scale-[1.015] peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-[var(--ui-shadow-interactive)] motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 motion-reduce:peer-checked:scale-100",
+                  variant === "list" &&
+                    "flex min-h-12 cursor-pointer items-center gap-3 rounded-[var(--ui-radius-control)] border border-border bg-background px-3 py-2.5 pl-11 hover:border-primary/40 hover:bg-accent/40 peer-checked:border-primary peer-checked:bg-primary/5",
+                  variant === "pulse" &&
+                    "flex min-h-12 cursor-pointer items-center gap-3 rounded-[var(--ui-radius-control)] border border-border bg-background px-3 py-2.5 pl-11 hover:border-primary/50 hover:bg-accent/50 active:scale-[0.995] peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:ring-2 peer-checked:ring-primary/15 motion-reduce:active:scale-100",
+                  isScale &&
+                    "flex min-h-12 cursor-pointer items-center justify-center rounded-[var(--ui-radius-control)] border border-border bg-background px-2 py-2 text-center text-sm font-medium hover:border-primary/50 hover:bg-accent peer-checked:border-primary peer-checked:bg-primary peer-checked:text-primary-foreground peer-checked:shadow-[var(--ui-shadow-interactive)]",
+                )}
+              >
+                {!isScale && option.leading && (
+                  <span
+                    aria-hidden="true"
+                    data-slot="questionnaire-option-leading"
+                    className="flex size-8 shrink-0 items-center justify-center rounded-[var(--ui-radius-control)] bg-muted text-muted-foreground [&_svg]:size-4"
+                  >
+                    {option.leading}
+                  </span>
+                )}
+
+                <span
+                  data-slot="questionnaire-option-content"
+                  className={cn("min-w-0", !isScale && "grid flex-1 gap-0.5")}
+                >
+                  <span
+                    data-slot="questionnaire-option-title"
+                    className={cn(
+                      "font-medium",
+                      (variant === "cards" || variant === "pop") && "leading-snug",
+                      (variant === "list" || variant === "pulse") && "text-sm leading-snug",
+                    )}
+                  >
+                    {option.label}
+                  </span>
+                  {!isScale && option.description && (
+                    <span
+                      data-slot="questionnaire-option-description"
+                      className="text-sm leading-5 text-muted-foreground"
+                    >
+                      {option.description}
+                    </span>
+                  )}
+                </span>
+              </label>
+            </div>
+          );
+        })}
+      </div>
+
+      {isScale && (scaleStartLabel || scaleEndLabel) && (
+        <div
+          data-slot="questionnaire-scale-labels"
+          className="mt-2 flex items-start justify-between gap-4 text-xs leading-5 text-muted-foreground"
+        >
+          <span>{scaleStartLabel}</span>
+          <span className="text-right">{scaleEndLabel}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export type QuestionnaireTextAnswerProps = Omit<React.ComponentProps<"textarea">, "children"> & {
+  label: React.ReactNode;
+  hint?: React.ReactNode;
+  variant?: QuestionnaireTextAnswerVariant;
+  inputClassName?: string;
+};
+
+function QuestionnaireTextAnswer({
+  className,
+  inputClassName,
+  id,
+  label,
+  hint,
+  variant = "default",
+  rows = 5,
+  "aria-describedby": ariaDescribedBy,
+  ...props
+}: QuestionnaireTextAnswerProps) {
+  const generatedId = React.useId();
+  const resolvedId = id ?? `${generatedId}-answer`;
+  const hintId = `${generatedId}-hint`;
+  const describedBy = [hint ? hintId : null, ariaDescribedBy].filter(Boolean).join(" ") || undefined;
+
+  return (
+    <div
+      data-slot="questionnaire-text-answer"
+      data-variant={variant}
+      className={cn("grid gap-2", className)}
+    >
+      <label htmlFor={resolvedId} className="text-sm font-medium">
+        {label}
+      </label>
+      <textarea
+        id={resolvedId}
+        data-slot="questionnaire-textarea"
+        data-variant={variant}
+        rows={rows}
+        aria-describedby={describedBy}
+        className={cn(
+          "min-h-28 w-full resize-y rounded-[var(--ui-radius-control)] border border-input bg-background px-3 py-2 text-base shadow-[var(--ui-shadow-surface)] outline-none transition-[border-color,box-shadow,transform] placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm motion-reduce:transition-none",
+          variant === "pop" &&
+            "focus-visible:-translate-y-px focus-visible:shadow-[var(--ui-shadow-interactive)] motion-reduce:focus-visible:translate-y-0",
+          variant === "pulse" && "focus-visible:ring-2 focus-visible:ring-primary/20",
+          inputClassName,
+        )}
+        {...props}
+      />
+      {hint && (
+        <div id={hintId} data-slot="questionnaire-text-answer-hint" className="text-xs text-muted-foreground">
+          {hint}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export type QuestionnairePollResultsProps = Omit<React.ComponentProps<"div">, "children"> & {
+  results: readonly QuestionnairePollResult[];
+  totalResponses?: number;
+  selectedValue?: string;
+  showCounts?: boolean;
+  caption?: React.ReactNode;
+  variant?: QuestionnairePollResultsVariant;
+};
+
+function QuestionnairePollResults({
+  className,
+  results,
+  totalResponses,
+  selectedValue,
+  showCounts = true,
+  caption,
+  variant = "default",
+  ...props
+}: QuestionnairePollResultsProps) {
+  const generatedId = React.useId();
+  const normalizedCounts = results.map((result) =>
+    Number.isFinite(result.count) ? Math.max(0, Math.round(result.count)) : 0,
+  );
+  const computedTotal = normalizedCounts.reduce((sum, count) => sum + count, 0);
+  const resolvedTotal =
+    typeof totalResponses === "number" && Number.isFinite(totalResponses) && totalResponses >= 0
+      ? Math.round(totalResponses)
+      : computedTotal;
+
+  return (
+    <div
+      data-slot="questionnaire-poll-results"
+      data-variant={variant}
+      className={cn("grid gap-3", className)}
+      {...props}
+    >
+      {caption && (
+        <div data-slot="questionnaire-poll-results-caption" className="text-sm text-muted-foreground">
+          {caption}
+        </div>
+      )}
+
+      <ul data-slot="questionnaire-poll-results-list" className="grid gap-2.5">
+        {results.map((result, index) => {
+          const count = normalizedCounts[index] ?? 0;
+          const rawPercentage =
+            typeof result.percentage === "number" && Number.isFinite(result.percentage)
+              ? result.percentage
+              : resolvedTotal > 0
+                ? (count / resolvedTotal) * 100
+                : 0;
+          const percentage = Math.min(100, Math.max(0, rawPercentage));
+          const roundedPercentage = Math.round(percentage);
+          const selected = result.value === selectedValue;
+          const labelId = `${generatedId}-result-${index}`;
+
+          return (
+            <li
+              key={result.value}
+              data-slot="questionnaire-poll-result"
+              data-selected={selected ? "true" : undefined}
+              className={cn(
+                "grid gap-1.5",
+                variant === "pop" &&
+                  "rounded-[var(--ui-radius-control)] border border-transparent p-2 transition-transform duration-[var(--ui-motion-duration-base)] data-[selected=true]:scale-[1.01] data-[selected=true]:border-primary/30 data-[selected=true]:bg-primary/5 motion-reduce:data-[selected=true]:scale-100",
+                variant === "pulse" &&
+                  "rounded-[var(--ui-radius-control)] px-2 py-1.5 data-[selected=true]:bg-primary/5",
+              )}
+            >
+              <div className="flex min-w-0 items-baseline justify-between gap-3 text-sm">
+                <span id={labelId} data-slot="questionnaire-poll-result-label" className="min-w-0 font-medium">
+                  {result.label}
+                  {selected && (
+                    <span className="ml-1.5 text-xs font-normal text-primary" aria-hidden="true">
+                      ✓
+                    </span>
+                  )}
+                </span>
+                <span className="shrink-0 tabular-nums text-muted-foreground">
+                  <strong className="font-medium text-foreground">{roundedPercentage}%</strong>
+                  {showCounts && <span> · {count}</span>}
+                </span>
+              </div>
+
+              <div
+                role="progressbar"
+                aria-labelledby={labelId}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={roundedPercentage}
+                className={cn(
+                  "h-2 overflow-hidden rounded-full bg-muted",
+                  variant === "pop" && "h-2.5",
+                  variant === "pulse" && "h-1.5",
+                )}
+              >
+                <div
+                  data-slot="questionnaire-poll-result-indicator"
+                  className={cn(
+                    "h-full rounded-full bg-primary transition-[width] duration-[var(--ui-motion-duration-base)] ease-[var(--ui-motion-ease-standard)] motion-reduce:transition-none",
+                    variant === "pop" && "shadow-[var(--ui-shadow-interactive)]",
+                  )}
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+export {
+  Questionnaire,
+  QuestionnairePollResults,
+  QuestionnaireQuestion,
+  QuestionnaireSingleChoice,
+  QuestionnaireTextAnswer,
+};
+export type {
+  HeadingLevel,
+  QuestionnaireChoiceVariant,
+  QuestionnairePollResultsVariant,
+  QuestionnaireQuestionColumns,
+  QuestionnaireTextAnswerVariant,
+};
