@@ -154,7 +154,7 @@ function InlineEdit({
         <span className="truncate">{value || placeholder}</span>
         <button
           type="button"
-          className="rounded-[var(--ui-radius-control)] border px-2 py-1 text-xs opacity-70 group-hover:opacity-100"
+          className="min-h-10 rounded-[var(--ui-radius-control)] border px-2 py-1 text-xs opacity-70 group-hover:opacity-100"
           onClick={() => setEditing(true)}
         >
           Edit
@@ -179,18 +179,18 @@ function InlineEdit({
           if (event.key === "Enter") commit();
           if (event.key === "Escape") setEditing(false);
         }}
-        className="h-8 min-w-0 rounded-[var(--ui-radius-control)] border bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+        className="h-9 min-w-0 rounded-[var(--ui-radius-control)] border bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-ring"
       />
       <button
         type="button"
-        className="h-8 rounded-[var(--ui-radius-control)] bg-primary px-2 text-xs text-primary-foreground"
+        className="h-10 rounded-[var(--ui-radius-control)] bg-primary px-2 text-xs text-primary-foreground"
         onClick={commit}
       >
         Save
       </button>
       <button
         type="button"
-        className="h-8 rounded-[var(--ui-radius-control)] border px-2 text-xs"
+        className="h-10 rounded-[var(--ui-radius-control)] border px-2 text-xs"
         onClick={() => setEditing(false)}
       >
         Cancel

@@ -61,7 +61,7 @@ function MorphingDialog({
             <motion.button
               type="button"
               layoutId={layoutId}
-              className="rounded-[var(--ui-radius-control)] border bg-card px-3 py-2 text-sm font-medium"
+              className="min-h-10 rounded-[var(--ui-radius-control)] border bg-card px-3 py-2 text-sm font-medium"
             >
               {trigger}
             </motion.button>
@@ -92,7 +92,7 @@ function MorphingDialog({
                 <DialogClose asChild>
                   <button
                     type="button"
-                    className="h-9 rounded-[var(--ui-radius-control)] border px-3 text-sm"
+                    className="h-10 rounded-[var(--ui-radius-control)] border px-3 text-sm"
                   >
                     Close
                   </button>
@@ -182,7 +182,7 @@ function SpatialSegmentedControl({
             role="radio"
             aria-checked={active}
             onClick={() => onValueChange?.(item.id)}
-            className="relative isolate h-8 min-w-20 rounded-[var(--ui-radius-control)] px-3 text-sm font-medium"
+            className="relative isolate h-10 min-w-20 rounded-[var(--ui-radius-control)] px-3 text-sm font-medium"
           >
             {active ? (
               <motion.span
@@ -241,7 +241,7 @@ function ExpandingCard({
         type="button"
         aria-expanded={resolved}
         onClick={() => setExpanded(!resolved)}
-        className="flex items-start justify-between gap-4 text-left"
+        className="flex min-h-10 items-start justify-between gap-4 text-left"
       >
         <span className="grid gap-1">
           <span className="font-semibold">{title}</span>
@@ -301,7 +301,7 @@ function KineticBreadcrumbs({ items, onSelect, className, ...props }: KineticBre
                 type="button"
                 onClick={() => onSelect?.(item.id)}
                 className={cn(
-                  "max-w-40 truncate rounded px-1.5 py-1",
+                  "min-h-10 max-w-40 truncate rounded px-1.5 py-1",
                   index === items.length - 1
                     ? "font-semibold"
                     : "text-muted-foreground hover:text-foreground",
@@ -347,7 +347,7 @@ function PanelStack({
           type="button"
           disabled={clamped <= 0}
           onClick={() => onActiveIndexChange?.(clamped - 1)}
-          className="h-8 rounded-[var(--ui-radius-control)] border px-2 text-xs disabled:opacity-40"
+          className="h-10 rounded-[var(--ui-radius-control)] border px-2 text-xs disabled:opacity-40"
         >
           Back
         </button>
@@ -358,7 +358,7 @@ function PanelStack({
           type="button"
           disabled={clamped >= panels.length - 1}
           onClick={() => onActiveIndexChange?.(clamped + 1)}
-          className="h-8 rounded-[var(--ui-radius-control)] border px-2 text-xs disabled:opacity-40"
+          className="h-10 rounded-[var(--ui-radius-control)] border px-2 text-xs disabled:opacity-40"
         >
           Next
         </button>

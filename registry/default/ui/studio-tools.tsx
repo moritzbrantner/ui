@@ -46,21 +46,21 @@ function MediaTransport({
       <div className="flex items-center gap-1">
         <button
           type="button"
-          className="h-8 rounded-[var(--ui-radius-control)] border px-2 text-xs"
+          className="h-10 rounded-[var(--ui-radius-control)] border px-2 text-xs"
           onClick={() => onStep?.(-1)}
         >
           −1f
         </button>
         <button
           type="button"
-          className="h-8 rounded-[var(--ui-radius-control)] bg-primary px-3 text-sm font-medium text-primary-foreground"
+          className="h-10 rounded-[var(--ui-radius-control)] bg-primary px-3 text-sm font-medium text-primary-foreground"
           onClick={() => onPlayingChange?.(!playing)}
         >
           {playing ? "Pause" : "Play"}
         </button>
         <button
           type="button"
-          className="h-8 rounded-[var(--ui-radius-control)] border px-2 text-xs"
+          className="h-10 rounded-[var(--ui-radius-control)] border px-2 text-xs"
           onClick={() => onStep?.(1)}
         >
           +1f
@@ -69,7 +69,7 @@ function MediaTransport({
           type="button"
           aria-pressed={loop}
           className={cn(
-            "ml-auto h-8 rounded-[var(--ui-radius-control)] border px-2 text-xs",
+            "ml-auto h-10 rounded-[var(--ui-radius-control)] border px-2 text-xs",
             loop && "bg-accent",
           )}
           onClick={() => onLoopChange?.(!loop)}
@@ -87,7 +87,7 @@ function MediaTransport({
           step="any"
           value={Math.min(Math.max(currentTime, 0), Math.max(duration, 0))}
           onChange={(event) => onSeek?.(event.currentTarget.valueAsNumber)}
-          className="w-full accent-[var(--editor-playhead)]"
+          className="h-9 w-full accent-[var(--editor-playhead)]"
         />
         <span>{formatTime(duration)}</span>
       </div>
@@ -142,7 +142,7 @@ function TimelineTrack({
             aria-pressed={selected}
             onClick={() => onSelect?.(segment.id)}
             className={cn(
-              "absolute inset-y-1 overflow-hidden rounded-[var(--ui-radius-control)] border px-2 text-left text-xs font-medium",
+              "absolute inset-y-1 min-h-10 overflow-hidden rounded-[var(--ui-radius-control)] border px-2 text-left text-xs font-medium",
               selected && "ring-2 ring-[var(--editor-selection)] ring-offset-1",
             )}
             style={{
@@ -201,7 +201,7 @@ function Scrubber({
       max={max}
       step={step}
       onChange={(event) => onValueChange?.(event.currentTarget.valueAsNumber)}
-      className={cn("w-full accent-[var(--editor-playhead)]", className)}
+      className={cn("h-9 w-full accent-[var(--editor-playhead)]", className)}
       {...props}
     />
   );
@@ -252,7 +252,7 @@ function LayerStack({
               type="button"
               aria-label={`${layer.visible === false ? "Show" : "Hide"} layer`}
               aria-pressed={layer.visible !== false}
-              className="size-7 rounded-[var(--ui-radius-control)] text-xs"
+              className="size-10 rounded-[var(--ui-radius-control)] text-xs"
               onClick={() => onVisibilityChange?.(layer.id, layer.visible === false)}
             >
               {layer.visible === false ? "○" : "●"}
@@ -261,7 +261,7 @@ function LayerStack({
               type="button"
               aria-label={`${layer.locked ? "Unlock" : "Lock"} layer`}
               aria-pressed={layer.locked ?? false}
-              className="size-7 rounded-[var(--ui-radius-control)] text-xs"
+              className="size-10 rounded-[var(--ui-radius-control)] text-xs"
               onClick={() => onLockChange?.(layer.id, !layer.locked)}
             >
               {layer.locked ? "L" : "U"}
@@ -269,7 +269,7 @@ function LayerStack({
             <button
               type="button"
               onClick={() => onSelect?.(layer.id)}
-              className="min-w-0 rounded-[var(--ui-radius-control)] px-2 py-1 text-left text-sm"
+              className="min-h-10 min-w-0 rounded-[var(--ui-radius-control)] px-2 py-1 text-left text-sm"
               style={{ paddingLeft: `${0.5 + (layer.depth ?? 0) * 0.75}rem` }}
             >
               <span className="block truncate">{layer.label}</span>
@@ -355,7 +355,7 @@ function ToolShelf({
             title={tool.shortcut ? `${tool.label} (${tool.shortcut})` : tool.label}
             onClick={() => onToolChange?.(tool.id)}
             className={cn(
-              "inline-flex h-8 items-center gap-1.5 rounded-[var(--ui-radius-control)] px-2 text-xs font-medium",
+              "inline-flex h-10 items-center gap-1.5 rounded-[var(--ui-radius-control)] px-2 text-xs font-medium",
               active ? "bg-primary text-primary-foreground" : "hover:bg-muted",
             )}
           >
@@ -422,7 +422,7 @@ function BeforeAfter({
         max={100}
         value={resolved}
         onChange={(event) => setValue(event.currentTarget.valueAsNumber)}
-        className="w-full accent-[var(--editor-playhead)]"
+        className="h-9 w-full accent-[var(--editor-playhead)]"
       />
     </div>
   );

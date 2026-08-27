@@ -137,11 +137,11 @@ function MapLegend({
           return (
             <label
               key={item.id}
-              className="grid cursor-pointer grid-cols-[auto_auto_minmax(0,1fr)] items-center gap-2 rounded-[var(--ui-radius-control)] px-1.5 py-1 text-sm hover:bg-muted/60"
+              className="relative grid min-h-10 cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-2 rounded-[var(--ui-radius-control)] px-1.5 py-1 text-sm hover:bg-muted/60"
             >
               <input
                 type="checkbox"
-                className="size-3.5 accent-primary"
+                className="absolute left-1.5 size-9 opacity-0"
                 checked={visible}
                 onChange={(event) => onVisibilityChange?.(item.id, event.currentTarget.checked)}
               />

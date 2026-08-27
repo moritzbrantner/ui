@@ -170,7 +170,7 @@ function PassageNavigator({
         type="button"
         onClick={onPrevious}
         disabled={!onPrevious}
-        className="h-8 rounded-[var(--ui-radius-control)] border px-2 disabled:opacity-40"
+        className="h-10 rounded-[var(--ui-radius-control)] border px-2 disabled:opacity-40"
       >
         Previous
       </button>
@@ -193,7 +193,7 @@ function PassageNavigator({
         type="button"
         onClick={onNext}
         disabled={!onNext}
-        className="h-8 rounded-[var(--ui-radius-control)] border px-2 disabled:opacity-40"
+        className="h-10 rounded-[var(--ui-radius-control)] border px-2 disabled:opacity-40"
       >
         Next
       </button>

@@ -241,7 +241,7 @@ function QuickSwitcher({
               aria-selected={selected}
               onClick={() => onValueChange?.(item.id)}
               className={cn(
-                "grid grid-cols-[minmax(0,1fr)_auto] gap-3 rounded-[var(--ui-radius-control)] px-3 py-2 text-left text-sm hover:bg-white/10",
+                "grid min-h-10 grid-cols-[minmax(0,1fr)_auto] gap-3 rounded-[var(--ui-radius-control)] px-3 py-2 text-left text-sm hover:bg-white/10",
                 selected && "bg-white/10",
               )}
             >

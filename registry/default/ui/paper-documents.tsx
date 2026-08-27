@@ -237,7 +237,7 @@ function DocumentOutline({
             aria-current={active ? "location" : undefined}
             onClick={() => onSelect?.(item.id)}
             className={cn(
-              "flex min-w-0 items-center justify-between gap-3 rounded-[var(--ui-radius-control)] py-1.5 pr-2 text-left hover:bg-muted/50",
+              "flex min-h-10 min-w-0 items-center justify-between gap-3 rounded-[var(--ui-radius-control)] py-1.5 pr-2 text-left hover:bg-muted/50",
               active && "bg-[var(--document-selection)]",
             )}
             style={{ paddingLeft: `${0.5 + Math.max((item.level ?? 1) - 1, 0) * 0.75}rem` }}

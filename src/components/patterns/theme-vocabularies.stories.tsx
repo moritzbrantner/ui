@@ -402,7 +402,7 @@ export const ZleekShells: Story = {
             action={
               <button
                 type="button"
-                className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground"
+                className="min-h-10 rounded bg-primary px-3 py-2 text-sm text-primary-foreground"
               >
                 Launch
               </button>
@@ -455,17 +455,17 @@ export const ProductPatterns: Story = {
         <ResponsiveToolbar
           primary={
             <>
-              <button type="button" className="rounded border px-2 py-1">
+              <button type="button" className="min-h-10 rounded border px-2 py-1">
                 Filter
               </button>
-              <button type="button" className="rounded border px-2 py-1">
+              <button type="button" className="min-h-10 rounded border px-2 py-1">
                 Sort
               </button>
             </>
           }
           secondary={<InlineEdit value="Workspace name" />}
           overflow={
-            <button type="button" className="rounded border px-2 py-1">
+            <button type="button" className="min-h-10 rounded border px-2 py-1">
               More
             </button>
           }
@@ -482,13 +482,13 @@ export const ProductPatterns: Story = {
             primary={
               <button
                 type="button"
-                className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground"
+                className="min-h-10 rounded bg-primary px-3 py-2 text-sm text-primary-foreground"
               >
                 Save
               </button>
             }
             secondary={
-              <button type="button" className="rounded border px-3 py-2 text-sm">
+              <button type="button" className="min-h-10 rounded border px-3 py-2 text-sm">
                 Cancel
               </button>
             }
@@ -506,7 +506,7 @@ export const ProductPatterns: Story = {
             action={
               <button
                 type="button"
-                className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground"
+                className="min-h-10 rounded bg-primary px-3 py-2 text-sm text-primary-foreground"
               >
                 Create project
               </button>
@@ -556,7 +556,7 @@ export const PopRewardsExtended: Story = {
             actions={
               <button
                 type="button"
-                className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground"
+                className="min-h-10 rounded bg-primary px-3 py-2 text-sm text-primary-foreground"
               >
                 Share now
               </button>
@@ -600,7 +600,7 @@ export const PulseSpatial: Story = {
             <div className="grid content-start gap-2">
               <button
                 type="button"
-                className="justify-self-start rounded border px-3 py-2 text-sm"
+                className="min-h-10 justify-self-start rounded border px-3 py-2 text-sm"
                 onClick={() =>
                   setList((current) => [
                     ...current,

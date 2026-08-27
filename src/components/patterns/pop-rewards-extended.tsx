@@ -201,14 +201,20 @@ function RewardChecklist({
         {items.map((item) => (
           <label
             key={item.id}
-            className="flex cursor-pointer items-center gap-2 rounded-[var(--ui-radius-control)] px-2 py-1.5 hover:bg-muted/45"
+            className="relative flex min-h-10 cursor-pointer items-center gap-2 rounded-[var(--ui-radius-control)] px-2 py-1.5 hover:bg-muted/45"
           >
             <input
               type="checkbox"
               checked={item.checked}
               onChange={(event) => onCheckedChange?.(item.id, event.currentTarget.checked)}
-              className="size-4 accent-primary"
+              className="absolute left-2 size-9 opacity-0"
             />
+            <span
+              aria-hidden="true"
+              className="grid size-4 place-items-center rounded border text-[0.65rem] font-bold"
+            >
+              {item.checked ? "✓" : null}
+            </span>
             <span className={cn("text-sm", item.checked && "text-muted-foreground line-through")}>
               {item.label}
             </span>
@@ -277,7 +283,7 @@ function ReactionBurst({
         type="button"
         aria-pressed={active}
         className={cn(
-          "inline-flex h-9 items-center gap-1.5 rounded-full border bg-card px-3 text-sm transition",
+          "inline-flex h-10 items-center gap-1.5 rounded-full border bg-card px-3 text-sm transition",
           active && "border-primary bg-primary/10",
           className,
         )}
