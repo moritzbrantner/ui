@@ -1,0 +1,33 @@
+name: Temporary questionnaire formatting
+
+on:
+  push:
+    branches:
+      - feat/questionnaire-prototypes
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/questionnaire-prototypes
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.12
+      - name: Format questionnaire files
+        run: bunx oxfmt@0.51.0 src/components/patterns/questionnaire.tsx src/components/patterns/questionnaire.stories.tsx src/components/patterns/questionnaire.test.tsx
+      - name: Commit formatting
+        run: |
+          if git diff --quiet -- src/components/patterns/questionnaire.tsx src/components/patterns/questionnaire.stories.tsx src/components/patterns/questionnaire.test.tsx; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/patterns/questionnaire.tsx src/components/patterns/questionnaire.stories.tsx src/components/patterns/questionnaire.test.tsx
+          git commit -m "style(ui): format questionnaire components"
+          git push origin HEAD:feat/questionnaire-prototypes
