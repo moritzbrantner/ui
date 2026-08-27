@@ -1,10 +1,19 @@
-import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CompassIcon, FocusIcon, Layers3Icon } from "lucide-react";
 import { expect } from "storybook/test";
 
+import { PopTheme } from "../../themes/pop";
+import { PulseTheme } from "../../themes/pulse";
 import { Button } from "../stable/button";
-import { Questionnaire, QuestionnaireQuestion, type QuestionnaireOption } from "./questionnaire";
+import {
+  Questionnaire,
+  QuestionnairePollResults,
+  QuestionnaireQuestion,
+  QuestionnaireSingleChoice,
+  QuestionnaireTextAnswer,
+  type QuestionnaireOption,
+  type QuestionnairePollResult,
+} from "./questionnaire";
 
 const preferenceOptions = [
   {
@@ -56,9 +65,19 @@ const scaleOptions = [1, 2, 3, 4, 5].map((value) => ({
         : `${value} out of 5`,
 })) satisfies QuestionnaireOption[];
 
-function ChoiceCardsPrototype() {
-  const [value, setValue] = React.useState("balanced");
+const pollOptions = [
+  { value: "yes", label: "Yes, definitely" },
+  { value: "maybe", label: "Maybe, with some changes" },
+  { value: "no", label: "No, not for me" },
+] satisfies QuestionnaireOption[];
 
+const pollResults = [
+  { value: "yes", label: "Yes, definitely", count: 746 },
+  { value: "maybe", label: "Maybe, with some changes", count: 301 },
+  { value: "no", label: "No, not for me", count: 157 },
+] satisfies QuestionnairePollResult[];
+
+function ChoiceCardsPrototype() {
   return (
     <Questionnaire
       title="What kind of recommendations do you prefer?"
@@ -68,20 +87,20 @@ function ChoiceCardsPrototype() {
       <QuestionnaireQuestion
         legend="Choose the experience that feels most useful"
         description="You can change this later."
-        name="recommendation-style"
-        value={value}
-        onValueChange={setValue}
-        options={preferenceOptions}
-        variant="cards"
-        columns={3}
-      />
+      >
+        <QuestionnaireSingleChoice
+          name="recommendation-style"
+          defaultValue="balanced"
+          options={preferenceOptions}
+          variant="cards"
+          columns={3}
+        />
+      </QuestionnaireQuestion>
     </Questionnaire>
   );
 }
 
 function GuidedQuestionPrototype() {
-  const [value, setValue] = React.useState("guided");
-
   return (
     <Questionnaire
       title="Shape your questionnaire"
@@ -93,25 +112,23 @@ function GuidedQuestionPrototype() {
       footer={
         <>
           <Button variant="ghost">Back</Button>
-          <Button disabled={!value}>Continue</Button>
+          <Button>Continue</Button>
         </>
       }
     >
-      <QuestionnaireQuestion
-        legend="How much guidance do you want?"
-        name="guidance-level"
-        value={value}
-        onValueChange={setValue}
-        options={workflowOptions}
-        variant="list"
-      />
+      <QuestionnaireQuestion legend="How much guidance do you want?">
+        <QuestionnaireSingleChoice
+          name="guidance-level"
+          defaultValue="guided"
+          options={workflowOptions}
+          variant="list"
+        />
+      </QuestionnaireQuestion>
     </Questionnaire>
   );
 }
 
 function ScalePrototype() {
-  const [value, setValue] = React.useState("4");
-
   return (
     <Questionnaire
       title="Quick assessment"
@@ -121,15 +138,64 @@ function ScalePrototype() {
       <QuestionnaireQuestion
         legend="The recommendations matched what I was looking for."
         description="Select the answer that best describes your experience."
-        name="recommendation-fit"
-        value={value}
-        onValueChange={setValue}
-        options={scaleOptions}
-        variant="scale"
-        scaleStartLabel="Strongly disagree"
-        scaleEndLabel="Strongly agree"
-      />
+      >
+        <QuestionnaireSingleChoice
+          name="recommendation-fit"
+          defaultValue="4"
+          options={scaleOptions}
+          variant="scale"
+          scaleStartLabel="Strongly disagree"
+          scaleEndLabel="Strongly agree"
+        />
+      </QuestionnaireQuestion>
     </Questionnaire>
+  );
+}
+
+function PopOpenEndedPrototype() {
+  return (
+    <PopTheme className="max-w-[680px]">
+      <Questionnaire
+        title="Say it in your own words"
+        description="The same questionnaire structure can host an open-ended answer without changing the question shell."
+      >
+        <QuestionnaireQuestion legend="What would make this recommendation feel perfect for you?">
+          <QuestionnaireTextAnswer
+            label="Your answer"
+            name="recommendation-notes"
+            placeholder="For example: fewer choices, more context, or a completely different direction…"
+            hint="Write as much or as little as you need."
+            variant="pop"
+          />
+        </QuestionnaireQuestion>
+      </Questionnaire>
+    </PopTheme>
+  );
+}
+
+function PulsePollPrototype() {
+  return (
+    <PulseTheme className="max-w-[680px]">
+      <Questionnaire
+        title="Community pulse"
+        description="A compact poll can reveal aggregate results directly inside the same question."
+      >
+        <QuestionnaireQuestion legend="Would you use this recommendation again?">
+          <QuestionnaireSingleChoice
+            name="recommendation-poll"
+            defaultValue="yes"
+            options={pollOptions}
+            variant="pulse"
+          />
+          <QuestionnairePollResults
+            results={pollResults}
+            selectedValue="yes"
+            caption="1,204 responses"
+            variant="pulse"
+          />
+        </QuestionnaireQuestion>
+      </Questionnaire>
+    </PulseTheme>
   );
 }
 
@@ -175,5 +241,27 @@ export const LikertScale: Story = {
     await userEvent.click(stronglyAgree);
 
     await expect(stronglyAgree).toBeChecked();
+  },
+};
+
+export const PopOpenEnded: Story = {
+  render: () => <PopOpenEndedPrototype />,
+  play: async ({ canvas, userEvent }) => {
+    const answer = canvas.getByRole("textbox", { name: "Your answer" });
+
+    await userEvent.type(answer, "Give me fewer, more opinionated options.");
+
+    await expect(answer).toHaveValue("Give me fewer, more opinionated options.");
+  },
+};
+
+export const PulsePollResults: Story = {
+  render: () => <PulsePollPrototype />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("radio", { name: "Yes, definitely" })).toBeChecked();
+    await expect(canvas.getByRole("progressbar", { name: "Yes, definitely" })).toHaveAttribute(
+      "aria-valuenow",
+      "62",
+    );
   },
 };
