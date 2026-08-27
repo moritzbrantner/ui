@@ -157,7 +157,9 @@ describe("questionnaire", () => {
     expect(screen.getByRole("progressbar", { name: "Maybe" }).getAttribute("aria-valuenow")).toBe(
       "25",
     );
-    expect(screen.getByRole("progressbar", { name: "No" }).getAttribute("aria-valuenow")).toBe("13");
+    expect(screen.getByRole("progressbar", { name: "No" }).getAttribute("aria-valuenow")).toBe(
+      "13",
+    );
     expect(screen.getByText("100 responses")).toBeTruthy();
   });
 

@@ -266,11 +266,7 @@ function QuestionnaireSingleChoice({
             option.ariaLabel ?? (typeof option.label === "string" ? option.label : undefined);
 
           return (
-            <div
-              key={option.value}
-              data-slot="questionnaire-option"
-              className="relative min-w-0"
-            >
+            <div key={option.value} data-slot="questionnaire-option" className="relative min-w-0">
               <input
                 id={optionId}
                 data-slot="questionnaire-input"
@@ -385,7 +381,8 @@ function QuestionnaireTextAnswer({
   const generatedId = React.useId();
   const resolvedId = id ?? `${generatedId}-answer`;
   const hintId = `${generatedId}-hint`;
-  const describedBy = [hint ? hintId : null, ariaDescribedBy].filter(Boolean).join(" ") || undefined;
+  const describedBy =
+    [hint ? hintId : null, ariaDescribedBy].filter(Boolean).join(" ") || undefined;
 
   return (
     <div
@@ -412,7 +409,11 @@ function QuestionnaireTextAnswer({
         {...props}
       />
       {hint && (
-        <div id={hintId} data-slot="questionnaire-text-answer-hint" className="text-xs text-muted-foreground">
+        <div
+          id={hintId}
+          data-slot="questionnaire-text-answer-hint"
+          className="text-xs text-muted-foreground"
+        >
           {hint}
         </div>
       )}
@@ -457,7 +458,10 @@ function QuestionnairePollResults({
       {...props}
     >
       {caption && (
-        <div data-slot="questionnaire-poll-results-caption" className="text-sm text-muted-foreground">
+        <div
+          data-slot="questionnaire-poll-results-caption"
+          className="text-sm text-muted-foreground"
+        >
           {caption}
         </div>
       )}
@@ -490,7 +494,11 @@ function QuestionnairePollResults({
               )}
             >
               <div className="flex min-w-0 items-baseline justify-between gap-3 text-sm">
-                <span id={labelId} data-slot="questionnaire-poll-result-label" className="min-w-0 font-medium">
+                <span
+                  id={labelId}
+                  data-slot="questionnaire-poll-result-label"
+                  className="min-w-0 font-medium"
+                >
                   {result.label}
                   {selected && (
                     <span className="ml-1.5 text-xs font-normal text-primary" aria-hidden="true">

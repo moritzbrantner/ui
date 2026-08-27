@@ -1135,7 +1135,7 @@ const componentRegistry = [
     testFiles: ["src/components/patterns/questionnaire.test.tsx"],
     status: "pattern",
     reason:
-      "State-light questionnaire shell and single-answer selector with card, list, and scale presentation modes.",
+      "Composable questionnaire shell with native choices, open-ended answers, poll results, and Pop/Pulse presentations.",
   },
   {
     name: "theme-motion",
