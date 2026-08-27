@@ -195,6 +195,7 @@ import { HoverPreview as SubpathHoverPreview } from "./components/patterns/hover
 import { Navbar as SubpathNavbar } from "./components/shell/navbar";
 import { NavbarActions as SubpathNavbarActions } from "./components/shell/navbar-actions";
 import { Chat as SubpathChat } from "./components/social/chat";
+import { Presence as SubpathPresence } from "./components/collaboration/presence";
 import { getMenuActionItemText as subpathGetMenuActionItemText } from "./components/patterns/menu-actions";
 import { ResponsiveActionMenu as SubpathResponsiveActionMenu } from "./components/patterns/responsive-action-menu";
 import { componentRegistry } from "./component-registry";
@@ -267,6 +268,7 @@ import {
   SocialActionGroup,
   SocialPost,
 } from "./social";
+import { MentionTextarea, Presence } from "./collaboration";
 import * as StudioEntry from "./studio";
 import { studioTheme as studioServerTheme, uiTheme as studioServerUiTheme } from "./studio-server";
 import * as ZleekEntry from "./zleek";
@@ -539,6 +541,8 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./shell"].import).toBe("./dist/shell.js");
     expect(packageJson.exports["./social"].import).toBe("./dist/social.js");
     expect(packageJson.exports["./social"].types).toBe("./dist/social.d.ts");
+    expect(packageJson.exports["./collaboration"].import).toBe("./dist/collaboration.js");
+    expect(packageJson.exports["./collaboration"].types).toBe("./dist/collaboration.d.ts");
     expect(packageJson.exports["./media"].import).toBe("./dist/media.js");
     expect(packageJson.exports["./media"].types).toBe("./dist/media.d.ts");
     expect(packageJson.exports["./labs"].import).toBe("./dist/labs.js");
@@ -560,6 +564,9 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(packageJson.exports["./components/shell/*"].import).toBe("./dist/components/shell/*.js");
     expect(packageJson.exports["./components/social/*"].import).toBe(
       "./dist/components/social/*.js",
+    );
+    expect(packageJson.exports["./components/collaboration/*"].import).toBe(
+      "./dist/components/collaboration/*.js",
     );
     expect(packageJson.exports["./components/media/*"].import).toBe("./dist/components/media/*.js");
     expect(packageJson.exports["./components/labs/*"].import).toBe("./dist/components/labs/*.js");
@@ -863,6 +870,7 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(SubpathNavbarActions).toBe(NavbarActions);
     expect(SubpathResponsiveActionMenu).toBe(ResponsiveActionMenu);
     expect(SubpathChat).toBe(Chat);
+    expect(SubpathPresence).toBe(Presence);
     expect(SubpathAnimatedImage).toBe(AnimatedImage);
     expect(SubpathImageCarousel).toBe(ImageCarousel);
     expect(SubpathImageGallery).toBe(ImageGallery);
@@ -888,6 +896,7 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(typeof RelationshipMap).toBe("function");
     expect(typeof Infographic).toBe("function");
     expect(typeof SocialActionGroup).toBe("function");
+    expect(typeof MentionTextarea).toBe("function");
     expect(typeof SocialPost).toBe("function");
     expect(typeof ProfileSummary).toBe("function");
     expect(typeof AnimatedImage).toBe("function");
