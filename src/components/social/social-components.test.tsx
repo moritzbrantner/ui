@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, test, vi } from "vitest";
 
@@ -77,7 +78,7 @@ describe("social components", () => {
       <SocialActionGroup aria-label="Post actions">
         <LikeButton liked count={12} />
         <CommentButton commented count={8} />
-        <ShareButton count="4" />
+        <ShareButton shared count="4" />
         <FollowButton following />
       </SocialActionGroup>,
     );
@@ -92,13 +93,18 @@ describe("social components", () => {
     expect(screen.getByRole("button", { name: "Comment 8" }).getAttribute("data-commented")).toBe(
       "true",
     );
-    expect(screen.getByRole("button", { name: "Share 4" }).getAttribute("aria-pressed")).toBeNull();
+    const shareButton = screen.getByRole("button", { name: "Share 4" });
+
+    expect(shareButton.getAttribute("aria-pressed")).toBeNull();
+    expect(shareButton.getAttribute("data-shared")).toBe("true");
+    expect(shareButton.getAttribute("data-variant")).toBe("secondary");
     expect(screen.getByRole("button", { name: "Following" }).getAttribute("aria-pressed")).toBe(
       "true",
     );
   });
 
-  test("does not submit surrounding forms from social actions by default", () => {
+  test("does not submit surrounding forms from social actions by default", async () => {
+    const user = userEvent.setup();
     const onSubmit = vi.fn((event: React.FormEvent<HTMLFormElement>) => event.preventDefault());
 
     render(
@@ -110,10 +116,10 @@ describe("social components", () => {
       </form>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Like" }));
-    fireEvent.click(screen.getByRole("button", { name: "Comment" }));
-    fireEvent.click(screen.getByRole("button", { name: "Share" }));
-    fireEvent.click(screen.getByRole("button", { name: "Follow" }));
+    await user.click(screen.getByRole("button", { name: "Like" }));
+    await user.click(screen.getByRole("button", { name: "Comment" }));
+    await user.click(screen.getByRole("button", { name: "Share" }));
+    await user.click(screen.getByRole("button", { name: "Follow" }));
 
     expect(onSubmit).not.toHaveBeenCalled();
   });
