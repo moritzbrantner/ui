@@ -86,7 +86,9 @@ describe("social components", () => {
     expect(screen.getByRole("button", { name: "Unlike 12" }).getAttribute("aria-pressed")).toBe(
       "true",
     );
-    expect(screen.getByRole("button", { name: "Comment 8" }).getAttribute("aria-pressed")).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Comment 8" }).getAttribute("aria-pressed"),
+    ).toBeNull();
     expect(screen.getByRole("button", { name: "Comment 8" }).getAttribute("data-commented")).toBe(
       "true",
     );
