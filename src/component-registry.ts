@@ -1126,6 +1126,18 @@ const componentRegistry = [
       "Event-driven, state-light reward feedback that expresses the Pop theme without owning product incentives.",
   },
   {
+    name: "questionnaire",
+    fileName: "questionnaire",
+    tier: "patterns",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/patterns/questionnaire",
+    storyFiles: ["src/components/patterns/questionnaire.stories.tsx"],
+    testFiles: ["src/components/patterns/questionnaire.test.tsx"],
+    status: "pattern",
+    reason:
+      "State-light questionnaire shell and single-answer selector with card, list, and scale presentation modes.",
+  },
+  {
     name: "theme-motion",
     fileName: "theme-motion",
     tier: "patterns",
