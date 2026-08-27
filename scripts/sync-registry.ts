@@ -15,6 +15,14 @@ const checkOnly = process.argv.includes("--check");
 const registrySources: readonly RegistrySource[] = [
   { source: "src/lib/cn.ts", target: "registry/default/lib/cn.ts" },
   { source: "src/components/stable/button.tsx", target: "registry/default/ui/button.tsx" },
+  {
+    source: "src/components/stable/dialog.tsx",
+    target: "registry/default/ui/dialog.tsx",
+    replacements: [
+      ['from "../../lib/cn"', 'from "@/registry/default/lib/cn"'],
+      ['from "./button"', 'from "@/registry/default/ui/button"'],
+    ],
+  },
   { source: "src/components/stable/tabs.tsx", target: "registry/default/ui/tabs.tsx" },
   { source: "src/components/stable/input.tsx", target: "registry/default/ui/input.tsx" },
   { source: "src/components/stable/label.tsx", target: "registry/default/ui/label.tsx" },
@@ -92,6 +100,7 @@ const registrySources: readonly RegistrySource[] = [
   {
     source: "src/components/patterns/pulse-spatial.tsx",
     target: "registry/default/ui/pulse-spatial.tsx",
+    replacements: [['from "../stable/dialog"', 'from "@/registry/default/ui/dialog"']],
   },
   { source: "base.css", target: "registry/default/styles/moritz-base.css" },
   {

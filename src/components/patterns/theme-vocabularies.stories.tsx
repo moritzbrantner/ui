@@ -4,6 +4,7 @@ import * as React from "react";
 import { UiTheme } from "../../themes";
 import {
   AlertRail,
+  DeltaCell,
   KpiStrip,
   MapLegend,
   OperationalTable,
@@ -55,6 +56,7 @@ import {
   LayerStack,
   MediaTransport,
   Playhead,
+  Scrubber,
   TimelineTrack,
   ToolShelf,
 } from "./studio-tools";
@@ -129,7 +131,7 @@ export const AtlasOperations: Story = {
                   service: "API",
                   region: "eu-central",
                   trend: <SparklineCell values={[3, 5, 4, 7, 8, 6]} />,
-                  latency: "42ms",
+                  latency: <DeltaCell value="42ms" delta={-12.3} />,
                 },
               },
               {
@@ -198,6 +200,13 @@ export const StudioTools: Story = {
             />
             <Playhead position={time / 90} />
           </div>
+          <Scrubber
+            aria-label="Timeline scrubber"
+            value={time}
+            min={0}
+            max={90}
+            onValueChange={setTime}
+          />
           <ToolShelf
             tools={[
               { id: "select", label: "Select", shortcut: "V" },
