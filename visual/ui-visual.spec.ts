@@ -197,6 +197,37 @@ test("keeps primitive action controls compact and independently operable", async
   await expect(draggableButton).not.toHaveJSProperty("draggable", true);
 });
 
+test("keeps collaboration overlays pointer-transparent and positions remote geometry", async ({
+  page,
+}) => {
+  await gotoStory(page, "components-collaboration-live-overlays--shared-canvas", {
+    designSystem: "bobba",
+    theme: "light",
+  });
+
+  const overlay = page.locator('[data-slot="collaboration-overlay"]');
+  const cursor = page.getByLabel("Ada");
+  const selection = page.getByRole("img", { name: "Grace selection" });
+  const action = page.getByRole("button", { name: "Canvas action" });
+
+  await expect(overlay).toHaveCSS("pointer-events", "none");
+  await action.click();
+  await expect(page.getByRole("button", { name: "Canvas action activated" })).toBeVisible();
+
+  const [overlayBox, cursorBox, selectionBox] = await Promise.all([
+    getElementBox(overlay),
+    getElementBox(cursor),
+    getElementBox(selection),
+  ]);
+
+  expect(cursorBox.x - overlayBox.x).toBeCloseTo(260, 0);
+  expect(cursorBox.y - overlayBox.y).toBeCloseTo(96, 0);
+  expect(selectionBox.x - overlayBox.x).toBeCloseTo(72, 0);
+  expect(selectionBox.y - overlayBox.y).toBeCloseTo(82, 0);
+  expect(selectionBox.width).toBeCloseTo(180, 0);
+  expect(selectionBox.height).toBeCloseTo(72, 0);
+});
+
 const popMotionTestDetails = { tag: "@pop-motion" } as const;
 const pulseMotionTestDetails = { tag: "@pulse-motion" } as const;
 

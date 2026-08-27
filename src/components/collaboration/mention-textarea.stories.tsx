@@ -15,7 +15,7 @@ function MentionExample() {
   return (
     <MentionTextarea
       className="w-[min(34rem,90vw)]"
-      aria-label="Collaborative note"
+      inputLabel="Collaborative note"
       value={value}
       candidates={candidates}
       onValueChange={setValue}
@@ -34,6 +34,7 @@ const meta = {
     value: "",
     candidates: [],
     onValueChange: () => undefined,
+    inputLabel: "Collaborative note",
     suggestionsLabel: "Mention suggestions",
   },
 } satisfies Meta<typeof MentionTextarea>;

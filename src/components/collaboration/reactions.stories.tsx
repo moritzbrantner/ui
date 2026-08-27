@@ -11,18 +11,32 @@ function ReactionExample() {
         {
           key: "applaud",
           reaction: "👏",
+          shortLabel: "Applaud",
           label: "Applaud, 8 reactions",
           count: "8",
         },
-        { key: "heart", reaction: "❤️", label: "Heart, 4 reactions", count: "4" },
-        { key: "idea", reaction: "💡", label: "Good idea, 2 reactions", count: "2" },
+        {
+          key: "heart",
+          reaction: "❤️",
+          shortLabel: "Heart",
+          label: "Heart, 4 reactions",
+          count: "4",
+        },
+        {
+          key: "idea",
+          reaction: "💡",
+          shortLabel: "Good idea",
+          label: "Good idea, 2 reactions",
+          count: "2",
+        },
       ].map((item) => (
         <ReactionButton
           key={item.key}
           active={active.includes(item.key)}
           reaction={item.reaction}
-          label={item.label}
+          label={item.shortLabel}
           count={item.count}
+          countAccessibleLabel={item.label}
           onClick={() =>
             setActive((current) =>
               current.includes(item.key)

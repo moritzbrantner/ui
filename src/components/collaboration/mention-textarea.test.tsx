@@ -15,7 +15,7 @@ function MentionHarness({ onSelect = () => undefined }: { onSelect?: (label: str
   return (
     <>
       <MentionTextarea
-        aria-label="Comment"
+        inputLabel="Comment"
         value={value}
         candidates={candidates}
         onValueChange={setValue}
@@ -33,7 +33,7 @@ function ExternalUpdateHarness() {
   return (
     <>
       <MentionTextarea
-        aria-label="Comment"
+        inputLabel="Comment"
         value={value}
         candidates={candidates}
         onValueChange={setValue}
@@ -67,9 +67,9 @@ describe("MentionTextarea", () => {
 
     const textarea = screen.getByRole("textbox", { name: "Comment" });
     await user.type(textarea, "Hello @G");
-    expect(
-      screen.getByRole("combobox", { name: "Mention suggestions" }).getAttribute("aria-expanded"),
-    ).toBe("true");
+    expect(screen.getByRole("combobox", { name: "Comment" }).getAttribute("aria-expanded")).toBe(
+      "true",
+    );
     expect(textarea.getAttribute("aria-controls")).toBeTruthy();
     await user.keyboard("{ArrowDown}{Enter}");
 
@@ -106,8 +106,8 @@ describe("MentionTextarea", () => {
     expect(screen.getByRole("listbox", { name: "Mention suggestions" })).toBeTruthy();
     await user.click(screen.getByRole("button", { name: "Clear externally" }));
     expect(screen.queryByRole("listbox", { name: "Mention suggestions" })).toBeNull();
-    expect(
-      screen.getByRole("combobox", { name: "Mention suggestions" }).getAttribute("aria-expanded"),
-    ).toBe("false");
+    expect(screen.getByRole("combobox", { name: "Comment" }).getAttribute("aria-expanded")).toBe(
+      "false",
+    );
   });
 });

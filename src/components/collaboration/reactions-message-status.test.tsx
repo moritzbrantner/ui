@@ -14,8 +14,9 @@ describe("reaction controls", () => {
         <ReactionButton
           active
           reaction="👏"
-          label="Applaud, 3 reactions"
+          label="Applaud"
           count="3"
+          countAccessibleLabel="Applaud, 3 reactions"
           onClick={onClick}
         />
         <ReactionButton active={false} reaction={<span>Custom</span>} label="Custom reaction" />

@@ -47,16 +47,20 @@ function insertMention(value: string, range: MentionRange, label: string) {
 
 export type MentionTextareaProps = Omit<
   React.ComponentProps<typeof Textarea>,
-  "value" | "defaultValue" | "onChange" | "onSelect"
-> & {
-  value: string;
-  candidates: readonly MentionCandidate[];
-  onValueChange: (value: string) => void;
-  onMentionQueryChange?: (range: MentionRange | null) => void;
-  onMentionSelect?: (candidate: MentionCandidate, range: MentionRange) => void;
-  suggestionsLabel: string;
-  emptyContent?: React.ReactNode;
-};
+  "value" | "defaultValue" | "onChange" | "onSelect" | "aria-label" | "aria-labelledby"
+> &
+  (
+    | { inputLabel: string; inputLabelledBy?: never }
+    | { inputLabel?: never; inputLabelledBy: string }
+  ) & {
+    value: string;
+    candidates: readonly MentionCandidate[];
+    onValueChange: (value: string) => void;
+    onMentionQueryChange?: (range: MentionRange | null) => void;
+    onMentionSelect?: (candidate: MentionCandidate, range: MentionRange) => void;
+    suggestionsLabel: string;
+    emptyContent?: React.ReactNode;
+  };
 
 function MentionTextarea({
   value,
@@ -64,6 +68,8 @@ function MentionTextarea({
   onValueChange,
   onMentionQueryChange,
   onMentionSelect,
+  inputLabel,
+  inputLabelledBy,
   suggestionsLabel,
   emptyContent,
   className,
@@ -113,7 +119,8 @@ function MentionTextarea({
     <div
       data-slot="mention-textarea"
       role="combobox"
-      aria-label={suggestionsLabel}
+      aria-label={inputLabel}
+      aria-labelledby={inputLabelledBy}
       aria-expanded={open}
       aria-haspopup="listbox"
       aria-controls={open ? listboxId : undefined}
@@ -122,6 +129,8 @@ function MentionTextarea({
       <Textarea
         ref={textareaRef}
         value={value}
+        aria-label={inputLabel}
+        aria-labelledby={inputLabelledBy}
         aria-autocomplete="list"
         aria-haspopup="listbox"
         aria-controls={open ? listboxId : undefined}

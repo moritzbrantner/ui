@@ -17,16 +17,22 @@ function ReactionGroup({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-export type ReactionButtonProps = Omit<React.ComponentProps<typeof Button>, "children"> & {
+type ReactionButtonBaseProps = Omit<React.ComponentProps<typeof Button>, "children"> & {
   active: boolean;
-  count?: React.ReactNode;
   reaction: React.ReactNode;
   label: string;
 };
 
+type ReactionButtonCountProps =
+  | { count: React.ReactNode; countAccessibleLabel: string }
+  | { count?: undefined; countAccessibleLabel?: never };
+
+export type ReactionButtonProps = ReactionButtonBaseProps & ReactionButtonCountProps;
+
 function ReactionButton({
   active,
   count,
+  countAccessibleLabel,
   reaction,
   label,
   className,
@@ -39,7 +45,7 @@ function ReactionButton({
       type="button"
       size="sm"
       variant={variant ?? (active ? "secondary" : "outline")}
-      aria-label={label}
+      aria-label={count === undefined ? label : countAccessibleLabel}
       aria-pressed={active}
       className={cn("h-10 min-h-10 min-w-11 rounded-full px-2.5", className)}
       {...props}
