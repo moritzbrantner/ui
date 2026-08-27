@@ -38,6 +38,7 @@ function SocialActionGroup({ className, ...props }: React.ComponentProps<"div">)
   return (
     <div
       data-slot="social-action-group"
+      role="group"
       className={cn("flex flex-wrap items-center gap-2", className)}
       {...props}
     />
@@ -59,6 +60,7 @@ function LikeButton({
   return (
     <Button
       data-slot="like-button"
+      type="button"
       aria-pressed={liked}
       data-liked={liked ? true : undefined}
       variant={variant ?? (liked ? "secondary" : "outline")}
@@ -81,7 +83,7 @@ function ShareButton({
   count,
   label = "Share",
   showCount = true,
-  variant = "outline",
+  variant,
   children,
   className,
   ...props
@@ -89,9 +91,9 @@ function ShareButton({
   return (
     <Button
       data-slot="share-button"
-      aria-pressed={shared || undefined}
+      type="button"
       data-shared={shared ? true : undefined}
-      variant={variant}
+      variant={variant ?? (shared ? "secondary" : "outline")}
       className={cn("min-w-0", className)}
       {...props}
     >
@@ -119,7 +121,7 @@ function CommentButton({
   return (
     <Button
       data-slot="comment-button"
-      aria-pressed={commented}
+      type="button"
       data-commented={commented ? true : undefined}
       variant={variant ?? (commented ? "secondary" : "outline")}
       className={cn("min-w-0", className)}
@@ -152,6 +154,7 @@ function FollowButton({
   return (
     <Button
       data-slot="follow-button"
+      type="button"
       aria-pressed={following}
       data-following={following ? true : undefined}
       variant={variant ?? (following ? "secondary" : "default")}
