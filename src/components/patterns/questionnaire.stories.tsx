@@ -85,6 +85,7 @@ function ChoiceCardsPrototype() {
       className="max-w-[900px]"
     >
       <QuestionnaireQuestion
+        id="recommendation-style-question"
         legend="Choose the experience that feels most useful"
         description="You can change this later."
       >
@@ -116,7 +117,7 @@ function GuidedQuestionPrototype() {
         </>
       }
     >
-      <QuestionnaireQuestion legend="How much guidance do you want?">
+      <QuestionnaireQuestion id="guidance-level-question" legend="How much guidance do you want?">
         <QuestionnaireSingleChoice
           name="guidance-level"
           defaultValue="guided"
@@ -136,6 +137,7 @@ function ScalePrototype() {
       className="max-w-[640px]"
     >
       <QuestionnaireQuestion
+        id="recommendation-fit-question"
         legend="The recommendations matched what I was looking for."
         description="Select the answer that best describes your experience."
       >
@@ -159,8 +161,12 @@ function PopOpenEndedPrototype() {
         title="Say it in your own words"
         description="The same questionnaire structure can host an open-ended answer without changing the question shell."
       >
-        <QuestionnaireQuestion legend="What would make this recommendation feel perfect for you?">
+        <QuestionnaireQuestion
+          id="recommendation-notes-question"
+          legend="What would make this recommendation feel perfect for you?"
+        >
           <QuestionnaireTextAnswer
+            id="recommendation-notes"
             label="Your answer"
             name="recommendation-notes"
             placeholder="For example: fewer choices, more context, or a completely different direction…"
@@ -180,7 +186,10 @@ function PulsePollPrototype() {
         title="Community pulse"
         description="A compact poll can reveal aggregate results directly inside the same question."
       >
-        <QuestionnaireQuestion legend="Would you use this recommendation again?">
+        <QuestionnaireQuestion
+          id="recommendation-poll-question"
+          legend="Would you use this recommendation again?"
+        >
           <QuestionnaireSingleChoice
             name="recommendation-poll"
             defaultValue="yes"

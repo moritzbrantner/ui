@@ -69,8 +69,8 @@ describe("questionnaire", () => {
 
   test("composes native single-choice answers inside the question shell", () => {
     render(
-      <QuestionnaireQuestion legend="How much choice do you want?">
-        <QuestionnaireSingleChoice options={options} defaultValue="balanced" />
+      <QuestionnaireQuestion id="choice-question" legend="How much choice do you want?">
+        <QuestionnaireSingleChoice name="choice" options={options} defaultValue="balanced" />
       </QuestionnaireQuestion>,
     );
 
@@ -88,17 +88,30 @@ describe("questionnaire", () => {
 
   test("supports card, list, scale, pop, and pulse answer presentations", () => {
     const { rerender } = render(
-      <QuestionnaireSingleChoice data-testid="choice" options={options} variant="cards" />,
+      <QuestionnaireSingleChoice
+        data-testid="choice"
+        name="variant"
+        options={options}
+        variant="cards"
+      />,
     );
 
     expect(screen.getByTestId("choice").getAttribute("data-variant")).toBe("cards");
 
-    rerender(<QuestionnaireSingleChoice data-testid="choice" options={options} variant="list" />);
+    rerender(
+      <QuestionnaireSingleChoice
+        data-testid="choice"
+        name="variant"
+        options={options}
+        variant="list"
+      />,
+    );
     expect(screen.getByTestId("choice").getAttribute("data-variant")).toBe("list");
 
     rerender(
       <QuestionnaireSingleChoice
         data-testid="choice"
+        name="variant"
         options={options}
         variant="scale"
         scaleStartLabel="Low"
@@ -109,17 +122,32 @@ describe("questionnaire", () => {
     expect(screen.getByText("Low")).toBeTruthy();
     expect(screen.getByText("High")).toBeTruthy();
 
-    rerender(<QuestionnaireSingleChoice data-testid="choice" options={options} variant="pop" />);
+    rerender(
+      <QuestionnaireSingleChoice
+        data-testid="choice"
+        name="variant"
+        options={options}
+        variant="pop"
+      />,
+    );
     expect(screen.getByTestId("choice").getAttribute("data-variant")).toBe("pop");
 
-    rerender(<QuestionnaireSingleChoice data-testid="choice" options={options} variant="pulse" />);
+    rerender(
+      <QuestionnaireSingleChoice
+        data-testid="choice"
+        name="variant"
+        options={options}
+        variant="pulse"
+      />,
+    );
     expect(screen.getByTestId("choice").getAttribute("data-variant")).toBe("pulse");
   });
 
   test("renders an accessible open-ended answer field", () => {
     render(
-      <QuestionnaireQuestion legend="Tell us more">
+      <QuestionnaireQuestion id="details-question" legend="Tell us more">
         <QuestionnaireTextAnswer
+          id="details-answer"
           label="Your answer"
           name="details"
           hint="Optional context helps us understand your answer."
@@ -138,8 +166,12 @@ describe("questionnaire", () => {
 
   test("renders poll percentages as a composable child of a question", () => {
     render(
-      <QuestionnaireQuestion legend="Would you use it again?" data-testid="question">
-        <QuestionnaireSingleChoice options={options} defaultValue="focused" />
+      <QuestionnaireQuestion
+        id="poll-question"
+        legend="Would you use it again?"
+        data-testid="question"
+      >
+        <QuestionnaireSingleChoice name="poll-choice" options={options} defaultValue="focused" />
         <QuestionnairePollResults
           results={pollResults}
           selectedValue="yes"
@@ -184,11 +216,12 @@ describe("questionnaire", () => {
   test("exposes question descriptions and validation errors to assistive technology", () => {
     render(
       <QuestionnaireQuestion
+        id="required-choice"
         legend="Required choice"
         description="Choose the closest answer."
         error="Select one option to continue."
       >
-        <QuestionnaireSingleChoice options={options} required />
+        <QuestionnaireSingleChoice name="required-choice" options={options} required />
       </QuestionnaireQuestion>,
     );
 

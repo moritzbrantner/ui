@@ -24,6 +24,7 @@ export type QuestionnairePollResult = {
   label: React.ReactNode;
   count: number;
   percentage?: number;
+  ariaLabel?: string;
 };
 
 export type QuestionnaireProps = React.ComponentProps<"section"> & {
@@ -143,7 +144,8 @@ function Questionnaire({
   );
 }
 
-export type QuestionnaireQuestionProps = React.ComponentProps<"fieldset"> & {
+export type QuestionnaireQuestionProps = Omit<React.ComponentProps<"fieldset">, "id"> & {
+  id: string;
   legend: React.ReactNode;
   description?: React.ReactNode;
   error?: React.ReactNode;
@@ -151,6 +153,7 @@ export type QuestionnaireQuestionProps = React.ComponentProps<"fieldset"> & {
 
 function QuestionnaireQuestion({
   className,
+  id,
   legend,
   description,
   error,
@@ -158,16 +161,14 @@ function QuestionnaireQuestion({
   "aria-describedby": ariaDescribedBy,
   ...props
 }: QuestionnaireQuestionProps) {
-  const generatedId = React.useId();
-  const descriptionId = `${generatedId}-description`;
-  const errorId = `${generatedId}-error`;
+  const descriptionId = description ? `${id}-description` : undefined;
+  const errorId = error ? `${id}-error` : undefined;
   const describedBy =
-    [description ? descriptionId : null, error ? errorId : null, ariaDescribedBy]
-      .filter(Boolean)
-      .join(" ") || undefined;
+    [descriptionId, errorId, ariaDescribedBy].filter(Boolean).join(" ") || undefined;
 
   return (
     <fieldset
+      id={id}
       data-slot="questionnaire-question"
       className={cn("min-w-0 border-0 p-0", className)}
       aria-describedby={describedBy}
@@ -211,7 +212,7 @@ function QuestionnaireQuestion({
 
 export type QuestionnaireSingleChoiceProps = Omit<React.ComponentProps<"div">, "children"> & {
   options: readonly QuestionnaireOption[];
-  name?: string;
+  name: string;
   defaultValue?: string;
   variant?: QuestionnaireChoiceVariant;
   columns?: QuestionnaireQuestionColumns;
@@ -223,6 +224,7 @@ export type QuestionnaireSingleChoiceProps = Omit<React.ComponentProps<"div">, "
 
 function QuestionnaireSingleChoice({
   className,
+  id,
   options,
   name,
   defaultValue,
@@ -234,13 +236,13 @@ function QuestionnaireSingleChoice({
   scaleEndLabel,
   ...props
 }: QuestionnaireSingleChoiceProps) {
-  const generatedId = React.useId();
-  const resolvedName = name ?? `questionnaire-${generatedId}`;
+  const optionIdPrefix = (id ?? name).trim().replace(/[^a-zA-Z0-9_-]+/g, "-");
   const isScale = variant === "scale";
   const isCardLayout = variant === "cards" || variant === "pop";
 
   return (
     <div
+      id={id}
       data-slot="questionnaire-single-choice"
       data-variant={variant}
       data-columns={columns}
@@ -260,7 +262,7 @@ function QuestionnaireSingleChoice({
         )}
       >
         {options.map((option, index) => {
-          const optionId = `${generatedId}-${index}`;
+          const optionId = `${optionIdPrefix}-${index}`;
           const optionDisabled = Boolean(disabled || option.disabled);
           const accessibleLabel =
             option.ariaLabel ?? (typeof option.label === "string" ? option.label : undefined);
@@ -272,7 +274,7 @@ function QuestionnaireSingleChoice({
                 data-slot="questionnaire-input"
                 className="peer sr-only"
                 type="radio"
-                name={resolvedName}
+                name={name}
                 value={option.value}
                 defaultChecked={option.value === defaultValue}
                 disabled={optionDisabled}
@@ -360,7 +362,11 @@ function QuestionnaireSingleChoice({
   );
 }
 
-export type QuestionnaireTextAnswerProps = Omit<React.ComponentProps<"textarea">, "children"> & {
+export type QuestionnaireTextAnswerProps = Omit<
+  React.ComponentProps<"textarea">,
+  "children" | "id"
+> & {
+  id: string;
   label: React.ReactNode;
   hint?: React.ReactNode;
   variant?: QuestionnaireTextAnswerVariant;
@@ -378,11 +384,8 @@ function QuestionnaireTextAnswer({
   "aria-describedby": ariaDescribedBy,
   ...props
 }: QuestionnaireTextAnswerProps) {
-  const generatedId = React.useId();
-  const resolvedId = id ?? `${generatedId}-answer`;
-  const hintId = `${generatedId}-hint`;
-  const describedBy =
-    [hint ? hintId : null, ariaDescribedBy].filter(Boolean).join(" ") || undefined;
+  const hintId = hint ? `${id}-hint` : undefined;
+  const describedBy = [hintId, ariaDescribedBy].filter(Boolean).join(" ") || undefined;
 
   return (
     <div
@@ -390,11 +393,11 @@ function QuestionnaireTextAnswer({
       data-variant={variant}
       className={cn("grid gap-2", className)}
     >
-      <label htmlFor={resolvedId} className="text-sm font-medium">
+      <label htmlFor={id} className="text-sm font-medium">
         {label}
       </label>
       <textarea
-        id={resolvedId}
+        id={id}
         data-slot="questionnaire-textarea"
         data-variant={variant}
         rows={rows}
@@ -440,7 +443,6 @@ function QuestionnairePollResults({
   variant = "default",
   ...props
 }: QuestionnairePollResultsProps) {
-  const generatedId = React.useId();
   const normalizedCounts = results.map((result) =>
     Number.isFinite(result.count) ? Math.max(0, Math.round(result.count)) : 0,
   );
@@ -478,7 +480,8 @@ function QuestionnairePollResults({
           const percentage = Math.min(100, Math.max(0, rawPercentage));
           const roundedPercentage = Math.round(percentage);
           const selected = result.value === selectedValue;
-          const labelId = `${generatedId}-result-${index}`;
+          const accessibleLabel =
+            result.ariaLabel ?? (typeof result.label === "string" ? result.label : undefined);
 
           return (
             <li
@@ -494,11 +497,7 @@ function QuestionnairePollResults({
               )}
             >
               <div className="flex min-w-0 items-baseline justify-between gap-3 text-sm">
-                <span
-                  id={labelId}
-                  data-slot="questionnaire-poll-result-label"
-                  className="min-w-0 font-medium"
-                >
+                <span data-slot="questionnaire-poll-result-label" className="min-w-0 font-medium">
                   {result.label}
                   {selected && (
                     <span className="ml-1.5 text-xs font-normal text-primary" aria-hidden="true">
@@ -514,10 +513,11 @@ function QuestionnairePollResults({
 
               <div
                 role="progressbar"
-                aria-labelledby={labelId}
+                aria-label={accessibleLabel}
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-valuenow={roundedPercentage}
+                aria-valuetext={`${roundedPercentage}%${showCounts ? `, ${count} responses` : ""}`}
                 className={cn(
                   "h-2 overflow-hidden rounded-full bg-muted",
                   variant === "pop" && "h-2.5",
