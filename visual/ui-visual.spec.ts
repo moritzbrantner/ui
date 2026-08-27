@@ -138,6 +138,65 @@ const grepSafeStoryTitles = new Map([
   ],
 ]);
 
+test("keeps primitive action controls compact and independently operable", async ({ page }) => {
+  await gotoStory(page, "components-stable-primitive-actions--overview", {
+    designSystem: "bobba",
+    theme: "light",
+  });
+
+  const buttonGroup = page.locator('[data-slot="button-group"]');
+  const previewButton = buttonGroup.getByRole("button", { name: "Preview" });
+  const previewChannel = page.getByRole("radio", { name: "Preview" });
+  const stableChannel = page.getByRole("radio", { name: "Stable" });
+  const releaseWindowStart = page.getByRole("slider", { name: "Release window start" });
+  const releaseWindowEnd = page.getByRole("slider", { name: "Release window end" });
+
+  await expect(page.getByRole("radio", { name: "Draft" })).toBeVisible();
+  await expect(previewChannel).toBeVisible();
+  await previewChannel.click();
+  await expect(previewChannel).toHaveAttribute("aria-checked", "true");
+  await expect(stableChannel).toHaveAttribute("aria-checked", "false");
+
+  const initialReleaseWindowStart = Number(await releaseWindowStart.getAttribute("aria-valuenow"));
+  await releaseWindowStart.press("ArrowRight");
+  await expect(releaseWindowStart).toHaveAttribute(
+    "aria-valuenow",
+    String(initialReleaseWindowStart + 1),
+  );
+  await expect(releaseWindowEnd).toHaveAttribute("aria-valuenow", "70");
+
+  const [groupBox, previewButtonBox, startThumbVisualSize] = await Promise.all([
+    getElementBox(buttonGroup),
+    getElementBox(previewButton),
+    releaseWindowStart.evaluate((element) => window.getComputedStyle(element, "::before").height),
+  ]);
+
+  expect(groupBox.height).toBeLessThanOrEqual(previewButtonBox.height + 1);
+  expect(startThumbVisualSize).toBe("16px");
+
+  await gotoStory(page, "components-actions-button--states", {
+    designSystem: "bobba",
+    theme: "light",
+  });
+
+  const draggableButton = page.getByRole("button", { name: "Drag on x" });
+  const draggableButtonBox = await getElementBox(draggableButton);
+
+  await page.mouse.move(
+    draggableButtonBox.x + draggableButtonBox.width / 2,
+    draggableButtonBox.y + draggableButtonBox.height / 2,
+  );
+  await page.mouse.down();
+  await page.mouse.move(
+    draggableButtonBox.x + draggableButtonBox.width / 2 + 24,
+    draggableButtonBox.y + draggableButtonBox.height / 2,
+  );
+  await expect(draggableButton).toHaveAttribute("data-dragging", "true");
+  await page.mouse.up();
+  await expect(draggableButton).not.toHaveAttribute("data-dragging");
+  await expect(draggableButton).not.toHaveJSProperty("draggable", true);
+});
+
 const popMotionTestDetails = { tag: "@pop-motion" } as const;
 const pulseMotionTestDetails = { tag: "@pulse-motion" } as const;
 
