@@ -112,4 +112,4 @@ bun pm pack --dry-run --ignore-scripts
 
 ## Token metadata
 
-Token names and categories belong in `src/token-metadata.ts`. CSS is still manually authored in `styles.css`, theme CSS entrypoints, and `theme-scopes.css`; do not introduce CSS generation until the dedicated token source-of-truth pass.
+Token names, categories, and built-in theme values belong in `src/token-metadata.ts`. Run `bun run generate:tokens` after token changes and include the generated CSS and token documentation updates in the same change.
