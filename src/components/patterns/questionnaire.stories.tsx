@@ -160,10 +160,9 @@ export const ChoiceCards: Story = {
 export const GuidedSingleQuestion: Story = {
   render: () => <GuidedQuestionPrototype />,
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole("progressbar", { name: "Questionnaire progress" })).toHaveAttribute(
-      "aria-valuenow",
-      "2",
-    );
+    await expect(
+      canvas.getByRole("progressbar", { name: "Questionnaire progress" }),
+    ).toHaveAttribute("aria-valuenow", "2");
     await expect(canvas.getByRole("button", { name: "Continue" })).toBeEnabled();
   },
 };

@@ -41,17 +41,17 @@ describe("questionnaire", () => {
     const { rerender } = render(<Questionnaire currentStep={0} totalSteps={3} />);
 
     expect(
-      screen.getByRole("progressbar", { name: "Questionnaire progress" }).getAttribute(
-        "aria-valuenow",
-      ),
+      screen
+        .getByRole("progressbar", { name: "Questionnaire progress" })
+        .getAttribute("aria-valuenow"),
     ).toBe("1");
 
     rerender(<Questionnaire currentStep={9} totalSteps={3} />);
 
     expect(
-      screen.getByRole("progressbar", { name: "Questionnaire progress" }).getAttribute(
-        "aria-valuenow",
-      ),
+      screen
+        .getByRole("progressbar", { name: "Questionnaire progress" })
+        .getAttribute("aria-valuenow"),
     ).toBe("3");
   });
 

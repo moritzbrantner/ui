@@ -181,9 +181,10 @@ function QuestionnaireQuestion({
   const errorId = `${generatedId}-error`;
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const selectedValue = value ?? internalValue;
-  const describedBy = [description ? descriptionId : null, error ? errorId : null, ariaDescribedBy]
-    .filter(Boolean)
-    .join(" ") || undefined;
+  const describedBy =
+    [description ? descriptionId : null, error ? errorId : null, ariaDescribedBy]
+      .filter(Boolean)
+      .join(" ") || undefined;
 
   const selectValue = React.useCallback(
     (nextValue: string) => {
