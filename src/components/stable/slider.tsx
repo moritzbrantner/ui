@@ -6,7 +6,7 @@ import { Slider as SliderPrimitive } from "radix-ui";
 import { cn } from "../../lib/cn";
 
 export type SliderProps = React.ComponentProps<typeof SliderPrimitive.Root> & {
-  thumbAriaLabel?: string;
+  thumbAriaLabel?: string | readonly string[];
   thumbAriaLabelledBy?: string;
 };
 
@@ -28,6 +28,10 @@ function Slider({
   const getThumbAriaLabel = (index: number) => {
     if (thumbAriaLabelledBy) {
       return undefined;
+    }
+
+    if (Array.isArray(thumbAriaLabel)) {
+      return thumbAriaLabel[index];
     }
 
     if (thumbAriaLabel) {
@@ -69,7 +73,7 @@ function Slider({
           key={index}
           aria-label={getThumbAriaLabel(index)}
           aria-labelledby={thumbAriaLabelledBy}
-          className="relative block size-10 shrink-0 rounded-full ring-ring/50 transition-[color,box-shadow] select-none before:absolute before:top-1/2 before:left-1/2 before:size-3 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:border before:border-ring before:bg-white hover:ring-3 focus-visible:ring-3 focus-visible:outline-hidden active:ring-3 disabled:pointer-events-none disabled:opacity-50"
+          className="relative block size-10 shrink-0 select-none before:absolute before:top-1/2 before:left-1/2 before:size-4 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:border before:border-ring before:bg-background before:transition-[box-shadow] hover:before:ring-3 focus-visible:before:ring-3 focus-visible:outline-hidden active:before:ring-3 disabled:pointer-events-none disabled:opacity-50"
         />
       ))}
     </SliderPrimitive.Root>

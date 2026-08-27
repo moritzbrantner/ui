@@ -564,6 +564,20 @@ describe("@moritzbrantner/ui button-and-form", () => {
     expect(disabledButton.className).toContain("custom-disabled-class");
   });
 
+  test("uses pointer dragging without starting a competing native drag operation", () => {
+    render(
+      <Button dragX style={{ transform: "rotate(1deg)" }}>
+        Drag horizontally
+      </Button>,
+    );
+
+    const button = screen.getByRole("button", { name: "Drag horizontally" });
+
+    expect(button.draggable).toBe(false);
+
+    expect(button.style.transform).toBe("rotate(1deg)");
+  });
+
   test("renders auxiliary catalog components with glass styling slots", () => {
     const { container } = render(
       <div>
