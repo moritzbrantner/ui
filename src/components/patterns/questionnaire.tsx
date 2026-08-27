@@ -424,7 +424,10 @@ function QuestionnaireTextAnswer({
   );
 }
 
-export type QuestionnairePollResultsProps = Omit<React.ComponentProps<"div">, "children"> & {
+export type QuestionnairePollResultsProps = Omit<
+  React.ComponentProps<"div">,
+  "children" | "results"
+> & {
   results: readonly QuestionnairePollResult[];
   totalResponses?: number;
   selectedValue?: string;
