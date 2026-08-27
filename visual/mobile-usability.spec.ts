@@ -548,31 +548,35 @@ async function verifyInteractiveTargets(
       continue;
     }
 
-    const scrolled = await locator
-      .scrollIntoViewIfNeeded({ timeout: 1_500 })
-      .then(() => true)
-      .catch(async (error: unknown) => {
-        const stillExists = await locator
-          .count()
-          .then((count) => count > 0)
-          .catch(() => false);
+    const scrollResult = await retryTargetAction(page, () =>
+      locator.scrollIntoViewIfNeeded({ timeout: 3_000 }),
+    );
+    const scrolled = scrollResult.ok
+      ? true
+      : await (async () => {
+          const stillExists = await locator
+            .count()
+            .then((count) => count > 0)
+            .catch(() => false);
 
-        if (!stillExists) {
+          if (!stillExists) {
+            return false;
+          }
+
+          storyFindings.push(
+            createFinding(
+              story,
+              "target-actionability",
+              `Interactive target could not be scrolled into view: ${target.label}. ${
+                scrollResult.error instanceof Error
+                  ? scrollResult.error.message
+                  : String(scrollResult.error)
+              }`,
+              target.selector,
+            ),
+          );
           return false;
-        }
-
-        storyFindings.push(
-          createFinding(
-            story,
-            "target-actionability",
-            `Interactive target could not be scrolled into view: ${target.label}. ${
-              error instanceof Error ? error.message : String(error)
-            }`,
-            target.selector,
-          ),
-        );
-        return false;
-      });
+        })();
 
     if (!scrolled) {
       continue;
@@ -636,15 +640,13 @@ async function verifyInteractiveTargets(
 
     const actionable = target.isDragSeparator
       ? true
-      : target.isFormInput
-        ? await locator
-            .focus({ timeout: 1_000 })
-            .then(() => true)
-            .catch(() => false)
-        : await locator
-            .click({ trial: true, timeout: 1_500 })
-            .then(() => true)
-            .catch(() => false);
+      : (
+          await retryTargetAction(page, () =>
+            target.isFormInput
+              ? locator.focus({ timeout: 2_500 })
+              : locator.click({ trial: true, timeout: 2_500 }),
+          )
+        ).ok;
 
     if (!actionable) {
       storyFindings.push(
@@ -660,6 +662,24 @@ async function verifyInteractiveTargets(
       );
     }
   }
+}
+
+async function retryTargetAction(page: Page, action: () => Promise<unknown>) {
+  let error: unknown;
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      await action();
+      return { ok: true as const, error: undefined };
+    } catch (nextError) {
+      error = nextError;
+      if (attempt < 2) {
+        await page.waitForTimeout(100);
+      }
+    }
+  }
+
+  return { ok: false as const, error };
 }
 
 async function verifyTextClipping(
