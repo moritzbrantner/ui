@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, test, vi } from "vitest";
 
@@ -72,26 +73,55 @@ const filteredValue: ImageFilterValue = {
 };
 
 describe("social components", () => {
-  test("renders social action buttons with counts and pressed states", () => {
+  test("renders social action buttons with counts and correct action semantics", () => {
     render(
-      <SocialActionGroup>
+      <SocialActionGroup aria-label="Post actions">
         <LikeButton liked count={12} />
         <CommentButton commented count={8} />
-        <ShareButton count="4" />
+        <ShareButton shared count="4" />
         <FollowButton following />
       </SocialActionGroup>,
     );
 
+    expect(screen.getByRole("group", { name: "Post actions" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Unlike 12" }).getAttribute("aria-pressed")).toBe(
       "true",
     );
-    expect(screen.getByRole("button", { name: "Comment 8" }).getAttribute("aria-pressed")).toBe(
+    expect(
+      screen.getByRole("button", { name: "Comment 8" }).getAttribute("aria-pressed"),
+    ).toBeNull();
+    expect(screen.getByRole("button", { name: "Comment 8" }).getAttribute("data-commented")).toBe(
       "true",
     );
-    expect(screen.getByRole("button", { name: "Share 4" })).toBeTruthy();
+    const shareButton = screen.getByRole("button", { name: "Share 4" });
+
+    expect(shareButton.getAttribute("aria-pressed")).toBeNull();
+    expect(shareButton.getAttribute("data-shared")).toBe("true");
+    expect(shareButton.getAttribute("data-variant")).toBe("secondary");
     expect(screen.getByRole("button", { name: "Following" }).getAttribute("aria-pressed")).toBe(
       "true",
     );
+  });
+
+  test("does not submit surrounding forms from social actions by default", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn((event: React.FormEvent<HTMLFormElement>) => event.preventDefault());
+
+    render(
+      <form onSubmit={onSubmit}>
+        <LikeButton />
+        <CommentButton />
+        <ShareButton />
+        <FollowButton />
+      </form>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Like" }));
+    await user.click(screen.getByRole("button", { name: "Comment" }));
+    await user.click(screen.getByRole("button", { name: "Share" }));
+    await user.click(screen.getByRole("button", { name: "Follow" }));
+
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 
   test("renders a social post with comments and a composer workflow", () => {
