@@ -1,6 +1,22 @@
-type ComponentTier = "stable" | "patterns" | "data" | "shell" | "social" | "media" | "labs";
+type ComponentTier =
+  | "stable"
+  | "patterns"
+  | "data"
+  | "shell"
+  | "social"
+  | "collaboration"
+  | "media"
+  | "labs";
 
-type ComponentStatus = "stable" | "pattern" | "data" | "shell" | "social" | "media" | "lab";
+type ComponentStatus =
+  | "stable"
+  | "pattern"
+  | "data"
+  | "shell"
+  | "social"
+  | "collaboration"
+  | "media"
+  | "lab";
 
 type ComponentRegistryEntry = {
   name: string;
@@ -1451,6 +1467,105 @@ const componentRegistry = [
     testFiles: ["src/components/media/media-components.test.tsx"],
     status: "media",
     reason: "Reusable state-light media surface available through the media API.",
+  },
+  {
+    name: "activity-feed",
+    fileName: "activity-feed",
+    tier: "collaboration",
+    rootExport: false,
+    publicSubpath: "@moritzbrantner/ui/components/collaboration/activity-feed",
+    storyFiles: ["src/components/collaboration/activity-feed.stories.tsx"],
+    testFiles: ["src/components/collaboration/activity-overlays-status.test.tsx"],
+    status: "collaboration",
+    reason: "Reusable state-light collaboration surface available through the collaboration API.",
+  },
+  {
+    name: "collaboration-status-bar",
+    fileName: "collaboration-status-bar",
+    tier: "collaboration",
+    rootExport: false,
+    publicSubpath: "@moritzbrantner/ui/components/collaboration/collaboration-status-bar",
+    storyFiles: ["src/components/collaboration/collaboration-status-bar.stories.tsx"],
+    testFiles: ["src/components/collaboration/activity-overlays-status.test.tsx"],
+    status: "collaboration",
+    reason: "Reusable state-light collaboration surface available through the collaboration API.",
+  },
+  {
+    name: "collaborator-picker",
+    fileName: "collaborator-picker",
+    tier: "collaboration",
+    rootExport: false,
+    publicSubpath: "@moritzbrantner/ui/components/collaboration/collaborator-picker",
+    storyFiles: ["src/components/collaboration/collaborator-picker.stories.tsx"],
+    testFiles: ["src/components/collaboration/collaborator-picker.test.tsx"],
+    status: "collaboration",
+    reason: "Reusable state-light collaboration surface available through the collaboration API.",
+  },
+  {
+    name: "live-overlays",
+    fileName: "live-overlays",
+    tier: "collaboration",
+    rootExport: false,
+    publicSubpath: "@moritzbrantner/ui/components/collaboration/live-overlays",
+    storyFiles: ["src/components/collaboration/live-overlays.stories.tsx"],
+    testFiles: ["src/components/collaboration/activity-overlays-status.test.tsx"],
+    status: "collaboration",
+    reason: "Reusable state-light collaboration surface available through the collaboration API.",
+  },
+  {
+    name: "mention-textarea",
+    fileName: "mention-textarea",
+    tier: "collaboration",
+    rootExport: false,
+    publicSubpath: "@moritzbrantner/ui/components/collaboration/mention-textarea",
+    storyFiles: ["src/components/collaboration/mention-textarea.stories.tsx"],
+    testFiles: ["src/components/collaboration/mention-textarea.test.tsx"],
+    status: "collaboration",
+    reason: "Reusable state-light collaboration surface available through the collaboration API.",
+  },
+  {
+    name: "message-status",
+    fileName: "message-status",
+    tier: "collaboration",
+    rootExport: false,
+    publicSubpath: "@moritzbrantner/ui/components/collaboration/message-status",
+    storyFiles: ["src/components/collaboration/message-status.stories.tsx"],
+    testFiles: ["src/components/collaboration/reactions-message-status.test.tsx"],
+    status: "collaboration",
+    reason: "Reusable state-light collaboration surface available through the collaboration API.",
+  },
+  {
+    name: "presence",
+    fileName: "presence",
+    tier: "collaboration",
+    rootExport: false,
+    publicSubpath: "@moritzbrantner/ui/components/collaboration/presence",
+    storyFiles: ["src/components/collaboration/presence.stories.tsx"],
+    testFiles: ["src/components/collaboration/presence-typing.test.tsx"],
+    status: "collaboration",
+    reason: "Reusable state-light collaboration surface available through the collaboration API.",
+  },
+  {
+    name: "reactions",
+    fileName: "reactions",
+    tier: "collaboration",
+    rootExport: false,
+    publicSubpath: "@moritzbrantner/ui/components/collaboration/reactions",
+    storyFiles: ["src/components/collaboration/reactions.stories.tsx"],
+    testFiles: ["src/components/collaboration/reactions-message-status.test.tsx"],
+    status: "collaboration",
+    reason: "Reusable state-light collaboration surface available through the collaboration API.",
+  },
+  {
+    name: "typing-indicator",
+    fileName: "typing-indicator",
+    tier: "collaboration",
+    rootExport: false,
+    publicSubpath: "@moritzbrantner/ui/components/collaboration/typing-indicator",
+    storyFiles: ["src/components/collaboration/typing-indicator.stories.tsx"],
+    testFiles: ["src/components/collaboration/presence-typing.test.tsx"],
+    status: "collaboration",
+    reason: "Reusable state-light collaboration surface available through the collaboration API.",
   },
   {
     name: "logical-argument",

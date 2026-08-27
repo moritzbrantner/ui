@@ -14,7 +14,15 @@ type InternalScrollAllowance = MobileUsabilityAllowance & {
   selector: string;
 };
 
-const includedTiers = ["stable", "patterns", "data", "shell", "social", "media"] as const;
+const includedTiers = [
+  "stable",
+  "patterns",
+  "data",
+  "shell",
+  "social",
+  "collaboration",
+  "media",
+] as const;
 const excludedTiers = ["labs"] as const;
 
 export const mobileUsabilityConfig = {

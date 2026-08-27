@@ -69,6 +69,18 @@ assert.equal(
   "function",
   "social entry should expose social actions",
 );
+
+const collaboration = await importPackage("@moritzbrantner/ui/collaboration");
+assert.equal(
+  typeof collaboration.Presence,
+  "function",
+  "collaboration entry should expose presence",
+);
+assert.equal(
+  typeof collaboration.MentionTextarea,
+  "function",
+  "collaboration entry should expose mention textarea",
+);
 assert.equal(typeof social.SocialPost, "function", "social entry should expose social feed");
 assert.equal(typeof social.ProfileSummary, "function", "social entry should expose ProfileSummary");
 assert.equal(
@@ -241,6 +253,15 @@ assert.equal(typeof dialog.Dialog, "function", "dialog subpath should expose Dia
 const socialChat = await importPackage("@moritzbrantner/ui/components/social/chat");
 assert.equal(typeof socialChat.Chat, "function", "social chat subpath should expose Chat");
 
+const collaborationPresence = await importPackage(
+  "@moritzbrantner/ui/components/collaboration/presence",
+);
+assert.equal(
+  typeof collaborationPresence.Presence,
+  "function",
+  "collaboration presence subpath should expose Presence",
+);
+
 const imageCropper = await importPackage("@moritzbrantner/ui/components/media/image-cropper");
 assert.equal(
   typeof imageCropper.ImageCropper,
@@ -360,6 +381,8 @@ const requiredPackageFiles = [
   "dist/shell.d.ts",
   "dist/social.js",
   "dist/social.d.ts",
+  "dist/collaboration.js",
+  "dist/collaboration.d.ts",
   "dist/media.js",
   "dist/media.d.ts",
   "dist/labs.js",
@@ -390,6 +413,8 @@ const requiredPackageFiles = [
   "dist/components/shell/navbar.d.ts",
   "dist/components/social/chat.js",
   "dist/components/social/chat.d.ts",
+  "dist/components/collaboration/presence.js",
+  "dist/components/collaboration/presence.d.ts",
   "dist/components/media/animated-image.js",
   "dist/components/media/animated-image.d.ts",
   "dist/components/media/image-carousel.js",

@@ -6,7 +6,16 @@ import { defineConfig } from "tsup";
 
 const packageRoot = fileURLToPath(new URL("./", import.meta.url));
 const componentsDir = path.join(packageRoot, "src/components");
-const componentTiers = ["stable", "patterns", "data", "shell", "social", "media", "labs"] as const;
+const componentTiers = [
+  "stable",
+  "patterns",
+  "data",
+  "shell",
+  "social",
+  "collaboration",
+  "media",
+  "labs",
+] as const;
 const componentEntries = Object.fromEntries(
   componentTiers.flatMap((tier) => {
     const tierDir = path.join(componentsDir, tier);
@@ -40,6 +49,7 @@ export default defineConfig({
     data: "src/data.ts",
     shell: "src/shell.ts",
     social: "src/social.ts",
+    collaboration: "src/collaboration.ts",
     media: "src/media.ts",
     labs: "src/labs.ts",
     zleek: "src/zleek.ts",

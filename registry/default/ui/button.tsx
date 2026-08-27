@@ -144,7 +144,7 @@ function Button(props: ButtonProps) {
       ? style
       : {
           ...style,
-          transform: `translateX(${dragOffset}px)`,
+          translate: `${dragOffset}px`,
         };
   const nativeDragHandler = typeof onDrag === "function" ? onDrag : undefined;
 
@@ -178,7 +178,6 @@ function Button(props: ButtonProps) {
       data-keyboard-active={keyboardActive ? true : undefined}
       className={buttonClassName}
       disabled={disabled}
-      draggable={enableDrag || undefined}
       onDrag={nativeDragHandler}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}

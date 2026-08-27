@@ -23,10 +23,20 @@ const patternsPath = path.join(packageRoot, "src", "patterns.ts");
 const dataPath = path.join(packageRoot, "src", "data.ts");
 const shellPath = path.join(packageRoot, "src", "shell.ts");
 const socialPath = path.join(packageRoot, "src", "social.ts");
+const collaborationPath = path.join(packageRoot, "src", "collaboration.ts");
 const mediaPath = path.join(packageRoot, "src", "media.ts");
 const labsPath = path.join(packageRoot, "src", "labs.ts");
 const errors: string[] = [];
-const publicTiers = ["stable", "patterns", "data", "shell", "social", "media", "labs"] as const;
+const publicTiers = [
+  "stable",
+  "patterns",
+  "data",
+  "shell",
+  "social",
+  "collaboration",
+  "media",
+  "labs",
+] as const;
 const rootExportTiers = new Set<ComponentTier>(["stable", "patterns"]);
 const releaseBlockingTiers = new Set<ComponentTier>([
   "stable",
@@ -34,6 +44,7 @@ const releaseBlockingTiers = new Set<ComponentTier>([
   "data",
   "shell",
   "social",
+  "collaboration",
   "media",
 ]);
 const publicTierSourceAllowlist = new Set(["src/components/media/media-gallery-types.ts"]);
@@ -43,6 +54,7 @@ const tierBarrelPaths = {
   data: dataPath,
   shell: shellPath,
   social: socialPath,
+  collaboration: collaborationPath,
   media: mediaPath,
   labs: labsPath,
 } as const;
@@ -161,6 +173,7 @@ function verifyPackageMetadata() {
   expectExport("./data", "./dist/data.js", "./dist/data.d.ts");
   expectExport("./shell", "./dist/shell.js", "./dist/shell.d.ts");
   expectExport("./social", "./dist/social.js", "./dist/social.d.ts");
+  expectExport("./collaboration", "./dist/collaboration.js", "./dist/collaboration.d.ts");
   expectExport("./media", "./dist/media.js", "./dist/media.d.ts");
   expectExport("./labs", "./dist/labs.js", "./dist/labs.d.ts");
   expectExport("./themes", "./dist/themes.js", "./dist/themes.d.ts");
@@ -205,6 +218,11 @@ function verifyPackageMetadata() {
     "./components/social/*",
     "./dist/components/social/*.js",
     "./dist/components/social/*.d.ts",
+  );
+  expectExport(
+    "./components/collaboration/*",
+    "./dist/components/collaboration/*.js",
+    "./dist/components/collaboration/*.d.ts",
   );
   expectExport(
     "./components/media/*",
@@ -631,6 +649,7 @@ function verifyComponentRegistry() {
     'export * from "./data";',
     'export * from "./shell";',
     'export * from "./social";',
+    'export * from "./collaboration";',
     'export * from "./media";',
     'export * from "./labs";',
   ]) {
@@ -683,6 +702,7 @@ function verifyComponentDependencyBoundaries() {
     data: new Set(["data", "patterns", "stable", "internal"]),
     shell: new Set(["shell", "patterns", "stable", "internal"]),
     social: new Set(["social", "patterns", "stable", "internal"]),
+    collaboration: new Set(["collaboration", "patterns", "stable", "internal"]),
     media: new Set(["media", "stable", "internal"]),
     labs: new Set(["labs", "data", "patterns", "stable", "internal"]),
     internal: new Set(["internal", "patterns", "stable"]),
@@ -732,7 +752,17 @@ function getComponentSourceTier(filePath: string): ComponentTier | "internal" | 
   const tier = relativePath.split(path.sep)[0];
 
   if (
-    ["stable", "patterns", "data", "shell", "social", "media", "labs", "internal"].includes(tier)
+    [
+      "stable",
+      "patterns",
+      "data",
+      "shell",
+      "social",
+      "collaboration",
+      "media",
+      "labs",
+      "internal",
+    ].includes(tier)
   ) {
     return tier as ComponentTier | "internal";
   }
