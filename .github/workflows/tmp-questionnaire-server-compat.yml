@@ -1,0 +1,262 @@
+name: Temporary questionnaire server compatibility
+
+on:
+  push:
+    branches:
+      - feat/questionnaire-prototypes
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: feat/questionnaire-prototypes
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.12
+      - run: bun install --frozen-lockfile
+      - name: Remove questionnaire hook-only IDs
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(text: str, old: str, new: str, label: str) -> str:
+              if text.count(old) != 1:
+                  raise SystemExit(f"{label}: expected exactly one match, found {text.count(old)}")
+              return text.replace(old, new, 1)
+
+          path = Path("src/components/patterns/questionnaire.tsx")
+          text = path.read_text()
+
+          replacements = [
+              (
+                  "  count: number;\n  percentage?: number;\n};",
+                  "  count: number;\n  percentage?: number;\n  ariaLabel?: string;\n};",
+                  "poll aria label",
+              ),
+              (
+                  'export type QuestionnaireQuestionProps = React.ComponentProps<"fieldset"> & {\n  legend: React.ReactNode;',
+                  'export type QuestionnaireQuestionProps = Omit<React.ComponentProps<"fieldset">, "id"> & {\n  id: string;\n  legend: React.ReactNode;',
+                  "question id type",
+              ),
+              (
+                  "function QuestionnaireQuestion({\n  className,\n  legend,",
+                  "function QuestionnaireQuestion({\n  className,\n  id,\n  legend,",
+                  "question id destructure",
+              ),
+              (
+                  '  const generatedId = React.useId();\n  const descriptionId = `${generatedId}-description`;\n  const errorId = `${generatedId}-error`;\n  const describedBy =\n    [description ? descriptionId : null, error ? errorId : null, ariaDescribedBy]\n      .filter(Boolean)\n      .join(" ") || undefined;',
+                  '  const descriptionId = description ? `${id}-description` : undefined;\n  const errorId = error ? `${id}-error` : undefined;\n  const describedBy =\n    [descriptionId, errorId, ariaDescribedBy].filter(Boolean).join(" ") || undefined;',
+                  "question static ids",
+              ),
+              (
+                  '    <fieldset\n      data-slot="questionnaire-question"',
+                  '    <fieldset\n      id={id}\n      data-slot="questionnaire-question"',
+                  "question fieldset id",
+              ),
+              (
+                  "  name?: string;\n  defaultValue?: string;",
+                  "  name: string;\n  defaultValue?: string;",
+                  "choice name required",
+              ),
+              (
+                  "function QuestionnaireSingleChoice({\n  className,\n  options,",
+                  "function QuestionnaireSingleChoice({\n  className,\n  id,\n  options,",
+                  "choice id destructure",
+              ),
+              (
+                  '  const generatedId = React.useId();\n  const resolvedName = name ?? `questionnaire-${generatedId}`;',
+                  '  const optionIdPrefix = (id ?? name).trim().replace(/[^a-zA-Z0-9_-]+/g, "-");',
+                  "choice static id prefix",
+              ),
+              (
+                  '    <div\n      data-slot="questionnaire-single-choice"',
+                  '    <div\n      id={id}\n      data-slot="questionnaire-single-choice"',
+                  "choice wrapper id",
+              ),
+              (
+                  '          const optionId = `${generatedId}-${index}`;',
+                  '          const optionId = `${optionIdPrefix}-${index}`;',
+                  "choice option id",
+              ),
+              (
+                  "                name={resolvedName}",
+                  "                name={name}",
+                  "choice name",
+              ),
+              (
+                  'export type QuestionnaireTextAnswerProps = Omit<React.ComponentProps<"textarea">, "children"> & {\n  label: React.ReactNode;',
+                  'export type QuestionnaireTextAnswerProps = Omit<\n  React.ComponentProps<"textarea">,\n  "children" | "id"\n> & {\n  id: string;\n  label: React.ReactNode;',
+                  "text answer id type",
+              ),
+              (
+                  '  const generatedId = React.useId();\n  const resolvedId = id ?? `${generatedId}-answer`;\n  const hintId = `${generatedId}-hint`;\n  const describedBy =\n    [hint ? hintId : null, ariaDescribedBy].filter(Boolean).join(" ") || undefined;',
+                  '  const hintId = hint ? `${id}-hint` : undefined;\n  const describedBy = [hintId, ariaDescribedBy].filter(Boolean).join(" ") || undefined;',
+                  "text answer static ids",
+              ),
+              (
+                  "      <label htmlFor={resolvedId} className=\"text-sm font-medium\">",
+                  "      <label htmlFor={id} className=\"text-sm font-medium\">",
+                  "text answer label id",
+              ),
+              (
+                  "        id={resolvedId}\n        data-slot=\"questionnaire-textarea\"",
+                  "        id={id}\n        data-slot=\"questionnaire-textarea\"",
+                  "text answer textarea id",
+              ),
+              (
+                  "}: QuestionnairePollResultsProps) {\n  const generatedId = React.useId();\n  const normalizedCounts",
+                  "}: QuestionnairePollResultsProps) {\n  const normalizedCounts",
+                  "poll remove useId",
+              ),
+              (
+                  '          const selected = result.value === selectedValue;\n          const labelId = `${generatedId}-result-${index}`;',
+                  '          const selected = result.value === selectedValue;\n          const accessibleLabel =\n            result.ariaLabel ?? (typeof result.label === "string" ? result.label : undefined);',
+                  "poll accessible label",
+              ),
+              (
+                  "                <span\n                  id={labelId}\n                  data-slot=\"questionnaire-poll-result-label\"",
+                  "                <span\n                  data-slot=\"questionnaire-poll-result-label\"",
+                  "poll label id removal",
+              ),
+              (
+                  "                aria-labelledby={labelId}\n                aria-valuemin={0}\n                aria-valuemax={100}\n                aria-valuenow={roundedPercentage}",
+                  '                aria-label={accessibleLabel}\n                aria-valuemin={0}\n                aria-valuemax={100}\n                aria-valuenow={roundedPercentage}\n                aria-valuetext={`${roundedPercentage}%${showCounts ? `, ${count} responses` : ""}`}',
+                  "poll aria label",
+              ),
+          ]
+
+          for old, new, label in replacements:
+              text = replace_once(text, old, new, label)
+
+          if "React.useId" in text:
+              raise SystemExit("React.useId still present in questionnaire")
+
+          path.write_text(text)
+
+          stories = Path("src/components/patterns/questionnaire.stories.tsx")
+          text = stories.read_text()
+          story_replacements = [
+              (
+                  '<QuestionnaireQuestion\n        legend="Choose the experience that feels most useful"',
+                  '<QuestionnaireQuestion\n        id="recommendation-style-question"\n        legend="Choose the experience that feels most useful"',
+                  "choice story question id",
+              ),
+              (
+                  '<QuestionnaireQuestion legend="How much guidance do you want?">',
+                  '<QuestionnaireQuestion id="guidance-level-question" legend="How much guidance do you want?">',
+                  "guided story question id",
+              ),
+              (
+                  '<QuestionnaireQuestion\n        legend="The recommendations matched what I was looking for."',
+                  '<QuestionnaireQuestion\n        id="recommendation-fit-question"\n        legend="The recommendations matched what I was looking for."',
+                  "scale story question id",
+              ),
+              (
+                  '<QuestionnaireQuestion legend="What would make this recommendation feel perfect for you?">',
+                  '<QuestionnaireQuestion\n          id="recommendation-notes-question"\n          legend="What would make this recommendation feel perfect for you?"\n        >',
+                  "open story question id",
+              ),
+              (
+                  '<QuestionnaireTextAnswer\n            label="Your answer"',
+                  '<QuestionnaireTextAnswer\n            id="recommendation-notes"\n            label="Your answer"',
+                  "open story answer id",
+              ),
+              (
+                  '<QuestionnaireQuestion legend="Would you use this recommendation again?">',
+                  '<QuestionnaireQuestion\n          id="recommendation-poll-question"\n          legend="Would you use this recommendation again?"\n        >',
+                  "poll story question id",
+              ),
+          ]
+          for old, new, label in story_replacements:
+              text = replace_once(text, old, new, label)
+          stories.write_text(text)
+
+          tests = Path("src/components/patterns/questionnaire.test.tsx")
+          text = tests.read_text()
+          test_replacements = [
+              (
+                  '<QuestionnaireQuestion legend="How much choice do you want?">',
+                  '<QuestionnaireQuestion id="choice-question" legend="How much choice do you want?">',
+                  "choice test question id",
+              ),
+              (
+                  '<QuestionnaireSingleChoice options={options} defaultValue="balanced" />',
+                  '<QuestionnaireSingleChoice name="choice" options={options} defaultValue="balanced" />',
+                  "choice test name",
+              ),
+              (
+                  '<QuestionnaireSingleChoice data-testid="choice" options={options} variant="cards" />',
+                  '<QuestionnaireSingleChoice\n        data-testid="choice"\n        name="variant"\n        options={options}\n        variant="cards"\n      />',
+                  "cards variant name",
+              ),
+              (
+                  '<QuestionnaireSingleChoice data-testid="choice" options={options} variant="list" />',
+                  '<QuestionnaireSingleChoice\n        data-testid="choice"\n        name="variant"\n        options={options}\n        variant="list"\n      />',
+                  "list variant name",
+              ),
+              (
+                  '        data-testid="choice"\n        options={options}\n        variant="scale"',
+                  '        data-testid="choice"\n        name="variant"\n        options={options}\n        variant="scale"',
+                  "scale variant name",
+              ),
+              (
+                  '<QuestionnaireSingleChoice data-testid="choice" options={options} variant="pop" />',
+                  '<QuestionnaireSingleChoice\n        data-testid="choice"\n        name="variant"\n        options={options}\n        variant="pop"\n      />',
+                  "pop variant name",
+              ),
+              (
+                  '<QuestionnaireSingleChoice data-testid="choice" options={options} variant="pulse" />',
+                  '<QuestionnaireSingleChoice\n        data-testid="choice"\n        name="variant"\n        options={options}\n        variant="pulse"\n      />',
+                  "pulse variant name",
+              ),
+              (
+                  '<QuestionnaireQuestion legend="Tell us more">',
+                  '<QuestionnaireQuestion id="details-question" legend="Tell us more">',
+                  "text test question id",
+              ),
+              (
+                  '<QuestionnaireTextAnswer\n          label="Your answer"',
+                  '<QuestionnaireTextAnswer\n          id="details-answer"\n          label="Your answer"',
+                  "text test answer id",
+              ),
+              (
+                  '<QuestionnaireQuestion legend="Would you use it again?" data-testid="question">',
+                  '<QuestionnaireQuestion\n        id="poll-question"\n        legend="Would you use it again?"\n        data-testid="question"\n      >',
+                  "poll test question id",
+              ),
+              (
+                  '<QuestionnaireSingleChoice options={options} defaultValue="focused" />',
+                  '<QuestionnaireSingleChoice name="poll-choice" options={options} defaultValue="focused" />',
+                  "poll test name",
+              ),
+              (
+                  '<QuestionnaireQuestion\n        legend="Required choice"',
+                  '<QuestionnaireQuestion\n        id="required-choice"\n        legend="Required choice"',
+                  "validation question id",
+              ),
+              (
+                  '<QuestionnaireSingleChoice options={options} required />',
+                  '<QuestionnaireSingleChoice name="required-choice" options={options} required />',
+                  "validation choice name",
+              ),
+          ]
+          for old, new, label in test_replacements:
+              text = replace_once(text, old, new, label)
+          tests.write_text(text)
+          PY
+          bunx oxfmt@0.51.0 src/components/patterns/questionnaire.tsx src/components/patterns/questionnaire.stories.tsx src/components/patterns/questionnaire.test.tsx
+      - name: Commit server-compatible questionnaire
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/patterns/questionnaire.tsx src/components/patterns/questionnaire.stories.tsx src/components/patterns/questionnaire.test.tsx
+          git commit -m "fix: keep questionnaire server-compatible"
+          git push origin HEAD:feat/questionnaire-prototypes
