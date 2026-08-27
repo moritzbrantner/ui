@@ -15,6 +15,14 @@ const checkOnly = process.argv.includes("--check");
 const registrySources: readonly RegistrySource[] = [
   { source: "src/lib/cn.ts", target: "registry/default/lib/cn.ts" },
   { source: "src/components/stable/button.tsx", target: "registry/default/ui/button.tsx" },
+  {
+    source: "src/components/stable/dialog.tsx",
+    target: "registry/default/ui/dialog.tsx",
+    replacements: [
+      ['from "../../lib/cn"', 'from "@/registry/default/lib/cn"'],
+      ['from "./button"', 'from "@/registry/default/ui/button"'],
+    ],
+  },
   { source: "src/components/stable/tabs.tsx", target: "registry/default/ui/tabs.tsx" },
   { source: "src/components/stable/input.tsx", target: "registry/default/ui/input.tsx" },
   { source: "src/components/stable/label.tsx", target: "registry/default/ui/label.tsx" },
@@ -60,7 +68,66 @@ const registrySources: readonly RegistrySource[] = [
       ['from "../stable/tabs"', 'from "@/registry/default/ui/tabs"'],
     ],
   },
+  {
+    source: "src/components/patterns/atlas-operations.tsx",
+    target: "registry/default/ui/atlas-operations.tsx",
+  },
+  {
+    source: "src/components/patterns/studio-tools.tsx",
+    target: "registry/default/ui/studio-tools.tsx",
+  },
+  {
+    source: "src/components/patterns/scholia-research.tsx",
+    target: "registry/default/ui/scholia-research.tsx",
+  },
+  {
+    source: "src/components/patterns/paper-documents.tsx",
+    target: "registry/default/ui/paper-documents.tsx",
+  },
+  {
+    source: "src/components/patterns/zleek-shells.tsx",
+    target: "registry/default/ui/zleek-shells.tsx",
+  },
+  {
+    source: "src/components/patterns/product-patterns.tsx",
+    target: "registry/default/ui/product-patterns.tsx",
+  },
+  {
+    source: "src/components/patterns/pop-rewards-extended.tsx",
+    target: "registry/default/ui/pop-rewards-extended.tsx",
+    replacements: [['from "./pop-rewards"', 'from "@/registry/default/ui/pop-rewards"']],
+  },
+  {
+    source: "src/components/patterns/pulse-spatial.tsx",
+    target: "registry/default/ui/pulse-spatial.tsx",
+    replacements: [['from "../stable/dialog"', 'from "@/registry/default/ui/dialog"']],
+  },
   { source: "base.css", target: "registry/default/styles/moritz-base.css" },
+  {
+    source: "bobba/styles.css",
+    target: "registry/default/styles/bobba.css",
+    replacements: [['@import "../base.css";', '@import "./moritz-base.css";']],
+  },
+  {
+    source: "zleek/styles.css",
+    target: "registry/default/styles/zleek.css",
+    replacements: [['@import "../base.css";', '@import "./moritz-base.css";']],
+  },
+  {
+    source: "atlas/styles.css",
+    target: "registry/default/styles/atlas.css",
+    replacements: [['@import "../base.css";', '@import "./moritz-base.css";']],
+  },
+  {
+    source: "studio/styles.css",
+    target: "registry/default/styles/studio.css",
+    replacements: [['@import "../base.css";', '@import "./moritz-base.css";']],
+  },
+  {
+    source: "paper/styles.css",
+    target: "registry/default/styles/paper.css",
+    replacements: [['@import "../base.css";', '@import "./moritz-base.css";']],
+  },
   {
     source: "scholia/styles.css",
     target: "registry/default/styles/scholia.css",

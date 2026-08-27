@@ -128,6 +128,25 @@
       ]
     },
     {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "An accessible modal dialog with token-backed overlay, content, and close controls.",
+      "dependencies": ["lucide-react", "radix-ui"],
+      "registryDependencies": [
+        "moritzbrantner/ui/button",
+        "moritzbrantner/ui/cn",
+        "moritzbrantner/ui/moritz-theme"
+      ],
+      "files": [
+        {
+          "path": "ui/dialog.tsx",
+          "type": "registry:ui",
+          "target": "@ui/dialog.tsx"
+        }
+      ]
+    },
+    {
       "name": "tabs",
       "type": "registry:ui",
       "title": "Tabs",
@@ -290,6 +309,223 @@
           "target": "@ui/scholia-source-workbench.tsx"
         }
       ]
+    },
+    {
+      "name": "bobba-theme",
+      "type": "registry:theme",
+      "title": "Bobba Theme",
+      "description": "The default product-safe Bobba theme and shared UI foundation.",
+      "dependencies": ["tw-animate-css"],
+      "files": [
+        {
+          "path": "styles/moritz-base.css",
+          "type": "registry:style",
+          "target": "@/styles/moritz-base.css"
+        },
+        {
+          "path": "styles/bobba.css",
+          "type": "registry:style",
+          "target": "@/styles/bobba.css"
+        }
+      ]
+    },
+    {
+      "name": "zleek-theme",
+      "type": "registry:theme",
+      "title": "Zleek Theme",
+      "description": "The glass command-center Zleek theme with translucent shell tokens.",
+      "dependencies": ["tw-animate-css"],
+      "files": [
+        {
+          "path": "styles/moritz-base.css",
+          "type": "registry:style",
+          "target": "@/styles/moritz-base.css"
+        },
+        {
+          "path": "styles/zleek.css",
+          "type": "registry:style",
+          "target": "@/styles/zleek.css"
+        }
+      ]
+    },
+    {
+      "name": "atlas-theme",
+      "type": "registry:theme",
+      "title": "Atlas Theme",
+      "description": "The dense Atlas operational dashboard theme with data and map tokens.",
+      "dependencies": ["tw-animate-css"],
+      "files": [
+        {
+          "path": "styles/moritz-base.css",
+          "type": "registry:style",
+          "target": "@/styles/moritz-base.css"
+        },
+        {
+          "path": "styles/atlas.css",
+          "type": "registry:style",
+          "target": "@/styles/atlas.css"
+        }
+      ]
+    },
+    {
+      "name": "studio-theme",
+      "type": "registry:theme",
+      "title": "Studio Theme",
+      "description": "The Studio creative-tooling theme with editor and timeline tokens.",
+      "dependencies": ["tw-animate-css"],
+      "files": [
+        {
+          "path": "styles/moritz-base.css",
+          "type": "registry:style",
+          "target": "@/styles/moritz-base.css"
+        },
+        {
+          "path": "styles/studio.css",
+          "type": "registry:style",
+          "target": "@/styles/studio.css"
+        }
+      ]
+    },
+    {
+      "name": "paper-theme",
+      "type": "registry:theme",
+      "title": "Paper Theme",
+      "description": "The quiet Paper document and research theme with document tokens.",
+      "dependencies": ["tw-animate-css"],
+      "files": [
+        {
+          "path": "styles/moritz-base.css",
+          "type": "registry:style",
+          "target": "@/styles/moritz-base.css"
+        },
+        {
+          "path": "styles/paper.css",
+          "type": "registry:style",
+          "target": "@/styles/paper.css"
+        }
+      ]
+    },
+    {
+      "name": "atlas-operations",
+      "type": "registry:ui",
+      "title": "Atlas Operations",
+      "description": "Dense KPI, delta, map, table, alert, and sparkline primitives for operational interfaces.",
+      "registryDependencies": ["moritzbrantner/ui/cn", "moritzbrantner/ui/atlas-theme"],
+      "files": [
+        {
+          "path": "ui/atlas-operations.tsx",
+          "type": "registry:ui",
+          "target": "@ui/atlas-operations.tsx"
+        }
+      ]
+    },
+    {
+      "name": "studio-tools",
+      "type": "registry:ui",
+      "title": "Studio Tools",
+      "description": "Media transport, timeline, layer, inspector, tool, and before/after primitives for creative workflows.",
+      "registryDependencies": ["moritzbrantner/ui/cn", "moritzbrantner/ui/studio-theme"],
+      "files": [
+        {
+          "path": "ui/studio-tools.tsx",
+          "type": "registry:ui",
+          "target": "@ui/studio-tools.tsx"
+        }
+      ]
+    },
+    {
+      "name": "scholia-research",
+      "type": "registry:ui",
+      "title": "Scholia Research",
+      "description": "Marginalia, citation trails, interpretation comparison, passage navigation, witness matrices, and lemma anchors.",
+      "registryDependencies": ["moritzbrantner/ui/cn", "moritzbrantner/ui/scholia-theme"],
+      "files": [
+        {
+          "path": "ui/scholia-research.tsx",
+          "type": "registry:ui",
+          "target": "@ui/scholia-research.tsx"
+        }
+      ]
+    },
+    {
+      "name": "paper-documents",
+      "type": "registry:ui",
+      "title": "Paper Documents",
+      "description": "Page, OCR, translation, outline, and annotation primitives for document workflows.",
+      "registryDependencies": ["moritzbrantner/ui/cn", "moritzbrantner/ui/paper-theme"],
+      "files": [
+        {
+          "path": "ui/paper-documents.tsx",
+          "type": "registry:ui",
+          "target": "@ui/paper-documents.tsx"
+        }
+      ]
+    },
+    {
+      "name": "zleek-shells",
+      "type": "registry:ui",
+      "title": "Zleek Shells",
+      "description": "Glass docks, command decks, status capsules, launch cards, quick switchers, and HUD panels.",
+      "registryDependencies": ["moritzbrantner/ui/cn", "moritzbrantner/ui/zleek-theme"],
+      "files": [
+        {
+          "path": "ui/zleek-shells.tsx",
+          "type": "registry:ui",
+          "target": "@ui/zleek-shells.tsx"
+        }
+      ]
+    },
+    {
+      "name": "product-patterns",
+      "type": "registry:ui",
+      "title": "Product Patterns",
+      "description": "Theme-agnostic settings, empty-state, form-action, inline-edit, toolbar, and resource patterns.",
+      "registryDependencies": ["moritzbrantner/ui/cn", "moritzbrantner/ui/moritz-theme"],
+      "files": [
+        {
+          "path": "ui/product-patterns.tsx",
+          "type": "registry:ui",
+          "target": "@ui/product-patterns.tsx"
+        }
+      ]
+    },
+    {
+      "name": "pop-rewards-extended",
+      "type": "registry:ui",
+      "title": "Extended Pop Rewards",
+      "description": "Achievement, streak, completion, checklist, share-success, and reaction reward primitives.",
+      "registryDependencies": [
+        "moritzbrantner/ui/cn",
+        "moritzbrantner/ui/pop-theme",
+        "moritzbrantner/ui/pop-rewards"
+      ],
+      "files": [
+        {
+          "path": "ui/pop-rewards-extended.tsx",
+          "type": "registry:ui",
+          "target": "@ui/pop-rewards-extended.tsx"
+        }
+      ],
+      "dependencies": ["motion"]
+    },
+    {
+      "name": "pulse-spatial",
+      "type": "registry:ui",
+      "title": "Pulse Spatial",
+      "description": "Morphing dialog, kinetic list, spatial selection, expanding card, breadcrumb, and panel-stack primitives.",
+      "registryDependencies": [
+        "moritzbrantner/ui/cn",
+        "moritzbrantner/ui/dialog",
+        "moritzbrantner/ui/pulse-theme"
+      ],
+      "files": [
+        {
+          "path": "ui/pulse-spatial.tsx",
+          "type": "registry:ui",
+          "target": "@ui/pulse-spatial.tsx"
+        }
+      ],
+      "dependencies": ["motion"]
     }
   ]
 }
