@@ -246,3 +246,5 @@ export type ResourceListContentProps = React.ComponentProps<typeof ResourceListC
 export type ResourceListHeaderProps = React.ComponentProps<typeof ResourceListHeader>;
 export type ResourceListResetButtonProps = React.ComponentProps<typeof ResourceListResetButton>;
 export type ResourceListToolbarProps = React.ComponentProps<typeof ResourceListToolbar>;
+
+export * from "./resource-list/reorderable-list";
