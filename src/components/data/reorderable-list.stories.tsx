@@ -79,16 +79,10 @@ function InteractiveChildrenDemo({ onReorder }: { onReorder?: (change: ReorderCh
   );
 }
 
-function OptimisticPersistenceDemo({
-  onReorder,
-}: {
-  onReorder?: (change: ReorderChange) => void;
-}) {
+function OptimisticPersistenceDemo({ onReorder }: { onReorder?: (change: ReorderChange) => void }) {
   const [items, setItems] = React.useState(initialItems);
   const [failNextSave, setFailNextSave] = React.useState(false);
-  const [saveStatus, setSaveStatus] = React.useState<"idle" | "saving" | "saved" | "error">(
-    "idle",
-  );
+  const [saveStatus, setSaveStatus] = React.useState<"idle" | "saving" | "saved" | "error">("idle");
 
   async function persistReorder(change: ReorderChange) {
     const previousItems = items;
@@ -120,12 +114,7 @@ function OptimisticPersistenceDemo({
   return (
     <div className="grid max-w-md gap-3">
       <div className="flex flex-wrap items-center gap-2">
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={() => setFailNextSave(true)}
-        >
+        <Button type="button" size="sm" variant="outline" onClick={() => setFailNextSave(true)}>
           Fail next save
         </Button>
         <span role="status" className="text-sm text-muted-foreground">
