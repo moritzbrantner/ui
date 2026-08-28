@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { ReorderableItem, ReorderableList, ReorderHandle } from "./reorderable-list";
+import { ReorderableItem, ReorderableList, ReorderHandle } from "./resource-list";
 
 describe("reorderable list", () => {
   test("renders a list with focusable reorder handles", () => {
