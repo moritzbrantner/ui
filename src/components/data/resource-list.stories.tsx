@@ -45,7 +45,12 @@ function ReorderableResourceListDemo() {
     >
       <ReorderableList aria-label="Release order" className="gap-1 p-2" onReorder={handleReorder}>
         {items.map((item, index) => (
-          <ReorderableItem key={item.id} id={item.id} index={index} className="border-0 shadow-none">
+          <ReorderableItem
+            key={item.id}
+            id={item.id}
+            index={index}
+            className="border-0 shadow-none"
+          >
             <div className="flex min-h-12 items-center gap-2 rounded-md px-2 py-1 hover:bg-muted/60">
               <ReorderHandle aria-label={`Move ${item.label}`} />
               <span className="min-w-0 flex-1 text-sm font-medium">{item.label}</span>
