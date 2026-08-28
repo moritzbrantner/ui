@@ -4,17 +4,21 @@ on:
   push:
     branches:
       - feat/refresh-control
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
 
 jobs:
   prepare:
-    if: github.actor != 'github-actions[bot]'
+    if: github.actor != 'github-actions[bot]' && (github.event_name == 'push' || github.head_ref == 'feat/refresh-control')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: feat/refresh-control
           fetch-depth: 0
       - uses: oven-sh/setup-bun@v2
         with:
