@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { RefreshControl } from "./refresh-control";
+import { RefreshControl } from "./resource-list";
 
 const intervalOptions = [
   { label: "5 seconds", value: 5_000 },
