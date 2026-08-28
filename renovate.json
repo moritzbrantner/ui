@@ -1,10 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    ":dependencyDashboard",
-    ":preserveSemverRanges"
-  ],
+  "extends": ["config:recommended", ":dependencyDashboard", ":preserveSemverRanges"],
   "prConcurrentLimit": 3,
   "prHourlyLimit": 1,
   "packageRules": [
