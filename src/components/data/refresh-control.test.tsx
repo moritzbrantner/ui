@@ -41,7 +41,8 @@ describe("refresh control", () => {
       />,
     );
 
-    expect(screen.getByRole("combobox", { name: "Refresh interval" })).toBeDisabled();
+    const intervalSelect = screen.getByRole("combobox", { name: "Refresh interval" });
+    expect((intervalSelect as HTMLButtonElement).disabled).toBe(true);
   });
 
   test("communicates refreshing state and supports preformatted status content", () => {
@@ -51,7 +52,7 @@ describe("refresh control", () => {
 
     const refreshButton = screen.getByRole("button", { name: "Refreshing" });
 
-    expect(refreshButton).toBeDisabled();
+    expect((refreshButton as HTMLButtonElement).disabled).toBe(true);
     expect(refreshButton.getAttribute("aria-busy")).toBe("true");
     expect(screen.getByText("Updated 12 seconds ago")).toBeTruthy();
   });
