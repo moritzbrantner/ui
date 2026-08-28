@@ -43,6 +43,12 @@ Keep product workflows, routing, auth/session state, backend contracts, settings
 
 Before running visual tests locally for the first time, install the Chromium browser with `bunx playwright install chromium`. CI uses `bunx playwright install --with-deps chromium`.
 
+## Pull Request Merge Gate
+
+Before merging any pull request, run `bun run verify:release` locally from its exact head commit. A successful local exit status is the merge metric; green hosted checks do not override a local pipeline failure. If the local pipeline fails, diagnose and repair the failure before merging.
+
+After a merge, switch back to `main`, fast-forward from `origin/main`, and continue the queue from that baseline.
+
 ## Release Flow
 
 This package is published directly to the public package registry for the `@moritzbrantner` scope. Use `bun run publish:registry` for a local publish after authenticating for the registry. `.github/workflows/publish.yml` can also publish on `v*` tags or manual workflow dispatch when `NPM_TOKEN` is configured.
