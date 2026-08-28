@@ -53,12 +53,15 @@ describe("activity calendar", () => {
     );
 
     const first = screen.getByLabelText("0 activities on August 1, 2026");
-    const second = screen.getByLabelText("0 activities on August 2, 2026");
+    const nextDay = screen.getByLabelText("0 activities on August 2, 2026");
+    const nextWeek = screen.getByLabelText("0 activities on August 9, 2026");
 
     fireEvent.focus(first);
-    fireEvent.keyDown(first, { key: "ArrowRight" });
+    fireEvent.keyDown(first, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(nextDay);
 
-    expect(document.activeElement).toBe(second);
+    fireEvent.keyDown(nextDay, { key: "ArrowRight" });
+    expect(document.activeElement).toBe(nextWeek);
   });
 
   test("activates days without embedding product-specific activity semantics", () => {
@@ -79,7 +82,6 @@ describe("activity calendar", () => {
       date: "2026-08-03",
       value: 7,
       label: "Seven completed items",
-      level: 4,
     });
   });
 

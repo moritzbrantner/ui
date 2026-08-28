@@ -142,10 +142,10 @@ function ActivityCalendar({
     (date: string, key: string) => {
       let targetDate: string | undefined;
 
-      if (key === "ArrowLeft") targetDate = addDaysToDateKey(date, -1);
-      if (key === "ArrowRight") targetDate = addDaysToDateKey(date, 1);
-      if (key === "ArrowUp") targetDate = addDaysToDateKey(date, -7);
-      if (key === "ArrowDown") targetDate = addDaysToDateKey(date, 7);
+      if (key === "ArrowLeft") targetDate = addDaysToDateKey(date, -7);
+      if (key === "ArrowRight") targetDate = addDaysToDateKey(date, 7);
+      if (key === "ArrowUp") targetDate = addDaysToDateKey(date, -1);
+      if (key === "ArrowDown") targetDate = addDaysToDateKey(date, 1);
 
       if (!targetDate || !isDateKeyWithinRange(targetDate, model.startDate, model.endDate)) {
         return;
@@ -239,11 +239,17 @@ function ActivityCalendar({
                               `${formatValue(day.value)} on ${formatDate.format(parseDateKey(day.date))}`
                             }
                             tooltip={
-                              formatTooltip?.(day) ??
+                              formatTooltip?.({
+                                date: day.date,
+                                value: day.value,
+                                label: day.label,
+                              }) ??
                               day.label ??
                               `${formatValue(day.value)} on ${formatDate.format(parseDateKey(day.date))}`
                             }
-                            onActivate={(selectedDay) => onDayClick?.(selectedDay)}
+                            onActivate={({ date, value, label }) =>
+                              onDayClick?.({ date, value, label })
+                            }
                             onFocusDate={setActiveDate}
                             onMoveFocus={moveFocus}
                             registerDay={registerDay}
