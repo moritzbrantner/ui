@@ -45,6 +45,17 @@ const componentRegistry = [
     reason: "Reusable primitive or low-level control with stable support.",
   },
   {
+    name: "activity-calendar",
+    fileName: "activity-calendar",
+    tier: "stable",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/stable/activity-calendar",
+    storyFiles: ["src/components/stable/activity-calendar.stories.tsx"],
+    testFiles: ["src/components/stable/activity-calendar.test.tsx"],
+    status: "stable",
+    reason: "Reusable calendar heatmap visualization for date-indexed activity and intensity.",
+  },
+  {
     name: "alert",
     fileName: "alert",
     tier: "stable",
