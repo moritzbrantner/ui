@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn } from "storybook/test";
 
-import { RefreshControl } from "./refresh-control";
+import { RefreshControl } from "./resource-list";
 
 const intervalOptions = [
   { label: "5 seconds", value: 5_000 },
