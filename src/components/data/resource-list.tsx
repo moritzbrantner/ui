@@ -247,4 +247,6 @@ export type ResourceListHeaderProps = React.ComponentProps<typeof ResourceListHe
 export type ResourceListResetButtonProps = React.ComponentProps<typeof ResourceListResetButton>;
 export type ResourceListToolbarProps = React.ComponentProps<typeof ResourceListToolbar>;
 
+<<<<<<< HEAD
+export * from "./resource-list/refresh-control";
 export * from "./resource-list/reorderable-list";
