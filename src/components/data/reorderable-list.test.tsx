@@ -34,7 +34,8 @@ describe("reorderable list", () => {
       </ReorderableList>,
     );
 
-    expect(screen.getByRole("button", { name: "Reorder item" })).toBeDisabled();
+    const handle = screen.getByRole("button", { name: "Reorder item" });
+    expect((handle as HTMLButtonElement).disabled).toBe(true);
   });
 
   test("requires handles to stay inside reorderable items", () => {
