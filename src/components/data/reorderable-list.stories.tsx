@@ -2,7 +2,12 @@ import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn } from "storybook/test";
 
-import { ReorderableItem, ReorderableList, ReorderHandle, type ReorderChange } from "./reorderable-list";
+import {
+  ReorderableItem,
+  ReorderableList,
+  ReorderHandle,
+  type ReorderChange,
+} from "./resource-list";
 
 const initialItems = [
   { id: "design", label: "Design review" },
