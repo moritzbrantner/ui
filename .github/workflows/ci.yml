@@ -14,31 +14,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  prepare-dnd:
-    if: github.event_name == 'pull_request' && github.head_ref == 'feat/reorderable-list' && github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: feat/reorderable-list
-          fetch-depth: 0
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.12
-      - run: bun install --frozen-lockfile
-      - run: bun add @dnd-kit/react@^0.5.0
-      - name: Commit generated dependency metadata
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json bun.lock
-          if ! git diff --cached --quiet; then
-            git commit -m "Add dnd-kit dependency"
-            git push origin HEAD:feat/reorderable-list
-          fi
-
   fast-validation:
     name: Fast Validation
     permissions:
