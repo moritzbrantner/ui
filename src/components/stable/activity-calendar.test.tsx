@@ -52,9 +52,9 @@ describe("activity calendar", () => {
       />,
     );
 
-    const first = screen.getByLabelText("0 activities on August 1, 2026");
-    const nextDay = screen.getByLabelText("0 activities on August 2, 2026");
-    const nextWeek = screen.getByLabelText("0 activities on August 9, 2026");
+    const first = screen.getByLabelText("0 activities on August 3, 2026");
+    const nextDay = screen.getByLabelText("0 activities on August 4, 2026");
+    const nextWeek = screen.getByLabelText("0 activities on August 11, 2026");
 
     fireEvent.focus(first);
     fireEvent.keyDown(first, { key: "ArrowDown" });
@@ -62,6 +62,29 @@ describe("activity calendar", () => {
 
     fireEvent.keyDown(nextDay, { key: "ArrowRight" });
     expect(document.activeElement).toBe(nextWeek);
+  });
+
+  test("stops vertical navigation at weekday-row boundaries", () => {
+    render(
+      <ActivityCalendar
+        data={[]}
+        startDate="2026-08-01"
+        endDate="2026-08-14"
+        showMonthLabels={false}
+        showWeekdayLabels={false}
+      />,
+    );
+
+    const sunday = screen.getByLabelText("0 activities on August 2, 2026");
+    const saturday = screen.getByLabelText("0 activities on August 8, 2026");
+
+    sunday.focus();
+    fireEvent.keyDown(sunday, { key: "ArrowUp" });
+    expect(document.activeElement).toBe(sunday);
+
+    saturday.focus();
+    fireEvent.keyDown(saturday, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(saturday);
   });
 
   test("aligns ARIA rows with the visual weekday rows", () => {

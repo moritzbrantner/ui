@@ -141,11 +141,12 @@ function ActivityCalendar({
   const moveFocus = React.useCallback(
     (date: string, key: string, direction: "ltr" | "rtl") => {
       let targetDate: string | undefined;
+      const weekdayIndex = (parseDateKey(date).getUTCDay() - weekStartsOn + 7) % 7;
 
       if (key === "ArrowLeft") targetDate = addDaysToDateKey(date, direction === "rtl" ? 7 : -7);
       if (key === "ArrowRight") targetDate = addDaysToDateKey(date, direction === "rtl" ? -7 : 7);
-      if (key === "ArrowUp") targetDate = addDaysToDateKey(date, -1);
-      if (key === "ArrowDown") targetDate = addDaysToDateKey(date, 1);
+      if (key === "ArrowUp" && weekdayIndex > 0) targetDate = addDaysToDateKey(date, -1);
+      if (key === "ArrowDown" && weekdayIndex < 6) targetDate = addDaysToDateKey(date, 1);
 
       if (!targetDate || !isDateKeyWithinRange(targetDate, model.startDate, model.endDate)) {
         return;
@@ -154,7 +155,7 @@ function ActivityCalendar({
       setActiveDate(targetDate);
       dayRefs.current.get(targetDate)?.focus();
     },
-    [model.endDate, model.startDate],
+    [model.endDate, model.startDate, weekStartsOn],
   );
 
   return (
