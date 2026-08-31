@@ -64,6 +64,50 @@ describe("activity calendar", () => {
     expect(document.activeElement).toBe(nextWeek);
   });
 
+  test("aligns ARIA rows with the visual weekday rows", () => {
+    render(
+      <ActivityCalendar
+        data={[]}
+        startDate="2026-08-01"
+        endDate="2026-08-14"
+        showMonthLabels={false}
+        showWeekdayLabels={false}
+      />,
+    );
+
+    const augustSecond = screen.getByLabelText("0 activities on August 2, 2026");
+    const augustNinth = screen.getByLabelText("0 activities on August 9, 2026");
+    const augustThird = screen.getByLabelText("0 activities on August 3, 2026");
+
+    const sundayRow = augustSecond.closest('[role="row"]');
+
+    expect(sundayRow?.contains(augustNinth)).toBe(true);
+    expect(sundayRow?.contains(augustThird)).toBe(false);
+    expect(screen.getAllByRole("row")).toHaveLength(7);
+  });
+
+  test("moves between visual week columns in RTL direction", () => {
+    render(
+      <div dir="rtl">
+        <ActivityCalendar
+          data={[]}
+          startDate="2026-08-01"
+          endDate="2026-08-14"
+          showMonthLabels={false}
+          showWeekdayLabels={false}
+        />
+      </div>,
+    );
+
+    const currentWeek = screen.getByLabelText("0 activities on August 2, 2026");
+    const visuallyLeftWeek = screen.getByLabelText("0 activities on August 9, 2026");
+
+    fireEvent.focus(currentWeek);
+    fireEvent.keyDown(currentWeek, { key: "ArrowLeft" });
+
+    expect(document.activeElement).toBe(visuallyLeftWeek);
+  });
+
   test("activates days without embedding product-specific activity semantics", () => {
     const onDayClick = vi.fn();
 

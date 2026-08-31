@@ -49,7 +49,7 @@ type ActivityCalendarDayCellProps = {
   tooltip: React.ReactNode;
   onActivate: (day: ActivityCalendarDay) => void;
   onFocusDate: (date: string) => void;
-  onMoveFocus: (date: string, key: string) => void;
+  onMoveFocus: (date: string, key: string, direction: "ltr" | "rtl") => void;
   registerDay: (date: string, node: HTMLSpanElement | null) => void;
   interactive: boolean;
 };
@@ -139,11 +139,11 @@ function ActivityCalendar({
   }, []);
 
   const moveFocus = React.useCallback(
-    (date: string, key: string) => {
+    (date: string, key: string, direction: "ltr" | "rtl") => {
       let targetDate: string | undefined;
 
-      if (key === "ArrowLeft") targetDate = addDaysToDateKey(date, -7);
-      if (key === "ArrowRight") targetDate = addDaysToDateKey(date, 7);
+      if (key === "ArrowLeft") targetDate = addDaysToDateKey(date, direction === "rtl" ? 7 : -7);
+      if (key === "ArrowRight") targetDate = addDaysToDateKey(date, direction === "rtl" ? -7 : 7);
       if (key === "ArrowUp") targetDate = addDaysToDateKey(date, -1);
       if (key === "ArrowDown") targetDate = addDaysToDateKey(date, 1);
 
@@ -217,17 +217,19 @@ function ActivityCalendar({
                 data-slot="activity-calendar-grid"
                 role="grid"
                 aria-label={ariaLabel}
-                className="flex gap-0 sm:gap-1"
+                className="grid grid-rows-7 gap-0 sm:gap-1"
               >
-                {model.weeks.map((week, weekIndex) => (
+                {Array.from({ length: 7 }, (_, dayIndex) => (
                   <div
-                    key={weekIndex}
-                    data-slot="activity-calendar-week"
+                    key={dayIndex}
+                    data-slot="activity-calendar-row"
                     role="row"
-                    className="grid shrink-0 grid-rows-7 gap-0 sm:gap-1"
+                    className="flex gap-0 sm:gap-1"
                   >
-                    {week.map((day, dayIndex) =>
-                      day ? (
+                    {model.weeks.map((week, weekIndex) => {
+                      const day = week[dayIndex];
+
+                      return day ? (
                         <div key={day.date} role="gridcell" data-slot="activity-calendar-gridcell">
                           <ActivityCalendarDayCell
                             day={day}
@@ -260,11 +262,12 @@ function ActivityCalendar({
                         <div
                           key={`padding-${weekIndex}-${dayIndex}`}
                           data-slot="activity-calendar-padding-day"
+                          role="gridcell"
                           aria-hidden="true"
                           className={variantCellClasses[variant]}
                         />
-                      ),
-                    )}
+                      );
+                    })}
                   </div>
                 ))}
               </div>
@@ -313,7 +316,7 @@ function ActivityCalendarDayCell({
   const handleKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>) => {
     if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) {
       event.preventDefault();
-      onMoveFocus(day.date, event.key);
+      onMoveFocus(day.date, event.key, getElementDirection(event.currentTarget));
       return;
     }
 
@@ -357,6 +360,16 @@ function ActivityCalendarDayCell({
       <TooltipContent sideOffset={4}>{tooltip}</TooltipContent>
     </Tooltip>
   );
+}
+
+function getElementDirection(element: HTMLElement) {
+  const declaredDirection = element.closest<HTMLElement>('[dir="ltr"], [dir="rtl"]')?.dir;
+
+  if (declaredDirection === "rtl" || declaredDirection === "ltr") {
+    return declaredDirection;
+  }
+
+  return window.getComputedStyle(element).direction === "rtl" ? "rtl" : "ltr";
 }
 
 function getActivityColor(level: number, levels: number) {
