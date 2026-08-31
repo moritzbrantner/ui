@@ -142,9 +142,12 @@ describe("activity calendar", () => {
     );
 
     const monthLabels = document.querySelector('[data-slot="activity-calendar-months"]');
+    const weekdayLabel = document.querySelector('[data-slot="activity-calendar-weekdays"] > div');
 
     expect(monthLabels?.className).toContain("ps-10");
     expect(monthLabels?.className).not.toContain("pl-10");
+    expect(weekdayLabel?.className).toContain("pe-2");
+    expect(weekdayLabel?.className).not.toContain("pr-2");
   });
 
   test("activates days without embedding product-specific activity semantics", () => {

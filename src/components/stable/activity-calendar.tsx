@@ -76,7 +76,7 @@ function ActivityCalendar({
   showMonthLabels = variant !== "compact",
   showWeekdayLabels = variant === "year",
   showLegend = true,
-  locale,
+  locale = "en",
   legendLabels,
   formatTooltip,
   formatValue = defaultFormatValue,
@@ -204,7 +204,7 @@ function ActivityCalendar({
                     <div
                       key={`${weekday}-${index}`}
                       className={cn(
-                        "flex items-center pr-2 text-xs text-muted-foreground",
+                        "flex items-center pe-2 text-xs text-muted-foreground",
                         variantCellClasses[variant],
                       )}
                     >
