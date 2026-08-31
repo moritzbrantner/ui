@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import { ActivityCalendar } from "./activity-calendar";
@@ -107,6 +107,9 @@ describe("activity calendar", () => {
     expect(sundayRow?.contains(augustNinth)).toBe(true);
     expect(sundayRow?.contains(augustThird)).toBe(false);
     expect(screen.getAllByRole("row")).toHaveLength(7);
+    expect(
+      screen.getAllByRole("row").every((row) => within(row).getAllByRole("gridcell").length === 3),
+    ).toBe(true);
   });
 
   test("moves between visual week columns in RTL direction", () => {
@@ -129,6 +132,19 @@ describe("activity calendar", () => {
     fireEvent.keyDown(currentWeek, { key: "ArrowLeft" });
 
     expect(document.activeElement).toBe(visuallyLeftWeek);
+  });
+
+  test("uses logical month-label spacing for RTL layouts", () => {
+    render(
+      <div dir="rtl">
+        <ActivityCalendar data={[]} startDate="2026-08-01" endDate="2026-08-14" />
+      </div>,
+    );
+
+    const monthLabels = document.querySelector('[data-slot="activity-calendar-months"]');
+
+    expect(monthLabels?.className).toContain("ps-10");
+    expect(monthLabels?.className).not.toContain("pl-10");
   });
 
   test("activates days without embedding product-specific activity semantics", () => {

@@ -176,7 +176,7 @@ function ActivityCalendar({
             {showMonthLabels ? (
               <div
                 data-slot="activity-calendar-months"
-                className={cn("mb-1 flex gap-0 sm:gap-1", showWeekdayLabels && "pl-10 sm:pl-8")}
+                className={cn("mb-1 flex gap-0 sm:gap-1", showWeekdayLabels && "ps-10 sm:ps-8")}
                 aria-hidden="true"
               >
                 {model.weeks.map((_, weekIndex) => (
@@ -264,7 +264,6 @@ function ActivityCalendar({
                           key={`padding-${weekIndex}-${dayIndex}`}
                           data-slot="activity-calendar-padding-day"
                           role="gridcell"
-                          aria-hidden="true"
                           className={variantCellClasses[variant]}
                         />
                       );
