@@ -66,6 +66,10 @@ const variantSwatchClasses: Record<ActivityCalendarVariant, string> = {
   compact: "size-7 sm:size-5",
 };
 
+const subscribeToHydration = () => () => {};
+const getClientHydrationSnapshot = () => true;
+const getServerHydrationSnapshot = () => false;
+
 function ActivityCalendar({
   data,
   startDate,
@@ -85,6 +89,13 @@ function ActivityCalendar({
   "aria-label": ariaLabel = "Activity calendar",
   ...props
 }: ActivityCalendarProps) {
+  const hydrated = React.useSyncExternalStore(
+    subscribeToHydration,
+    getClientHydrationSnapshot,
+    getServerHydrationSnapshot,
+  );
+  const [implicitEndDate] = React.useState(getTodayDateKey);
+  const usesImplicitRange = !startDate && !endDate;
   const formatMonth = React.useMemo(
     () => new Intl.DateTimeFormat(locale, { month: "short", timeZone: "UTC" }),
     [locale],
@@ -103,12 +114,13 @@ function ActivityCalendar({
         data,
         startDate,
         endDate,
+        implicitEndDate,
         levels,
         weekStartsOn,
         variant,
         formatMonth: (date) => formatMonth.format(date),
       }),
-    [data, endDate, formatMonth, levels, startDate, variant, weekStartsOn],
+    [data, endDate, formatMonth, implicitEndDate, levels, startDate, variant, weekStartsOn],
   );
   const dayRefs = React.useRef(new Map<string, HTMLSpanElement>());
   const [activeDate, setActiveDate] = React.useState(model.endDate);
@@ -157,6 +169,19 @@ function ActivityCalendar({
     },
     [model.endDate, model.startDate, weekStartsOn],
   );
+
+  if (usesImplicitRange && !hydrated) {
+    return (
+      <div
+        data-slot="activity-calendar"
+        data-variant={variant}
+        aria-label={ariaLabel}
+        aria-busy="true"
+        className={cn("grid min-w-0 gap-2 text-sm", className)}
+        {...props}
+      />
+    );
+  }
 
   return (
     <div
@@ -383,6 +408,10 @@ function getActivityColor(level: number, levels: number) {
 
 function defaultFormatValue(value: number) {
   return `${value} ${value === 1 ? "activity" : "activities"}`;
+}
+
+function getTodayDateKey() {
+  return new Date().toISOString().slice(0, 10);
 }
 
 export { ActivityCalendar };

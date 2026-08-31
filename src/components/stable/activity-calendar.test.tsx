@@ -1,9 +1,23 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
 import { describe, expect, test, vi } from "vitest";
 
 import { ActivityCalendar } from "./activity-calendar";
 
 describe("activity calendar", () => {
+  test("defers an implicit date range until after hydration", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-31T23:59:59Z"));
+    const beforeMidnight = renderToString(<ActivityCalendar data={[]} variant="compact" />);
+    vi.setSystemTime(new Date("2026-09-01T00:00:01Z"));
+    const afterMidnight = renderToString(<ActivityCalendar data={[]} variant="compact" />);
+    vi.useRealTimers();
+
+    expect(beforeMidnight).toBe(afterMidnight);
+    expect(beforeMidnight).toContain('aria-busy="true"');
+    expect(beforeMidnight).not.toContain("data-date");
+  });
+
   test("renders a date-indexed intensity calendar with generic labels", () => {
     render(
       <ActivityCalendar

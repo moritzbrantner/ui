@@ -30,6 +30,7 @@ export function buildActivityCalendarModel<TLabel>(options: {
   data: readonly ActivityCalendarValue<TLabel>[];
   startDate?: string;
   endDate?: string;
+  implicitEndDate?: string;
   levels: number;
   weekStartsOn: 0 | 1;
   variant: ActivityCalendarVariant;
@@ -39,6 +40,7 @@ export function buildActivityCalendarModel<TLabel>(options: {
   const { startDate, endDate } = resolveActivityCalendarRange(
     options.startDate,
     options.endDate,
+    options.implicitEndDate,
     options.variant,
   );
   const start = parseDateKey(startDate);
@@ -134,6 +136,7 @@ export function parseDateKey(date: string) {
 function resolveActivityCalendarRange(
   requestedStart: string | undefined,
   requestedEnd: string | undefined,
+  implicitEndDate: string | undefined,
   variant: ActivityCalendarVariant,
 ) {
   const dayCount = variantDayCounts[variant];
@@ -141,7 +144,11 @@ function resolveActivityCalendarRange(
   let end = requestedEnd ? parseDateKey(requestedEnd) : undefined;
 
   if (!start && !end) {
-    end = parseDateKey(getTodayDateKey());
+    if (!implicitEndDate) {
+      throw new Error("An implicit end date is required when no date range is provided.");
+    }
+
+    end = parseDateKey(implicitEndDate);
     start = addDays(end, -(dayCount - 1));
   } else if (start && !end) {
     end = addDays(start, dayCount - 1);
@@ -196,8 +203,4 @@ function addDays(date: Date, amount: number) {
 
 function toDateKey(date: Date) {
   return date.toISOString().slice(0, 10);
-}
-
-function getTodayDateKey() {
-  return new Date().toISOString().slice(0, 10);
 }
