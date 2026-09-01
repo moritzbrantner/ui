@@ -20,6 +20,7 @@ export * from "./components/patterns/pop-rewards";
 export * from "./components/patterns/pop-rewards-extended";
 export * from "./components/patterns/product-patterns";
 export * from "./components/patterns/pulse-spatial";
+export * from "./components/patterns/questionnaire";
 export * from "./components/patterns/responsive-action-menu";
 export * from "./components/patterns/scholarly-note";
 export * from "./components/patterns/scholia-research";
