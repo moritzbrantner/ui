@@ -1,0 +1,92 @@
+name: Verify issue 31 generator
+
+on:
+  push:
+    branches: [issue-31-ui-component-test-generator]
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: issue-31-ui-component-test-generator
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          repository: moritzbrantner/coding-tooling
+          ref: main
+          path: .tmp/coding-tooling
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.0
+      - name: Install tooling
+        working-directory: .tmp/coding-tooling
+        run: bun install --frozen-lockfile
+      - name: Install UI dependencies
+        run: bun install --frozen-lockfile
+      - name: Normalize new repository files
+        run: |
+          rm -rf .tmp
+          bun run format
+      - uses: actions/checkout@v4
+        with:
+          repository: moritzbrantner/coding-tooling
+          ref: main
+          path: .tmp/coding-tooling
+      - name: Install tooling after formatting
+        working-directory: .tmp/coding-tooling
+        run: bun install --frozen-lockfile
+      - name: Exercise test generator in disposable repository copy
+        run: |
+          rm -rf /tmp/ui-test-generator-test
+          mkdir -p /tmp/ui-test-generator-test
+          rsync -a --exclude=.git --exclude=.tmp ./ /tmp/ui-test-generator-test/
+          cd /tmp/ui-test-generator-test
+          TOOL="$GITHUB_WORKSPACE/.tmp/coding-tooling/src/cli.ts"
+
+          bun "$TOOL" generate ui-component-test \
+            --input name=Badge \
+            --input tier=stable \
+            --json | tee /tmp/test-apply.json
+          grep -q 'generated-and-verified' /tmp/test-apply.json
+          test -f src/components/stable/badge.test.tsx
+          grep -q 'TODO(GEN-GAP:test-behavior)' src/components/stable/badge.test.tsx
+
+          bun "$TOOL" generate ui-component-test \
+            --input name=Badge \
+            --input tier=stable \
+            --json | tee /tmp/test-repeat.json
+          grep -q 'generated-and-verified' /tmp/test-repeat.json
+          grep -q '"result": "no-op"' /tmp/test-repeat.json
+
+          set +e
+          bun "$TOOL" generate ui-component-test \
+            --input name=DefinitelyMissingComponent \
+            --input tier=labs \
+            --json | tee /tmp/test-missing.json
+          status=${PIPESTATUS[0]}
+          set -e
+          test "$status" -ne 0
+          grep -q 'prerequisite-failed' /tmp/test-missing.json
+          grep -q 'missing-generator-file' /tmp/test-missing.json
+          test ! -f src/components/labs/definitely-missing-component.test.tsx
+      - name: Validate repository branch
+        run: |
+          rm -rf .tmp
+          bun run format:check
+          bun run check-types
+          bun run lint
+          bun run test:unit
+      - name: Remove helper workflow and commit normalization
+        run: |
+          rm .github/workflows/issue-31-generator-verify.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: normalize issue 31 generator files"
+          git push origin HEAD:issue-31-ui-component-test-generator
