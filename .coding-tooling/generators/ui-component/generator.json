@@ -12,16 +12,7 @@
     "tier": {
       "type": "enum",
       "required": true,
-      "values": [
-        "stable",
-        "patterns",
-        "data",
-        "shell",
-        "social",
-        "collaboration",
-        "media",
-        "labs"
-      ]
+      "values": ["stable", "patterns", "data", "shell", "social", "collaboration", "media", "labs"]
     },
     "storyCategory": {
       "type": "enum",
