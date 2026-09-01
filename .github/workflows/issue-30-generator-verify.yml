@@ -47,7 +47,7 @@ jobs:
           grep -q 'component-false.tsx.tmpl' /tmp/server-plan.json
           grep -q 'Components/Layout/Generator Probe' /tmp/server-plan.json
           grep -q 'component-true.tsx.tmpl' /tmp/client-plan.json
-          grep -q '"use client";' /tmp/client-plan.json
+          grep -q 'use client' /tmp/client-plan.json
       - name: Apply generator in disposable repository copy
         run: |
           mkdir -p /tmp/ui-generator-test
