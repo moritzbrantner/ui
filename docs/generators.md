@@ -52,4 +52,6 @@ The generated semantic gaps behaved as intended: the implementing agent replaced
 
 Two boundaries were confirmed rather than automated away. `componentRegistry` metadata remains semantic because tier status, rationale, and evidence are maintenance decisions; it was added after the component contract was resolved. Shadcn source-registry promotion remains a separate lifecycle decision and was not performed.
 
+The first barrel insertion also exposed that the initial `typescript-barrel-export` implementation reordered pre-existing exports while adding one new line. That was broader than the intended mutation boundary. `coding-tooling` issue #45 fixed the operation to preserve all existing export order and insert only the requested export, and this dogfood change restores the pre-existing `stable.ts` order.
+
 One performance friction remains: the `ui-component-test` `test:unit` postcondition currently executes the repository-wide unit suite because postconditions cannot yet target only the generated test file. That is acceptable for this first adoption but is a candidate for a later, separately justified focused-check capability rather than a reason to add arbitrary command execution to generators.
