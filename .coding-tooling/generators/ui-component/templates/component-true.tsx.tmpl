@@ -1,0 +1,14 @@
+"use client";
+
+import * as React from "react";
+
+import { cn } from "../../lib/cn";
+
+function {{name | pascal}}({ className, ...props }: React.ComponentProps<"div">) {
+  // TODO(GEN-GAP:semantic-root): Choose the correct semantic element or primitive.
+  return <div data-slot="{{name | kebab}}" className={cn(className)} {...props} />;
+}
+
+export { {{name | pascal}} };
+
+export type {{name | pascal}}Props = React.ComponentProps<typeof {{name | pascal}}>;
