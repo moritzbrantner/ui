@@ -62,7 +62,7 @@ jobs:
             --input tier=stable \
             --json | tee /tmp/test-repeat.json
           grep -q 'generated-and-verified' /tmp/test-repeat.json
-          grep -q '"result": "no-op"' /tmp/test-repeat.json
+          grep -q '"result":"no-op"' /tmp/test-repeat.json
 
           set +e
           bun "$TOOL" generate ui-component-test \
