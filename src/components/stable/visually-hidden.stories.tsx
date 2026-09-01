@@ -15,7 +15,7 @@ type Story = StoryObj<typeof meta>;
 
 export const AccessibleButtonLabel: Story = {
   render: () => (
-    <button type="button">
+    <button type="button" style={{ minHeight: 40, minWidth: 40 }}>
       <span aria-hidden="true">?</span>
       <VisuallyHidden>Help</VisuallyHidden>
     </button>
