@@ -914,6 +914,17 @@ const componentRegistry = [
     reason: "Reusable state-light application shell surface available through the shell API.",
   },
   {
+    name: "visually-hidden",
+    fileName: "visually-hidden",
+    tier: "stable",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/stable/visually-hidden",
+    storyFiles: ["src/components/stable/visually-hidden.stories.tsx"],
+    testFiles: ["src/components/stable/visually-hidden.test.tsx"],
+    status: "stable",
+    reason: "Reusable primitive or low-level control with stable support.",
+  },
+  {
     name: "action-menu",
     fileName: "action-menu",
     tier: "patterns",
