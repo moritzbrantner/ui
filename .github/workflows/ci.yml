@@ -15,18 +15,13 @@ concurrency:
 
 jobs:
   findings:
-    name: Deterministic Findings v2 Candidate
-    runs-on: ubuntu-latest
+    name: Deterministic Findings
     permissions:
       contents: read
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-      - name: Inspect deterministic repository findings
-        uses: moritzbrantner/coding-tooling@8e50a04b78c26a2015d1a28f412289f80f4abcfb
-        with:
-          operation: findings
-          report-path: .artifacts/coding-tooling/findings.json
+    uses: moritzbrantner/reusable-workflows/.github/workflows/coding-tooling-validation.yml@604f68a276c49ab557d40578fb7453fb964b4882
+    with:
+      operation: findings
+      report_path: .artifacts/coding-tooling/findings.json
 
   fast-validation:
     name: Fast Validation
