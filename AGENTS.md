@@ -4,6 +4,8 @@
 
 `@moritzbrantner/ui` is a publishable Bun/TypeScript React design-system package. It owns shared Tailwind 4 styles, theme metadata, primitive components, composed state-light components, Storybook coverage, and package-consumption checks for the wider `moritzbrantner` platform packages workspace.
 
+Do not make `@moritzbrantner/tables`, `@moritzbrantner/charts`, or `@moritzbrantner/diagrams` depend on this package. Specialized visualization behavior and styling are owned by those repositories; `ui` may only provide optional consumer-side adapters or theme integration.
+
 Keep product workflows, routing, auth/session state, backend contracts, settings/profile/admin screens, and other app-specific behavior in consuming app packages.
 
 ## Key Directories
