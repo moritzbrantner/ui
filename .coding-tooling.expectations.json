@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "verifications": [
+    {
+      "id": "VERIFY-TOKENS",
+      "version": 1,
+      "expectation": "typescript-source-test",
+      "subject": "src/token-metadata.ts",
+      "command": ["bun", "run", "verify:tokens"],
+      "reason": "Token metadata is checked by the repository-owned token verifier."
+    }
+  ]
+}
