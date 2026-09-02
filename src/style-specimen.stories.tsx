@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import "../theme-scopes.css";
+import themeScopesStyles from "../theme-scopes.css?inline";
 
 import { Badge } from "./components/stable/badge";
 import { Button } from "./components/stable/button";
@@ -12,8 +12,19 @@ import { UiTheme, builtInUiThemeNames, uiThemeLabels, type BuiltInUiThemeName } 
 const meta = {
   title: "Design System/Style Specimen",
   parameters: {
+    a11y: {
+      test: "todo",
+    },
     layout: "fullscreen",
   },
+  decorators: [
+    (Story) => (
+      <>
+        <style>{themeScopesStyles}</style>
+        <Story />
+      </>
+    ),
+  ],
   tags: ["autodocs", "test"],
 } satisfies Meta;
 
