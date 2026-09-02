@@ -1598,3 +1598,206 @@ async function verifyNavbarLayout(page: Page, storyId: string) {
       const style = window.getComputedStyle(element);
       const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
       const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+
+      return {
+        isInViewport:
+          box.left >= -1 &&
+          box.top >= -1 &&
+          box.right <= viewportWidth + 1 &&
+          box.bottom <= viewportHeight + 1,
+        ownsVerticalScroll: style.overflowY === "auto" || style.overflowY === "scroll",
+      };
+    });
+
+    expect(submenuLayout.isInViewport, "navbar submenu should stay inside the viewport").toBe(true);
+    expect(submenuLayout.ownsVerticalScroll, "navbar submenu should scroll internally").toBe(true);
+  }
+
+  if (!storyId.startsWith("components-navigation-navbar--mobile")) {
+    return;
+  }
+
+  const mobileTargets = await nav.evaluate((element) => {
+    const visibleButtons = [...element.querySelectorAll<HTMLButtonElement>("button")].filter(
+      (button) => {
+        const style = window.getComputedStyle(button);
+        const box = button.getBoundingClientRect();
+
+        return (
+          style.display !== "none" &&
+          style.visibility !== "hidden" &&
+          box.width > 0 &&
+          box.height > 0
+        );
+      },
+    );
+
+    return visibleButtons.map((button) => {
+      const box = button.getBoundingClientRect();
+
+      return {
+        name: button.textContent?.trim() || button.getAttribute("aria-label") || "button",
+        isPrimaryTrigger:
+          button.getAttribute("data-slot") === "navbar-trigger" ||
+          button.getAttribute("data-slot") === "navbar-mobile-menu-trigger" ||
+          Boolean(button.getAttribute("aria-controls")?.startsWith("navbar-")),
+        width: box.width,
+        height: box.height,
+      };
+    });
+  });
+
+  for (const target of mobileTargets) {
+    const minimumSize = target.isPrimaryTrigger ? 44 : 40;
+
+    expect(
+      Math.min(target.width, target.height),
+      `${target.name} should keep a ${minimumSize}px mobile target`,
+    ).toBeGreaterThanOrEqual(minimumSize);
+  }
+
+  await verifyMobileNavbarActionability(page, nav);
+}
+
+async function verifyMobileNavbarActionability(page: Page, nav: Locator) {
+  const mobileMenuTrigger = nav.locator('[data-slot="navbar-mobile-menu-trigger"]').first();
+
+  if ((await mobileMenuTrigger.count()) > 0) {
+    await expectClickableInViewport(page, mobileMenuTrigger, "navbar mobile menu trigger");
+    await mobileMenuTrigger.click();
+    await expect(mobileMenuTrigger).toHaveAttribute("aria-expanded", "true");
+
+    const mobileMenuId = await mobileMenuTrigger.getAttribute("aria-controls");
+
+    expect(mobileMenuId, "mobile menu trigger should control a mounted menu").not.toBeNull();
+
+    const mobileMenu = page.locator('[data-slot="navbar-mobile-menu"]').first();
+
+    await expect(mobileMenu, "mobile navbar menu should be visible").toBeVisible();
+    await expect(mobileMenu, "mobile navbar menu should match aria-controls").toHaveAttribute(
+      "id",
+      mobileMenuId ?? "",
+    );
+
+    const mobileMenuTargets = mobileMenu.locator("a, button, [role='button'], [role='menuitem']");
+    const mobileMenuTargetCount = await mobileMenuTargets.count();
+
+    expect(
+      mobileMenuTargetCount,
+      "mobile navbar menu should expose navigation targets",
+    ).toBeGreaterThan(0);
+
+    for (let index = 0; index < mobileMenuTargetCount; index += 1) {
+      await expectClickableInViewport(
+        page,
+        mobileMenuTargets.nth(index),
+        `mobile navbar menu target ${index + 1}`,
+      );
+    }
+
+    await page.keyboard.press("Escape");
+    await expect(mobileMenu, "mobile navbar menu should close").toBeHidden();
+    await verifyMobileNavbarActions(page, nav);
+    return;
+  }
+
+  const triggers = nav.locator('[data-slot="navbar-trigger"]');
+  const triggerCount = await triggers.count();
+
+  expect(triggerCount, "mobile navbar should expose primary navigation triggers").toBeGreaterThan(
+    0,
+  );
+
+  for (let index = 0; index < triggerCount; index += 1) {
+    const trigger = triggers.nth(index);
+    const triggerName = (await trigger.textContent())?.trim() || `trigger ${index + 1}`;
+
+    await expectClickableInViewport(page, trigger, `navbar ${triggerName}`);
+    await trigger.click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+
+    const submenuId = await trigger.getAttribute("aria-controls");
+
+    expect(submenuId, `${triggerName} should control a mounted submenu`).not.toBeNull();
+
+    const submenu = page.locator('[data-slot="navbar-submenu"]').first();
+
+    await expect(submenu, `${triggerName} submenu should be visible`).toBeVisible();
+    await expect(submenu, `${triggerName} submenu should match aria-controls`).toHaveAttribute(
+      "id",
+      submenuId ?? "",
+    );
+
+    const submenuTargets = submenu.locator("a, button, [role='button'], [role='menuitem']");
+    const submenuTargetCount = await submenuTargets.count();
+
+    expect(
+      submenuTargetCount,
+      `${triggerName} submenu should expose navigation targets`,
+    ).toBeGreaterThan(0);
+
+    for (let targetIndex = 0; targetIndex < submenuTargetCount; targetIndex += 1) {
+      await expectClickableInViewport(
+        page,
+        submenuTargets.nth(targetIndex),
+        `${triggerName} submenu target ${targetIndex + 1}`,
+      );
+    }
+  }
+
+  await verifyMobileNavbarActions(page, nav);
+}
+
+async function verifyMobileNavbarActions(page: Page, nav: Locator) {
+  const actionTrigger = nav.locator('[data-slot="navbar-mobile-actions-trigger"]').first();
+
+  if ((await actionTrigger.count()) === 0) {
+    return;
+  }
+
+  await expectClickableInViewport(page, actionTrigger, "navbar mobile actions trigger");
+  await actionTrigger.click();
+
+  const actionMenu = page.locator('[data-slot="navbar-mobile-actions-menu"]').first();
+
+  await expect(actionMenu, "mobile navbar actions menu should be visible").toBeVisible();
+
+  const actionTargets = actionMenu.locator("button, a, [role='button'], [role='switch']");
+  const actionTargetCount = await actionTargets.count();
+
+  expect(actionTargetCount, "mobile actions menu should expose action targets").toBeGreaterThan(0);
+
+  for (let index = 0; index < actionTargetCount; index += 1) {
+    await expectClickableInViewport(page, actionTargets.nth(index), `navbar action ${index + 1}`);
+  }
+}
+
+async function expectClickableInViewport(page: Page, locator: Locator, label: string) {
+  await locator.scrollIntoViewIfNeeded();
+  await expect(locator, `${label} should be visible`).toBeVisible();
+  await expect(locator, `${label} should be enabled`).toBeEnabled();
+
+  const [box, viewport] = await Promise.all([
+    locator.boundingBox(),
+    page.evaluate(() => ({
+      height: document.documentElement.clientHeight || window.innerHeight,
+      width: document.documentElement.clientWidth || window.innerWidth,
+    })),
+  ]);
+
+  expect(box, `${label} should have a clickable box`).not.toBeNull();
+
+  if (!box) {
+    return;
+  }
+
+  expect(
+    box.x >= -1 &&
+      box.y >= -1 &&
+      box.x + box.width <= viewport.width + 1 &&
+      box.y + box.height <= viewport.height + 1,
+    `${label} should be inside the viewport`,
+  ).toBe(true);
+
+  await locator.click({ trial: true });
+}
