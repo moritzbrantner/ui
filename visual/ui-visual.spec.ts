@@ -1181,7 +1181,37 @@ async function gotoStory(
   );
   await page.evaluate(() => document.fonts.ready);
   await openOverlayStory(page, storyId);
-  await page.waitForTimeout(500);
+  await waitForStoryToSettle(page);
+}
+
+async function waitForStoryToSettle(page: Page) {
+  await page.waitForFunction(
+    () =>
+      (
+        window as typeof window & {
+          __STORYBOOK_PREVIEW__?: { currentRender?: { phase?: string } };
+        }
+      ).__STORYBOOK_PREVIEW__?.currentRender?.phase === "finished",
+  );
+
+  await page.waitForFunction(() =>
+    document.getAnimations().every((animation) => {
+      const timing = animation.effect?.getComputedTiming();
+
+      return (
+        animation.playState !== "running" ||
+        timing === undefined ||
+        !Number.isFinite(timing.endTime)
+      );
+    }),
+  );
+
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      }),
+  );
 }
 
 async function gotoStoryWithRetry(page: Page, url: string) {
