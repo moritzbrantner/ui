@@ -382,22 +382,37 @@ function cloneReusableWorkflowRepository(
   const repositoryUrl = `https://github.com/${repositoryName}.git`;
 
   try {
-    execFileSync(
-      "git",
-      [
-        "clone",
-        "--quiet",
-        "--depth",
-        "1",
-        "--branch",
-        reusableWorkflowRef.ref,
-        repositoryUrl,
-        cloneRoot,
-      ],
-      {
+    if (/^[0-9a-f]{40}$/i.test(reusableWorkflowRef.ref)) {
+      execFileSync("git", ["init", "--quiet", cloneRoot], { stdio: "pipe" });
+      execFileSync("git", ["-C", cloneRoot, "remote", "add", "origin", repositoryUrl], {
         stdio: "pipe",
-      },
-    );
+      });
+      execFileSync(
+        "git",
+        ["-C", cloneRoot, "fetch", "--quiet", "--depth", "1", "origin", reusableWorkflowRef.ref],
+        { stdio: "pipe" },
+      );
+      execFileSync("git", ["-C", cloneRoot, "checkout", "--quiet", "--detach", "FETCH_HEAD"], {
+        stdio: "pipe",
+      });
+    } else {
+      execFileSync(
+        "git",
+        [
+          "clone",
+          "--quiet",
+          "--depth",
+          "1",
+          "--branch",
+          reusableWorkflowRef.ref,
+          repositoryUrl,
+          cloneRoot,
+        ],
+        {
+          stdio: "pipe",
+        },
+      );
+    }
   } catch (error) {
     const stderr = error instanceof Error && "stderr" in error ? String(error.stderr) : "";
     errors.push(
