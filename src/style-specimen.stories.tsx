@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import "../theme-scopes.css";
+
 import { Badge } from "./components/stable/badge";
 import { Button } from "./components/stable/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/stable/card";
@@ -95,7 +97,9 @@ function Specimen({ theme }: { theme: BuiltInUiThemeName }) {
               <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
                 Typography ladder
               </span>
-              <h2 className="font-heading text-2xl font-semibold tracking-tight">Section heading</h2>
+              <h2 className="font-heading text-2xl font-semibold tracking-tight">
+                Section heading
+              </h2>
             </div>
             <span className="font-mono text-xs text-muted-foreground">123,456.78 ms</span>
           </div>

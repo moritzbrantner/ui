@@ -6,16 +6,16 @@ The design system should vary themes through a small set of deliberate visual di
 
 Every built-in theme should make an explicit choice for each dimension:
 
-| Dimension | Questions |
-| --- | --- |
-| Typography | What is the hierarchy for display, heading, body, control, caption, and numeric text? |
-| Density | Is the theme compact, default, or comfortable? Which control and table rhythms follow from it? |
-| Spacing | Which reference spacing steps drive surfaces, controls, groups, and page layout? |
-| Shape | How do controls, surfaces, overlays, and pills relate instead of choosing radii independently? |
-| Elevation | When should borders, shadows, translucency, or flat surfaces communicate hierarchy? |
-| Color | Which reference ramps produce semantic surface, text, action, status, and data colors? |
-| Motion | Which interactions move, how far, how quickly, and which properties are safe to animate? |
-| Surface treatment | Is the theme solid, glassy, paper-like, editorial, or otherwise distinct? |
+| Dimension         | Questions                                                                                      |
+| ----------------- | ---------------------------------------------------------------------------------------------- |
+| Typography        | What is the hierarchy for display, heading, body, control, caption, and numeric text?          |
+| Density           | Is the theme compact, default, or comfortable? Which control and table rhythms follow from it? |
+| Spacing           | Which reference spacing steps drive surfaces, controls, groups, and page layout?               |
+| Shape             | How do controls, surfaces, overlays, and pills relate instead of choosing radii independently? |
+| Elevation         | When should borders, shadows, translucency, or flat surfaces communicate hierarchy?            |
+| Color             | Which reference ramps produce semantic surface, text, action, status, and data colors?         |
+| Motion            | Which interactions move, how far, how quickly, and which properties are safe to animate?       |
+| Surface treatment | Is the theme solid, glassy, paper-like, editorial, or otherwise distinct?                      |
 
 ## Token architecture
 
