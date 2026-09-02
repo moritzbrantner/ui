@@ -1,0 +1,84 @@
+name: Decouple visualization ownership once
+
+on:
+  push:
+    branches:
+      - decouple-visualization-ownership
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: decouple-visualization-ownership
+      - uses: oven-sh/setup-bun@v2.2.0
+        with:
+          bun-version: 1.3.12
+      - name: Update ownership docs
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          readme = Path("README.md")
+          text = readme.read_text()
+          role = (
+              "`@moritzbrantner/ui` is the low-level design-system package. It owns shared tokens, "
+              "primitives, composed components, theme metadata, Storybook coverage, and package-consumption guarantees.\n"
+          )
+          boundary = (
+              role
+              + "\nSpecialized visualization engines are deliberately outside this ownership boundary. "
+              "`@moritzbrantner/tables`, `@moritzbrantner/charts`, and `@moritzbrantner/diagrams` "
+              "must remain independently installable and must not require this package at runtime. "
+              "This package may provide optional adapters or theme integration in the consumer-facing direction. "
+              "See [visualization package boundaries](./docs/visualization-boundaries.md).\n"
+          )
+          if "visualization package boundaries" not in text:
+              if role not in text:
+                  raise SystemExit("README design-system role changed")
+              text = text.replace(role, boundary)
+
+          old_data = (
+              "- `data`: data grids, resource lists, filters, search fields, and selection toolbars."
+          )
+          new_data = (
+              "- `data`: generic resource lists, filters, search fields, selection toolbars, and lightweight data-display affordances. Specialized table/data-grid behavior belongs in `@moritzbrantner/tables`."
+          )
+          if old_data in text:
+              text = text.replace(old_data, new_data)
+          readme.write_text(text)
+
+          agents = Path("AGENTS.md")
+          text = agents.read_text()
+          marker = (
+              "`@moritzbrantner/ui` is a publishable Bun/TypeScript React design-system package. It owns shared Tailwind 4 styles, theme metadata, primitive components, composed state-light components, Storybook coverage, and package-consumption checks for the wider `moritzbrantner` platform packages workspace.\n"
+          )
+          rule = (
+              marker
+              + "\nDo not make `@moritzbrantner/tables`, `@moritzbrantner/charts`, or `@moritzbrantner/diagrams` depend on this package. Specialized visualization behavior and styling are owned by those repositories; `ui` may only provide optional consumer-side adapters or theme integration.\n"
+          )
+          if "Do not make `@moritzbrantner/tables`" not in text:
+              if marker not in text:
+                  raise SystemExit("AGENTS project purpose changed")
+              text = text.replace(marker, rule)
+          agents.write_text(text)
+          PY
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Format docs
+        run: bun run format
+      - name: Check formatting
+        run: bun run format:check
+      - name: Commit boundary
+        run: |
+          rm .github/workflows/decouple-visualization-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Clarify visualization package ownership"
+          git push origin HEAD:decouple-visualization-ownership
