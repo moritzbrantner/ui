@@ -1,0 +1,73 @@
+name: Verification Evidence Dogfood
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verification-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out UI
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: 1.4.0
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Execute declared token verifier
+        run: bun run verify:tokens
+
+      - name: Run normal repository findings
+        id: findings
+        uses: moritzbrantner/coding-tooling@dab70394fd84e9fc4ad70bc74e19866bec96819a
+        with:
+          operation: findings
+          install-mode: none
+          report-path: .artifacts/coding-tooling/findings.json
+
+      - name: Assert verified token finding is not active
+        run: |
+          bun -e '
+            const report = await Bun.file(".artifacts/coding-tooling/findings.json").json();
+            const active = report.data.findings.find(
+              (finding) => finding.expectationId === "typescript-source-test" && finding.subject?.key === "src/token-metadata.ts",
+            );
+            if (active) throw new Error(`token metadata finding remained active: ${active.id}`);
+          '
+
+      - name: Inspect all finding dispositions
+        shell: bash
+        run: |
+          tooling="$RUNNER_TEMP/coding-tooling"
+          git init "$tooling"
+          git -C "$tooling" remote add origin https://github.com/moritzbrantner/coding-tooling.git
+          git -C "$tooling" fetch --depth=1 origin dab70394fd84e9fc4ad70bc74e19866bec96819a
+          git -C "$tooling" checkout --detach FETCH_HEAD
+          bun "$tooling/src/entry.ts" findings --all --json > .artifacts/coding-tooling/findings-all.json
+          bun -e '
+            const report = await Bun.file(".artifacts/coding-tooling/findings-all.json").json();
+            const finding = report.data.findings.find(
+              (candidate) => candidate.expectationId === "typescript-source-test" && candidate.subject?.key === "src/token-metadata.ts",
+            );
+            if (!finding) throw new Error("token metadata finding is not inspectable under --all");
+            if (finding.disposition !== "verified") throw new Error(`unexpected disposition: ${finding.disposition}`);
+            const evidence = finding.verificationEvidence;
+            if (evidence?.id !== "VERIFY-TOKENS" || evidence?.version !== 1) {
+              throw new Error("verification evidence identity/version was not preserved");
+            }
+            if (JSON.stringify(evidence.command) !== JSON.stringify(["bun", "run", "verify:tokens"])) {
+              throw new Error("verification command was not preserved exactly");
+            }
+            const reconciliation = report.data.reconciliation;
+            for (const key of ["staleVerifications", "invalidVerifications", "duplicateVerifications"]) {
+              if ((reconciliation[key] ?? []).length !== 0) throw new Error(`${key} is not clean`);
+            }
+          '
