@@ -1,3 +1,5 @@
+import { mkdir, writeFile } from "node:fs/promises";
+
 import { expect, test, type CDPSession, type Page } from "@playwright/test";
 
 type BrowserMetrics = {
@@ -45,22 +47,24 @@ test.describe("style performance", () => {
         }
 
         const metrics = subtractBrowserMetrics(await readBrowserMetrics(session), before);
+        const result = {
+          theme,
+          interactions: 24,
+          metrics,
+          budgets: {
+            layoutDuration: MAX_LAYOUT_SECONDS,
+            recalcStyleDuration: MAX_RECALC_STYLE_SECONDS,
+            taskDuration: MAX_TASK_SECONDS,
+          },
+        };
+        const resultJson = JSON.stringify(result, null, 2);
+
+        await mkdir("performance-results/style-performance", { recursive: true });
+        await writeFile(`performance-results/style-performance/${theme}.json`, resultJson);
+        console.log(`[style-performance] ${JSON.stringify(result)}`);
 
         await testInfo.attach(`${theme}-style-performance.json`, {
-          body: JSON.stringify(
-            {
-              theme,
-              interactions: 24,
-              metrics,
-              budgets: {
-                layoutDuration: MAX_LAYOUT_SECONDS,
-                recalcStyleDuration: MAX_RECALC_STYLE_SECONDS,
-                taskDuration: MAX_TASK_SECONDS,
-              },
-            },
-            null,
-            2,
-          ),
+          body: resultJson,
           contentType: "application/json",
         });
 
