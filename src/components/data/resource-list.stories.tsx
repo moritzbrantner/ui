@@ -1,10 +1,66 @@
+import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { DownloadIcon, PlusIcon, RefreshCwIcon } from "lucide-react";
 import { expect, fn } from "storybook/test";
 
 import { Button } from "../stable/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../stable/table";
-import { ResourceList, ResourceListResetButton } from "./resource-list";
+import {
+  ReorderableItem,
+  ReorderableList,
+  ReorderHandle,
+  ResourceList,
+  ResourceListResetButton,
+  type ReorderChange,
+} from "./resource-list";
+
+const reorderableReleaseItems = [
+  { id: "contract", label: "Package contract" },
+  { id: "storybook", label: "Storybook review" },
+  { id: "release", label: "Release verification" },
+];
+
+function ReorderableResourceListDemo() {
+  const [items, setItems] = React.useState(reorderableReleaseItems);
+
+  function handleReorder(change: ReorderChange) {
+    setItems((currentItems) => {
+      const nextItems = [...currentItems];
+      const [movedItem] = nextItems.splice(change.fromIndex, 1);
+
+      if (!movedItem) {
+        return currentItems;
+      }
+
+      nextItems.splice(change.toIndex, 0, movedItem);
+      return nextItems;
+    });
+  }
+
+  return (
+    <ResourceList
+      title="Release order"
+      description="ResourceList can host reorderable content without owning its state or persistence."
+      toolbar={<span className="text-xs text-muted-foreground">Drag or use the keyboard</span>}
+    >
+      <ReorderableList aria-label="Release order" className="gap-1 p-2" onReorder={handleReorder}>
+        {items.map((item, index) => (
+          <ReorderableItem
+            key={item.id}
+            id={item.id}
+            index={index}
+            className="border-0 shadow-none"
+          >
+            <div className="flex min-h-12 items-center gap-2 rounded-md px-2 py-1 hover:bg-muted/60">
+              <ReorderHandle aria-label={`Move ${item.label}`} />
+              <span className="min-w-0 flex-1 text-sm font-medium">{item.label}</span>
+            </div>
+          </ReorderableItem>
+        ))}
+      </ReorderableList>
+    </ResourceList>
+  );
+}
 
 const meta = {
   title: "Components/Data Display/Resource List",
@@ -80,6 +136,14 @@ export const WithSelection: Story = {
     await expect(canvas.getByText("2 of 8 selected")).toBeVisible();
     await userEvent.click(canvas.getByRole("button", { name: "Clear selection" }));
     await expect(args.onClearSelection).toHaveBeenCalled();
+  },
+};
+
+export const ReorderableContent: Story = {
+  render: () => <ReorderableResourceListDemo />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("list", { name: "Release order" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Move Package contract" })).toBeVisible();
   },
 };
 
