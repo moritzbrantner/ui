@@ -38,16 +38,10 @@ describe("editor workbench pattern", () => {
 
   test("matches portable Mod shortcuts on either platform modifier", () => {
     expect(
-      matchesEditorShortcut(
-        new KeyboardEvent("keydown", { key: "k", ctrlKey: true }),
-        "Mod+K",
-      ),
+      matchesEditorShortcut(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }), "Mod+K"),
     ).toBe(true);
     expect(
-      matchesEditorShortcut(
-        new KeyboardEvent("keydown", { key: "k", metaKey: true }),
-        "Mod+K",
-      ),
+      matchesEditorShortcut(new KeyboardEvent("keydown", { key: "k", metaKey: true }), "Mod+K"),
     ).toBe(true);
   });
 
