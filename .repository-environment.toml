@@ -16,4 +16,3 @@ commands = ["bun install --frozen-lockfile"]
 paths = ["~/.bun/install/cache"]
 
 [compatibility_holds]
-
