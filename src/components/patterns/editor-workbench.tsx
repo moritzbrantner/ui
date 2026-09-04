@@ -248,8 +248,7 @@ function createEditorCommandPaletteGroups(
       label: command.groupLabel ?? (groupId === "commands" ? "Commands" : groupId),
       actions: [],
     };
-    const { groupId: _groupId, groupLabel: _groupLabel, ...action } = command;
-    group.actions.push({ ...action, shortcut: command.shortcut });
+    group.actions.push(command);
     groups.set(groupId, group);
   }
 
@@ -297,8 +296,8 @@ function matchesEditorShortcut(event: KeyboardEvent, shortcut: string): boolean 
   if (modifiers.has("mod") !== mod) return false;
   if (modifiers.has("ctrl") !== event.ctrlKey && !modifiers.has("mod")) return false;
   if (modifiers.has("meta") !== event.metaKey && !modifiers.has("mod")) return false;
-  if (modifiers.has("alt") !== event.altKey) return false;
-  if (modifiers.has("shift") !== event.shiftKey) return false;
+  if (modifiers.has("alt") ? !event.altKey : event.altKey) return false;
+  if (modifiers.has("shift") ? !event.shiftKey : event.shiftKey) return false;
 
   return event.key.toLowerCase() === key;
 }
