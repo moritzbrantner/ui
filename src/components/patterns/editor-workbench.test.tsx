@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import {
@@ -54,8 +54,9 @@ describe("editor workbench pattern", () => {
   test("selection summary is an accessible live status", () => {
     render(<EditorSelectionSummary>3 nodes selected</EditorSelectionSummary>);
 
-    expect(screen.getByRole("status")).toHaveTextContent("3 nodes selected");
-    expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
+    const status = screen.getByRole("status");
+    expect(status.textContent).toBe("3 nodes selected");
+    expect(status.getAttribute("aria-live")).toBe("polite");
   });
 
   test("inspector exposes a named complementary surface", () => {
@@ -65,7 +66,8 @@ describe("editor workbench pattern", () => {
       </EditorInspectorPanel>,
     );
 
-    expect(screen.getByRole("complementary", { name: "Properties" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+    const inspector = screen.getByRole("complementary", { name: "Properties" });
+    expect(inspector.getAttribute("data-slot")).toBe("editor-inspector");
+    expect(screen.getByRole("button", { name: "Reset" }).textContent).toBe("Reset");
   });
 });
