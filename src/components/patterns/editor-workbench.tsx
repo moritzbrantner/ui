@@ -8,11 +8,7 @@ import {
   type CommandPaletteAction,
   type CommandPaletteGroup,
 } from "./command-palette";
-import {
-  ShortcutHelpDialog,
-  type ShortcutHelpGroup,
-  type ShortcutHelpItem,
-} from "./shortcut-help";
+import { ShortcutHelpDialog, type ShortcutHelpGroup, type ShortcutHelpItem } from "./shortcut-help";
 import { WorkbenchLayout, type WorkbenchLayoutProps } from "./workbench-layout";
 
 export type EditorWorkbenchCommand = Omit<CommandPaletteAction, "shortcut"> & {
@@ -75,12 +71,10 @@ function EditorWorkbench({
   children,
   ...layoutProps
 }: EditorWorkbenchProps) {
-  const [internalCommandPaletteOpen, setInternalCommandPaletteOpen] = React.useState(
-    defaultCommandPaletteOpen,
-  );
-  const [internalShortcutHelpOpen, setInternalShortcutHelpOpen] = React.useState(
-    defaultShortcutHelpOpen,
-  );
+  const [internalCommandPaletteOpen, setInternalCommandPaletteOpen] =
+    React.useState(defaultCommandPaletteOpen);
+  const [internalShortcutHelpOpen, setInternalShortcutHelpOpen] =
+    React.useState(defaultShortcutHelpOpen);
   const resolvedCommandPaletteOpen = commandPaletteOpen ?? internalCommandPaletteOpen;
   const resolvedShortcutHelpOpen = shortcutHelpOpen ?? internalShortcutHelpOpen;
   const commandGroups = React.useMemo(() => createEditorCommandPaletteGroups(commands), [commands]);
@@ -153,14 +147,15 @@ function EditorWorkbench({
     shortcutHelpShortcut,
   ]);
 
-  const resolvedToolbar = toolbar || selectionSummary ? (
-    <>
-      {toolbar}
-      {selectionSummary ? (
-        <EditorSelectionSummary className="ml-auto">{selectionSummary}</EditorSelectionSummary>
-      ) : null}
-    </>
-  ) : undefined;
+  const resolvedToolbar =
+    toolbar || selectionSummary ? (
+      <>
+        {toolbar}
+        {selectionSummary ? (
+          <EditorSelectionSummary className="ml-auto">{selectionSummary}</EditorSelectionSummary>
+        ) : null}
+      </>
+    ) : undefined;
 
   return (
     <>
@@ -261,7 +256,9 @@ function createEditorCommandPaletteGroups(
   return [...groups].map(([id, group]) => ({ id, ...group }));
 }
 
-function createEditorShortcutGroups(commands: readonly EditorWorkbenchCommand[]): ShortcutHelpGroup[] {
+function createEditorShortcutGroups(
+  commands: readonly EditorWorkbenchCommand[],
+): ShortcutHelpGroup[] {
   const groups = new Map<string, { label: React.ReactNode; shortcuts: ShortcutHelpItem[] }>();
 
   for (const command of commands) {
