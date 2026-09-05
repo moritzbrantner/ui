@@ -25,3 +25,21 @@ The source scaffold deliberately leaves `TODO(GEN-GAP:semantic-root)`. The gener
 Generator postconditions run formatting and type checking. Full `lint` is intentionally not a generation postcondition: the repository's design-system verification requires a `componentRegistry` entry for every public component, and registry status, rationale, and meaningful test coverage are semantic maintenance decisions that the generator must not invent. After resolving the component's semantics, add the appropriate `componentRegistry` metadata, update generated documentation with `bun run generate:components`, and run the normal repository validation.
 
 Shadcn source-registry promotion is a separate lifecycle decision and is not performed by this generator.
+
+## `ui-component-test`
+
+`ui-component-test` stages a separate behavioral test only after an implementing agent has decided that an existing public component has meaningful user-observable behavior worth testing:
+
+```sh
+coding-tooling generate ui-component-test \
+  --input name=StatusBadge \
+  --input tier=stable
+```
+
+The generator accepts the same closed public tier set as `ui-component`. Before writing anything, an exact `file` prerequisite requires `src/components/<tier>/<name>.tsx` to exist. A missing source therefore fails structurally without creating an orphan test.
+
+The generated `.test.tsx` intentionally contains a Vitest `test.todo` with `TODO(GEN-GAP:test-behavior)`. It does not invent an assertion, interaction, snapshot, or product behavior merely to make a test file exist. The implementing agent should replace that gap with meaningful React Testing Library/user-observable tests when the component contract warrants them.
+
+Storybook remains the baseline render/a11y smoke surface. This generator is for additional behavioral/unit evidence, not a requirement that every component receive a dedicated `.test.tsx`.
+
+Generation is idempotent when the exact scaffold already exists and conflicts rather than overwriting different existing test content. Its focused postconditions run formatting, type checking, and the unit-test suite.
