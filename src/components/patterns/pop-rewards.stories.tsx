@@ -213,6 +213,7 @@ const meta = {
   title: "Design System/Motion/Pop Rewards",
   component: PopRewardPlayground,
   tags: ["autodocs", "test"],
+  globals: { designSystem: "pop" },
   parameters: {
     layout: "centered",
     docs: {
