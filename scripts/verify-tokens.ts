@@ -50,7 +50,7 @@ const requiredPublicDarkTokens = uiTokenMetadata
   .filter((token) => token.category === "color" || token.name.startsWith("--glass-"))
   .map((token) => token.name);
 const tokenBackedComponents = [
-  ["src/components/stable/button.tsx", "--ui-button-height-md"],
+  ["src/lib/button-variants.ts", "--ui-button-height-md"],
   ["src/components/stable/input.tsx", "--ui-input-height"],
   ["src/components/stable/card.tsx", "--ui-card-radius"],
   ["src/components/stable/select.tsx", "--ui-input-height"],
