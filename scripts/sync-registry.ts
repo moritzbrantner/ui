@@ -216,10 +216,7 @@ function toRegistrySource(
   let result = source.replaceAll('from "../../lib/cn"', 'from "@/registry/default/lib/cn"');
 
   if (result.includes('from "../../lib/button-variants"')) {
-    const variantSource = readFileSync(
-      path.join(packageRoot, "src/lib/button-variants.ts"),
-      "utf8",
-    )
+    const variantSource = readFileSync(path.join(packageRoot, "src/lib/button-variants.ts"), "utf8")
       .replace('import { cva } from "class-variance-authority";\n\n', "")
       .replace(/\nexport \{ buttonVariants \};\n?$/, "");
 
