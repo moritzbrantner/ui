@@ -215,9 +215,9 @@ function toRegistrySource(
 ): string {
   let result = source.replaceAll('from "../../lib/cn"', 'from "@/registry/default/lib/cn"');
 
-  if (result.includes('from "./button-variants"')) {
+  if (result.includes('from "../../lib/button-variants"')) {
     const variantSource = readFileSync(
-      path.join(packageRoot, "src/components/stable/button-variants.ts"),
+      path.join(packageRoot, "src/lib/button-variants.ts"),
       "utf8",
     )
       .replace('import { cva } from "class-variance-authority";\n\n', "")
@@ -228,7 +228,7 @@ function toRegistrySource(
         'import { type VariantProps } from "class-variance-authority";',
         'import { cva, type VariantProps } from "class-variance-authority";',
       )
-      .replace('import { buttonVariants } from "./button-variants";', variantSource);
+      .replace('import { buttonVariants } from "../../lib/button-variants";', variantSource);
   }
 
   for (const [from, to] of replacements) {
