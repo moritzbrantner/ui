@@ -50,7 +50,7 @@ const requiredPublicDarkTokens = uiTokenMetadata
   .filter((token) => token.category === "color" || token.name.startsWith("--glass-"))
   .map((token) => token.name);
 const tokenBackedComponents = [
-  ["src/lib/button-variants.ts", "--ui-button-height-md"],
+  ["src/components/stable/button-variants.ts", "--ui-button-height-md"],
   ["src/components/stable/input.tsx", "--ui-input-height"],
   ["src/components/stable/card.tsx", "--ui-card-radius"],
   ["src/components/stable/select.tsx", "--ui-input-height"],
@@ -172,7 +172,7 @@ function readTokens(filePath: string): { root: Set<string>; dark: Set<string> } 
 }
 
 function extractBlock(source: string, selector: string): string {
-  const selectorMatch = new RegExp(`(^|\\n)\\s*${escapeRegExp(selector)}\\s*\\{`, "m").exec(source);
+  const selectorMatch = new RegExp(`(^|\n)\s*${escapeRegExp(selector)}\s*\{`, "m").exec(source);
 
   if (!selectorMatch || selectorMatch.index === undefined) {
     return "";
@@ -498,11 +498,11 @@ function expectTokenValue(
 }
 
 function readTokenValue(source: string, tokenName: string): string | undefined {
-  const match = new RegExp(`${escapeRegExp(tokenName)}\\s*:\\s*([^;]+);`).exec(source);
+  const match = new RegExp(`${escapeRegExp(tokenName)}\s*:\s*([^;]+);`).exec(source);
 
   return match?.[1]?.trim();
 }
 
 function hasCssImport(source: string, importPath: string) {
-  return new RegExp(`^\\s*@import\\s+["']${escapeRegExp(importPath)}["'];?\\s*$`, "m").test(source);
+  return new RegExp(`^\s*@import\s+["']${escapeRegExp(importPath)}["'];?\s*$`, "m").test(source);
 }

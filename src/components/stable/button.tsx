@@ -4,7 +4,7 @@ import * as React from "react";
 import { type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 import { cn } from "../../lib/cn";
-import { buttonVariants } from "../../lib/button-variants";
+import { buttonVariants } from "./button-variants";
 
 type SharedProps = VariantProps<typeof buttonVariants> & {
   className?: string;
