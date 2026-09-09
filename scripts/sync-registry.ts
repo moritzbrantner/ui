@@ -221,14 +221,15 @@ function toRegistrySource(
       "utf8",
     )
       .replace('import { cva } from "class-variance-authority";\n\n', "")
-      .replace(/\nexport \{ buttonVariants \};\n?$/, "");
+      .replace(/\nexport \{ buttonVariants \};\n?$/, "")
+      .trim();
 
     result = result
       .replace(
         'import { type VariantProps } from "class-variance-authority";',
         'import { cva, type VariantProps } from "class-variance-authority";',
       )
-      .replace('import { buttonVariants } from "./button-variants";', variantSource);
+      .replace('import { buttonVariants } from "./button-variants";', `\n${variantSource}`);
   }
 
   for (const [from, to] of replacements) {
