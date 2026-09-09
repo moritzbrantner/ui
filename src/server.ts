@@ -1,3 +1,4 @@
+export { buttonVariants } from "./components/stable/button-variants";
 export { cn } from "./lib/cn";
 export {
   atlasTheme,
