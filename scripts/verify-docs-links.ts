@@ -49,6 +49,7 @@ console.log("@moritzbrantner/ui docs links verified");
 
 function listMarkdownFiles(directory: string): string[] {
   const ignored = new Set([
+    ".conventions",
     "node_modules",
     "dist",
     "coverage",
