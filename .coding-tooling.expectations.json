@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "verifications": [
+    {
+      "id": "VERIFY-TOKENS",
+      "version": 1,
+      "expectation": "typescript-source-test",
+      "subject": "src/token-metadata.ts",
+      "command": ["bun", "run", "verify:tokens"],
+      "reason": "Token metadata is checked by the repository-owned token verifier."
+    },
+    {
+      "id": "VERIFY-CONSUMER",
+      "version": 1,
+      "expectation": "package-test-capability",
+      "subject": "examples/consumer",
+      "command": ["bun", "run", "verify:consumer"],
+      "reason": "The consumer fixture is exercised by the repository-owned package, import-topology, typecheck, build, and bundle-budget verifier."
+    }
+  ]
+}
