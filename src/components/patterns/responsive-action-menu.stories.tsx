@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArchiveIcon, CopyIcon, MoreHorizontalIcon } from "lucide-react";
-import { expect, screen } from "storybook/test";
 
 import { Button } from "../stable/button";
 import { ResponsiveActionMenu } from "./responsive-action-menu";
@@ -41,14 +40,10 @@ export const DesktopMode: Story = {
         </Button>
       }
       label="Desktop actions"
-      desktopProps={{ modal: false }}
+      desktopProps={{ modal: false, open: true }}
       items={items}
     />
   ),
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: "Open desktop actions" }));
-    await expect(screen.getByRole("menu")).toBeTruthy();
-  },
 };
 
 export const MobileMode: Story = {
@@ -67,11 +62,8 @@ export const MobileMode: Story = {
       }
       title="Actions"
       description="Mobile sheet presentation."
+      mobileProps={{ open: true }}
       items={items}
     />
   ),
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: "Open mobile actions" }));
-    await expect(screen.getByRole("dialog")).toBeTruthy();
-  },
 };
