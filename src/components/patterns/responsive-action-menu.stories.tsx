@@ -40,7 +40,7 @@ export const DesktopMode: Story = {
         </Button>
       }
       label="Desktop actions"
-      desktopProps={{ modal: false, open: true }}
+      desktopProps={{ modal: false, defaultOpen: true }}
       items={items}
     />
   ),
@@ -62,7 +62,7 @@ export const MobileMode: Story = {
       }
       title="Actions"
       description="Mobile sheet presentation."
-      mobileProps={{ open: true }}
+      mobileProps={{ defaultOpen: true }}
       items={items}
     />
   ),
