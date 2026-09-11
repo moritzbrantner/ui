@@ -85,6 +85,5 @@ jobs:
         unlighthouse-report
         .unlighthouse
         benchmark-results
-        performance-results
     secrets:
       GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
