@@ -24,21 +24,53 @@ jobs:
       format_command: bun run format:check
       lint_command: bun run lint
       typecheck_command: bun run check-types
-      build_command: bun run build
       unit_test_command: bun run test:unit
       timeout_minutes: 30
     secrets:
       GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
-  integration-validation:
-    name: Integration Validation
+  build-package:
+    name: Build or reuse package
+    needs: fast-validation
     permissions:
+      actions: read
       contents: read
       packages: read
-    uses: moritzbrantner/reusable-workflows/.github/workflows/integration-validation.yml@workflow-standard-v1.2
+    uses: moritzbrantner/reusable-workflows/.github/workflows/build-artifact.yml@544af51c921b09b4452b7346347ec9effa58f179
     with:
+      source_sha: ${{ github.event.pull_request.head.sha || github.sha }}
+      artifact_key: ui-package-v1
+      node_version: "24"
+      bun_version: 1.3.14
+      cache_bun: true
+      bun_cache_dependency_path: bun.lock
+      setup_command: bun install --frozen-lockfile
+      build_command: bun run build
+      artifact_paths: dist
+      reuse_across_runs: true
+      artifact_retention_days: 7
+    secrets:
+      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+
+  integration-validation:
+    name: Integration Validation
+    needs: build-package
+    permissions:
+      actions: read
+      contents: read
+      packages: read
+    uses: moritzbrantner/reusable-workflows/.github/workflows/integration-validation.yml@544af51c921b09b4452b7346347ec9effa58f179
+    with:
+      prebuilt_artifact_run_id: ${{ needs.build-package.outputs.producer_run_id }}
+      prebuilt_artifact_receipt_name: ${{ needs.build-package.outputs.receipt_artifact_name }}
+      prebuilt_artifact_name: ${{ needs.build-package.outputs.artifact_name }}
+      prebuilt_artifact_digest: ${{ needs.build-package.outputs.artifact_digest }}
+      prebuilt_source_sha: ${{ needs.build-package.outputs.source_sha }}
+      prebuilt_artifact_key: ${{ needs.build-package.outputs.artifact_key }}
+      prebuilt_identity_digest: ${{ needs.build-package.outputs.identity_digest }}
+      prebuilt_artifact_destination: dist
       integration_command: bun run test:coverage
-      package_check_command: bun run build && bun run test:package && bun run verify:consumer && bun run pack:dry
+      package_check_command: bun run test:package && bun run verify:consumer && bun run pack:dry
       timeout_minutes: 45
     secrets:
       GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
@@ -67,7 +99,7 @@ jobs:
   performance-validation:
     name: Performance Validation
     needs:
-      - fast-validation
+      - build-package
       - integration-validation
       - storybook-validation
     permissions:
