@@ -253,6 +253,7 @@
     "test:coverage": "bun ./scripts/run-coverage.ts",
     "test:package": "bun ./scripts/verify-package.ts",
     "test:storybook": "vitest --config vitest.storybook.config.ts --project=storybook --run",
+    "test:style-performance": "playwright test --config playwright.visual.config.ts visual/style-performance.spec.ts",
     "test:unit": "vitest run src",
     "test:unit:report": "vitest run src --reporter=default --reporter=json --outputFile=benchmark-results/unit-tests.json",
     "test:unlighthouse": "bun run build-storybook && bun ./scripts/run-unlighthouse.ts",
