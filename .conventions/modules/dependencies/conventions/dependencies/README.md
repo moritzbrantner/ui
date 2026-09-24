@@ -12,12 +12,12 @@
 - Put version bumps, changelogs, tags, registry publication, and registry-only consumer updates in a dedicated release change.
 - Do not treat a missing published version as a feature blocker when an exact source dependency can prove the change.
 
-## DEP-003 — Bound cross-repository task expansion
+## DEP-003 — Bound cross-repository task expansion by ownership
 
-- A normal implementation task may modify the target repository and at most two upstream repositories unless broader migration scope is explicitly authorized.
-- Treat this as an execution-scope budget, not as a limit on how many independently versioned capabilities an application may consume.
-- If implementation requires changing a wider source graph, stop recursively expanding the task and treat the boundary as explicit architecture or migration work.
-- Do not recursively repair or release unrelated transitive packages merely because they appear in the dependency graph.
+- A normal implementation task may cross repository boundaries when each changed repository owns a necessary part of the same capability or contract.
+- Keep the changed source graph as small as the architecture permits and make each repository's responsibility independently explainable and verifiable.
+- If implementation starts recursively pulling in unrelated transitive repositories, release work, or opportunistic cleanup, stop the expansion and treat the newly discovered boundary as separate architecture, migration, or follow-up work.
+- Do not impose an arbitrary repository-count limit when a coherent change genuinely spans more owners, and do not use a broad task as permission to repair unrelated dependencies.
 
 ## DEP-004 — Require a reason for a new independently versioned package
 
@@ -106,3 +106,12 @@
 - Use managed snapshots when copied policy, configuration, or generated distribution material remains upstream-owned and consumers should not edit the installed snapshot directly.
 - Keep source-copy registries lightweight. Do not grow them into replacement package managers with general version solving, broad transitive dependency semantics, or automatic semantic conflict merging.
 - Content fingerprints prove source identity and drift, not runtime or API compatibility; consumer tests, type checks, and benchmarks remain the compatibility gate.
+
+## DEP-017 — Prove dependency ranges as a clean consumer
+
+- Treat the repository's locked development graph, the minimum compatibility point declared by peer ranges, and a fresh registry resolution as three different pieces of evidence.
+- Consumer verification for a deterministic compatibility point installs exact versions derived from the package's declared contract rather than floating caret, tilde, or inequality ranges that change meaning over time.
+- For publishable packages, use a clean consumer and the real package-manager resolver to prove both the deterministic minimum compatibility point and the current fresh-range resolution before release or distribution integration.
+- Do not use `--force`, `--legacy-peer-deps`, or equivalent resolver bypasses as proof that a full consumer dependency graph is valid.
+- Registry or network unavailability is an unavailable result, never a passing compatibility result and never evidence that repository code is defective.
+- A locked repository graph passing while a clean consumer fails is an explicit distribution-contract finding; repair the verifier or declared peer contract according to the failing boundary instead of weakening resolution.
