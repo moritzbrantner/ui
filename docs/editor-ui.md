@@ -98,16 +98,15 @@ Generic shared inspector APIs must remain state-light and controlled.
 
 ## Control Selection
 
-| Need                                                              | Default                                                               |
-| ----------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Exact numeric edit                                                | Editable numeric input; use a shared precision control once available |
-| Angle                                                             | `AngleInput`                                                          |
-| Fast approximate adjustment with meaningful exact value           | Direct control plus editable numeric input                             |
-| Purely perceptual or intentionally approximate bounded adjustment | Slider may be sufficient                                              |
-| Resizable editor regions                                          | Existing resizable/workbench primitives                               |
-| Selection properties                                              | Controlled inspector/property composition                             |
-| Commands                                                          | Visible action plus command/shortcut discovery                         |
-| Mobile/touch                                                      | Touch-capable equivalent that preserves the edit and exact-value path  |
+- Exact numeric edit: editable numeric input; use a shared precision control once available.
+- Angle: `AngleInput`.
+- Fast approximate adjustment with a meaningful exact value: direct control plus editable numeric
+  input.
+- Purely perceptual or intentionally approximate bounded adjustment: a slider may be sufficient.
+- Resizable editor regions: existing resizable/workbench primitives.
+- Selection properties: controlled inspector/property composition.
+- Commands: visible action plus command/shortcut discovery.
+- Mobile/touch: a touch-capable equivalent that preserves the edit and exact-value path.
 
 Do not introduce a slider merely because a value is numeric. Choose a slider only when continuous approximate manipulation is itself the intended interaction.
 
