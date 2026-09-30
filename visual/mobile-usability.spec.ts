@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { expect, test, type Locator, type Page, type TestInfo } from "@playwright/test";
+import { errors, expect, test, type Locator, type Page, type TestInfo } from "@playwright/test";
 
 import {
   componentRegistry,
@@ -99,6 +99,53 @@ for (const component of auditedComponents) {
     expect(componentFindings, formatFindingSummary(componentFindings)).toEqual([]);
   });
 }
+
+const focusAuditFixture: MobileUsabilityStory = {
+  componentName: "focus-audit-fixture",
+  tier: "stable",
+  storyId: "focus-audit-fixture",
+  storyTitle: "Focus audit fixture",
+  storyName: "Focus audit fixture",
+  importPath: "visual/mobile-usability.spec.ts",
+};
+
+test("waits for keyboard focus motion to settle inside the viewport", async ({ page }) => {
+  await page.setContent(
+    '<button style="position:fixed;top:0;left:0;width:80px;height:40px;transform:translateY(-4px);transition:transform 150ms linear">Focus target</button>',
+  );
+  await page.getByRole("button").evaluate((button) => {
+    button.addEventListener("focus", () => {
+      button.style.transform = "none";
+    });
+  });
+  const findings: MobileUsabilityFinding[] = [];
+  await verifyKeyboardFocus(page, focusAuditFixture, findings);
+  expect(findings).toEqual([]);
+});
+
+test("reports keyboard focus that remains clipped outside the viewport", async ({ page }) => {
+  await page.setContent(
+    '<button style="position:fixed;top:-4px;left:0;width:80px;height:40px">Focus target</button>',
+  );
+  const findings: MobileUsabilityFinding[] = [];
+  await verifyKeyboardFocus(page, focusAuditFixture, findings);
+  expect(findings).toHaveLength(1);
+  expect(findings[0]?.category).toBe("keyboard-focus");
+});
+
+test("propagates unexpected keyboard focus measurement failures", async ({ page }) => {
+  await page.setContent("<button>Focus target</button>");
+  await page.getByRole("button").evaluate((button) => {
+    button.getBoundingClientRect = () => {
+      throw new Error("focus measurement failed");
+    };
+  });
+  const findings: MobileUsabilityFinding[] = [];
+  await expect(verifyKeyboardFocus(page, focusAuditFixture, findings)).rejects.toThrow(
+    "focus measurement failed",
+  );
+  expect(findings).toEqual([]);
+});
 
 function formatComponentAuditTitle(component: ComponentRegistryEntry) {
   return component.name === "popover" ? "floating overlay" : component.name;
@@ -967,53 +1014,17 @@ async function verifyKeyboardFocus(
   for (let attempt = 0; attempt < 4; attempt += 1) {
     await page.keyboard.press("Tab");
 
-    const focusState = await page.evaluate(() => {
-      const element = document.activeElement;
-      const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
-      const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
-
-      if (!(element instanceof HTMLElement) || element === document.body) {
-        return {
-          isBody: true,
-          isRadixFocusGuard: false,
-          isVisible: true,
-          inViewport: true,
-          debug: "body",
-        };
+    try {
+      await page.waitForFunction(readKeyboardFocusState, true, { timeout: 1_000 });
+    } catch (error) {
+      if (!(error instanceof errors.TimeoutError)) {
+        throw error;
       }
-
-      const box = element.getBoundingClientRect();
-      const style = window.getComputedStyle(element);
-      const isVisible =
-        box.width > 0 &&
-        box.height > 0 &&
-        style.display !== "none" &&
-        style.visibility !== "hidden";
-
-      return {
-        isBody: false,
-        isRadixFocusGuard: element.matches("[data-radix-focus-guard]"),
-        isVisible,
-        inViewport:
-          box.left >= -1 &&
-          box.top >= -1 &&
-          box.right <= viewportWidth + 1 &&
-          box.bottom <= viewportHeight + 1,
-        debug: JSON.stringify({
-          tag: element.tagName.toLowerCase(),
-          role: element.getAttribute("role"),
-          dataSlot: element.getAttribute("data-slot"),
-          ariaLabel: element.getAttribute("aria-label"),
-          tabindex: element.getAttribute("tabindex"),
-          box: {
-            x: Math.round(box.x),
-            y: Math.round(box.y),
-            width: Math.round(box.width),
-            height: Math.round(box.height),
-          },
-        }),
-      };
-    });
+    }
+    const focusState = await page.evaluate(readKeyboardFocusState, false);
+    if (!focusState) {
+      throw new Error("Keyboard focus measurement is unavailable.");
+    }
 
     lastDebug = focusState.debug;
 
@@ -1042,6 +1053,54 @@ async function verifyKeyboardFocus(
       `Keyboard focus did not leave Radix focus guards after 4 tabs: ${lastDebug}.`,
     ),
   );
+}
+
+function readKeyboardFocusState(requireSettled: boolean = false) {
+  const element = document.activeElement;
+  const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+  const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+
+  if (!(element instanceof HTMLElement) || element === document.body) {
+    return {
+      isBody: true,
+      isRadixFocusGuard: false,
+      isVisible: true,
+      inViewport: true,
+      debug: "body",
+    };
+  }
+
+  const box = element.getBoundingClientRect();
+  const style = window.getComputedStyle(element);
+  const isVisible =
+    box.width > 0 && box.height > 0 && style.display !== "none" && style.visibility !== "hidden";
+
+  const state = {
+    isBody: false,
+    isRadixFocusGuard: element.matches("[data-radix-focus-guard]"),
+    isVisible,
+    inViewport:
+      box.left >= -1 &&
+      box.top >= -1 &&
+      box.right <= viewportWidth + 1 &&
+      box.bottom <= viewportHeight + 1,
+    debug: JSON.stringify({
+      tag: element.tagName.toLowerCase(),
+      role: element.getAttribute("role"),
+      dataSlot: element.getAttribute("data-slot"),
+      ariaLabel: element.getAttribute("aria-label"),
+      tabindex: element.getAttribute("tabindex"),
+      box: {
+        x: Math.round(box.x),
+        y: Math.round(box.y),
+        width: Math.round(box.width),
+        height: Math.round(box.height),
+      },
+    }),
+  };
+  return !requireSettled || state.isRadixFocusGuard || (state.isVisible && state.inViewport)
+    ? state
+    : false;
 }
 
 async function openActionMenu(page: Page, name: string, itemName: RegExp) {
