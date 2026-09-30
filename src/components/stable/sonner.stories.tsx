@@ -8,7 +8,13 @@ import { Toaster } from "./sonner";
 function ToastDemo() {
   return (
     <div className="grid gap-3">
-      <Button onClick={() => toast.success("Saved changes")}>Show toast</Button>
+      <Button
+        onClick={() =>
+          toast.success("Saved changes", { id: "toaster-story-feedback", duration: Infinity })
+        }
+      >
+        Show toast
+      </Button>
       <Toaster theme="light" />
     </div>
   );

@@ -228,6 +228,21 @@ test("keeps collaboration overlays pointer-transparent and positions remote geom
   expect(selectionBox.height).toBeCloseTo(72, 0);
 });
 
+test("keeps toaster feedback stable throughout a delayed layout audit", async ({ page }) => {
+  await page.clock.install();
+  await gotoStory(page, "components-feedback-toaster--usage", {
+    designSystem: "bobba",
+    theme: "dark",
+  });
+  const feedback = page.getByText("Saved changes", { exact: true });
+  await expect(feedback).toBeVisible();
+  await page.clock.runFor(15_000);
+  await expect(feedback).toBeVisible();
+  await page.getByRole("button", { name: "Show toast" }).click();
+  await expect(feedback).toHaveCount(1);
+  await verifyPageLayout(page, "components-feedback-toaster--usage");
+});
+
 const popMotionTestDetails = { tag: "@pop-motion" } as const;
 const pulseMotionTestDetails = { tag: "@pulse-motion" } as const;
 
