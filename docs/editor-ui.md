@@ -78,7 +78,7 @@ Use the existing shared workbench primitives instead of rebuilding static editor
 - `ResizablePanelGroup`, `ResizablePanel`, and `ResizableHandle` for resizable regions.
 - The Studio theme for creative production/editing surfaces unless another established theme better matches the product.
 
-Panel layout state is presentation state. A host may persist it, but it is not part of the edited document unless that product explicitly makes layout part of its domain.
+Panel layout state is presentation state. A consuming app may persist it, but it is not part of the edited document unless that product explicitly makes layout part of its domain.
 
 Future docking and tab APIs should extend this model rather than introduce a second editor-shell hierarchy.
 
