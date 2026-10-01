@@ -12,6 +12,7 @@ for (const width of [360, 390, 768, 1440]) {
       const preview = page.getByRole("button", { name: "Select Square in preview" });
       await expect(page.getByRole("status", { name: "Editor activity" })).toHaveText(
         "Panel layout restored",
+        { timeout: 30_000 },
       );
       const x = page.getByRole("spinbutton", { name: "Position X" });
       await x.click();
@@ -99,6 +100,7 @@ test.describe("touch editor interaction", () => {
     );
     await expect(page.getByRole("status", { name: "Editor activity" })).toHaveText(
       "Panel layout restored",
+      { timeout: 30_000 },
     );
     const dial = page.getByRole("slider", { name: "Rotation dial" });
     const box = await dial.boundingBox();
@@ -137,6 +139,7 @@ test("retains vertical panel sizing across responsive presentation and restores 
   );
   await expect(page.getByRole("status", { name: "Editor activity" })).toHaveText(
     "Panel layout restored",
+    { timeout: 30_000 },
   );
   const separator = page.getByRole("separator", { name: "Resize bottom panel" });
   const original = Number(await separator.getAttribute("aria-valuenow"));

@@ -1205,6 +1205,12 @@ async function gotoStory(
     `/iframe.html?id=${storyId}&globals=${encodeURIComponent(globalParam)}`,
   );
   await page.evaluate(() => document.fonts.ready);
+  if (storyId === "components-editors-editor-workbench--reference") {
+    await expect(page.getByRole("status", { name: "Editor activity" })).toHaveText(
+      "Panel layout restored",
+      { timeout: 30_000 },
+    );
+  }
   await openOverlayStory(page, storyId);
   await page.waitForTimeout(500);
 }
