@@ -7,6 +7,40 @@ import { describe, expect, test, vi } from "vitest";
 import { InspectorPanel } from "./inspector-panel";
 
 describe("Inspector numeric fields", () => {
+  test("keeps identical property IDs in separate inspectors independently labeled", async () => {
+    const user = userEvent.setup();
+    const fields = [
+      { id: "width", label: "Width", type: "number" as const, description: "Pixels" },
+    ];
+    render(
+      <>
+        <InspectorPanel
+          fields={fields}
+          values={{ width: 1 }}
+          validationMessages={{ width: "First error" }}
+        />
+        <InspectorPanel
+          fields={fields}
+          values={{ width: 2 }}
+          validationMessages={{ width: "Second error" }}
+        />
+      </>,
+    );
+    const inputs = screen.getAllByRole("spinbutton", { name: "Width" });
+    expect(inputs[0].id).not.toBe(inputs[1].id);
+    const labels = screen.getAllByText("Width");
+    await user.click(labels[1]);
+    expect(document.activeElement).toBe(inputs[1]);
+    for (const [index, input] of inputs.entries()) {
+      const descriptions = input.getAttribute("aria-describedby")?.split(" ") ?? [];
+      expect(descriptions.map((id) => document.getElementById(id)?.textContent)).toEqual([
+        "Pixels",
+        index === 0 ? "First error" : "Second error",
+      ]);
+      expect(input.getAttribute("aria-invalid")).toBe("true");
+    }
+  });
+
   test("does not convert cleared numeric fields to zero", async () => {
     const user = userEvent.setup();
     const onValuesChange = vi.fn();

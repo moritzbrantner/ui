@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CheckIcon, ChevronDownIcon, RotateCcwIcon } from "lucide-react";
+import { CheckIcon, RotateCcwIcon } from "lucide-react";
 
 import { cn } from "../../lib/cn";
 import { Badge } from "../stable/badge";
@@ -11,7 +11,8 @@ import { Input } from "../stable/input";
 import { NumericInput } from "../stable/numeric-input";
 import { ScrollArea } from "../stable/scroll-area";
 import { SelectDropdown } from "../stable/select";
-import { Separator } from "../stable/separator";
+import { FieldGroup } from "../stable/field";
+import { PropertyRow, PropertySection } from "../stable/property";
 import { Slider } from "../stable/slider";
 import { Textarea } from "../stable/textarea";
 
@@ -86,6 +87,8 @@ export type InspectorPanelSectionProps = React.ComponentProps<"section"> & {
   title: React.ReactNode;
   description?: React.ReactNode;
   defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export type InspectorFieldProps = React.ComponentProps<"div"> & {
@@ -237,46 +240,26 @@ function InspectorPanelSection({
   title,
   description,
   defaultOpen = true,
-  children,
-  className,
+  open,
+  onOpenChange,
   ...props
 }: InspectorPanelSectionProps) {
-  const [open, setOpen] = React.useState(defaultOpen);
-
   return (
-    <section
-      data-slot="inspector-panel-section"
-      data-open={open ? "true" : undefined}
-      className={cn("rounded-md border bg-background", className)}
+    <PropertySection
       {...props}
-    >
-      <button
-        type="button"
-        className="flex w-full items-center justify-between gap-2 p-3 text-left outline-none hover:bg-muted/40 focus-visible:ring-[3px] focus-visible:ring-ring/50"
-        aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
-      >
-        <span>
-          <span className="block text-sm font-medium">{title}</span>
-          {description ? (
-            <span className="block text-xs text-muted-foreground">{description}</span>
-          ) : null}
-        </span>
-        <ChevronDownIcon className={cn("size-4 transition-transform", open && "rotate-180")} />
-      </button>
-      {open ? (
-        <>
-          <Separator />
-          <div className="p-3">{children}</div>
-        </>
-      ) : null}
-    </section>
+      title={title}
+      description={description}
+      collapsible
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+    />
   );
 }
 
 function InspectorFieldGroup({ className, ...props }: InspectorFieldGroupProps) {
   return (
-    <div data-slot="inspector-field-group" className={cn("space-y-3", className)} {...props} />
+    <FieldGroup data-slot="inspector-field-group" className={cn("gap-3", className)} {...props} />
   );
 }
 
@@ -290,44 +273,52 @@ function InspectorField({
   ...props
 }: InspectorFieldProps) {
   const disabled = readOnly || field.readOnly;
+  const inputId = React.useId();
+  const descriptionId = field.description ? `${inputId}-description` : undefined;
+  const validationId = validationMessage ? `${inputId}-validation` : undefined;
+  const describedBy = [descriptionId, validationId].filter(Boolean).join(" ") || undefined;
 
   return (
-    <div data-slot="inspector-field" className={cn("space-y-1.5", className)} {...props}>
-      <label
-        className="block text-xs font-medium text-muted-foreground"
-        htmlFor={`inspector-${field.id}`}
-      >
-        {field.label}
-      </label>
+    <PropertyRow
+      {...props}
+      label={field.label}
+      htmlFor={field.type === "custom" ? undefined : inputId}
+      description={field.description}
+      descriptionId={descriptionId}
+      validationMessage={validationMessage}
+      validationId={validationId}
+      className={className}
+    >
       <InspectorFieldEditor
+        id={inputId}
+        describedBy={describedBy}
+        invalid={Boolean(validationMessage)}
         field={field}
         value={value}
         disabled={disabled}
         onValueChange={onValueChange}
       />
-      {field.description ? (
-        <div className="text-xs text-muted-foreground">{field.description}</div>
-      ) : null}
-      {validationMessage ? (
-        <div className="text-xs text-destructive">{validationMessage}</div>
-      ) : null}
-    </div>
+    </PropertyRow>
   );
 }
 
 function InspectorFieldEditor({
+  id,
+  describedBy,
+  invalid,
   field,
   value,
   disabled,
   onValueChange,
 }: {
+  id: string;
+  describedBy?: string;
+  invalid?: boolean;
   field: InspectorFieldDefinition;
   value?: InspectorFieldValue;
   disabled?: boolean;
   onValueChange?: (value: InspectorFieldValue) => void;
 }) {
-  const id = `inspector-${field.id}`;
-
   if (field.type === "custom") {
     return <>{field.render?.(value, (nextValue) => !disabled && onValueChange?.(nextValue))}</>;
   }
@@ -337,6 +328,8 @@ function InspectorFieldEditor({
       <label className="flex h-8 items-center gap-2 rounded-md border px-2 text-sm">
         <Checkbox
           id={id}
+          aria-describedby={describedBy}
+          aria-invalid={invalid || undefined}
           checked={Boolean(value)}
           disabled={disabled}
           onCheckedChange={(checked) => onValueChange?.(checked === true)}
@@ -350,6 +343,8 @@ function InspectorFieldEditor({
     return (
       <SelectDropdown
         id={id}
+        aria-describedby={describedBy}
+        aria-invalid={invalid || undefined}
         aria-label={field.label}
         value={String(value ?? "")}
         disabled={disabled}
@@ -368,7 +363,7 @@ function InspectorFieldEditor({
     return (
       <div className="flex items-center gap-3">
         <Slider
-          id={id}
+          id={`${id}-slider`}
           aria-label={field.label}
           value={[Number.isFinite(numericValue) ? numericValue : (field.min ?? 0)]}
           min={field.min ?? 0}
@@ -378,6 +373,9 @@ function InspectorFieldEditor({
           onValueChange={(values) => onValueChange?.(values[0] ?? field.min ?? 0)}
         />
         <NumericInput
+          id={id}
+          aria-describedby={describedBy}
+          aria-invalid={invalid || undefined}
           aria-label={`${field.label} value`}
           value={Number.isFinite(numericValue) ? numericValue : null}
           min={field.min ?? 0}
@@ -400,6 +398,8 @@ function InspectorFieldEditor({
       <div className="flex items-center gap-2">
         <Input
           id={id}
+          aria-describedby={describedBy}
+          aria-invalid={invalid || undefined}
           aria-label={field.label}
           type="color"
           value={String(value || "#000000")}
@@ -423,6 +423,8 @@ function InspectorFieldEditor({
     return (
       <Textarea
         id={id}
+        aria-describedby={describedBy}
+        aria-invalid={invalid || undefined}
         aria-label={field.label}
         value={String(value ?? "")}
         disabled={disabled}
@@ -437,6 +439,8 @@ function InspectorFieldEditor({
     return (
       <Textarea
         id={id}
+        aria-describedby={describedBy}
+        aria-invalid={invalid || undefined}
         aria-label={field.label}
         value={String(value ?? "")}
         disabled={disabled}
@@ -451,6 +455,8 @@ function InspectorFieldEditor({
     return (
       <NumericInput
         id={id}
+        aria-describedby={describedBy}
+        aria-invalid={invalid || undefined}
         aria-label={field.label}
         value={typeof value === "number" ? value : null}
         min={field.min}
@@ -470,6 +476,8 @@ function InspectorFieldEditor({
   return (
     <Input
       id={id}
+      aria-describedby={describedBy}
+      aria-invalid={invalid || undefined}
       aria-label={field.label}
       type="text"
       value={String(value ?? "")}

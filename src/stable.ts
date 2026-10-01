@@ -53,6 +53,7 @@ export * from "./components/stable/pagination";
 export * from "./components/stable/popover";
 export * from "./components/stable/process-map";
 export * from "./components/stable/progress";
+export * from "./components/stable/property";
 export * from "./components/stable/radio-group";
 export * from "./components/stable/relationship-map";
 export * from "./components/stable/resizable";

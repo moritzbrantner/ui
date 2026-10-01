@@ -80,7 +80,13 @@ Use the existing shared workbench primitives instead of rebuilding static editor
 
 Panel layout state is presentation state. A consuming app may persist it, but it is not part of the edited document unless that product explicitly makes layout part of its domain.
 
-Future docking and tab APIs should extend this model rather than introduce a second editor-shell hierarchy.
+`WorkbenchLayout` accepts a `docking` collection with stable panel IDs, labels, contents, and app-owned `positions` (`left`, `right`, or `bottom`). `onPositionsChange` requests a placement change; the accepted positions remain authoritative. Without this callback the placement selector is disabled. `activePanels` and `onActivePanelChange` optionally control the active tab in each dock. Moving a panel focuses its destination tab after the app accepts the placement.
+
+Use `horizontalGroup` and `verticalGroup` to supply the existing resizable engine's `defaultLayout`, `onLayoutChanged`, and `groupRef`. These are native percentage layouts, not a second persistence API. Supply a stable workbench `id` when persisting layouts; panel keys are `${id}-left`, `${id}-canvas`, `${id}-right`, `${id}-main`, and `${id}-bottom` for regions that are present. The app chooses storage, restores a compatible layout, and may use the native group handle to reset sizes.
+
+Below the shared 768px breakpoint, the workbench presents one vertical stack instead of mounting hidden desktop and mobile copies. Changing layouts or docks can remount panel contents: keep edited values in app-owned controlled state so they survive these presentation changes. A control's unfinished local draft is not document state.
+
+Use the existing `Toolbar`, `Command`, and `TreeView` primitives for domain-independent action, command discovery, and outliner presentation. Consumers provide commands, selection, object identities, and tree contents.
 
 ## Inspector And Property Model
 
@@ -95,6 +101,10 @@ The consuming editor owns:
 - multi-selection merge/conflict semantics.
 
 Generic shared inspector APIs must remain state-light and controlled.
+
+Use `PropertyRow` for a labeled control, optional description, and validation message. For a single input, pass its `id` as `htmlFor`; connect the control's `aria-describedby` to the row's supplied `descriptionId` and `validationId`, and set `aria-invalid` from app validation. Composite controls keep their own accessible coordinate labels. The row does not clone children or create property values.
+
+`PropertySection` provides a compact heading and content. Set `collapsible` for keyboard-operable disclosure; use `open`/`onOpenChange` for app-owned disclosure state or `defaultOpen` for local presentation state. The existing public Studio `InspectorPanel` and internal schema-based inspector reuse these sections rather than adding another inspector hierarchy.
 
 ## Control Selection
 

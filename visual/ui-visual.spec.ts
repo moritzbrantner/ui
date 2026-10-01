@@ -29,6 +29,8 @@ const storyIds = [
   "components-forms-inputs-numeric-input--default",
   "components-forms-inputs-vector-input--default",
   "components-forms-inputs-vector-input--three-axes",
+  "components-forms-inputs-property--default",
+  "components-layout-workbench-layout--docking",
   "components-forms-inputs-stepper--horizontal",
   "components-navigation-shortcut-help--dialog",
   "components-feedback-connection-status--states",

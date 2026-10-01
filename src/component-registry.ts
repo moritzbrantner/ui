@@ -617,6 +617,18 @@ const componentRegistry = [
     reason: "Reusable primitive or low-level control with stable support.",
   },
   {
+    name: "property",
+    fileName: "property",
+    tier: "stable",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/stable/property",
+    storyFiles: ["src/components/stable/property.stories.tsx"],
+    testFiles: ["src/components/stable/property.test.tsx"],
+    status: "stable",
+    reason:
+      "State-light inspector rows and sections built from existing field and disclosure primitives.",
+  },
+  {
     name: "radio-group",
     fileName: "radio-group",
     tier: "stable",
