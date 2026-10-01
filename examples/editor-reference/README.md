@@ -31,7 +31,7 @@ The older PR #45 supplies the sound workbench/command composition. Its separate 
 
 ## Standalone scaffold
 
-The existing `editor-consumer` generator creates a small Vite/React app that imports this published example. Its only UI dependency is the supplied package archive; its TypeScript configuration contains no producer aliases or parent config. Bun 1.3.12 and an installed `coding-tooling` CLI are explicit setup prerequisites. `coding-tooling` is a source-development tool; the generated app does not require it or a sibling checkout to compile or run.
+The existing `editor-consumer` generator creates Vite/React app files in a prepared consumer that imports this published example. The source-owned [consumer-package.json](./consumer-package.json) declares its archive dependency; its TypeScript configuration contains no producer aliases or parent config. Bun 1.3.12 and an installed `coding-tooling` CLI are explicit setup prerequisites. `coding-tooling` is a source-development tool; the generated app does not require it or a sibling checkout to compile or run.
 
 From this repository, choose an empty disposable target and supply an archive after building the package:
 
@@ -39,16 +39,16 @@ From this repository, choose an empty disposable target and supply an archive af
 bun run build
 mkdir -p .cache/editor-consumer
 bun pm pack --ignore-scripts --filename .cache/editor-consumer/ui.tgz
-coding-tooling generate plan editor-consumer --input archive=.cache/editor-consumer/ui.tgz --target .cache/editor-consumer --json
-coding-tooling generate editor-consumer --input archive=.cache/editor-consumer/ui.tgz --target .cache/editor-consumer --json
+cp examples/editor-reference/consumer-package.json .cache/editor-consumer/package.json
+(cd .cache/editor-consumer && bun install && bun install --frozen-lockfile)
+coding-tooling generate plan editor-consumer --target .cache/editor-consumer --json
+coding-tooling generate editor-consumer --target .cache/editor-consumer --json
 cd .cache/editor-consumer
-bun install
-bun install --frozen-lockfile
 bun run check-types
 bun run build
 bun run dev
 ```
 
-Archive creation and dependency installation are explicit setup/acquisition steps. Do not overwrite a pre-existing archive. The generator checks for the supplied archive and creates the complete scaffold atomically; identical output is a no-op, and conflicting source content prevents any scaffold write. Empty generator postconditions do not claim app behavior: the separate native compile/build/browser commands establish that evidence. Preserve the generated lockfile for subsequent frozen installs.
+Archive creation and dependency installation are explicit setup/acquisition steps. Use a fresh target; do not overwrite a pre-existing archive or manifest. The generator checks the UI package version at the selected consumer target after explicit installation and creates the app files atomically; identical output is a no-op, and conflicting source content prevents any scaffold write. Empty generator postconditions do not claim app behavior: the separate native compile/build/browser commands establish that evidence. Preserve the generated lockfile for subsequent frozen installs.
 
 UI maintainers own the fixture, dependency pins and Labs outliner upgrades. Products own any documents or commands they replace it with. A package/API change must pass the example's own compile and behavior checks; this reference does not claim arbitrary consumer compatibility.
