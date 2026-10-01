@@ -47,6 +47,7 @@ try {
   cpSync(path.join(consumerRoot, "index.html"), path.join(tempConsumerRoot, "index.html"));
   cpSync(path.join(consumerRoot, "tsconfig.json"), path.join(tempConsumerRoot, "tsconfig.json"));
   cpSync(path.join(consumerRoot, "vite.config.ts"), path.join(tempConsumerRoot, "vite.config.ts"));
+  cpSync(path.join(consumerRoot, "bun.lock"), path.join(tempConsumerRoot, "bun.lock"));
 
   const packageJson = JSON.parse(readFileSync(path.join(consumerRoot, "package.json"), "utf8"));
   packageJson.dependencies["@moritzbrantner/ui"] = `file:${tarballPath}`;
