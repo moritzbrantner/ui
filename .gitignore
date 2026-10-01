@@ -16,3 +16,5 @@ unlighthouse-report/
 .env
 .env.*
 !.env.example
+
+benchmark-results/size-evidence.json

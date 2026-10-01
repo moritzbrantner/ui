@@ -270,12 +270,17 @@
     "verify": "bun run check:hygiene && bun run verify:release",
     "verify:mobile-usability-skips": "bun ./scripts/verify-mobile-usability-skips.ts",
     "verify:registry": "bun ./scripts/sync-registry.ts --check && bunx shadcn@4.18.0 registry validate ./registry.json && bun run build:registry --output .cache/registry-check",
-    "verify:release:ci": "bun run check-types && bun run lint && bun run test:unit && bun run build && bun run test:package && bun run test:storybook && bun run test:coverage && bun run test:visual && bun run test:mobile-usability && bun run test:unlighthouse && bun run verify:consumer:editor && bun run verify:build-size && bun run bench && bun run pack:dry",
-    "verify:release": "bun run check-types && bun run lint && bun run test:unit && bun run build && bun run test:package && bun run test:storybook && bun run test:coverage && bun run test:visual && bun run test:mobile-usability && bun run test:unlighthouse && bun run verify:consumer:editor && bun run verify:build-size && bun run bench && bun run pack:dry",
+    "verify:release:ci": "bun run check-types && bun run lint && bun run test:unit && bun run build && bun run test:package && bun run test:storybook && bun run test:coverage && bun run test:visual && bun run test:mobile-usability && bun run test:unlighthouse && bun run verify:consumer:editor && bun run verify:size && bun run bench && bun run pack:dry",
+    "verify:release": "bun run check-types && bun run lint && bun run test:unit && bun run build && bun run test:package && bun run test:storybook && bun run test:coverage && bun run test:visual && bun run test:mobile-usability && bun run test:unlighthouse && bun run verify:consumer:editor && bun run verify:size && bun run bench && bun run pack:dry",
     "verify:results": "mkdir -p benchmark-results && bun run test:unit:report && bun run bench",
     "verify:tokens": "bun ./scripts/verify-tokens.ts",
     "verify:workflows": "bun ./scripts/verify-workflows.ts",
-    "verify:consumer:editor": "bun run build && bun ./scripts/verify-consumer-build.ts --editor-browser"
+    "verify:consumer:editor": "bun run build && bun ./scripts/verify-consumer-build.ts --editor-browser",
+    "verify:size-baseline": "bun scripts/verify-size-baseline.ts",
+    "verify:size": "bun run verify:build-size && bun run verify:size-baseline",
+    "size:budget": "bun run build && bun run verify:size",
+    "test:size-evidence": "bun scripts/verify-size-evidence.acceptance.ts",
+    "size:baseline:update": "bun run build && bun run verify:build-size && bun scripts/verify-size-baseline.ts --update"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
@@ -315,6 +320,7 @@
     "@types/react-dom": "^19.2.2",
     "@vitest/browser-playwright": "^4.1.4",
     "@vitest/coverage-v8": "4.1.6",
+    "coding-tooling": "github:moritzbrantner/coding-tooling#122ad55cbc5fd82233f2aa4af17278554db5cc78",
     "jsdom": "^26.1.0",
     "oxfmt": "0.51.0",
     "oxlint": "1.81.0",

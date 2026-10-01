@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "targets": [
+    {
+      "id": "ui-distributed-js",
+      "kind": "web",
+      "entrypoint": "dist/index.js",
+      "artifacts": [
+        {
+          "path": "dist",
+          "extensions": [".js"]
+        }
+      ],
+      "target": "es2022-browser",
+      "profile": "production-esm",
+      "features": [],
+      "minification": "tsup-minify",
+      "toolchains": [
+        ["bun", "--version"],
+        ["bun", "scripts/size-toolchain.ts"]
+      ],
+      "buildInputs": [
+        "bun.lock",
+        "package.json",
+        "tsup.config.ts",
+        "tsconfig.base.json",
+        "scripts/size-toolchain.ts"
+      ],
+      "maxBytes": 901120
+    }
+  ]
+}
