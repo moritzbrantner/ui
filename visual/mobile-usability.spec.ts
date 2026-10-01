@@ -293,6 +293,12 @@ async function gotoStory(page: Page, storyId: string) {
       }
 
       await page.evaluate(() => document.fonts.ready);
+      if (storyId === "components-editors-editor-workbench--reference") {
+        await expect(page.getByRole("status", { name: "Editor activity" })).toHaveText(
+          "Panel layout restored",
+          { timeout: 30_000 },
+        );
+      }
       await page.waitForTimeout(250);
       return;
     }

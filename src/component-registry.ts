@@ -1016,6 +1016,18 @@ const componentRegistry = [
     reason: "Reusable state-light application pattern exported from the root API.",
   },
   {
+    name: "editor-workbench",
+    fileName: "editor-workbench",
+    tier: "patterns",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/patterns/editor-workbench",
+    storyFiles: ["src/components/patterns/editor-workbench.stories.tsx"],
+    testFiles: ["src/components/patterns/editor-workbench.test.tsx"],
+    status: "pattern",
+    reason:
+      "State-light command composition over the existing workbench and public editor controls.",
+  },
+  {
     name: "connection-status",
     fileName: "connection-status",
     tier: "patterns",

@@ -70,6 +70,7 @@ const storyIds = [
   "components-data-display-document-viewer--ocr-report-viewer",
   "components-data-display-resource-list--default",
   "components-editors-annotation-canvas--default",
+  "components-editors-editor-workbench--reference",
   "components-social-overview--social-feed",
   "components-social-overview--chat-thread-preview",
   "components-layout-workbench-layout--full-workbench",
@@ -1204,6 +1205,12 @@ async function gotoStory(
     `/iframe.html?id=${storyId}&globals=${encodeURIComponent(globalParam)}`,
   );
   await page.evaluate(() => document.fonts.ready);
+  if (storyId === "components-editors-editor-workbench--reference") {
+    await expect(page.getByRole("status", { name: "Editor activity" })).toHaveText(
+      "Panel layout restored",
+      { timeout: 30_000 },
+    );
+  }
   await openOverlayStory(page, storyId);
   await page.waitForTimeout(500);
 }
