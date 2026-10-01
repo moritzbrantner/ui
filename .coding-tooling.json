@@ -99,7 +99,13 @@
       },
       {
         "id": "size-evidence",
-        "paths": [".performance/**", "scripts/*size*", "tsup.config.ts"],
+        "paths": [
+          ".performance/**",
+          "scripts/*size*",
+          "tsup.config.ts",
+          "tsconfig.json",
+          "tsconfig.base.json"
+        ],
         "taskKinds": ["performance", "package-size"],
         "instructions": ["docs/size-evidence.md"],
         "conventionRefs": ["BENCH-010"],

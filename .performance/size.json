@@ -24,7 +24,8 @@
         "package.json",
         "tsup.config.ts",
         "tsconfig.base.json",
-        "scripts/size-toolchain.ts"
+        "scripts/size-toolchain.ts",
+        "tsconfig.json"
       ],
       "maxBytes": 901120
     }

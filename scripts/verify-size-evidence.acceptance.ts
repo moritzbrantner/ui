@@ -14,6 +14,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { writeSizeOutput } from "./size-output.js";
+
 const producer = fileURLToPath(new URL("../", import.meta.url));
 const fixture = mkdtempSync(path.join(tmpdir(), "ui-size-evidence-"));
 const baselineRelative = ".performance/baselines/ui-js.json";
@@ -64,6 +66,17 @@ try {
   declaration.targets[0].profile = "production-esm";
   writeFileSync(path.join(fixture, ".performance/size.json"), JSON.stringify(declaration));
 
+  const compilerConfig = path.join(fixture, "tsconfig.json");
+  cpSync(path.join(producer, "tsconfig.json"), compilerConfig);
+  const compilerBefore = readFileSync(compilerConfig, "utf8");
+  const changedCompiler = JSON.parse(compilerBefore);
+  changedCompiler.compilerOptions.jsx = "react-jsxdev";
+  writeFileSync(compilerConfig, JSON.stringify(changedCompiler));
+  const changedConfiguration = invoke();
+  assert.equal(changedConfiguration.status, 2);
+  assert.equal(changedConfiguration.report.data.targets[0].comparison.state, "incomparable");
+  writeFileSync(compilerConfig, compilerBefore);
+
   const entrypoint = path.join(fixture, "dist/index.js");
   const original = readFileSync(entrypoint);
   writeFileSync(entrypoint, Buffer.alloc(880 * 1024 + 1));
@@ -80,8 +93,14 @@ try {
   assert.equal(missingTool.status, 2);
   assert.equal(missingTool.report.status, "unavailable");
   assert.equal(readFileSync(baselinePath, "utf8"), before);
+  const guardedOutput = path.join(fixture, "guarded-output.json");
+  const victim = path.join(fixture, "victim.txt");
+  writeFileSync(victim, "preserve this file");
+  symlinkSync(victim, `${guardedOutput}.${process.pid}.tmp`);
+  assert.throws(() => writeSizeOutput(fixture, guardedOutput, "must not reach victim"));
+  assert.equal(readFileSync(victim, "utf8"), "preserve this file");
   process.stdout.write(
-    "Size acceptance passed: unchanged baseline, repeat update no-op, missing baseline, incompatible build, oversize failure, rejected update and missing tool.\n",
+    "Size acceptance passed: unchanged baseline, repeat update no-op, missing baseline, incompatible build, changed JSX config, oversize failure, rejected update, missing tool and staging symlink rejection.\n",
   );
 } finally {
   rmSync(fixture, { recursive: true, force: true });

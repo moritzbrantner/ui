@@ -1,8 +1,9 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, lstatSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
+import { assertSizeOutput, writeSizeOutput } from "./size-output.js";
 import { sizeEvidence } from "coding-tooling/size-evidence";
 
 const { values } = parseArgs({
@@ -15,30 +16,10 @@ if (values.update && values.baseline) {
   throw new Error("Baseline updates use only the repository-owned default path.");
 }
 const report = sizeEvidence(root, values.update ? {} : { baseline });
-function assertLocalFile(file: string): void {
-  const relative = path.relative(root, file);
-  if (path.isAbsolute(relative) || relative.startsWith(`..${path.sep}`)) {
-    throw new Error("Size output must stay inside its repository.");
-  }
-  let current = root;
-  for (const part of relative.split(path.sep)) {
-    current = path.join(current, part);
-    if (lstatSync(current, { throwIfNoEntry: false })?.isSymbolicLink()) {
-      throw new Error("Size output cannot cross a symlink boundary.");
-    }
-  }
-}
-function atomicWrite(file: string, contents: string): void {
-  assertLocalFile(file);
-  mkdirSync(path.dirname(file), { recursive: true });
-  const temporary = `${file}.${process.pid}.tmp`;
-  writeFileSync(temporary, contents);
-  renameSync(temporary, file);
-}
 let baselineUpdate: "not-requested" | "changed" | "unchanged" = "not-requested";
 if (values.update && report.status === "passed") {
   const baselinePath = path.join(root, baseline);
-  assertLocalFile(baselinePath);
+  assertSizeOutput(root, baselinePath);
   const previous: unknown = existsSync(baselinePath)
     ? JSON.parse(readFileSync(baselinePath, "utf8"))
     : null;
@@ -66,12 +47,12 @@ if (values.update && report.status === "passed") {
     if (formatted.error || formatted.status !== 0 || !formatted.stdout.trim()) {
       throw new Error("The declared formatter is unavailable for the baseline update.");
     }
-    atomicWrite(baselinePath, formatted.stdout);
+    writeSizeOutput(root, baselinePath, formatted.stdout);
     baselineUpdate = "changed";
   }
 }
 const output = JSON.stringify({ ...report, baselineUpdate }, null, 2) + "\n";
-atomicWrite(path.join(root, "benchmark-results/size-evidence.json"), output);
+writeSizeOutput(root, path.join(root, "benchmark-results/size-evidence.json"), output);
 process.stdout.write(output);
 if (report.status === "passed") {
   process.exitCode = 0;
