@@ -133,7 +133,7 @@ function PropertySection({
         data-open={isOpen ? "true" : undefined}
         className={sectionClassName}
       >
-        <CollapsibleTrigger className="flex min-h-10 w-full items-center justify-between gap-2 py-2 text-left outline-none hover:bg-muted/40 focus-visible:ring-3 focus-visible:ring-ring/50">
+        <CollapsibleTrigger className="flex min-h-10 w-full items-center justify-between gap-2 px-2 py-2 text-left outline-none hover:bg-muted/40 focus-visible:ring-3 focus-visible:ring-ring/50">
           <span>{heading}</span>
           <ChevronDownIcon
             aria-hidden="true"
