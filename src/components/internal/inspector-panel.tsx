@@ -8,6 +8,7 @@ import { Badge } from "../stable/badge";
 import { Button } from "../stable/button";
 import { Checkbox } from "../stable/checkbox";
 import { Input } from "../stable/input";
+import { NumericInput } from "../stable/numeric-input";
 import { ScrollArea } from "../stable/scroll-area";
 import { SelectDropdown } from "../stable/select";
 import { Separator } from "../stable/separator";
@@ -39,6 +40,10 @@ type InspectorFieldDefinition = {
   min?: number;
   max?: number;
   step?: number;
+  smallStep?: number;
+  largeStep?: number;
+  unit?: string;
+  displayPrecision?: number;
   placeholder?: string;
   readOnly?: boolean;
   options?: InspectorFieldOption[];
@@ -372,16 +377,19 @@ function InspectorFieldEditor({
           disabled={disabled}
           onValueChange={(values) => onValueChange?.(values[0] ?? field.min ?? 0)}
         />
-        <Input
+        <NumericInput
           aria-label={`${field.label} value`}
-          type="number"
-          value={String(Number.isFinite(numericValue) ? numericValue : (field.min ?? 0))}
-          min={field.min}
-          max={field.max}
+          value={Number.isFinite(numericValue) ? numericValue : null}
+          min={field.min ?? 0}
+          max={field.max ?? 100}
           step={field.step}
+          smallStep={field.smallStep}
+          largeStep={field.largeStep}
+          unit={field.unit}
+          displayPrecision={field.displayPrecision}
           disabled={disabled}
-          className="h-8 w-20"
-          onChange={(event) => onValueChange?.(Number(event.currentTarget.value))}
+          className="w-24 shrink-0"
+          onValueChange={onValueChange}
         />
       </div>
     );
@@ -439,19 +447,35 @@ function InspectorFieldEditor({
     );
   }
 
+  if (field.type === "number") {
+    return (
+      <NumericInput
+        id={id}
+        aria-label={field.label}
+        value={typeof value === "number" ? value : null}
+        min={field.min}
+        max={field.max}
+        step={field.step}
+        smallStep={field.smallStep}
+        largeStep={field.largeStep}
+        unit={field.unit}
+        displayPrecision={field.displayPrecision}
+        disabled={disabled}
+        placeholder={field.placeholder}
+        onValueChange={onValueChange}
+      />
+    );
+  }
+
   return (
     <Input
       id={id}
       aria-label={field.label}
-      type={field.type === "number" ? "number" : "text"}
+      type="text"
       value={String(value ?? "")}
       disabled={disabled}
       placeholder={field.placeholder}
-      onChange={(event) =>
-        onValueChange?.(
-          field.type === "number" ? Number(event.currentTarget.value) : event.currentTarget.value,
-        )
-      }
+      onChange={(event) => onValueChange?.(event.currentTarget.value)}
     />
   );
 }

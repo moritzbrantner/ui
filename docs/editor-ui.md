@@ -40,7 +40,7 @@ Examples include:
 
 A slider, dial, drag handle, scrubber, gizmo, or canvas gesture may supplement exact entry for fast exploration. It must not be the only input mechanism when an exact value is meaningful.
 
-Use `AngleInput` as the existing reference: it combines direct manipulation with a typed numeric value and keyboard adjustment. Until a shared generic numeric control exists, use an editable numeric field rather than a slider-only substitute.
+Use `NumericInput` for exact entry and `Vector2Input`/`Vector3Input` for XY/XYZ values. `AngleInput` combines a dial with this shared exact input; inspector sliders use the same editing behavior.
 
 ### Direct manipulation and exact manipulation share one value
 
@@ -98,7 +98,8 @@ Generic shared inspector APIs must remain state-light and controlled.
 
 ## Control Selection
 
-- Exact numeric edit: editable numeric input; use a shared precision control once available.
+- Exact numeric edit: `NumericInput`.
+- XY/XYZ edit: controlled `Vector2Input`/`Vector3Input`.
 - Angle: `AngleInput`.
 - Fast approximate adjustment with a meaningful exact value: direct control plus editable numeric
   input.
@@ -133,3 +134,13 @@ This keeps the UI package a design system and interaction toolkit rather than a 
 3. Build a canonical reference workbench in Storybook that demonstrates the contract.
 4. Migrate one real editor as the proving consumer before broad rollout.
 5. Encode the durable cross-repository requirements in coding-agent conventions after the components and pilot validate the contract.
+
+## Numeric Input Behavior
+
+`NumericInput` accepts a controlled `value` and `onValueChange`, or an uncontrolled `defaultValue`. `null` represents an unset controlled value. Vector inputs require controlled readonly tuples and return a new tuple through `onValueChange`; other coordinates retain their authoritative precision.
+
+Set `unit`, `step`, `smallStep`, `largeStep`, `min`, `max`, and `displayPrecision` explicitly where the editor domain requires them. Display precision formats an unfocused field only; focus reveals the full value and named form submission preserves it. The control does not change supplied data merely to match formatting or constraints.
+
+Valid in-range decimal or scientific text emits a finite numeric edit immediately. Empty, incomplete, invalid, or out-of-range text remains a local draft. Enter or blur commits a valid draft within the declared bounds; invalid drafts revert to the accepted value. Escape discards the draft. A consuming app replacement supersedes a stale draft. Clearing an input never emits zero or `NaN`.
+
+Arrow Up/Down uses `step`, Alt uses `smallStep`, and Shift uses `largeStep`. Page Up/Down uses `largeStep`; Home/End uses declared min/max when present. Defaults are step 1, small step one tenth of the step, and large step ten times the step. These increments do not quantize typed values. `AngleInput` keeps its existing circular snapping and wrapping semantics.
