@@ -150,6 +150,10 @@ Hover previews: use `HoverPreview` for person, file, and status summaries. Do no
 
 Non-happy paths: compose `EmptyState`, `LoadingState`, `ErrorState`, `OfflineState`, and `StateViewActions` with app-owned copy and retry callbacks.
 
+## Editor Surfaces
+
+Editor-style applications follow the [Editor UI Contract](./editor-ui.md). It defines the shared boundary for precision-first controls, direct plus exact manipulation, workbench/panel composition, inspector ownership, keyboard/touch operation, and information density. Reuse the existing workbench, resizable, Studio-theme, and `AngleInput` foundations before adding editor-local alternatives.
+
 ## Component Contract
 
 Public components should accept `className`, forward DOM props where they render DOM, expose stable `data-slot` values, use semantic tokens from the published stylesheets, and avoid arbitrary visual knobs. If a wrapper cannot satisfy a rule because it delegates to a third-party primitive or provider, the verifier allowlist must include a reason.
