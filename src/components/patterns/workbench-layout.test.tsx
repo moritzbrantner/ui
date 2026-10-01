@@ -128,6 +128,32 @@ describe("controlled workbench presentation", () => {
     expect(screen.getByText("Asset list")).toBeTruthy();
   });
 
+  test("focuses the destination when the app accepts a placement on a later render", async () => {
+    const user = userEvent.setup();
+    const onPositionsChange = vi.fn();
+    const panels = [{ id: "inspector", label: "Inspector", content: "Property content" }];
+    const { rerender } = render(
+      <WorkbenchLayout docking={{ panels, positions: { inspector: "right" }, onPositionsChange }}>
+        Canvas
+      </WorkbenchLayout>,
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Move Inspector panel" }),
+      "bottom",
+    );
+    expect(onPositionsChange).toHaveBeenCalledWith({ inspector: "bottom" });
+    expect(screen.getByRole("combobox", { name: "Move Inspector panel" })).toHaveProperty(
+      "value",
+      "right",
+    );
+    rerender(
+      <WorkbenchLayout docking={{ panels, positions: { inspector: "bottom" }, onPositionsChange }}>
+        Canvas
+      </WorkbenchLayout>,
+    );
+    expect(document.activeElement).toBe(screen.getByRole("tab", { name: "Inspector" }));
+  });
+
   test("does not move a panel if the consuming app rejects the placement", async () => {
     const user = userEvent.setup();
     const onPositionsChange = vi.fn();

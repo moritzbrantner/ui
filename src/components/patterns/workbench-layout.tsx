@@ -81,15 +81,18 @@ function WorkbenchLayout({
 
   React.useEffect(() => {
     if (!pendingFocus) return;
-    if (docking && panelSide(docking, pendingFocus.panelId) === pendingFocus.side) {
-      const dock = document
-        .getElementById(workbenchId)
-        ?.querySelector(`[data-workbench-dock-side="${pendingFocus.side}"]`);
-      const tab = Array.from(
-        dock?.querySelectorAll<HTMLButtonElement>('[role="tab"][data-value]') ?? [],
-      ).find((element) => element.dataset.value === pendingFocus.panelId);
-      tab?.focus();
+    if (!docking?.panels.some((panel) => panel.id === pendingFocus.panelId)) {
+      setPendingFocus(null);
+      return;
     }
+    if (panelSide(docking, pendingFocus.panelId) !== pendingFocus.side) return;
+    const dock = document
+      .getElementById(workbenchId)
+      ?.querySelector(`[data-workbench-dock-side="${pendingFocus.side}"]`);
+    const tab = Array.from(
+      dock?.querySelectorAll<HTMLButtonElement>('[role="tab"][data-value]') ?? [],
+    ).find((element) => element.dataset.value === pendingFocus.panelId);
+    tab?.focus();
     setPendingFocus(null);
   }, [docking, pendingFocus, workbenchId]);
 
