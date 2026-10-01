@@ -54,6 +54,7 @@ const meta = {
   title: "Components/Layout/Workbench Layout",
   component: WorkbenchLayoutDemo,
   tags: ["autodocs", "test"],
+  parameters: { layout: "fullscreen" },
 } satisfies Meta<typeof WorkbenchLayoutDemo>;
 
 export default meta;

@@ -7,6 +7,11 @@ test("honors one-sided workbench percentage defaults", async ({ page }) => {
   );
   const panel = page.locator('[data-slot="workbench-panel"][data-side="left"]:visible');
   await expect(panel).toBeVisible();
+  await expect
+    .poll(
+      async () => (await page.locator('[data-slot="workbench-layout"]').boundingBox())?.width ?? 0,
+    )
+    .toBeGreaterThan(1440 * 0.9);
   const group = page
     .locator('[data-slot="workbench-desktop-layout"] [data-slot="resizable-panel-group"]')
     .nth(1);
