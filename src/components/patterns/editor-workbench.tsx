@@ -40,12 +40,6 @@ export type EditorWorkbenchProps = Omit<
   commandPaletteEmptyMessage?: React.ReactNode;
 };
 
-export type EditorInspectorPanelProps = React.ComponentProps<"aside"> & {
-  title: React.ReactNode;
-  description?: React.ReactNode;
-  actions?: React.ReactNode;
-};
-
 export type EditorSelectionSummaryProps = React.ComponentProps<"div"> & {
   children: React.ReactNode;
 };
@@ -71,6 +65,8 @@ function EditorWorkbench({
   children,
   ...layoutProps
 }: EditorWorkbenchProps) {
+  const generatedId = React.useId();
+  const workbenchId = layoutProps.id ?? generatedId;
   const [internalCommandPaletteOpen, setInternalCommandPaletteOpen] =
     React.useState(defaultCommandPaletteOpen);
   const [internalShortcutHelpOpen, setInternalShortcutHelpOpen] =
@@ -106,6 +102,12 @@ function EditorWorkbench({
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.isComposing || event.repeat) return;
+      if (
+        !(event.target instanceof Node) ||
+        !document.getElementById(workbenchId)?.contains(event.target)
+      )
+        return;
       if (matchesEditorShortcut(event, commandPaletteShortcut)) {
         event.preventDefault();
         setCommandPaletteOpen(true);
@@ -145,6 +147,7 @@ function EditorWorkbench({
     setCommandPaletteOpen,
     setShortcutHelpOpen,
     shortcutHelpShortcut,
+    workbenchId,
   ]);
 
   const resolvedToolbar =
@@ -161,6 +164,7 @@ function EditorWorkbench({
     <>
       <WorkbenchLayout
         {...layoutProps}
+        id={workbenchId}
         toolbar={resolvedToolbar}
         leftPanel={navigator}
         rightPanel={inspector}
@@ -187,35 +191,6 @@ function EditorWorkbench({
         description="Keyboard commands available in this editor."
       />
     </>
-  );
-}
-
-function EditorInspectorPanel({
-  title,
-  description,
-  actions,
-  className,
-  children,
-  ...props
-}: EditorInspectorPanelProps) {
-  return (
-    <aside
-      data-slot="editor-inspector"
-      aria-label={typeof title === "string" ? title : "Editor inspector"}
-      className={cn("grid min-h-0 content-start gap-3", className)}
-      {...props}
-    >
-      <header className="grid gap-1 border-b border-border/60 pb-3">
-        <div className="flex min-w-0 items-start justify-between gap-3">
-          <h2 className="min-w-0 truncate text-sm font-semibold">{title}</h2>
-          {actions ? <div className="flex shrink-0 items-center gap-1">{actions}</div> : null}
-        </div>
-        {description ? <p className="text-xs text-muted-foreground">{description}</p> : null}
-      </header>
-      <div data-slot="editor-inspector-body" className="grid min-h-0 gap-3">
-        {children}
-      </div>
-    </aside>
   );
 }
 
@@ -292,10 +267,18 @@ function matchesEditorShortcut(event: KeyboardEvent, shortcut: string): boolean 
   }
 
   const modifiers = new Set(parts.slice(0, -1).map((part) => part.toLowerCase()));
-  const mod = event.metaKey || event.ctrlKey;
-  if (modifiers.has("mod") !== mod) return false;
-  if (modifiers.has("ctrl") !== event.ctrlKey && !modifiers.has("mod")) return false;
-  if (modifiers.has("meta") !== event.metaKey && !modifiers.has("mod")) return false;
+  if (
+    [...modifiers].some((modifier) => !["mod", "ctrl", "meta", "alt", "shift"].includes(modifier))
+  )
+    return false;
+  if (modifiers.has("mod")) {
+    if (!event.metaKey && !event.ctrlKey) return false;
+    if (modifiers.has("ctrl") && !event.ctrlKey) return false;
+    if (modifiers.has("meta") && !event.metaKey) return false;
+  } else {
+    if (modifiers.has("ctrl") !== event.ctrlKey || modifiers.has("meta") !== event.metaKey)
+      return false;
+  }
   if (modifiers.has("alt") ? !event.altKey : event.altKey) return false;
   if (modifiers.has("shift") ? !event.shiftKey : event.shiftKey) return false;
 
@@ -306,6 +289,7 @@ function isEditableKeyboardTarget(target: EventTarget | null): boolean {
   return (
     target instanceof HTMLInputElement ||
     target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement ||
     (target instanceof HTMLElement && target.isContentEditable)
   );
 }
@@ -315,7 +299,6 @@ function hasCommandModifier(event: KeyboardEvent): boolean {
 }
 
 export {
-  EditorInspectorPanel,
   EditorSelectionSummary,
   EditorWorkbench,
   createEditorCommandPaletteGroups,

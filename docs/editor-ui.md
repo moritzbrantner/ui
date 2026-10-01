@@ -147,6 +147,8 @@ This keeps the UI package a design system and interaction toolkit rather than a 
 
 ## Numeric Input Behavior
 
+The [canonical editor reference](../examples/editor-reference/README.md) is discoverable under **Components / Editors / Editor Workbench / Reference** in Storybook. Its [single source fixture](../examples/editor-reference/EditorReference.tsx) composes supported public imports; consuming apps retain document and layout authority.
+
 `NumericInput` accepts a controlled `value` and `onValueChange`, or an uncontrolled `defaultValue`. `null` represents an unset controlled value. Vector inputs require controlled readonly tuples and return a new tuple through `onValueChange`; other coordinates retain their authoritative precision.
 
 Set `unit`, `step`, `smallStep`, `largeStep`, `min`, `max`, and `displayPrecision` explicitly where the editor domain requires them. Display precision formats an unfocused field only; focus reveals the full value and named form submission preserves it. The control does not change supplied data merely to match formatting or constraints.

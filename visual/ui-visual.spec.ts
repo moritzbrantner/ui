@@ -70,6 +70,7 @@ const storyIds = [
   "components-data-display-document-viewer--ocr-report-viewer",
   "components-data-display-resource-list--default",
   "components-editors-annotation-canvas--default",
+  "components-editors-editor-workbench--reference",
   "components-social-overview--social-feed",
   "components-social-overview--chat-thread-preview",
   "components-layout-workbench-layout--full-workbench",

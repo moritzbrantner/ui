@@ -30,5 +30,55 @@
     "test:visual",
     "benchmark",
     "storybook:check"
-  ]
+  ],
+  "capabilityCommands": {
+    "@moritzbrantner/ui": {
+      "storybook:check": [
+        "bun",
+        "run",
+        "test:storybook",
+        "src/components/patterns/editor-workbench.stories.tsx"
+      ],
+      "test:e2e:smoke": ["bun", "run", "test:visual", "visual/editor-reference.spec.ts"]
+    }
+  },
+  "taskKnowledge": {
+    "schemaVersion": 1,
+    "alwaysInstructions": ["CONTEXT.md", "docs/design-system.md"],
+    "completion": {
+      "command": ["bun", "run", "verify:release"],
+      "source": "package.json"
+    },
+    "scopes": [
+      {
+        "id": "editor-reference",
+        "paths": [
+          "src/components/patterns/editor-workbench*",
+          "src/components/patterns/workbench-layout*",
+          "src/components/stable/numeric-input*",
+          "src/components/stable/vector-input*",
+          "src/components/stable/property*",
+          "src/components/stable/angle-input*",
+          "examples/editor-reference/**",
+          "visual/editor-reference.spec.ts"
+        ],
+        "taskKinds": ["presentation", "editor-adoption"],
+        "instructions": ["docs/editor-ui.md", "examples/editor-reference/README.md"],
+        "conventionRefs": ["MORITZUI-001", "MORITZUI-002", "UI-005", "UI-007"],
+        "capabilities": ["test:unit", "storybook:check", "test:e2e:smoke"],
+        "examples": [
+          {
+            "path": "examples/editor-reference/EditorReference.tsx",
+            "entrypoint": "@moritzbrantner/ui"
+          },
+          {
+            "path": "src/components/patterns/editor-workbench.stories.tsx",
+            "entrypoint": "@moritzbrantner/ui/components/patterns/editor-workbench"
+          }
+        ],
+        "generators": ["ui-component"],
+        "owners": ["moritzbrantner/ui"]
+      }
+    ]
+  }
 }
