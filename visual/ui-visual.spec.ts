@@ -26,6 +26,9 @@ const viewports = [
 const storyIds = [
   "components-actions-button--variants",
   "components-forms-inputs-form-controls--basic",
+  "components-forms-inputs-numeric-input--default",
+  "components-forms-inputs-vector-input--default",
+  "components-forms-inputs-vector-input--three-axes",
   "components-forms-inputs-stepper--horizontal",
   "components-navigation-shortcut-help--dialog",
   "components-feedback-connection-status--states",
