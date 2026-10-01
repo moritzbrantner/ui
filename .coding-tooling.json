@@ -19,7 +19,7 @@
     ],
     "integration": ["test:integration"],
     "e2e": ["test:e2e", "test:e2e:smoke", "test:accessibility"],
-    "performance": ["benchmark"]
+    "performance": ["benchmark", "size:budget"]
   },
   "requiredCapabilities": ["format:check", "lint", "typecheck", "build", "test:unit"],
   "optionalCapabilities": [
@@ -29,7 +29,8 @@
     "test:accessibility",
     "test:visual",
     "benchmark",
-    "storybook:check"
+    "storybook:check",
+    "size:budget"
   ],
   "capabilityCommands": {
     "@moritzbrantner/ui": {
@@ -94,6 +95,21 @@
           }
         ],
         "generators": ["ui-component", "editor-consumer"],
+        "owners": ["moritzbrantner/ui"]
+      },
+      {
+        "id": "size-evidence",
+        "paths": [
+          ".performance/**",
+          "scripts/*size*",
+          "tsup.config.ts",
+          "tsconfig.json",
+          "tsconfig.base.json"
+        ],
+        "taskKinds": ["performance", "package-size"],
+        "instructions": ["docs/size-evidence.md"],
+        "conventionRefs": ["BENCH-010"],
+        "capabilities": ["build", "size:budget"],
         "owners": ["moritzbrantner/ui"]
       }
     ]
