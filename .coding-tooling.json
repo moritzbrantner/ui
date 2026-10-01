@@ -33,12 +33,7 @@
   ],
   "capabilityCommands": {
     "@moritzbrantner/ui": {
-      "storybook:check": [
-        "bun",
-        "run",
-        "test:storybook",
-        "src/components/patterns/editor-workbench.stories.tsx"
-      ],
+      "storybook:check": ["bun", "run", "test:storybook"],
       "test:e2e:smoke": ["bun", "run", "test:visual", "visual/editor-reference.spec.ts"]
     }
   },

@@ -127,3 +127,44 @@ test.describe("touch editor interaction", () => {
     await expect(page.getByRole("heading", { name: "Square properties" })).toBeVisible();
   });
 });
+
+test("retains vertical panel sizing across responsive presentation and restores it separately from objects", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(
+    "/iframe.html?id=components-editors-editor-workbench--reference&globals=designSystem:studio;theme:dark",
+  );
+  await expect(page.getByRole("status", { name: "Editor activity" })).toHaveText(
+    "Panel layout restored",
+  );
+  const separator = page.getByRole("separator", { name: "Resize bottom panel" });
+  const original = Number(await separator.getAttribute("aria-valuenow"));
+  await separator.focus();
+  await separator.press("ArrowUp");
+  await expect
+    .poll(async () => Number(await separator.getAttribute("aria-valuenow")))
+    .not.toBe(original);
+  const resized = Number(await separator.getAttribute("aria-valuenow"));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(separator).toHaveCount(0);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect
+    .poll(async () => Math.abs(Number(await separator.getAttribute("aria-valuenow")) - resized))
+    .toBeLessThan(1);
+  await page.getByRole("button", { name: "Restore panel layout" }).click();
+  await expect
+    .poll(async () => Math.abs(Number(await separator.getAttribute("aria-valuenow")) - original))
+    .toBeLessThan(1);
+  await separator.focus();
+  await separator.press("ArrowUp");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(separator).toHaveCount(0);
+  await page.getByRole("button", { name: "Restore panel layout" }).click();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect
+    .poll(async () => Math.abs(Number(await separator.getAttribute("aria-valuenow")) - original))
+    .toBeLessThan(1);
+  await expect(page.getByLabel("Preview transform")).toContainText("1.234567");
+  await expect(page.getByLabel("Exact preview time")).toHaveText("2.345678 s");
+});

@@ -37,11 +37,13 @@ export function EditorReference() {
   const [activePanels, setActivePanels] = React.useState<
     Partial<Record<WorkbenchPanelSide, string>>
   >({});
-  const [layout, setLayout] = React.useState<Record<string, number>>({});
+  const [horizontalLayout, setHorizontalLayout] = React.useState<Record<string, number>>({});
+  const [verticalLayout, setVerticalLayout] = React.useState<Record<string, number>>({});
   const [paletteOpen, setPaletteOpen] = React.useState(false);
   const [helpOpen, setHelpOpen] = React.useState(false);
   const [message, setMessage] = React.useState("Preview ready");
   const horizontalRef = React.useRef<WorkbenchPanelGroupHandle>(null);
+  const verticalRef = React.useRef<WorkbenchPanelGroupHandle>(null);
   const selected = objects.find((object) => object.id === selectedId);
   const timeId = React.useId();
 
@@ -58,11 +60,19 @@ export function EditorReference() {
   function restoreLayout() {
     setPositions(initialPositions);
     setActivePanels({});
-    horizontalRef.current?.setLayout({
+    const horizontal = {
       "reference-workbench-left": 22,
       "reference-workbench-canvas": 52,
       "reference-workbench-right": 26,
-    });
+    };
+    const vertical = {
+      "reference-workbench-main": 72,
+      "reference-workbench-bottom": 28,
+    };
+    setHorizontalLayout(horizontal);
+    setVerticalLayout(vertical);
+    horizontalRef.current?.setLayout(horizontal);
+    verticalRef.current?.setLayout(vertical);
     setMessage("Panel layout restored");
   }
   const commands: EditorWorkbenchCommand[] = [
@@ -174,8 +184,13 @@ export function EditorReference() {
       selectionSummary={selected ? `${selected.label} selected` : "No selection"}
       horizontalGroup={{
         groupRef: horizontalRef,
-        defaultLayout: Object.keys(layout).length ? layout : undefined,
-        onLayoutChanged: setLayout,
+        defaultLayout: Object.keys(horizontalLayout).length ? horizontalLayout : undefined,
+        onLayoutChanged: setHorizontalLayout,
+      }}
+      verticalGroup={{
+        groupRef: verticalRef,
+        defaultLayout: Object.keys(verticalLayout).length ? verticalLayout : undefined,
+        onLayoutChanged: setVerticalLayout,
       }}
       docking={{
         panels: [
