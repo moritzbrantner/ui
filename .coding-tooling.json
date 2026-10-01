@@ -36,6 +36,19 @@
       "storybook:check": ["bun", "run", "test:storybook"],
       "test:e2e:smoke": ["bun", "run", "test:visual", "visual/editor-reference.spec.ts"],
       "test:integration": ["bun", "run", "verify:consumer:editor"]
+    },
+    "@moritzbrantner/ui-consumer-example": {
+      "test:unit": ["bun", "run", "--cwd", "../..", "test:unit"],
+      "storybook:check": ["bun", "run", "--cwd", "../..", "test:storybook"],
+      "test:e2e:smoke": [
+        "bun",
+        "run",
+        "--cwd",
+        "../..",
+        "test:visual",
+        "visual/editor-reference.spec.ts"
+      ],
+      "test:integration": ["bun", "run", "--cwd", "../..", "verify:consumer:editor"]
     }
   },
   "taskKnowledge": {
@@ -59,7 +72,8 @@
           "visual/editor-reference.spec.ts",
           "examples/consumer/src/main-editor.tsx",
           "visual/editor-consumer.acceptance.ts",
-          ".coding-tooling/generators/editor-consumer/**"
+          ".coding-tooling/generators/editor-consumer/**",
+          "visual/property-section.spec.ts"
         ],
         "taskKinds": ["presentation", "editor-adoption"],
         "instructions": ["docs/editor-ui.md", "examples/editor-reference/README.md"],
