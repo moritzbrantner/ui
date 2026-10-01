@@ -55,7 +55,7 @@ jobs:
       pre_command: bunx playwright install chromium
       storybook_build_command: bun run build-storybook
       storybook_test_command: bun run test:storybook
-      visual_command: bun run test:visual && bun run test:mobile-usability
+      visual_command: bun run verify:consumer:editor && bun run test:visual && bun run test:mobile-usability
       timeout_minutes: 60
       artifact_paths: |
         storybook-static

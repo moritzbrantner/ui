@@ -34,7 +34,21 @@
   "capabilityCommands": {
     "@moritzbrantner/ui": {
       "storybook:check": ["bun", "run", "test:storybook"],
-      "test:e2e:smoke": ["bun", "run", "test:visual", "visual/editor-reference.spec.ts"]
+      "test:e2e:smoke": ["bun", "run", "test:visual", "visual/editor-reference.spec.ts"],
+      "test:integration": ["bun", "run", "verify:consumer:editor"]
+    },
+    "@moritzbrantner/ui-consumer-example": {
+      "test:unit": ["bun", "run", "--cwd", "../..", "test:unit"],
+      "storybook:check": ["bun", "run", "--cwd", "../..", "test:storybook"],
+      "test:e2e:smoke": [
+        "bun",
+        "run",
+        "--cwd",
+        "../..",
+        "test:visual",
+        "visual/editor-reference.spec.ts"
+      ],
+      "test:integration": ["bun", "run", "--cwd", "../..", "verify:consumer:editor"]
     }
   },
   "taskKnowledge": {
@@ -55,12 +69,16 @@
           "src/components/stable/property*",
           "src/components/stable/angle-input*",
           "examples/editor-reference/**",
-          "visual/editor-reference.spec.ts"
+          "visual/editor-reference.spec.ts",
+          "examples/consumer/src/main-editor.tsx",
+          "visual/editor-consumer.acceptance.ts",
+          ".coding-tooling/generators/editor-consumer/**",
+          "visual/property-section.spec.ts"
         ],
         "taskKinds": ["presentation", "editor-adoption"],
         "instructions": ["docs/editor-ui.md", "examples/editor-reference/README.md"],
         "conventionRefs": ["MORITZUI-001", "MORITZUI-002", "UI-005", "UI-007"],
-        "capabilities": ["test:unit", "storybook:check", "test:e2e:smoke"],
+        "capabilities": ["test:unit", "storybook:check", "test:e2e:smoke", "test:integration"],
         "examples": [
           {
             "path": "examples/editor-reference/EditorReference.tsx",
@@ -69,9 +87,13 @@
           {
             "path": "src/components/patterns/editor-workbench.stories.tsx",
             "entrypoint": "@moritzbrantner/ui/components/patterns/editor-workbench"
+          },
+          {
+            "path": "examples/consumer/src/main-editor.tsx",
+            "entrypoint": "@moritzbrantner/ui/examples/editor-reference"
           }
         ],
-        "generators": ["ui-component"],
+        "generators": ["ui-component", "editor-consumer"],
         "owners": ["moritzbrantner/ui"]
       }
     ]
