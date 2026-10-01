@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, test, vi } from "vitest";
@@ -42,20 +42,24 @@ describe("NumericInput", () => {
 
   test.each(["", "-", "+", ".", "1e", "Infinity", "NaN", "0x10", "1e999"])(
     "keeps %j as a draft and restores the value on blur",
-    (text) => {
+    async (text) => {
+      const user = userEvent.setup();
       const onValueChange = vi.fn();
       render(<NumericInput aria-label="Offset" defaultValue={7} onValueChange={onValueChange} />);
       const input = screen.getByRole("spinbutton", { name: "Offset" });
-      fireEvent.change(input, { target: { value: text } });
+      await user.click(input);
+      await user.clear(input);
+      if (text) await user.paste(text);
       expect(input).toHaveProperty("value", text);
       expect(onValueChange).not.toHaveBeenCalled();
-      fireEvent.blur(input);
+      await user.tab();
       expect(input).toHaveProperty("value", "7");
       expect(onValueChange).not.toHaveBeenCalled();
     },
   );
 
-  test("commits bounded drafts explicitly and cancels them without fabricated edits", () => {
+  test("commits bounded drafts explicitly and cancels them without fabricated edits", async () => {
+    const user = userEvent.setup();
     const onValueChange = vi.fn();
     render(
       <NumericInput
@@ -67,16 +71,21 @@ describe("NumericInput", () => {
       />,
     );
     const input = screen.getByRole("spinbutton", { name: "Opacity" });
-    fireEvent.change(input, { target: { value: "3" } });
+    await user.click(input);
+    await user.clear(input);
+    await user.paste("3");
     expect(onValueChange).not.toHaveBeenCalled();
-    fireEvent.keyDown(input, { key: "Escape" });
+    await user.keyboard("{Escape}");
     expect(input).toHaveProperty("value", "0.5");
-    fireEvent.change(input, { target: { value: "3" } });
-    fireEvent.keyDown(input, { key: "Enter" });
+    await user.click(input);
+    await user.clear(input);
+    await user.paste("3");
+    await user.keyboard("{Enter}");
     expect(input).toHaveProperty("value", "1");
     expect(onValueChange).toHaveBeenLastCalledWith(1);
-    fireEvent.change(input, { target: { value: "-2" } });
-    fireEvent.blur(input);
+    await user.clear(input);
+    await user.paste("-2");
+    await user.tab();
     expect(input).toHaveProperty("value", "0");
     expect(onValueChange).toHaveBeenLastCalledWith(0);
   });
@@ -110,13 +119,16 @@ describe("NumericInput", () => {
     expect(input).toHaveProperty("value", "0");
   });
 
-  test("synchronizes controlled replacements even while editing an incomplete value", () => {
+  test("synchronizes controlled replacements even while editing an incomplete value", async () => {
+    const user = userEvent.setup();
     const onValueChange = vi.fn();
     const { rerender } = render(
       <NumericInput aria-label="Position" value={2} onValueChange={onValueChange} />,
     );
     const input = screen.getByRole("spinbutton", { name: "Position" });
-    fireEvent.change(input, { target: { value: "-" } });
+    await user.click(input);
+    await user.clear(input);
+    await user.paste("-");
     rerender(
       <NumericInput
         aria-label="Position"
@@ -125,25 +137,30 @@ describe("NumericInput", () => {
         onValueChange={onValueChange}
       />,
     );
-    expect(input).toHaveProperty("value", "8.77");
+    expect(input).toHaveProperty("value", "8.7654");
     expect(input.getAttribute("aria-valuenow")).toBe("8.7654");
     expect(onValueChange).not.toHaveBeenCalled();
-    fireEvent.blur(input);
+    await user.tab();
+    expect(input).toHaveProperty("value", "8.77");
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
-  test("uses the consuming app's accepted value and does not become a second source of truth", () => {
+  test("uses the consuming app's accepted value and does not become a second source of truth", async () => {
+    const user = userEvent.setup();
     const onValueChange = vi.fn();
     render(<NumericInput aria-label="Fixed value" value={10} onValueChange={onValueChange} />);
     const input = screen.getByRole("spinbutton", { name: "Fixed value" });
-    fireEvent.change(input, { target: { value: "25" } });
+    await user.click(input);
+    await user.clear(input);
+    await user.paste("25");
     expect(onValueChange).toHaveBeenLastCalledWith(25);
     expect(input).toHaveProperty("value", "10");
-    fireEvent.blur(input);
+    await user.tab();
     expect(onValueChange).toHaveBeenCalledTimes(1);
   });
 
-  test("supports controlled accepted edits and a genuinely unset value", () => {
+  test("supports controlled accepted edits and a genuinely unset value", async () => {
+    const user = userEvent.setup();
     function Demo() {
       const [value, setValue] = React.useState<number | null>(null);
       return <NumericInput aria-label="Optional position" value={value} onValueChange={setValue} />;
@@ -152,14 +169,16 @@ describe("NumericInput", () => {
     const input = screen.getByRole("spinbutton", { name: "Optional position" });
     expect(input).toHaveProperty("value", "");
     expect(input.getAttribute("aria-valuenow")).toBeNull();
-    fireEvent.change(input, { target: { value: "1e-3" } });
+    await user.click(input);
+    await user.paste("1e-3");
     expect(input).toHaveProperty("value", "1e-3");
     expect(input.getAttribute("aria-valuenow")).toBe("0.001");
-    fireEvent.blur(input);
+    await user.tab();
     expect(input).toHaveProperty("value", "0.001");
   });
 
-  test.each([{ disabled: true }, { readOnly: true }])("blocks edits when %j", (props) => {
+  test.each([{ disabled: true }, { readOnly: true }])("blocks edits when %j", async (props) => {
+    const user = userEvent.setup();
     const onValueChange = vi.fn();
     render(
       <NumericInput
@@ -170,8 +189,9 @@ describe("NumericInput", () => {
       />,
     );
     const input = screen.getByRole("spinbutton", { name: "Locked" });
-    fireEvent.change(input, { target: { value: "5" } });
-    fireEvent.keyDown(input, { key: "ArrowUp" });
+    await user.click(input);
+    await user.type(input, "5");
+    await user.keyboard("{ArrowUp}");
     expect(input).toHaveProperty("value", "4");
     expect(onValueChange).not.toHaveBeenCalled();
   });
