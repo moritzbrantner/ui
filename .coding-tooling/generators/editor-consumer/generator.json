@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "id": "editor-consumer",
+  "description": "Create a standalone consumer of the packaged canonical editor reference from a supplied ui.tgz archive.",
+  "rules": [],
+  "technologies": ["typescript", "react"],
+  "inputs": {
+    "archive": {
+      "type": "path",
+      "required": true
+    }
+  },
+  "target": {
+    "kind": "root"
+  },
+  "operations": [
+    {
+      "kind": "create-file",
+      "template": "templates/package.json.tmpl",
+      "path": "package.json"
+    },
+    {
+      "kind": "create-file",
+      "template": "templates/tsconfig.json.tmpl",
+      "path": "tsconfig.json"
+    },
+    {
+      "kind": "create-file",
+      "template": "templates/index.html.tmpl",
+      "path": "index.html"
+    },
+    {
+      "kind": "create-file",
+      "template": "templates/vite.config.ts.tmpl",
+      "path": "vite.config.ts"
+    },
+    {
+      "kind": "create-file",
+      "template": "templates/src-main.tsx.tmpl",
+      "path": "src/main.tsx"
+    },
+    {
+      "kind": "create-file",
+      "template": "templates/src-editor.css.tmpl",
+      "path": "src/editor.css"
+    },
+    {
+      "kind": "create-file",
+      "template": "templates/src-vite-env.d.ts.tmpl",
+      "path": "src/vite-env.d.ts"
+    }
+  ],
+  "compose": [],
+  "prerequisites": [
+    {
+      "kind": "tool",
+      "name": "bun"
+    },
+    {
+      "kind": "file",
+      "path": "{{archive}}"
+    }
+  ],
+  "postconditions": []
+}
