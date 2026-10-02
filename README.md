@@ -6,6 +6,8 @@ Shared Tailwind 4 React UI primitives, layout components, and global theme style
 
 `@moritzbrantner/ui` is the low-level design-system package. It owns shared tokens, primitives, composed components, theme metadata, Storybook coverage, and package-consumption guarantees.
 
+Specialized visualization engines are deliberately outside this ownership boundary. `@moritzbrantner/tables`, `@moritzbrantner/charts`, and `@moritzbrantner/diagrams` must remain independently installable and must not require this package at runtime. This package may provide optional adapters or theme integration in the consumer-facing direction. See [visualization package boundaries](./docs/visualization-boundaries.md).
+
 Keep product workflows in higher-level app packages. Complete frontend surfaces, pages, navigation composition, roles, auth/session state, admin/account/settings/profile workflows, and other app-specific behavior should compose `@moritzbrantner/ui` instead of living in it.
 
 Generic visual affordances such as `AccountMenu` and `NotificationMenu` live in this package only when they stay state-free and contract-free. Apps own the menu content, routing, auth/session state, notification state, and backend behavior.
@@ -75,6 +77,8 @@ The audit builds Storybook, serves the static output locally, checks representat
 
 `bun run test:coverage` runs the local coverage helper. When Bun's `node` shim cannot expose V8 coverage APIs, it falls back to the unit suite and reports that coverage was not measured; CI runs the same release contract with the configured runtime.
 
+Package size checks use `bun run size:budget`; [size evidence](docs/size-evidence.md) documents selection, comparable baselines and explicit updates.
+
 Run `bun run bench` by itself, not in parallel with Storybook, Playwright, or other browser-heavy checks. The benchmark verifier retries failed samples once to filter transient host load, but repeat failures should be treated as release signals.
 
 ## Styles
@@ -136,7 +140,7 @@ Components are organized into support tiers:
 
 - `stable`: primitives and low-level controls with the strongest API expectations.
 - `patterns`: state-light composed components for common app layouts and workflows.
-- `data`: data grids, resource lists, filters, search fields, and selection toolbars.
+- `data`: generic resource lists, filters, search fields, selection toolbars, and lightweight data-display affordances. Specialized table/data-grid behavior belongs in `@moritzbrantner/tables`.
 - `shell`: app chrome, page shell, navigation, account, and notification surfaces.
 - `social`: state-light social, chat, feed, action, and profile summary components.
 - `media`: image cropper and filter editing surfaces.

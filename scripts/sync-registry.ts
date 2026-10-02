@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 
+import { format, type FormatConfig } from "oxfmt";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -12,6 +13,9 @@ type RegistrySource = {
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const checkOnly = process.argv.includes("--check");
+const formatterOptions: FormatConfig = JSON.parse(
+  readFileSync(path.join(packageRoot, ".oxfmtrc.json"), "utf8"),
+);
 const registrySources: readonly RegistrySource[] = [
   { source: "src/lib/cn.ts", target: "registry/default/lib/cn.ts" },
   { source: "src/components/stable/button.tsx", target: "registry/default/ui/button.tsx" },
@@ -24,6 +28,31 @@ const registrySources: readonly RegistrySource[] = [
     ],
   },
   { source: "src/components/stable/tabs.tsx", target: "registry/default/ui/tabs.tsx" },
+  {
+    source: "src/components/stable/collapsible.tsx",
+    target: "registry/default/ui/collapsible.tsx",
+  },
+  {
+    source: "src/components/stable/separator.tsx",
+    target: "registry/default/ui/separator.tsx",
+  },
+  {
+    source: "src/components/stable/field.tsx",
+    target: "registry/default/ui/field.tsx",
+    replacements: [
+      ['from "./label"', 'from "@/registry/default/ui/label"'],
+      ['from "./separator"', 'from "@/registry/default/ui/separator"'],
+    ],
+  },
+  {
+    source: "src/components/stable/property.tsx",
+    target: "registry/default/ui/property.tsx",
+    replacements: [
+      ['from "./collapsible"', 'from "@/registry/default/ui/collapsible"'],
+      ['from "./field"', 'from "@/registry/default/ui/field"'],
+      ['from "./separator"', 'from "@/registry/default/ui/separator"'],
+    ],
+  },
   { source: "src/components/stable/input.tsx", target: "registry/default/ui/input.tsx" },
   { source: "src/components/stable/label.tsx", target: "registry/default/ui/label.tsx" },
   {
@@ -75,6 +104,7 @@ const registrySources: readonly RegistrySource[] = [
   {
     source: "src/components/patterns/studio-tools.tsx",
     target: "registry/default/ui/studio-tools.tsx",
+    replacements: [['from "../stable/property"', 'from "@/registry/default/ui/property"']],
   },
   {
     source: "src/components/patterns/scholia-research.tsx",
@@ -151,7 +181,14 @@ let updated = 0;
 for (const { source, target, replacements } of registrySources) {
   const sourcePath = path.join(packageRoot, source);
   const targetPath = path.join(packageRoot, target);
-  const expected = toRegistrySource(readFileSync(sourcePath, "utf8"), replacements);
+  const transformed = toRegistrySource(readFileSync(sourcePath, "utf8"), replacements);
+  const formatted = await format(targetPath, transformed, formatterOptions);
+  if (formatted.errors.length > 0) {
+    throw new Error(
+      `Cannot format registry source ${source}: ${formatted.errors.map((error) => error.message).join("; ")}`,
+    );
+  }
+  const expected = formatted.code;
   const current = existsSync(targetPath) ? readFileSync(targetPath, "utf8") : null;
 
   if (current === expected) {
@@ -214,6 +251,23 @@ function toRegistrySource(
   replacements: RegistrySource["replacements"] = [],
 ): string {
   let result = source.replaceAll('from "../../lib/cn"', 'from "@/registry/default/lib/cn"');
+
+  if (result.includes('from "./button-variants"')) {
+    const variantSource = readFileSync(
+      path.join(packageRoot, "src/components/stable/button-variants.ts"),
+      "utf8",
+    )
+      .replace('import { cva } from "class-variance-authority";\n\n', "")
+      .replace(/\nexport \{ buttonVariants \};\n?$/, "")
+      .trim();
+
+    result = result
+      .replace(
+        'import { type VariantProps } from "class-variance-authority";',
+        'import { cva, type VariantProps } from "class-variance-authority";',
+      )
+      .replace('import { buttonVariants } from "./button-variants";', `\n${variantSource}`);
+  }
 
   for (const [from, to] of replacements) {
     result = result.replaceAll(from, to);

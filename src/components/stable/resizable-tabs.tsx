@@ -278,6 +278,7 @@ function ResizableTabsTrigger({
       aria-controls={contentId}
       tabIndex={active ? 0 : -1}
       data-slot="resizable-tabs-trigger"
+      data-value={item.value}
       data-active={active ? "" : undefined}
       disabled={item.disabled}
       className={cn(
