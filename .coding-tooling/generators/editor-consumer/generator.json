@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "editor-consumer",
+  "description": "Create editor app files in a prepared consumer with the locally installed UI package.",
+  "rules": [],
+  "technologies": ["typescript", "react"],
+  "inputs": {},
+  "target": {
+    "kind": "root"
+  },
+  "operations": [
+    {
+      "kind": "create-file",
+      "template": "templates/tsconfig.json.tmpl",
+      "path": "tsconfig.json"
+    },
+    {
+      "kind": "create-file",
+      "template": "templates/index.html.tmpl",
+      "path": "index.html"
+    },
+    {
+      "kind": "create-file",
+      "template": "templates/vite.config.ts.tmpl",
+      "path": "vite.config.ts"
+    },
+    {
+      "kind": "create-file",
+      "template": "templates/src-main.tsx.tmpl",
+      "path": "src/main.tsx"
+    },
+    {
+      "kind": "create-file",
+      "template": "templates/src-editor.css.tmpl",
+      "path": "src/editor.css"
+    },
+    {
+      "kind": "create-file",
+      "template": "templates/src-vite-env.d.ts.tmpl",
+      "path": "src/vite-env.d.ts"
+    }
+  ],
+  "compose": [],
+  "prerequisites": [
+    {
+      "kind": "tool",
+      "name": "bun"
+    },
+    {
+      "kind": "package",
+      "name": "@moritzbrantner/ui",
+      "version": "1.1.0"
+    }
+  ],
+  "postconditions": []
+}
