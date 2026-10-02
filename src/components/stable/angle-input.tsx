@@ -5,7 +5,7 @@ import { RotateCcwIcon } from "lucide-react";
 
 import { cn } from "../../lib/cn";
 import { Button } from "./button";
-import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "./input-group";
+import { NumericInput } from "./numeric-input";
 
 const FULL_ROTATION = 360;
 const DIAL_RADIUS = 42;
@@ -108,7 +108,6 @@ function AngleInput({
   const [internalValue, setInternalValue] = React.useState(() =>
     snapAngle(defaultValue, safeStep, precision),
   );
-  const [draftValue, setDraftValue] = React.useState<string | null>(null);
   const [activePointerId, setActivePointerId] = React.useState<number | null>(null);
   const dialRef = React.useRef<HTMLDivElement>(null);
   const generatedId = React.useId();
@@ -158,24 +157,6 @@ function AngleInput({
     },
     [commitValue, precision],
   );
-
-  const commitDraftValue = React.useCallback(() => {
-    if (draftValue === null) {
-      return;
-    }
-
-    const trimmed = draftValue.trim();
-
-    if (trimmed !== "") {
-      const parsed = Number(trimmed);
-
-      if (Number.isFinite(parsed)) {
-        commitValue(parsed);
-      }
-    }
-
-    setDraftValue(null);
-  }, [commitValue, draftValue]);
 
   const handleDialKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -346,49 +327,17 @@ function AngleInput({
         </div>
       </div>
       <div data-slot="angle-input-controls" className="grid min-w-0 content-center gap-3">
-        <InputGroup>
-          <InputGroupInput
-            id={inputId}
-            type="number"
-            inputMode="decimal"
-            step={safeStep}
-            value={draftValue ?? formattedAngle}
-            aria-label={inputAriaLabel}
-            disabled={disabled}
-            onChange={(event) => {
-              const nextDraftValue = event.currentTarget.value;
-
-              setDraftValue(nextDraftValue);
-
-              if (nextDraftValue.trim() === "") {
-                return;
-              }
-
-              const parsedValue = Number(nextDraftValue);
-
-              if (Number.isFinite(parsedValue)) {
-                commitValue(parsedValue);
-              }
-            }}
-            onBlur={commitDraftValue}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                commitDraftValue();
-                event.currentTarget.blur();
-              }
-
-              if (event.key === "Escape") {
-                event.preventDefault();
-                setDraftValue(null);
-                event.currentTarget.blur();
-              }
-            }}
-          />
-          <InputGroupAddon align="inline-end">
-            <InputGroupText>deg</InputGroupText>
-          </InputGroupAddon>
-        </InputGroup>
+        <NumericInput
+          id={inputId}
+          value={currentAngle}
+          step={safeStep}
+          smallStep={safeStep}
+          largeStep={safeNudgeStep}
+          unit="deg"
+          aria-label={inputAriaLabel}
+          disabled={disabled}
+          onValueChange={commitValue}
+        />
         <div className="flex flex-wrap gap-2">
           <Button
             type="button"

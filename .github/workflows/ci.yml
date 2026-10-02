@@ -18,7 +18,7 @@ jobs:
     name: Deterministic Findings
     permissions:
       contents: read
-    uses: moritzbrantner/reusable-workflows/.github/workflows/coding-tooling-validation.yml@604f68a276c49ab557d40578fb7453fb964b4882
+    uses: moritzbrantner/reusable-workflows/.github/workflows/coding-tooling-validation.yml@159701da0842f885d786fc8109c1de32f7dc0128
     with:
       operation: findings
       report_path: .artifacts/coding-tooling/findings.json
@@ -64,7 +64,7 @@ jobs:
       pre_command: bunx playwright install chromium
       storybook_build_command: bun run build-storybook
       storybook_test_command: bun run test:storybook
-      visual_command: bun run test:visual && bun run test:mobile-usability
+      visual_command: bun run verify:consumer:editor && bun run test:visual && bun run test:mobile-usability
       timeout_minutes: 60
       artifact_paths: |
         storybook-static
@@ -88,7 +88,7 @@ jobs:
       build_command: bun run build
       unlighthouse_command: bun run test:unlighthouse
       benchmark_command: bun run bench
-      bundle_size_command: bun run verify:build-size
+      bundle_size_command: bun run verify:size && bun run test:size-evidence
       timeout_minutes: 75
       artifact_paths: |
         unlighthouse-report
