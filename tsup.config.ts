@@ -42,6 +42,7 @@ export default defineConfig({
   dts: true,
   entry: {
     index: "src/index.ts",
+    "examples/editor-reference": "examples/editor-reference/EditorReference.tsx",
     server: "src/server.ts",
     client: "src/client.ts",
     stable: "src/stable.ts",

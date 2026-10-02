@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "id": "ui-component",
+  "description": "Create a public UI component scaffold, Storybook smoke surface, and tier export.",
+  "rules": [],
+  "technologies": ["typescript", "react"],
+  "inputs": {
+    "name": {
+      "type": "identifier",
+      "required": true
+    },
+    "tier": {
+      "type": "enum",
+      "required": true,
+      "values": ["stable", "patterns", "data", "shell", "social", "collaboration", "media", "labs"]
+    },
+    "storyCategory": {
+      "type": "enum",
+      "required": true,
+      "values": [
+        "Actions",
+        "Forms & Inputs",
+        "Navigation",
+        "Overlays",
+        "Layout",
+        "Data Display",
+        "Feedback",
+        "Editors",
+        "Social"
+      ]
+    },
+    "client": {
+      "type": "boolean",
+      "required": true
+    }
+  },
+  "target": {
+    "kind": "root"
+  },
+  "operations": [
+    {
+      "kind": "create-file",
+      "template": "templates/component-{{client}}.tsx.tmpl",
+      "path": "src/components/{{tier}}/{{name | kebab}}.tsx"
+    },
+    {
+      "kind": "create-file",
+      "template": "templates/component.stories.tsx.tmpl",
+      "path": "src/components/{{tier}}/{{name | kebab}}.stories.tsx"
+    },
+    {
+      "kind": "typescript-barrel-export",
+      "path": "src/{{tier}}.ts",
+      "module": "./components/{{tier}}/{{name | kebab}}"
+    }
+  ],
+  "compose": [],
+  "prerequisites": [
+    {
+      "kind": "package",
+      "name": "react"
+    },
+    {
+      "kind": "package",
+      "name": "@storybook/react-vite"
+    }
+  ],
+  "postconditions": ["format:check", "typecheck"]
+}

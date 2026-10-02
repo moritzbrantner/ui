@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "components": [
+    {
+      "component": "@moritzbrantner/ui",
+      "scenarios": [
+        {
+          "family": "size-budget",
+          "capability": "size:budget",
+          "path": ".performance/size.json",
+          "tools": ["bun"],
+          "platforms": []
+        }
+      ]
+    }
+  ]
+}
