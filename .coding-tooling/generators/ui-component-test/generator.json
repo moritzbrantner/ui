@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "ui-component-test",
+  "description": "Create a behavioral test scaffold for an existing public UI component.",
+  "rules": [],
+  "technologies": ["typescript", "react"],
+  "inputs": {
+    "name": {
+      "type": "identifier",
+      "required": true
+    },
+    "tier": {
+      "type": "enum",
+      "required": true,
+      "values": ["stable", "patterns", "data", "shell", "social", "collaboration", "media", "labs"]
+    }
+  },
+  "target": {
+    "kind": "root"
+  },
+  "operations": [
+    {
+      "kind": "create-file",
+      "template": "templates/component.test.tsx.tmpl",
+      "path": "src/components/{{tier}}/{{name | kebab}}.test.tsx"
+    }
+  ],
+  "compose": [],
+  "prerequisites": [
+    {
+      "kind": "package",
+      "name": "vitest"
+    },
+    {
+      "kind": "file",
+      "path": "src/components/{{tier}}/{{name | kebab}}.tsx"
+    }
+  ],
+  "postconditions": ["format:check", "typecheck", "test:unit"]
+}
