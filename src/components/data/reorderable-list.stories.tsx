@@ -203,7 +203,28 @@ export const WithLockedItem: Story = {
 export const InteractiveChildren: Story = {
   render: (args) => <InteractiveChildrenDemo onReorder={args.onReorder} />,
   play: async ({ args, canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: "Open details" }));
+    const detailsButton = canvas.getByRole("button", { name: "Open details" });
+    const [, targetItem] = canvas.getAllByRole("listitem");
+    const targetBox = targetItem.getBoundingClientRect();
+
+    // Press on the interactive child and drag it past the next item: only the
+    // handle may activate dragging, so no reorder may start from the child.
+    await userEvent.pointer([
+      { keys: "[MouseLeft>]", target: detailsButton },
+      {
+        target: targetItem,
+        coords: {
+          clientX: targetBox.left + targetBox.width / 2,
+          clientY: targetBox.bottom + 8,
+        },
+      },
+      { keys: "[/MouseLeft]", target: targetItem },
+    ]);
+
+    await expect(args.onReorder).not.toHaveBeenCalled();
+    await expect(canvas.getAllByRole("listitem")[0]).toHaveTextContent("Design review");
+
+    await userEvent.click(detailsButton);
 
     await expect(canvas.getByText("Details opened")).toBeVisible();
     await expect(args.onReorder).not.toHaveBeenCalled();
