@@ -49,6 +49,7 @@ function RefreshControl({
 }: RefreshControlProps) {
   const autoRefreshId = React.useId();
   const showAutoRefresh = autoRefresh !== undefined || onAutoRefreshChange !== undefined;
+  const isAutoRefreshEnabled = autoRefresh ?? false;
   const showInterval =
     intervalMs !== undefined && onIntervalMsChange !== undefined && intervalOptions.length > 0;
 
@@ -78,7 +79,7 @@ function RefreshControl({
         <div data-slot="refresh-control-auto" className="flex min-h-9 items-center gap-2">
           <Switch
             id={autoRefreshId}
-            checked={autoRefresh ?? false}
+            checked={isAutoRefreshEnabled}
             disabled={disabled}
             onCheckedChange={onAutoRefreshChange}
           />
@@ -98,7 +99,7 @@ function RefreshControl({
           }))}
           size="sm"
           className="min-w-28"
-          disabled={disabled || autoRefresh === false}
+          disabled={disabled || (showAutoRefresh && !isAutoRefreshEnabled)}
           onValueChange={(value) => {
             const nextInterval = Number(value);
             if (Number.isFinite(nextInterval)) {
@@ -108,15 +109,13 @@ function RefreshControl({
         />
       ) : null}
 
-      {lastUpdated ? (
-        <span
-          data-slot="refresh-control-last-updated"
-          className="text-xs text-muted-foreground"
-          aria-live="polite"
-        >
-          {lastUpdated}
-        </span>
-      ) : null}
+      <span
+        data-slot="refresh-control-last-updated"
+        className="text-xs text-muted-foreground empty:hidden"
+        aria-live="polite"
+      >
+        {lastUpdated || null}
+      </span>
 
       {children}
     </div>

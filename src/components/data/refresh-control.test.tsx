@@ -56,4 +56,31 @@ describe("refresh control", () => {
     expect(refreshButton.getAttribute("aria-busy")).toBe("true");
     expect(screen.getByText("Updated 12 seconds ago")).toBeTruthy();
   });
+
+  test("disables the interval while uncontrolled auto-refresh is shown as off", () => {
+    render(
+      <RefreshControl
+        onRefresh={vi.fn()}
+        onAutoRefreshChange={vi.fn()}
+        intervalMs={5_000}
+        intervalOptions={intervalOptions}
+        onIntervalMsChange={vi.fn()}
+      />,
+    );
+
+    const intervalSelect = screen.getByRole("combobox", { name: "Refresh interval" });
+    expect((intervalSelect as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  test("keeps the status live region mounted before the first update", () => {
+    const { container, rerender } = render(<RefreshControl onRefresh={vi.fn()} />);
+    const liveRegion = container.querySelector('[data-slot="refresh-control-last-updated"]');
+
+    expect(liveRegion?.getAttribute("aria-live")).toBe("polite");
+
+    rerender(<RefreshControl onRefresh={vi.fn()} lastUpdated="Updated just now" />);
+
+    expect(container.querySelector('[data-slot="refresh-control-last-updated"]')).toBe(liveRegion);
+    expect(liveRegion?.textContent).toBe("Updated just now");
+  });
 });
