@@ -126,10 +126,20 @@ async function readBrowserMetrics(session: CDPSession): Promise<BrowserMetrics> 
 
   const metrics = new Map(response.metrics.map((metric) => [metric.name, metric.value]));
 
+  const requireMetric = (name: string) => {
+    const value = metrics.get(name);
+
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+      throw new Error(`Chromium did not report a finite ${name} performance metric.`);
+    }
+
+    return value;
+  };
+
   return {
-    layoutDuration: metrics.get("LayoutDuration") ?? 0,
-    recalcStyleDuration: metrics.get("RecalcStyleDuration") ?? 0,
-    taskDuration: metrics.get("TaskDuration") ?? 0,
+    layoutDuration: requireMetric("LayoutDuration"),
+    recalcStyleDuration: requireMetric("RecalcStyleDuration"),
+    taskDuration: requireMetric("TaskDuration"),
   };
 }
 
