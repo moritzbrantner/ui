@@ -1,17 +1,21 @@
 #!/usr/bin/env bun
 
-// Proves that a commit-pinned git dependency on this package works: a clean clone of HEAD
-// must build with nothing but the `prepare` script, and every export target must exist afterwards.
+// Proves that a commit-pinned git dependency on this package works: a clean clone of HEAD,
+// placed below node_modules like bun places a git dependency, must build with nothing but the
+// `prepare` script, and every main/types/exports target must exist afterwards.
 
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const tempRoot = mkdtempSync(path.join(tmpdir(), "ui-git-install-"));
-const cloneDir = path.join(tempRoot, "clone");
+const packageName: string = JSON.parse(
+  readFileSync(path.join(packageRoot, "package.json"), "utf8"),
+).name;
+const tempRoot = mkdtempSync(path.join(tmpdir(), "git-install-"));
+const cloneDir = path.join(tempRoot, "node_modules", packageName);
 
 function run(command: string, args: string[], cwd: string) {
   execFileSync(command, args, { cwd, stdio: "inherit" });
@@ -29,6 +33,7 @@ function collectTargets(value: unknown, targets: string[]) {
 
 try {
   const head = execFileSync("git", ["rev-parse", "HEAD"], { cwd: packageRoot }).toString().trim();
+  mkdirSync(path.dirname(cloneDir), { recursive: true });
   run("git", ["clone", "--quiet", "--no-checkout", packageRoot, cloneDir], packageRoot);
   run("git", ["-c", "advice.detachedHead=false", "checkout", "--quiet", head], cloneDir);
 
