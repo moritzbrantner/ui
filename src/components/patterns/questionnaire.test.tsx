@@ -195,6 +195,31 @@ describe("questionnaire", () => {
     expect(screen.getByText("100 responses")).toBeTruthy();
   });
 
+  test("names progress bars from non-string labels and announces the selected result", () => {
+    render(
+      <QuestionnairePollResults
+        selectedValue="team"
+        selectedLabel="Your vote"
+        results={[
+          {
+            value: "team",
+            label: (
+              <>
+                <em>Team</em> plan
+              </>
+            ),
+            count: 3,
+          },
+          { value: "solo", label: "Solo", count: 1 },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole("progressbar", { name: "Team plan" })).toBeTruthy();
+    expect(screen.getByRole("progressbar", { name: "Solo" })).toBeTruthy();
+    expect(screen.getByText(", Your vote").className).toContain("sr-only");
+  });
+
   test("uses explicit percentages when supplied and clamps unsafe values", () => {
     render(
       <QuestionnairePollResults

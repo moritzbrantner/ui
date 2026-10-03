@@ -434,6 +434,8 @@ export type QuestionnairePollResultsProps = Omit<
   showCounts?: boolean;
   caption?: React.ReactNode;
   variant?: QuestionnairePollResultsVariant;
+  /** Visually hidden text announced after the result matching `selectedValue`. */
+  selectedLabel?: string;
 };
 
 function QuestionnairePollResults({
@@ -444,6 +446,7 @@ function QuestionnairePollResults({
   showCounts = true,
   caption,
   variant = "default",
+  selectedLabel = "Your answer",
   ...props
 }: QuestionnairePollResultsProps) {
   const normalizedCounts = results.map((result) =>
@@ -483,8 +486,7 @@ function QuestionnairePollResults({
           const percentage = Math.min(100, Math.max(0, rawPercentage));
           const roundedPercentage = Math.round(percentage);
           const selected = result.value === selectedValue;
-          const accessibleLabel =
-            result.ariaLabel ?? (typeof result.label === "string" ? result.label : undefined);
+          const accessibleLabel = result.ariaLabel ?? getQuestionnaireNodeText(result.label);
 
           return (
             <li
@@ -503,9 +505,12 @@ function QuestionnairePollResults({
                 <span data-slot="questionnaire-poll-result-label" className="min-w-0 font-medium">
                   {result.label}
                   {selected && (
-                    <span className="ml-1.5 text-xs font-normal text-primary" aria-hidden="true">
-                      ✓
-                    </span>
+                    <>
+                      <span className="ml-1.5 text-xs font-normal text-primary" aria-hidden="true">
+                        ✓
+                      </span>
+                      <span className="sr-only">, {selectedLabel}</span>
+                    </>
                   )}
                 </span>
                 <span className="shrink-0 tabular-nums text-muted-foreground">
@@ -542,6 +547,25 @@ function QuestionnairePollResults({
       </ul>
     </div>
   );
+}
+
+function getQuestionnaireNodeText(node: React.ReactNode): string | undefined {
+  const parts: string[] = [];
+
+  const collect = (value: React.ReactNode) => {
+    if (typeof value === "string" || typeof value === "number") {
+      parts.push(String(value));
+    } else if (Array.isArray(value)) {
+      value.forEach(collect);
+    } else if (React.isValidElement<{ children?: React.ReactNode }>(value)) {
+      collect(value.props.children);
+    }
+  };
+
+  collect(node);
+
+  const text = parts.join("").replace(/\s+/g, " ").trim();
+  return text.length > 0 ? text : undefined;
 }
 
 export {
