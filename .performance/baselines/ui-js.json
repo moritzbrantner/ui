@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "operation": "size-evidence",
   "status": "passed",
-  "durationMs": 40,
+  "durationMs": 101,
   "data": {
     "schemaVersion": "coding-tooling/size-evidence/v1",
     "metric": "raw-artifact-bytes",
@@ -65,7 +65,7 @@
             }
           ]
         },
-        "bytes": 721850,
+        "bytes": 710418,
         "artifacts": [
           {
             "path": "dist/atlas.js",
@@ -358,19 +358,9 @@
             "sha256": "b36cbb3d157ff5df89765f4cc6bf021ff5c451f7480a4d896a70e7f047955984"
           },
           {
-            "path": "dist/chunk-DCUMUGRA.js",
-            "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-          },
-          {
             "path": "dist/chunk-DES2UDOF.js",
             "bytes": 6758,
             "sha256": "273d5c443e7f945c3739dfc283eb4af898a21ea7fd0c910ed9345455d07297e7"
-          },
-          {
-            "path": "dist/chunk-DGUTHNL4.js",
-            "bytes": 3010,
-            "sha256": "002ed9e575dbf7284ed7e8b7ddff8e9213ab449422c3afd233965dd3e5881745"
           },
           {
             "path": "dist/chunk-DHP53WF2.js",
@@ -453,6 +443,11 @@
             "sha256": "951230aa0785e3903dcb4f9cf45f2d5e89a18d2364a5fe2776bc7d3dd1f8aa1c"
           },
           {
+            "path": "dist/chunk-I73TUXHM.js",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
             "path": "dist/chunk-IB3IPPZN.js",
             "bytes": 3713,
             "sha256": "82983dd0cb60eadca54c8d67d4d2df2adead547ba836cc2d8f5b0f544f9e8b08"
@@ -501,11 +496,6 @@
             "path": "dist/chunk-K2PDG5AD.js",
             "bytes": 118,
             "sha256": "024297285192424eed8a474a34ff9d2681a6138cb6ef516ea44c5aedb27594cc"
-          },
-          {
-            "path": "dist/chunk-K55ECIUT.js",
-            "bytes": 12204,
-            "sha256": "32155ea3ad060daebc5edaeb5af01242fc8c1d2e92ae7180e08b87b234712b9e"
           },
           {
             "path": "dist/chunk-K6U3XQZN.js",
@@ -613,6 +603,11 @@
             "sha256": "820a224abe3b025acf6ff1764454328e9acf5d11b2cf9322bf475fb822f9d3e7"
           },
           {
+            "path": "dist/chunk-N2RGX5TF.js",
+            "bytes": 3010,
+            "sha256": "defb29f0feaf360a504accf4d0fa072b0e3bac4db653250b02472bfa5953cfe2"
+          },
+          {
             "path": "dist/chunk-N6RS5ZVC.js",
             "bytes": 1390,
             "sha256": "0cef8f437027f0d29b330675a5d6a3af7c5f16e2fe6b852bbcbd5cb17d2d7d5b"
@@ -661,6 +656,11 @@
             "path": "dist/chunk-OWKPZ7BA.js",
             "bytes": 2015,
             "sha256": "bcb244af4bf57660d5e6c812aa57baf53f23898ed11347641b7d7b0dfec5bff1"
+          },
+          {
+            "path": "dist/chunk-P3ECVGTK.js",
+            "bytes": 6349,
+            "sha256": "95247ce286ed043c08012433257e11165670106c17b8691c66029e7cd1cef6f4"
           },
           {
             "path": "dist/chunk-PBPIQMLJ.js",
@@ -786,11 +786,6 @@
             "path": "dist/chunk-T4SM7CGO.js",
             "bytes": 95,
             "sha256": "27bb2de626c5ec7853d0d693474b24bcc862b55a1bf85c5fae361847a961efbb"
-          },
-          {
-            "path": "dist/chunk-T57ZU7XX.js",
-            "bytes": 4791,
-            "sha256": "c6f3d6680e228e8bd0f596ca8a9e64d5841765ad5b8d3f15d917aafd52eea26e"
           },
           {
             "path": "dist/chunk-T5V67V6Z.js",
@@ -1024,13 +1019,13 @@
           },
           {
             "path": "dist/client.js",
-            "bytes": 22731,
-            "sha256": "a5f6a171ba2123e2c9a6afdb5a55d41295954c292a24f3ea2200b51ecb2c9df3"
+            "bytes": 22517,
+            "sha256": "362e2270a16f174668dc7cb2b701beaba26998bf0ac8027bda60fe31d902b5b2"
           },
           {
             "path": "dist/collaboration.js",
             "bytes": 1605,
-            "sha256": "ce02ebecb7332604845a7d59603423ef820cff313ead2cc089850ddcb35fe991"
+            "sha256": "d9bf4bda031473a041b0268f9d68fcd6e93695904f6380a9ab31f0a2bdb4567d"
           },
           {
             "path": "dist/components/collaboration/activity-feed.js",
@@ -1089,8 +1084,8 @@
           },
           {
             "path": "dist/components/data/resource-list.js",
-            "bytes": 801,
-            "sha256": "d214bf5dddd53d81f17d7f4ce6ba66c63cd0c50d532e8254fcf15575f9fef264"
+            "bytes": 855,
+            "sha256": "2c15ed9051c207378222e6e855a864ae31405864bfa382d36df684ade11a2744"
           },
           {
             "path": "dist/components/data/search-field.js",
@@ -1293,11 +1288,6 @@
             "sha256": "4e99c82a56efdb79cdccf7ff5d938a0654d228cd90807af047cc16a3956f4384"
           },
           {
-            "path": "dist/components/patterns/questionnaire.js",
-            "bytes": 224,
-            "sha256": "d3e9fcf3a7abaa4c8edd689aaa47c806240e9ebbaa67e423e1f80038c6d270eb"
-          },
-          {
             "path": "dist/components/patterns/responsive-action-menu.js",
             "bytes": 439,
             "sha256": "ad31bd398b75d187213e4d4c29a1d0a65af555225d61709158535163f7847cd9"
@@ -1315,7 +1305,7 @@
           {
             "path": "dist/components/patterns/scholia-source-workbench.js",
             "bytes": 217,
-            "sha256": "aca3cd82750880fcd3861e7d3043b481ca58ab5ccc6c0354b46d32014c8eafaa"
+            "sha256": "8e49ac0b449a48c0a67b9f72f8569a1d4cdfc1f067792b27764f612da8604489"
           },
           {
             "path": "dist/components/patterns/shortcut-help.js",
@@ -1834,23 +1824,23 @@
           },
           {
             "path": "dist/data.js",
-            "bytes": 1974,
-            "sha256": "9043dc3daa1496d39acecee1b755517076206b2ff0c5807d34cd2684e858a0d6"
+            "bytes": 2029,
+            "sha256": "279f34a37035a4ca7dab47dfaef069438ef38b1b22d4a283d16befb28f126cea"
           },
           {
             "path": "dist/examples/editor-reference.js",
-            "bytes": 9311,
-            "sha256": "c78a5fee1d82038a4f53a84a8d0e1c4c0fe8811d4da69c03028fdcca5c2cc03b"
+            "bytes": 9282,
+            "sha256": "89dee65da55952792b3ce1536a0855c61e63baafcb61158aeb90f25678a1350d"
           },
           {
             "path": "dist/index.js",
-            "bytes": 22736,
-            "sha256": "08be1580f6f24043b2ef60e4aae9b5c744341aaec17da2e261238a13bf6a9fb2"
+            "bytes": 22522,
+            "sha256": "390795c39ceaa319a65bb68412197ebdedaa4ccbf4f6496e24ddd3879f34c2d3"
           },
           {
             "path": "dist/labs.js",
             "bytes": 3145,
-            "sha256": "69b1953c718d8b49fc904f4c9c068edd038ebe8960a537fb5896f59e65d0280b"
+            "sha256": "40be91cc5ed0ffbf78f054994af93d8caa11923e4c9c4b67987dad51886e00e4"
           },
           {
             "path": "dist/lib/cn.js",
@@ -1860,7 +1850,7 @@
           {
             "path": "dist/media.js",
             "bytes": 915,
-            "sha256": "2a0fe46eaa8ef251fc51015a6fab635a0551604d65edbe081569b83a034be23c"
+            "sha256": "400cf5c77188e5e36928a903cf3183f3de01dd378745fbfc85cac29a306d29bd"
           },
           {
             "path": "dist/paper.js",
@@ -1874,8 +1864,8 @@
           },
           {
             "path": "dist/patterns.js",
-            "bytes": 6302,
-            "sha256": "90d09cd21f4ead7baf6283bbcf2166ea180b913c1cb02fc988a9fe7e819e5f03"
+            "bytes": 6088,
+            "sha256": "238b70b51684c35b81c2b569a3a02f4aced315877c783cc93030055bca0d5195"
           },
           {
             "path": "dist/pop.js",
@@ -1920,12 +1910,12 @@
           {
             "path": "dist/social.js",
             "bytes": 1966,
-            "sha256": "64ca70d52acf29f7db61017d85eff369366c5b2b6bf439d886275f610c113d83"
+            "sha256": "efa14f5a80014b3ec68bbd4ab53098569f0475a68ccb9742d2cdb75269f1cd9e"
           },
           {
             "path": "dist/stable.js",
             "bytes": 15804,
-            "sha256": "77374d91f3876925ae9a534c86e6a6944fe837494ad68182c7fe937d680ba9d6"
+            "sha256": "388fc59bd0a742aa5b5cff402db38333c9490678ca8654429a580a22c954ae50"
           },
           {
             "path": "dist/studio.js",
