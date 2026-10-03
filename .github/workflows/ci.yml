@@ -14,6 +14,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  findings:
+    name: Deterministic Findings
+    permissions:
+      contents: read
+    uses: moritzbrantner/reusable-workflows/.github/workflows/coding-tooling-validation.yml@159701da0842f885d786fc8109c1de32f7dc0128
+    with:
+      operation: findings
+      report_path: .artifacts/coding-tooling/findings.json
+
   fast-validation:
     name: Fast Validation
     permissions:
