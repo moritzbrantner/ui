@@ -191,6 +191,7 @@ function PopRewardPlayground() {
             </div>
 
             <SuccessPop
+              aria-label="Action feedback"
               open={success !== null}
               level={rewardTarget === "milestone" ? "celebration" : undefined}
               title={success?.title ?? "Reward ready"}
@@ -238,6 +239,11 @@ export const Playground: Story = {
 
     await userEvent.click(playground.getByRole("button", { name: "Complete goal" }));
     await waitFor(() => expect(playground.getByText("Goal completed")).toBeVisible());
+    await waitFor(() =>
+      expect(playground.getByRole("status", { name: "Action feedback" })).toHaveStyle({
+        opacity: "1",
+      }),
+    );
 
     await userEvent.click(playground.getByRole("button", { name: "Resolve loader" }));
     await expect(playground.getByTestId("reward-loader")).toHaveAttribute("data-status", "success");
