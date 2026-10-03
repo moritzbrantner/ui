@@ -83,3 +83,4 @@ export * from "./components/stable/toolbar";
 export * from "./components/stable/tooltip";
 export * from "./components/stable/typography";
 export * from "./components/stable/vector-input";
+export * from "./components/stable/visually-hidden";
