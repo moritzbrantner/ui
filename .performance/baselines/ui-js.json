@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "operation": "size-evidence",
   "status": "passed",
-  "durationMs": 46,
+  "durationMs": 51,
   "data": {
     "schemaVersion": "coding-tooling/size-evidence/v1",
     "metric": "raw-artifact-bytes",
@@ -65,7 +65,7 @@
             }
           ]
         },
-        "bytes": 724038,
+        "bytes": 731960,
         "artifacts": [
           {
             "path": "dist/atlas.js",
@@ -418,6 +418,11 @@
             "sha256": "a5e8c37bacc20b025a004d93b932de10b09a9acb68d4bb6d6844210d3c3bbf36"
           },
           {
+            "path": "dist/chunk-G75FCUWK.js",
+            "bytes": 2240,
+            "sha256": "79724d5aaf94c5a5c78564f5b6b3de00fe1c757b158defd7d1a669e1bd6d4140"
+          },
+          {
             "path": "dist/chunk-GEYS4WBI.js",
             "bytes": 8092,
             "sha256": "d2b84aa6c2e66f31e30cef4d28f3422c6562680684bd01197be2e4b77685339c"
@@ -483,6 +488,11 @@
             "sha256": "b4db6cee2f74707cdda6cf85dbdc8033f4b75ec7c302409afe2a60c1ea4a5f37"
           },
           {
+            "path": "dist/chunk-IQIMXOVO.js",
+            "bytes": 8070,
+            "sha256": "ccedc7f2bc821d889393c989ac1e75e00b29c24c914b12ac4fc4eb835f1ed20b"
+          },
+          {
             "path": "dist/chunk-IUZNWQJ3.js",
             "bytes": 692,
             "sha256": "2ffe6cec7b10667e5ad75a1ec986dd5f0366c995197cb44ddbe5dcbcaeedd94b"
@@ -491,11 +501,6 @@
             "path": "dist/chunk-J5AZMNXW.js",
             "bytes": 408,
             "sha256": "7b092c1f617fd367a717a96aab9f62af93090c30e1bde05031a9ef62ca387254"
-          },
-          {
-            "path": "dist/chunk-JIYOA5R2.js",
-            "bytes": 2240,
-            "sha256": "52291ea7644cc229ae0b4afa11a61f8c86fa182583f2121bdfbdfd094ec158fa"
           },
           {
             "path": "dist/chunk-K2PDG5AD.js",
@@ -613,11 +618,6 @@
             "sha256": "820a224abe3b025acf6ff1764454328e9acf5d11b2cf9322bf475fb822f9d3e7"
           },
           {
-            "path": "dist/chunk-N5NGUJWP.js",
-            "bytes": 206,
-            "sha256": "ad40a9e458efb898ab6b9951335159459eb2685db8ddb9803108f2700ed05cb8"
-          },
-          {
             "path": "dist/chunk-N6RS5ZVC.js",
             "bytes": 1390,
             "sha256": "0cef8f437027f0d29b330675a5d6a3af7c5f16e2fe6b852bbcbd5cb17d2d7d5b"
@@ -676,11 +676,6 @@
             "path": "dist/chunk-PBPIQMLJ.js",
             "bytes": 2954,
             "sha256": "83607f4fc15817d24901171db5959e19d56bd2a955556591be47eb02899d0f59"
-          },
-          {
-            "path": "dist/chunk-PC2YN2Y6.js",
-            "bytes": 13195,
-            "sha256": "30869ba26854d34c23090f5370da0e9c294409b4068afdba749e421fd36812fa"
           },
           {
             "path": "dist/chunk-PE5KGVXS.js",
@@ -873,11 +868,6 @@
             "sha256": "41eef477339af0f5e62290f9edc74cae04e84e11c35438596150209aedeba668"
           },
           {
-            "path": "dist/chunk-VLQHKSLA.js",
-            "bytes": 10747,
-            "sha256": "2f157315d9735d80dafdd2450e6ca4f4976d2ada7c0d84bce5863211a1c8cbfe"
-          },
-          {
             "path": "dist/chunk-VM6UIJPT.js",
             "bytes": 727,
             "sha256": "cbb76371ac51491ae3b2e27ea3c26bd36ef0f318a17bff8a04234de08d0691ca"
@@ -958,9 +948,19 @@
             "sha256": "849b124dc7d9b392f56e1e95dfb1c3674ea8e67314b318ffd8bd225c534c82c9"
           },
           {
+            "path": "dist/chunk-YBKT5BRK.js",
+            "bytes": 13195,
+            "sha256": "8381979c8c1d1acb6f71c8a431880fe9db605cea21c6fb51a798e70cf8a0ff0b"
+          },
+          {
             "path": "dist/chunk-YBZICC4T.js",
             "bytes": 6820,
             "sha256": "559a4c73f5ef43c49e5b15a71b2b41561e0872101ee45a5ea658ec6ba3ecc65f"
+          },
+          {
+            "path": "dist/chunk-YDEL5FBV.js",
+            "bytes": 10747,
+            "sha256": "20572126116a04d5ac9f050603e864825f967396be1460a8a678cceb723b8fa4"
           },
           {
             "path": "dist/chunk-YEL7NGD4.js",
@@ -1029,8 +1029,8 @@
           },
           {
             "path": "dist/client.js",
-            "bytes": 22793,
-            "sha256": "8d876e9de43810d08fe59b2499bd11216edcd9b53a9ac7eacba478f98196e59e"
+            "bytes": 22800,
+            "sha256": "eccba882afaea6f45b53c86898e9d37f369d120620b2cc305a373edaa2516836"
           },
           {
             "path": "dist/collaboration.js",
@@ -1120,7 +1120,7 @@
           {
             "path": "dist/components/labs/component-editor.js",
             "bytes": 771,
-            "sha256": "aebf160855274c8f91c974d2f734c9c570ddf1c08fbbd5d99de1281c6da2e041"
+            "sha256": "524952f2274e944991da2d315944e9bddba591b484688720093fdb5f679effe0"
           },
           {
             "path": "dist/components/labs/document-viewer.js",
@@ -1240,7 +1240,7 @@
           {
             "path": "dist/components/patterns/details-panel.js",
             "bytes": 362,
-            "sha256": "729049dde3941b860ae1edda2f30ae0fcd52e090f894f4393eab23ae4750591b"
+            "sha256": "be7213ce6307b5187559e80716c229ec54fc8cf3a5476d1b66aa7036a10c1b06"
           },
           {
             "path": "dist/components/patterns/disclosure-panel.js",
@@ -1426,6 +1426,11 @@
             "path": "dist/components/stable/accordion.js",
             "bytes": 177,
             "sha256": "9afbb3b05615ca40df140d1d8aae04e543f249bdb28617e178b79250d0bcf4da"
+          },
+          {
+            "path": "dist/components/stable/activity-calendar.js",
+            "bytes": 147,
+            "sha256": "cf6c667613469169e87cf4bac0aec37e56921f8540cce10cf2214073eae42041"
           },
           {
             "path": "dist/components/stable/alert-dialog.js",
@@ -1740,7 +1745,7 @@
           {
             "path": "dist/components/stable/sidebar.js",
             "bytes": 889,
-            "sha256": "6ef6bac427c516a491da66a0a7cb11a90701ed494c8756b5ac6523356ebe953d"
+            "sha256": "042edc58f697d627ceabb2b1b67389e4c9497c17ee820518ab490aadf9ba3b2b"
           },
           {
             "path": "dist/components/stable/skeleton.js",
@@ -1838,11 +1843,6 @@
             "sha256": "5f55dc129dae5af64d0be46b2ef296c2b2d3231b0413041201c1f7b1b900e22a"
           },
           {
-            "path": "dist/components/stable/visually-hidden.js",
-            "bytes": 100,
-            "sha256": "1095aea41b1b26a4b5ae18ba5e9d21c85e9aea989504e00ddec3a3db02bd0b20"
-          },
-          {
             "path": "dist/data.js",
             "bytes": 2029,
             "sha256": "51d20520db92d7fd6d85b750630f514f21f62c4773b02b997ac2052e539a8321"
@@ -1850,17 +1850,17 @@
           {
             "path": "dist/examples/editor-reference.js",
             "bytes": 9340,
-            "sha256": "a776ea4b30ce8338be79a15ac74472d6b6d9701643778065519f325abe2770e0"
+            "sha256": "0b97dc9b678a4a59b0b838a2c3ef4d4535ef9b300350aa274757de976b78a510"
           },
           {
             "path": "dist/index.js",
-            "bytes": 22798,
-            "sha256": "c66dc6c7e77b7a7e9e368b79e5b3ff42842fcabf3a4f7c10b21d893929542ead"
+            "bytes": 22800,
+            "sha256": "906d237fc5d95c8b723b885dcfe0bdadbc748c28e077a7732d66be03a5b521f8"
           },
           {
             "path": "dist/labs.js",
             "bytes": 3145,
-            "sha256": "0802d4898a0cd16ad43dcd485ac1ebbf56b14c8d2be3466a9b7f8b30cf9a592a"
+            "sha256": "4168ff9af7c20567defa0e6595702c936f90ed247f4c1fce76526f47dcfc6853"
           },
           {
             "path": "dist/lib/cn.js",
@@ -1870,7 +1870,7 @@
           {
             "path": "dist/media.js",
             "bytes": 915,
-            "sha256": "610cefba194cc1aa109b89b0ac44dbdece3a0cafc6557c22c7721bdaa44d29cf"
+            "sha256": "55bf84691d0e96379f0ff52de87544be24887e0e5225f98d5e5fc672c0211abd"
           },
           {
             "path": "dist/paper.js",
@@ -1885,7 +1885,7 @@
           {
             "path": "dist/patterns.js",
             "bytes": 6302,
-            "sha256": "b3898835a44faaefc487e9f5a08d80a8839058e4315a80ea807d0af7dc5b34c5"
+            "sha256": "b44d31ceb53b4a23a3e82b7377a49694f41fc1b1892843ac95ec6a2a57ec3798"
           },
           {
             "path": "dist/pop.js",
@@ -1934,8 +1934,8 @@
           },
           {
             "path": "dist/stable.js",
-            "bytes": 15866,
-            "sha256": "5f0b65f9cde22b61fa461328f52e522788ec4cb4b99673b3b3eff7e576e1e156"
+            "bytes": 15868,
+            "sha256": "daec35ec913844161361bf698372cff8581be67ac869ac01771192e5b9759535"
           },
           {
             "path": "dist/studio.js",
