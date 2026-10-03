@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "operation": "size-evidence",
   "status": "passed",
-  "durationMs": 51,
+  "durationMs": 39,
   "data": {
     "schemaVersion": "coding-tooling/size-evidence/v1",
     "metric": "raw-artifact-bytes",
@@ -65,7 +65,7 @@
             }
           ]
         },
-        "bytes": 731960,
+        "bytes": 731961,
         "artifacts": [
           {
             "path": "dist/atlas.js",
@@ -668,11 +668,6 @@
             "sha256": "bcb244af4bf57660d5e6c812aa57baf53f23898ed11347641b7d7b0dfec5bff1"
           },
           {
-            "path": "dist/chunk-P3ECVGTK.js",
-            "bytes": 6349,
-            "sha256": "95247ce286ed043c08012433257e11165670106c17b8691c66029e7cd1cef6f4"
-          },
-          {
             "path": "dist/chunk-PBPIQMLJ.js",
             "bytes": 2954,
             "sha256": "83607f4fc15817d24901171db5959e19d56bd2a955556591be47eb02899d0f59"
@@ -746,6 +741,11 @@
             "path": "dist/chunk-QU4ARI72.js",
             "bytes": 1710,
             "sha256": "bbccd53fa41c112e10dab253fd3e126e351ab71db06b8066e2e7589833d3543e"
+          },
+          {
+            "path": "dist/chunk-R6PHKZL5.js",
+            "bytes": 6350,
+            "sha256": "6c321d453a07ba4e7ad5732c9d2f9cbeeb2ed613699bde1bfc1e7c2d04913f7c"
           },
           {
             "path": "dist/chunk-R73UP37E.js",
@@ -1095,7 +1095,7 @@
           {
             "path": "dist/components/data/resource-list.js",
             "bytes": 855,
-            "sha256": "2c15ed9051c207378222e6e855a864ae31405864bfa382d36df684ade11a2744"
+            "sha256": "14c8ba51452b9fe57edd9bc4c16076419b474bd10dac0bb9cc98919cb9a13936"
           },
           {
             "path": "dist/components/data/search-field.js",
@@ -1845,7 +1845,7 @@
           {
             "path": "dist/data.js",
             "bytes": 2029,
-            "sha256": "51d20520db92d7fd6d85b750630f514f21f62c4773b02b997ac2052e539a8321"
+            "sha256": "be91674cb07503e0d00b27f72b7943057d2d7a7284ab5202ea70ba78f6157278"
           },
           {
             "path": "dist/examples/editor-reference.js",
