@@ -113,5 +113,9 @@
         "owners": ["moritzbrantner/ui"]
       }
     ]
+  },
+  "merge": {
+    "authority": "hosted",
+    "requiredChecks": ["Fast Validation / Fast Validation"]
   }
 }
