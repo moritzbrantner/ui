@@ -1,7 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const consumerDist = process.env.UI_EDITOR_CONSUMER_DIST;
+const quotedConsumerDist = consumerDist ? `'${consumerDist.replaceAll("'", "'\\''")}'` : undefined;
+
 export default defineConfig({
   testDir: "./visual",
+  testMatch: consumerDist ? "**/editor-consumer.acceptance.ts" : "**/*.spec.ts",
   fullyParallel: true,
   timeout: 45_000,
   workers: 8,
@@ -18,7 +22,9 @@ export default defineConfig({
     ...devices["Desktop Chrome"],
   },
   webServer: {
-    command: "storybook dev -p 6007 --host localhost --no-open --config-dir .storybook",
+    command: consumerDist
+      ? `vite preview --outDir ${quotedConsumerDist} --host localhost --port 6007 --strictPort`
+      : "storybook dev -p 6007 --host localhost --no-open --config-dir .storybook",
     port: 6007,
     reuseExistingServer: false,
     timeout: 120_000,

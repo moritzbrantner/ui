@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import { cn } from "@/registry/default/lib/cn";
+import { PropertySection } from "@/registry/default/ui/property";
 
 function formatTime(value: number) {
   const safe = Number.isFinite(value) ? Math.max(0, value) : 0;
@@ -304,12 +305,9 @@ function InspectorPanel({ title = "Inspector", groups, className, ...props }: In
     >
       <h2 className="text-sm font-semibold">{title}</h2>
       {groups.map((group) => (
-        <section key={group.id} className="grid gap-2 border-t pt-2 first:border-t-0 first:pt-0">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            {group.label}
-          </h3>
+        <PropertySection key={group.id} title={group.label}>
           <div className="grid gap-2">{group.content}</div>
-        </section>
+        </PropertySection>
       ))}
     </aside>
   );
