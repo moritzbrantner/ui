@@ -424,7 +424,11 @@
       "type": "registry:ui",
       "title": "Studio Tools",
       "description": "Media transport, timeline, layer, inspector, tool, and before/after primitives for creative workflows.",
-      "registryDependencies": ["moritzbrantner/ui/cn", "moritzbrantner/ui/studio-theme"],
+      "registryDependencies": [
+        "moritzbrantner/ui/cn",
+        "moritzbrantner/ui/studio-theme",
+        "moritzbrantner/ui/property"
+      ],
       "files": [
         {
           "path": "ui/studio-tools.tsx",
@@ -526,6 +530,75 @@
         }
       ],
       "dependencies": ["motion"]
+    },
+    {
+      "name": "collapsible",
+      "type": "registry:ui",
+      "title": "Collapsible",
+      "description": "Accessible controlled or uncontrolled disclosure.",
+      "dependencies": ["radix-ui"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "ui/collapsible.tsx",
+          "type": "registry:ui",
+          "target": "@ui/collapsible.tsx"
+        }
+      ]
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "Semantic separator presentation.",
+      "dependencies": ["radix-ui"],
+      "registryDependencies": ["moritzbrantner/ui/cn"],
+      "files": [
+        {
+          "path": "ui/separator.tsx",
+          "type": "registry:ui",
+          "target": "@ui/separator.tsx"
+        }
+      ]
+    },
+    {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "description": "Reusable labeled field presentation with descriptions and validation feedback.",
+      "dependencies": ["class-variance-authority"],
+      "registryDependencies": [
+        "moritzbrantner/ui/cn",
+        "moritzbrantner/ui/label",
+        "moritzbrantner/ui/separator"
+      ],
+      "files": [
+        {
+          "path": "ui/field.tsx",
+          "type": "registry:ui",
+          "target": "@ui/field.tsx"
+        }
+      ]
+    },
+    {
+      "name": "property",
+      "type": "registry:ui",
+      "title": "Property",
+      "description": "Shared compact property rows and controlled disclosure sections for inspectors.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "moritzbrantner/ui/cn",
+        "moritzbrantner/ui/field",
+        "moritzbrantner/ui/collapsible",
+        "moritzbrantner/ui/separator"
+      ],
+      "files": [
+        {
+          "path": "ui/property.tsx",
+          "type": "registry:ui",
+          "target": "@ui/property.tsx"
+        }
+      ]
     }
   ]
 }

@@ -551,6 +551,17 @@ const componentRegistry = [
     reason: "Reusable primitive or low-level control with stable support.",
   },
   {
+    name: "numeric-input",
+    fileName: "numeric-input",
+    tier: "stable",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/stable/numeric-input",
+    storyFiles: ["src/components/stable/numeric-input.stories.tsx"],
+    testFiles: ["src/components/stable/numeric-input.test.tsx"],
+    status: "stable",
+    reason: "Reusable exact-value editor control with keyboard operation.",
+  },
+  {
     name: "navigation-menu",
     fileName: "navigation-menu",
     tier: "stable",
@@ -604,6 +615,18 @@ const componentRegistry = [
     testFiles: ["src/components/stable/stable-contract.test.tsx"],
     status: "stable",
     reason: "Reusable primitive or low-level control with stable support.",
+  },
+  {
+    name: "property",
+    fileName: "property",
+    tier: "stable",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/stable/property",
+    storyFiles: ["src/components/stable/property.stories.tsx"],
+    testFiles: ["src/components/stable/property.test.tsx"],
+    status: "stable",
+    reason:
+      "State-light inspector rows and sections built from existing field and disclosure primitives.",
   },
   {
     name: "radio-group",
@@ -1004,6 +1027,18 @@ const componentRegistry = [
     reason: "Reusable state-light application pattern exported from the root API.",
   },
   {
+    name: "editor-workbench",
+    fileName: "editor-workbench",
+    tier: "patterns",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/patterns/editor-workbench",
+    storyFiles: ["src/components/patterns/editor-workbench.stories.tsx"],
+    testFiles: ["src/components/patterns/editor-workbench.test.tsx"],
+    status: "pattern",
+    reason:
+      "State-light command composition over the existing workbench and public editor controls.",
+  },
+  {
     name: "connection-status",
     fileName: "connection-status",
     tier: "patterns",
@@ -1357,6 +1392,17 @@ const componentRegistry = [
     testFiles: ["src/components/patterns/workbench-layout.test.tsx"],
     status: "pattern",
     reason: "Reusable state-light application pattern exported from the root API.",
+  },
+  {
+    name: "vector-input",
+    fileName: "vector-input",
+    tier: "stable",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/stable/vector-input",
+    storyFiles: ["src/components/stable/vector-input.stories.tsx"],
+    testFiles: ["src/components/stable/vector-input.test.tsx"],
+    status: "stable",
+    reason: "Reusable exact-value editor control with keyboard operation.",
   },
   {
     name: "annotation-canvas",

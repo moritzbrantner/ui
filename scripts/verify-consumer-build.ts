@@ -6,6 +6,12 @@ import { fileURLToPath } from "node:url";
 
 import { formatKb, getAssetSizeReport } from "./asset-size-report.js";
 
+const arguments_ = process.argv.slice(2);
+if (arguments_.some((argument) => argument !== "--editor-browser") || arguments_.length > 1) {
+  throw new Error("Usage: verify-consumer-build.ts [--editor-browser]");
+}
+const verifyEditorBrowser = arguments_.includes("--editor-browser");
+
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const consumerRoot = path.join(packageRoot, "examples", "consumer");
 const tempWorkspace = mkdtempSync(path.join(tmpdir(), "ui-consumer-"));
@@ -47,6 +53,7 @@ try {
   cpSync(path.join(consumerRoot, "index.html"), path.join(tempConsumerRoot, "index.html"));
   cpSync(path.join(consumerRoot, "tsconfig.json"), path.join(tempConsumerRoot, "tsconfig.json"));
   cpSync(path.join(consumerRoot, "vite.config.ts"), path.join(tempConsumerRoot, "vite.config.ts"));
+  cpSync(path.join(consumerRoot, "bun.lock"), path.join(tempConsumerRoot, "bun.lock"));
 
   const packageJson = JSON.parse(readFileSync(path.join(consumerRoot, "package.json"), "utf8"));
   packageJson.dependencies["@moritzbrantner/ui"] = `file:${tarballPath}`;
@@ -78,6 +85,17 @@ try {
       budget: singleThemeBudget,
     });
   }
+  buildConsumerFixture(tempConsumerRoot, {
+    name: "editor",
+    entry: "/src/main-editor.tsx",
+    budget: rootBudget,
+  });
+  if (verifyEditorBrowser) {
+    run("bun", ["run", "test:visual"], packageRoot, {
+      ...process.env,
+      UI_EDITOR_CONSUMER_DIST: path.join(tempConsumerRoot, "dist"),
+    });
+  }
 } finally {
   rmSync(tempWorkspace, { recursive: true, force: true });
 }
@@ -96,14 +114,13 @@ function packPackage(destination: string): string {
   );
 
   if (result.error) {
-    console.error(result.error.message);
-    process.exit(1);
+    throw result.error;
   }
 
   if (result.status !== 0) {
     process.stdout.write(result.stdout);
     process.stderr.write(result.stderr);
-    process.exit(result.status ?? 1);
+    throw new Error(`Consumer command failed with exit code ${result.status ?? "unavailable"}`);
   }
 
   const tarballFilename = result.stdout
@@ -123,20 +140,20 @@ function packPackage(destination: string): string {
     : path.join(destination, tarballFilename);
 }
 
-function run(command: string, args: string[], cwd: string): void {
+function run(command: string, args: string[], cwd: string, env = process.env): void {
   const result = spawnSync(command, args, {
     cwd,
+    env,
     shell: false,
     stdio: "inherit",
   });
 
   if (result.error) {
-    console.error(result.error.message);
-    process.exit(1);
+    throw result.error;
   }
 
   if (result.status !== 0) {
-    process.exit(result.status ?? 1);
+    throw new Error(`Consumer command failed with exit code ${result.status ?? "unavailable"}`);
   }
 }
 
@@ -225,7 +242,7 @@ function verifyConsumerSource(root: string): void {
 function buildConsumerFixture(
   root: string,
   fixture: {
-    name: "root" | "subpath" | `single-${(typeof simpleThemeFixtures)[number]}`;
+    name: "root" | "subpath" | "editor" | `single-${(typeof simpleThemeFixtures)[number]}`;
     entry: string;
     budget: {
       maxChunkBytes: number;
