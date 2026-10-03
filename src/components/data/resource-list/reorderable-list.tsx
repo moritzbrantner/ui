@@ -137,7 +137,7 @@ function ReorderHandle({
       aria-label={ariaLabel}
       disabled={isDisabled}
       className={cn(
-        "inline-flex size-9 shrink-0 touch-none items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-[dragging=true]:cursor-grabbing",
+        "inline-flex size-10 shrink-0 touch-none items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-[var(--ui-focus-ring-width)] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-[dragging=true]:cursor-grabbing",
         className,
       )}
       {...props}
