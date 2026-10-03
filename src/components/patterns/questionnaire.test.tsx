@@ -244,6 +244,31 @@ describe("questionnaire", () => {
     );
   });
 
+  test("names JSX-labelled options from their title without repeating the description", () => {
+    render(
+      <QuestionnaireSingleChoice
+        name="rich-choice"
+        options={[{ value: "rich", label: <strong>Rich</strong>, description: "Extra detail." }]}
+      />,
+    );
+
+    const radio = screen.getByRole("radio", { name: "Rich" });
+    expect(radio.getAttribute("aria-labelledby")).toBe("rich-choice-0-title");
+    expect(radio.getAttribute("aria-describedby")).toBe("rich-choice-0-description");
+  });
+
+  test("never leaves a poll result progressbar unnamed", () => {
+    function LocalizedLabel() {
+      return <span>Localized</span>;
+    }
+
+    render(
+      <QuestionnairePollResults results={[{ value: "", label: <LocalizedLabel />, count: 1 }]} />,
+    );
+
+    expect(screen.getByRole("progressbar", { name: "Result 1" })).toBeTruthy();
+  });
+
   test("uses explicit percentages when supplied and clamps unsafe values", () => {
     render(
       <QuestionnairePollResults

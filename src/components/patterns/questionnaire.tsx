@@ -285,6 +285,7 @@ function QuestionnaireSingleChoice({
                 disabled={optionDisabled}
                 required={required}
                 aria-label={accessibleLabel}
+                aria-labelledby={accessibleLabel === undefined ? `${optionId}-title` : undefined}
                 aria-describedby={
                   !isScale && option.description ? `${optionId}-description` : undefined
                 }
@@ -333,6 +334,7 @@ function QuestionnaireSingleChoice({
                   className={cn("min-w-0", !isScale && "grid flex-1 gap-0.5")}
                 >
                   <span
+                    id={`${optionId}-title`}
                     data-slot="questionnaire-option-title"
                     className={cn(
                       "font-medium",
@@ -496,9 +498,13 @@ function QuestionnairePollResults({
           const roundedPercentage = Math.round(percentage);
           const selected = result.value === selectedValue;
           // Component labels (for example a localized label element) may render text that is not
-          // statically visible here, so fall back to the stable result value as a guaranteed name.
+          // statically visible here, so fall back to the result value and finally its position to
+          // guarantee a non-empty name.
           const accessibleLabel =
-            result.ariaLabel ?? getQuestionnaireNodeText(result.label) ?? result.value;
+            result.ariaLabel ||
+            getQuestionnaireNodeText(result.label) ||
+            result.value ||
+            `Result ${index + 1}`;
 
           return (
             <li
