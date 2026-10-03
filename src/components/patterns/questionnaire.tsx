@@ -212,6 +212,11 @@ function QuestionnaireQuestion({
 
 export type QuestionnaireSingleChoiceProps = Omit<React.ComponentProps<"div">, "children"> & {
   options: readonly QuestionnaireOption[];
+  /**
+   * Radio group name. Like any native radio group it must be unique within its form (or the
+   * page, outside forms); option ids derive from `id ?? name`, so pass a distinct `id` when the
+   * same name is reused across separate forms on one page.
+   */
   name: string;
   defaultValue?: string;
   variant?: QuestionnaireChoiceVariant;
@@ -280,6 +285,9 @@ function QuestionnaireSingleChoice({
                 disabled={optionDisabled}
                 required={required}
                 aria-label={accessibleLabel}
+                aria-describedby={
+                  !isScale && option.description ? `${optionId}-description` : undefined
+                }
               />
 
               {!isScale && (
@@ -336,6 +344,7 @@ function QuestionnaireSingleChoice({
                   </span>
                   {!isScale && option.description && (
                     <span
+                      id={`${optionId}-description`}
                       data-slot="questionnaire-option-description"
                       className="text-sm leading-5 text-muted-foreground"
                     >
@@ -486,7 +495,10 @@ function QuestionnairePollResults({
           const percentage = Math.min(100, Math.max(0, rawPercentage));
           const roundedPercentage = Math.round(percentage);
           const selected = result.value === selectedValue;
-          const accessibleLabel = result.ariaLabel ?? getQuestionnaireNodeText(result.label);
+          // Component labels (for example a localized label element) may render text that is not
+          // statically visible here, so fall back to the stable result value as a guaranteed name.
+          const accessibleLabel =
+            result.ariaLabel ?? getQuestionnaireNodeText(result.label) ?? result.value;
 
           return (
             <li

@@ -220,6 +220,30 @@ describe("questionnaire", () => {
     expect(screen.getByText(", Your vote").className).toContain("sr-only");
   });
 
+  test("falls back to the result value for component labels without static text", () => {
+    function LocalizedLabel() {
+      return <span>Localized</span>;
+    }
+
+    render(
+      <QuestionnairePollResults
+        results={[{ value: "team", label: <LocalizedLabel />, count: 1 }]}
+      />,
+    );
+
+    expect(screen.getByRole("progressbar", { name: "team" })).toBeTruthy();
+  });
+
+  test("describes radio options with their visible description", () => {
+    render(<QuestionnaireSingleChoice name="described-choice" options={options} />);
+
+    const radio = screen.getByRole("radio", { name: "Focused" });
+    expect(radio.getAttribute("aria-describedby")).toBe("described-choice-0-description");
+    expect(document.getElementById("described-choice-0-description")?.textContent).toBe(
+      "Keep the decision narrow.",
+    );
+  });
+
   test("uses explicit percentages when supplied and clamps unsafe values", () => {
     render(
       <QuestionnairePollResults
