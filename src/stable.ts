@@ -1,6 +1,7 @@
 "use client";
 
 export * from "./components/stable/accordion";
+export * from "./components/stable/activity-calendar";
 export * from "./components/stable/alert";
 export * from "./components/stable/alert-dialog";
 export * from "./components/stable/angle-input";
