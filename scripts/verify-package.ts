@@ -365,6 +365,10 @@ const packageFiles = new Set(
     .filter((file): file is string => Boolean(file)),
 );
 const requiredPackageFiles = [
+  "dist/examples/editor-reference.js",
+  "dist/examples/editor-reference.d.ts",
+  "examples/editor-reference/EditorReference.tsx",
+  "examples/editor-reference/README.md",
   "dist/index.js",
   "dist/index.d.ts",
   "dist/server.js",

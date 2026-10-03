@@ -5,11 +5,16 @@
     "ignoreDeprecations": "6.0",
     "jsx": "react-jsx",
     "module": "ESNext",
-    "moduleResolution": "Bundler"
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@moritzbrantner/ui": ["./src/index.ts"],
+      "@moritzbrantner/ui/components/*": ["./src/components/*"]
+    }
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
+    "examples/editor-reference/**/*.tsx",
     ".storybook/**/*.ts",
     ".storybook/**/*.tsx",
     "vitest.storybook.config.ts"
