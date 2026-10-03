@@ -20,3 +20,10 @@
 - Verification, security, release, and deployment workflows pin external GitHub Actions or reusable workflows to a full commit SHA rather than a mutable version tag.
 - Keep a human-readable version comment where useful so reviewers can see the intended release without sacrificing immutability.
 - Local actions such as `./.github/actions/...` are repository source and do not need an external SHA pin.
+
+## GIT-005 — Bind integration evidence to the exact candidate
+
+- Required acceptance evidence identifies the exact source revision, and the exact built artifact when artifact identity matters.
+- Moving the candidate head invalidates earlier completion evidence unless the check is explicitly content-addressed and proves it still applies to the new candidate.
+- A skipped, cancelled, missing, timed-out, unavailable, or incomparable check is not green. Classify it explicitly as not applicable or unavailable and preserve why.
+- Integration must verify that the evidence being used belongs to the candidate being integrated rather than a previous head, base revision, or neighboring stacked change.
