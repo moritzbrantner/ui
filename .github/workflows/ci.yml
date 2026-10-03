@@ -36,8 +36,6 @@ jobs:
       build_command: bun run build
       unit_test_command: bun run test:unit
       timeout_minutes: 30
-    secrets:
-      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
   integration-validation:
     name: Integration Validation
@@ -47,10 +45,8 @@ jobs:
     uses: moritzbrantner/reusable-workflows/.github/workflows/integration-validation.yml@workflow-standard-v1.2
     with:
       integration_command: bun run test:coverage
-      package_check_command: bun run build && bun run test:package && bun run verify:consumer && bun run pack:dry
+      package_check_command: bun run build && bun run test:package && bun run verify:consumer && bun run verify:git-install && bun run pack:dry
       timeout_minutes: 45
-    secrets:
-      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
   storybook-validation:
     name: Storybook Validation
@@ -70,8 +66,6 @@ jobs:
         storybook-static
         playwright-report
         test-results
-    secrets:
-      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
   performance-validation:
     name: Performance Validation
@@ -96,5 +90,3 @@ jobs:
         .unlighthouse
         benchmark-results
         performance-results
-    secrets:
-      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
