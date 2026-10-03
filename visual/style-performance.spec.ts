@@ -41,8 +41,23 @@ test.describe("style performance", () => {
       // than JSDOM so CSS selector matching, style recalculation, layout, paint preparation, and
       // theme-specific effects participate in the measurement.
       try {
+        const primaryAction = page.getByRole("button", { name: "Primary action" });
+
         for (let index = 0; index < 12; index += 1) {
-          await page.getByRole("button", { name: "Primary action" }).hover();
+          await primaryAction.hover();
+          // Keep the pointer on the control until its finite hover animations (Pop/Pulse) have
+          // run, so the sampled metrics include the animated frames rather than only the
+          // selector toggle.
+          await primaryAction.evaluate((element) =>
+            Promise.all(
+              element
+                .getAnimations({ subtree: true })
+                .filter((animation) =>
+                  Number.isFinite(animation.effect?.getComputedTiming().endTime ?? Infinity),
+                )
+                .map((animation) => animation.finished.catch(() => undefined)),
+            ),
+          );
           await page.getByRole("heading", { name: "Section heading" }).hover();
         }
 
