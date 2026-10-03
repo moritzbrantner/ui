@@ -2,10 +2,14 @@ import { defineConfig, devices } from "@playwright/test";
 
 const consumerDist = process.env.UI_EDITOR_CONSUMER_DIST;
 const quotedConsumerDist = consumerDist ? `'${consumerDist.replaceAll("'", "'\\''")}'` : undefined;
+// The browser style-performance budgets run only in the dedicated performance job
+// (`bun run test:style-performance`), not in the generic visual suite.
+const runStylePerformance = process.env.UI_STYLE_PERFORMANCE === "1";
 
 export default defineConfig({
   testDir: "./visual",
   testMatch: consumerDist ? "**/editor-consumer.acceptance.ts" : "**/*.spec.ts",
+  testIgnore: runStylePerformance ? undefined : "**/style-performance.spec.ts",
   fullyParallel: true,
   timeout: 45_000,
   workers: 8,
