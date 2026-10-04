@@ -36,6 +36,7 @@ Keep product workflows, routing, auth/session state, backend contracts, settings
 - CI/release confidence contract: `bun run verify:release`
 - Package dry run: `bun run pack:dry`
 - Consumer example verification: `bun run verify:consumer`
+- Git-pin install proof (clean clone of `HEAD` builds via `prepare`): `bun run verify:git-install`
 - Visual tests only: `bun run test:visual`
 - Storybook build: `bun run build-storybook`
 - Synchronize shadcn registry source: `bun run sync:registry`
@@ -46,6 +47,8 @@ Keep product workflows, routing, auth/session state, backend contracts, settings
 Before running visual tests locally for the first time, install the Chromium browser with `bunx playwright install chromium`. CI uses `bunx playwright install --with-deps chromium`.
 
 ## Release Flow
+
+Consumers pin this package as a git source dependency on a commit SHA (`git+https://github.com/moritzbrantner/ui.git#<sha>`) and list `@moritzbrantner/ui` in `trustedDependencies`; `prepare` (`scripts/prepare-git-install.ts`) then builds `dist/` in an isolated copy with its own frozen install and copies it back. In a normal checkout `prepare` does nothing. Installing this repository needs no GitHub Packages token.
 
 This package is published directly to the public package registry for the `@moritzbrantner` scope. Use `bun run publish:registry` for a local publish after authenticating for the registry. `.github/workflows/publish.yml` can also publish on `v*` tags or manual workflow dispatch when `NPM_TOKEN` is configured.
 
