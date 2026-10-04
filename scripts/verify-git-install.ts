@@ -36,12 +36,19 @@ function collectTargets(value: unknown, targets: string[]) {
 
 try {
   const head = execFileSync("git", ["rev-parse", "HEAD"], { cwd: packageRoot }).toString().trim();
+  // CI may check out a synthetic merge commit without a branch advertising it.
+  // Give Bun a disposable repository with an explicit ref to the exact candidate.
+  const sourceDir = path.join(consumerDir, "source.git");
+  execFileSync("git", ["init", "--bare", "--quiet", sourceDir]);
+  execFileSync("git", ["-C", sourceDir, "fetch", "--quiet", "--depth=1", packageRoot, head]);
+  execFileSync("git", ["-C", sourceDir, "update-ref", "refs/heads/candidate", head]);
+  execFileSync("git", ["-C", sourceDir, "symbolic-ref", "HEAD", "refs/heads/candidate"]);
   writeFileSync(
     path.join(consumerDir, "package.json"),
     JSON.stringify({
       name: "git-install-consumer",
       private: true,
-      dependencies: { [packageName]: `git+${pathToFileURL(packageRoot).href}#${head}` },
+      dependencies: { [packageName]: `git+${pathToFileURL(sourceDir).href}#${head}` },
       trustedDependencies: [packageName],
     }),
   );
