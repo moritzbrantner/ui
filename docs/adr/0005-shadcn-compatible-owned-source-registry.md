@@ -21,7 +21,7 @@ The Moritz UI visual and product rules still apply:
 
 Maintain two deliberate distribution modes from the same repository:
 
-1. The npm package remains the compatibility and centrally managed distribution path.
+1. The package remains the compatibility and centrally managed distribution path. (Amended 2026-10-05: npm publishing is retired; the package is distributed as a commit-pinned git dependency built by `prepare`, see `docs/release.md`.)
 2. A shadcn-compatible registry provides source-owned installation for applications that need local adaptation.
 
 The registry starts with a small, representative set: the `cn` utility, the foundational theme tokens, `Button`, `Input`, `Label`, `DescriptionList`, and `MetricStrip`.

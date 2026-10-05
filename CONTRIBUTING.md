@@ -108,7 +108,7 @@ bun run test:package
 bun pm pack --dry-run --ignore-scripts
 ```
 
-`bun run publish:registry` runs the full local release contract and then publishes to the public package registry. Use it only after the changelog and `package.json` version describe the intended release.
+npm publishing is retired; consumers pin a commit SHA as a git dependency. Run `bun run verify:release` before merging a version bump, after the changelog and `package.json` version describe the intended release.
 
 ## Token metadata
 

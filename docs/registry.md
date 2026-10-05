@@ -1,6 +1,6 @@
 # Source Registry
 
-Moritz UI supports a shadcn-compatible source registry alongside the published `@moritzbrantner/ui` package.
+Moritz UI supports a shadcn-compatible source registry alongside the `@moritzbrantner/ui` package, which consumers install as a commit-pinned git dependency (see `docs/release.md`).
 
 Use the package when an application benefits from centralized upgrades and stable public entrypoints. Use the registry when an application should own and adapt the component source. Both paths use the same design tokens, component semantics, accessibility expectations, and state-light ownership boundary.
 

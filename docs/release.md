@@ -1,20 +1,17 @@
 # Release Runbook
 
-This package publishes directly to the public package registry as `@moritzbrantner/ui`.
+`@moritzbrantner/ui` is not published to npm for now; versions already on npm stay there. Consumers
+install a commit-pinned git dependency (`git+https://github.com/moritzbrantner/ui.git#<sha>`, listed
+in `trustedDependencies`), and `prepare` (`scripts/prepare-git-install.ts`) builds `dist/` during
+that install. `bun run verify:git-install` checks that path for the current pushed commit.
 
 ## Prepare
 
-1. Confirm the registry version that is already published:
+1. Bump `package.json` to the next semver version. The design-system verifier reads this version and checks the top `CHANGELOG.md` release heading.
 
-   ```sh
-   bun pm view @moritzbrantner/ui version dist-tags
-   ```
+2. Add a matching top entry in `CHANGELOG.md` that calls out public component/API changes, verification changes, and migration notes. If the top version has not been merged to `main` yet, update that prepared top entry instead of adding another version heading.
 
-2. Bump `package.json` to the next semver version. The design-system verifier reads this version and checks the top `CHANGELOG.md` release heading.
-
-3. Add a matching top entry in `CHANGELOG.md` that calls out public component/API changes, verification changes, and migration notes. If a prepared local version has not been published yet, update that prepared top entry instead of preserving an unpublished version heading.
-
-4. Check `src/component-registry.ts` for any public API moves and make sure new focused tiers have story and test coverage.
+3. Check `src/component-registry.ts` for any public API moves and make sure new focused tiers have story and test coverage.
 
 ## Verify
 
@@ -94,19 +91,9 @@ Inspect the package contents:
 bun run pack:dry
 ```
 
-## Publish
+## Release
 
-After `bun run verify:release` and `bun run pack:dry` pass, authenticate for the registry and publish:
-
-```sh
-bun run publish:registry
-```
-
-The GitHub publish workflow can also publish on a `v*` tag or manual dispatch. Configure npm trusted publishing for `moritzbrantner/ui` with workflow filename `publish.yml`, environment `npm`, and `npm publish` allowed:
-
-```sh
-npm trust github @moritzbrantner/ui --repo moritzbrantner/ui --file publish.yml --env npm
-npm trust list @moritzbrantner/ui
-```
-
-As a fallback, add an `NPM_TOKEN` secret with publish access to the GitHub `npm` environment. CI uses `bun run verify:release:ci`, which measures coverage with a real Node runtime instead of the local Bun coverage fallback.
+There is no publish step. After `bun run verify:release` and `bun run pack:dry` pass, merge the
+version bump to `main`; that commit is the release consumers pin. CI uses
+`bun run verify:release:ci`, which measures coverage with a real Node runtime instead of the local
+Bun coverage fallback.

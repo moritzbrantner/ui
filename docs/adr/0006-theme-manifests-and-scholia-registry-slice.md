@@ -47,7 +47,7 @@ locator, choose an interpretation, fetch a corpus, or persist annotations.
 - A theme can now manifest its ideas through an auditable installation contract rather than only a
   stylesheet or showcase.
 - Consumers may install the entire Scholia slice or choose its components independently.
-- The npm package and source registry continue to expose the same state-light component contracts.
+- The package and source registry continue to expose the same state-light component contracts.
 - Adding another themed slice requires a typed manifest, a complete theme item, reviewed components,
   at least one coherent block, source synchronization, and registry validation.
 - Theme manifests do not imply that every component is exclusive to one theme; they identify the

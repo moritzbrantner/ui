@@ -4,10 +4,14 @@
 
 ### Minor Changes
 
-- Add a shadcn-compatible source registry as an opt-in distribution path alongside the npm package, with seven pilot items, deterministic source synchronization, upstream schema validation, and GitHub Pages publishing.
+- Add a shadcn-compatible source registry as an opt-in distribution path alongside the package, with seven pilot items, deterministic source synchronization, upstream schema validation, and GitHub Pages publishing.
 - Add the first theme-owned registry slice for Scholia, with a typed theme manifest, complete source-installable theme styles, source passage, critical apparatus, scholarly note components, and a source workbench block.
 - Add explicit Motion-powered Pop and Pulse profiles with reduced-motion policy, motion-enhanced Button, Tabs, and Toast patterns, Storybook demos, typed theme manifests, and source-installable registry themes.
 - Add an event-driven Pop reward system with three intensity levels, bursts, success feedback, animated counters, progress rewards, collection entry motion, and an interactive Storybook playground.
+
+### Distribution
+
+- Retire npm publishing: the publish workflow, `publishConfig` and `publish:registry` are removed. Install the package as a commit-pinned git dependency (`git+https://github.com/moritzbrantner/ui.git#<sha>` listed in `trustedDependencies`); `prepare` builds `dist`. Versions already on npm stay there.
 
 ## 1.1.0
 

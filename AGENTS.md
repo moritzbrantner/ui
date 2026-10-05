@@ -50,9 +50,9 @@ Before running visual tests locally for the first time, install the Chromium bro
 
 Consumers pin this package as a git source dependency on a commit SHA (`git+https://github.com/moritzbrantner/ui.git#<sha>`) and list `@moritzbrantner/ui` in `trustedDependencies`; `prepare` (`scripts/prepare-git-install.ts`) then builds `dist/` in an isolated copy with its own frozen install and copies it back. In a normal checkout `prepare` does nothing. Installing this repository needs no GitHub Packages token.
 
-This package is published directly to the public package registry for the `@moritzbrantner` scope. Use `bun run publish:registry` for a local publish after authenticating for the registry. `.github/workflows/publish.yml` can also publish on `v*` tags or manual workflow dispatch when `NPM_TOKEN` is configured.
+npm publishing is retired: there is no publish workflow or publish script, and no npm token. Do not publish to npm; versions already there stay as they are.
 
-Before tagging, dispatching, or publishing manually, run `bun run verify:release` and inspect `bun pm pack --dry-run --ignore-scripts` output through `bun run pack:dry`.
+Before merging a release-relevant change (version bump, public API change), run `bun run verify:release` and inspect `bun pm pack --dry-run --ignore-scripts` output through `bun run pack:dry`.
 
 ## Do Not Edit Manually
 
