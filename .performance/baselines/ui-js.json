@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "operation": "size-evidence",
   "status": "passed",
-  "durationMs": 38,
+  "durationMs": 50,
   "data": {
     "schemaVersion": "coding-tooling/size-evidence/v1",
     "metric": "raw-artifact-bytes",
@@ -10,7 +10,7 @@
       {
         "id": "ui-distributed-js",
         "kind": "web",
-        "identity": "b2cbe8f51c0068e41a7236e6b79a7b68ed7fdd64e808b43d686b1cb18b800a9a",
+        "identity": "cbe929e44e718f1860b01399a65b8c929734743f07c60419e19b98f460eaa837",
         "inputs": {
           "id": "ui-distributed-js",
           "kind": "web",
@@ -45,7 +45,7 @@
             },
             {
               "path": "package.json",
-              "sha256": "45d02d3a06538f16099e7fdd485cdb56fb261ff960002f6727a434f2c8771806"
+              "sha256": "84ced4ed3a643894aa17c72f801d70d42c545ff7199350b5b46e100a3c64dac0"
             },
             {
               "path": "scripts/size-toolchain.ts",
