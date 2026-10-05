@@ -229,10 +229,6 @@
       "import": "./dist/examples/editor-reference.js"
     }
   },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
-  },
   "scripts": {
     "build": "tsup --config tsup.config.ts",
     "build-storybook": "storybook build --output-dir storybook-static",
@@ -252,7 +248,6 @@
     "perf:report": "bun ./scripts/report-performance-hotspots.ts",
     "prepack": "bun run build",
     "prepare": "bun ./scripts/prepare-git-install.ts",
-    "publish:registry": "bun run verify:release && bun publish --access public",
     "storybook": "storybook dev -p 6006 --no-open",
     "sync:registry": "bun ./scripts/sync-registry.ts",
     "test": "bun run test:unit",

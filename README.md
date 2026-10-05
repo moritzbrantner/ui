@@ -14,11 +14,19 @@ Generic visual affordances such as `AccountMenu` and `NotificationMenu` live in 
 
 ## Install
 
-```sh
-bun add @moritzbrantner/ui
+The package is not published to npm for now (earlier versions stay on npm). Install it as a
+commit-pinned git dependency and trust it so its `prepare` script can build `dist`:
+
+```json
+{
+  "dependencies": {
+    "@moritzbrantner/ui": "git+https://github.com/moritzbrantner/ui.git#<commit-sha>"
+  },
+  "trustedDependencies": ["@moritzbrantner/ui"]
+}
 ```
 
-The package is published to the public package registry for the `@moritzbrantner` scope, so consumers can install it with their normal Bun registry configuration.
+Pin a commit from `main`; bump the SHA to upgrade.
 
 ## Development Workflow
 
@@ -551,27 +559,14 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md), [docs/design-system.md](./docs/design-
 
 ## Release Checks
 
-Publishing goes directly to the public package registry. For a local publish, authenticate for the registry, run the release checks, then publish:
-
-```sh
-bun run publish:registry
-```
-
-The `.github/workflows/publish.yml` workflow can also publish on `v*` tags or manual dispatch. Configure npm trusted publishing for `moritzbrantner/ui` with workflow filename `publish.yml`, environment `npm`, and `npm publish` allowed:
-
-```sh
-npm trust github @moritzbrantner/ui --repo moritzbrantner/ui --file publish.yml --env npm --allow-publish
-```
-
-As a fallback, add an `NPM_TOKEN` secret with publish access to the GitHub `npm` environment.
-
-Before tagging, dispatching, or publishing manually, run:
+npm publishing is retired; a commit on `main` is the release and consumers pin its SHA. Before
+merging a version bump or public API change, run:
 
 ```sh
 bun run verify:release
 ```
 
-To inspect the package contents without publishing:
+To inspect the package contents:
 
 ```sh
 bun run pack:dry
