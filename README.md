@@ -193,13 +193,13 @@ Data, shell, social, and media components are exposed through `@moritzbrantner/u
 
 ### Source-owned installation
 
-The package also publishes a shadcn-compatible source registry for apps that should own and adapt component implementations:
+The repository also serves a shadcn-compatible source registry for apps that should own and adapt component implementations:
 
 ```sh
 bunx shadcn@4.18.0 add moritzbrantner/ui/button
 ```
 
-This is a distribution choice, not a separate visual system. Registry items preserve the same semantic tokens, restrained surfaces, state-light ownership boundary, and component contracts as the npm package. The initial catalog includes foundational controls plus `DescriptionList` and `MetricStrip`, which encode the preferred alternatives to repeated information cards.
+This is a distribution choice, not a separate visual system. Registry items preserve the same semantic tokens, restrained surfaces, state-light ownership boundary, and component contracts as the package. The initial catalog includes foundational controls plus `DescriptionList` and `MetricStrip`, which encode the preferred alternatives to repeated information cards.
 
 Scholia is the first complete themed slice. Install its source-first workbench and transitive theme
 and component dependencies with:
