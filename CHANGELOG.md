@@ -5,6 +5,12 @@
 ### Patch Changes
 
 - `FilterChip`'s accessible name is now its visible text with an action prefix, for example "Clear filter: Status Ready". Before, it was "Clear status filter", which axe-core 4.14 reports as `label-content-name-mismatch`. Locators that used the old name need updating.
+- More accessible names now contain their visible text, for axe-core 4.14's `label-content-name-mismatch`. Locators that used the old names need updating:
+  - **FilterBar control trigger:** "Filter Status" becomes "Filter Status Active" when a summary is shown.
+  - **DocumentViewer reset-zoom button:** "100%, reset zoom" (was "Reset zoom").
+  - **Gantt task bars without a `taskRenderer`:** "Discovery 40%, Apr 1 to Apr 10".
+  - **AccountMenu trigger:** "AL Open account menu", the avatar text followed by the label.
+  - **Calendar day buttons:** the visible day number and events, followed by react-day-picker's full date label.
 
 ### Minor Changes
 
