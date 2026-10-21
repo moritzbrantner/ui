@@ -107,7 +107,6 @@
           "tsconfig.base.json"
         ],
         "taskKinds": ["performance", "package-size"],
-        "instructions": ["docs/size-evidence.md"],
         "conventionRefs": ["BENCH-010"],
         "capabilities": ["build", "size:budget"],
         "owners": ["moritzbrantner/ui"]

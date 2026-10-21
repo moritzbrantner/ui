@@ -85,7 +85,7 @@ The audit builds Storybook, serves the static output locally, checks representat
 
 `bun run test:coverage` runs the local coverage helper. When Bun's `node` shim cannot expose V8 coverage APIs, it falls back to the unit suite and reports that coverage was not measured; CI runs the same release contract with the configured runtime.
 
-Package size checks use `bun run size:budget`; [size evidence](docs/size-evidence.md) documents selection, comparable baselines and explicit updates.
+Package size checks use `bun run size:budget` (public-entry, chunk, lean-theme and total-JS limits).
 
 Run `bun run bench` by itself, not in parallel with Storybook, Playwright, or other browser-heavy checks. The benchmark verifier retries failed samples once to filter transient host load, but repeat failures should be treated as release signals.
 
