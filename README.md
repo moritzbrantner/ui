@@ -30,7 +30,7 @@ Pin a commit from `main`; bump the SHA to upgrade.
 
 ## Development Workflow
 
-This repository uses Bun as the package manager and task runner. CI currently installs Bun `1.3.12` and Node `24`.
+This repository uses Bun as the package manager and task runner. CI currently installs Bun `1.4.3` and Node `24`.
 
 Set up the package from a clean checkout:
 

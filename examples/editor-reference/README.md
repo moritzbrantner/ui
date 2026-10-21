@@ -8,7 +8,7 @@ The outliner uses the public Labs `TreeView` entrypoint. UI maintainers own its 
 
 ## Run the reference
 
-Use the repository-pinned Bun 1.3.12 and its frozen lockfile. Browser setup uses the repository's matching Playwright Chromium installation:
+Use the repository-pinned Bun 1.4.3 and its frozen lockfile. Browser setup uses the repository's matching Playwright Chromium installation:
 
 ```sh
 bun install --frozen-lockfile
@@ -31,7 +31,7 @@ The older PR #45 supplies the sound workbench/command composition. Its separate 
 
 ## Standalone scaffold
 
-The existing `editor-consumer` generator creates Vite/React app files in a prepared consumer that imports this published example. The source-owned [consumer-package.json](./consumer-package.json) declares its archive dependency; its TypeScript configuration contains no producer aliases or parent config. Bun 1.3.12 and an installed `coding-tooling` CLI are explicit setup prerequisites. `coding-tooling` is a source-development tool; the generated app does not require it or a sibling checkout to compile or run.
+The existing `editor-consumer` generator creates Vite/React app files in a prepared consumer that imports this published example. The source-owned [consumer-package.json](./consumer-package.json) declares its archive dependency; its TypeScript configuration contains no producer aliases or parent config. Bun 1.4.3 and an installed `coding-tooling` CLI are explicit setup prerequisites. `coding-tooling` is a source-development tool; the generated app does not require it or a sibling checkout to compile or run.
 
 From this repository, choose an empty disposable target and supply an archive after building the package:
 
