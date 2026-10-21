@@ -251,7 +251,7 @@ describe("FilterBar", () => {
     fireEvent.click(screen.getByRole("button", { name: "Clear Amount filter" }));
 
     expect(screen.queryByLabelText("Minimum Amount")).toBeNull();
-    expect(screen.getByRole("button", { name: "Filter Amount" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Filter Amount\b/ })).toBeTruthy();
   });
 
   test("disabled typed filters do not emit changes", () => {

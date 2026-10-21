@@ -165,7 +165,7 @@ describe("@moritzbrantner/ui release readiness composed components", () => {
       expect.objectContaining({ id: "workspace" }),
     );
     expect(screen.getByRole("button", { name: "Notifications, 1 unread" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Open account menu" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Open account menu$/ })).toBeTruthy();
   });
 
   test("query builder reports expression changes from UI edits", () => {
@@ -223,7 +223,7 @@ describe("@moritzbrantner/ui release readiness composed components", () => {
       </>,
     );
 
-    openMenu(screen.getByRole("button", { name: "Open account menu" }));
+    openMenu(screen.getByRole("button", { name: /Open account menu$/ }));
     fireEvent.click(await screen.findByRole("menuitem", { name: "Settings" }));
     await waitFor(() => expect(onAccountSelect).toHaveBeenCalledTimes(1));
 

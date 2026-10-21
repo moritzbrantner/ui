@@ -964,7 +964,6 @@ function renderTypedFilterControl({
               size="sm"
               data-slot="filter-control-trigger"
               data-active={active ? true : undefined}
-              aria-label={`Filter ${labelText}`}
               disabled={disabled}
               className={cn(
                 "max-w-full rounded-r-none border-r-0",
@@ -972,11 +971,17 @@ function renderTypedFilterControl({
               )}
             >
               <ListFilterIcon aria-hidden="true" />
+              {/* The name starts with the visible label and summary in reading order (axe
+                  label-content-name-mismatch): "Filter Status Active". */}
+              <span className="sr-only">Filter </span>
               <span className="min-w-0 truncate">{label}</span>
               {visibleSummary ? (
-                <span className="min-w-0 max-w-36 truncate text-muted-foreground">
-                  {visibleSummary}
-                </span>
+                <>
+                  {" "}
+                  <span className="min-w-0 max-w-36 truncate text-muted-foreground">
+                    {visibleSummary}
+                  </span>
+                </>
               ) : null}
               <ChevronDownIcon aria-hidden="true" />
             </Button>

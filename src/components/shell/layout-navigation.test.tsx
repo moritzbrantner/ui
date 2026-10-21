@@ -197,7 +197,7 @@ describe("pattern layout and navigation", () => {
     expect(screen.queryByRole("button", { name: /Language:/ })).toBeNull();
     expect(screen.queryByRole("switch", { name: "Color mode" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Notifications" })).toBeNull();
-    expect(screen.queryByRole("button", { name: "Open account menu" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Open account menu$/ })).toBeNull();
 
     rerender(
       <NavbarActions
@@ -212,7 +212,7 @@ describe("pattern layout and navigation", () => {
     expect(screen.getByRole("button", { name: /Language:/ })).toBeTruthy();
     expect(screen.getByRole("switch", { name: "Color mode" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Notifications, 1 unread" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Open account menu" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Open account menu$/ })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Log in" })).toBeTruthy();
   });
 

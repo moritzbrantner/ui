@@ -196,7 +196,7 @@ export const Web: Story = {
     ),
   },
   play: async ({ canvas, userEvent }) => {
-    const trigger = (await canvas.findAllByRole("button", { name: "Open account menu" })).find(
+    const trigger = (await canvas.findAllByRole("button", { name: /Open account menu$/ })).find(
       (element) => {
         const styles = window.getComputedStyle(element);
 
@@ -238,7 +238,7 @@ export const PublicWithoutAuth: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("button", { name: /Language:/ })).toBeInTheDocument();
     await expect(canvas.getByRole("switch", { name: "Color mode" })).toBeInTheDocument();
-    await expect(canvas.queryByRole("button", { name: "Open account menu" })).toBeNull();
+    await expect(canvas.queryByRole("button", { name: /Open account menu$/ })).toBeNull();
   },
 };
 

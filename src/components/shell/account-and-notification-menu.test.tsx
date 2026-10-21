@@ -19,7 +19,7 @@ describe("account menu", () => {
     );
 
     expect(screen.getByText("AL")).toBeTruthy();
-    const trigger = screen.getByRole("button", { name: "Open account menu" });
+    const trigger = screen.getByRole("button", { name: /Open account menu$/ });
     expect(trigger.className).not.toContain("size-9");
     expect(trigger.className).not.toContain("hover:bg-accent");
     expect(screen.getByText("AL").closest('[data-slot="avatar"]')?.className).toContain(
@@ -42,7 +42,7 @@ describe("account menu", () => {
       />,
     );
 
-    openMenu(screen.getByRole("button", { name: "Open account menu" }));
+    openMenu(screen.getByRole("button", { name: /Open account menu$/ }));
     fireEvent.click(await screen.findByRole("menuitem", { name: "Settings" }));
 
     await waitFor(() => expect(onSelect).toHaveBeenCalledTimes(1));
@@ -51,7 +51,7 @@ describe("account menu", () => {
   test("renders guest label when user is null", async () => {
     render(<AccountMenu user={null} guestLabel="Signed out" />);
 
-    openMenu(screen.getByRole("button", { name: "Open account menu" }));
+    openMenu(screen.getByRole("button", { name: /Open account menu$/ }));
 
     expect(await screen.findByText("Signed out")).toBeTruthy();
   });
@@ -100,7 +100,7 @@ describe("account menu", () => {
       />,
     );
 
-    openMenu(screen.getByRole("button", { name: "Open account menu" }));
+    openMenu(screen.getByRole("button", { name: /Open account menu$/ }));
 
     const item = await screen.findByRole("menuitem", { name: "Sign out" });
     expect(item.getAttribute("data-variant")).toBe("destructive");
