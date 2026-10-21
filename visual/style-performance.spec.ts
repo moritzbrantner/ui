@@ -156,7 +156,7 @@ async function measureInteractions(
           .map((animation) => animation.finished.catch(() => undefined)),
       ),
     );
-    await page.getByRole("heading", { name: "Section heading" }).hover();
+    await page.getByRole("heading", { level: 1 }).hover();
   }
 
   return subtractBrowserMetrics(await readBrowserMetrics(session), before);
