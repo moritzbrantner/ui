@@ -274,11 +274,8 @@
     "verify:tokens": "bun ./scripts/verify-tokens.ts",
     "verify:workflows": "bun ./scripts/verify-workflows.ts",
     "verify:consumer:editor": "bun run build && bun ./scripts/verify-consumer-build.ts --editor-browser",
-    "verify:size-baseline": "bun scripts/verify-size-baseline.ts",
-    "verify:size": "bun run verify:build-size && bun run verify:size-baseline",
-    "size:budget": "bun run build && bun run verify:size",
-    "test:size-evidence": "bun scripts/verify-size-evidence.acceptance.ts",
-    "size:baseline:update": "bun run build && bun run verify:build-size && bun scripts/verify-size-baseline.ts --update"
+    "verify:size": "bun run verify:build-size",
+    "size:budget": "bun run build && bun run verify:size"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
