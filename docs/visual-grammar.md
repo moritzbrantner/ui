@@ -27,32 +27,38 @@ Use three conceptual layers when extending the token system:
 
 Prefer derivation over adding another isolated number. A component token that always equals a semantic token is an alias, not a new design decision.
 
+## Reference spacing
+
+`--ui-space-{0,1,2,3,4,5,6,7,8,9,10,11,12,14,16}` is the reference spacing scale: step `n` is `n × 0.25rem`. Bobba's semantic control, table, surface, menu, toolbar, and button spacing tokens derive from it. Other themes keep their own values where they deliberately differ.
+
 ## Density profiles
 
-The next token expansion should support three coherent density profiles:
+Three density profiles override the semantic control, table, and surface rhythm tokens (`--ui-control-*`, `--ui-table-row-height`, `--ui-table-cell-padding-x`, `--ui-surface-*`) from the reference scale:
 
 - `compact`: operational tables, command surfaces, editor tools, and high-information layouts.
-- `default`: general product applications and reusable patterns.
+- `default`: general product applications and reusable patterns. Equals Bobba's own rhythm.
 - `comfortable`: reading, document, and lower-frequency interaction surfaces.
 
-Themes may choose a default profile while components can opt into a different profile when their domain requires it. Atlas should generally bias compact; Paper and Scholia should generally bias comfortable reading surfaces; Studio can mix compact controls with spacious canvases.
+Opt in with `data-ui-density="compact" | "default" | "comfortable"` on any element. Put the attribute on or inside a `data-ui-theme` scope, since a nested theme scope restates its own rhythm. Without the attribute, each theme keeps its own default rhythm: Atlas, Paper, and Scholia are compact; Studio, Pop, and Pulse are comfortable; Bobba and Zleek are default. Studio can mix compact controls with spacious canvases by putting `data-ui-density="compact"` on its tool panels.
 
 ## Typography ladder
 
-The system needs a small reusable ladder rather than component-specific font sizes:
+A small reusable ladder replaces component-specific font sizes. Each role defines `--ui-text-<role>-size`, `-leading`, `-weight`, and `-tracking`, and is available as the Tailwind utility `text-ui-<role>`:
 
-- display
-- heading-1
-- heading-2
-- heading-3
-- title
-- body
-- body-small
-- control
-- caption
-- mono/numeric
+| Role         | Size      | Line height | Weight | Tracking |
+| ------------ | --------- | ----------- | ------ | -------- |
+| `display`    | 3rem      | 1.05        | 700    | -0.03em  |
+| `heading-1`  | 2.25rem   | 1.15        | 600    | -0.025em |
+| `heading-2`  | 1.5rem    | 1.25        | 600    | -0.02em  |
+| `heading-3`  | 1.25rem   | 1.35        | 600    | -0.01em  |
+| `title`      | 1rem      | 1.5rem      | 600    | 0        |
+| `body`       | 1rem      | 1.75rem     | 400    | 0        |
+| `body-small` | 0.875rem  | 1.5rem      | 400    | 0        |
+| `control`    | 0.875rem  | 1.25rem     | 500    | 0        |
+| `caption`    | 0.75rem   | 1rem        | 500    | 0.01em   |
+| `mono`       | 0.8125rem | 1.25rem     | 400    | 0        |
 
-Each role should define size, line height, weight, and tracking where relevant. Reading roles should also define a recommended measure instead of allowing arbitrary line lengths.
+Pair roles with the theme font families (`font-heading`, `font-body`, `font-control`, `font-mono`). `--ui-text-measure` (70ch) is the recommended maximum line length for reading text: `max-w-(--ui-text-measure)`.
 
 ## Performance rules
 

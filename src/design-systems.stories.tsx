@@ -82,7 +82,7 @@ const surfaceDescriptions = {
 
 const densityLabels = {
   compact: "High density",
-  balanced: "Balanced spacing",
+  default: "Default spacing",
   comfortable: "Comfortable spacing",
 } as const satisfies Record<UiThemeProfile["density"], string>;
 

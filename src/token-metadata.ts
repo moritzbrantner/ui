@@ -1,6 +1,8 @@
 const uiTokenCategories = [
   "color",
   "font",
+  "typography",
+  "space",
   "radius",
   "surface",
   "control",
@@ -18,6 +20,76 @@ type UiTokenMetadata = {
   description: string;
 };
 
+/** Reference spacing scale: step `n` is `n * 0.25rem`. */
+const uiSpaceScale = {
+  "0": "0rem",
+  "1": "0.25rem",
+  "2": "0.5rem",
+  "3": "0.75rem",
+  "4": "1rem",
+  "5": "1.25rem",
+  "6": "1.5rem",
+  "7": "1.75rem",
+  "8": "2rem",
+  "9": "2.25rem",
+  "10": "2.5rem",
+  "11": "2.75rem",
+  "12": "3rem",
+  "14": "3.5rem",
+  "16": "4rem",
+} as const;
+
+type UiSpaceStep = keyof typeof uiSpaceScale;
+
+const uiSpaceSteps = Object.keys(uiSpaceScale) as UiSpaceStep[];
+
+const uiTypographyRoles = [
+  "display",
+  "heading-1",
+  "heading-2",
+  "heading-3",
+  "title",
+  "body",
+  "body-small",
+  "control",
+  "caption",
+  "mono",
+] as const;
+
+type UiTypographyRole = (typeof uiTypographyRoles)[number];
+
+const uiTypographyProperties = {
+  size: "font size",
+  leading: "line height",
+  weight: "font weight",
+  tracking: "letter spacing",
+} as const;
+
+type UiTypographyProperty = keyof typeof uiTypographyProperties;
+
+const uiTypographyPropertyNames = Object.keys(uiTypographyProperties) as UiTypographyProperty[];
+
+const uiSpaceTokenMetadata = uiSpaceSteps.map((step) => ({
+  name: `--ui-space-${step}` as const,
+  category: "space" as const,
+  description: `Reference spacing step ${step} (${uiSpaceScale[step]}).`,
+}));
+
+const uiTypographyTokenMetadata = [
+  ...uiTypographyRoles.flatMap((role) =>
+    uiTypographyPropertyNames.map((property) => ({
+      name: `--ui-text-${role}-${property}` as const,
+      category: "typography" as const,
+      description: `Typography ladder ${role} ${uiTypographyProperties[property]}.`,
+    })),
+  ),
+  {
+    name: "--ui-text-measure" as const,
+    category: "typography" as const,
+    description: "Recommended maximum line length for reading text.",
+  },
+];
+
 const uiTokenMetadata = [
   { name: "--font-sans-app", category: "font", description: "Application sans font stack." },
   { name: "--font-body-app", category: "font", description: "Application body font stack." },
@@ -32,6 +104,8 @@ const uiTokenMetadata = [
     description: "Application heading and display font stack.",
   },
   { name: "--font-mono-app", category: "font", description: "Application monospace font stack." },
+  ...uiTypographyTokenMetadata,
+  ...uiSpaceTokenMetadata,
   {
     name: "--radius",
     category: "radius",
@@ -569,7 +643,99 @@ type UiThemeTokenValueName =
   | "pulse"
   | "custom";
 
+type UiTypographyLadder = Record<
+  UiTypographyRole,
+  readonly [size: string, leading: string, weight: string, tracking: string]
+>;
+
+function createTypographyTokens(
+  ladder: UiTypographyLadder,
+): Record<`--ui-text-${UiTypographyRole}-${UiTypographyProperty}`, string> {
+  return Object.fromEntries(
+    uiTypographyRoles.flatMap((role) =>
+      uiTypographyPropertyNames.map((property, index) => [
+        `--ui-text-${role}-${property}`,
+        ladder[role][index],
+      ]),
+    ),
+  ) as Record<`--ui-text-${UiTypographyRole}-${UiTypographyProperty}`, string>;
+}
+
+const uiSpaceTokens = Object.fromEntries(
+  uiSpaceSteps.map((step) => [`--ui-space-${step}`, uiSpaceScale[step]]),
+) as Record<`--ui-space-${UiSpaceStep}`, string>;
+
+const bobbaTypographyLadder = {
+  display: ["3rem", "1.05", "700", "-0.03em"],
+  "heading-1": ["2.25rem", "1.15", "600", "-0.025em"],
+  "heading-2": ["1.5rem", "1.25", "600", "-0.02em"],
+  "heading-3": ["1.25rem", "1.35", "600", "-0.01em"],
+  title: ["1rem", "1.5rem", "600", "0em"],
+  body: ["1rem", "1.75rem", "400", "0em"],
+  "body-small": ["0.875rem", "1.5rem", "400", "0em"],
+  control: ["0.875rem", "1.25rem", "500", "0em"],
+  caption: ["0.75rem", "1rem", "500", "0.01em"],
+  mono: ["0.8125rem", "1.25rem", "400", "0em"],
+} as const satisfies UiTypographyLadder;
+
+/**
+ * Density profiles override the semantic control, table, and surface rhythm tokens for a
+ * subtree (`data-ui-density="compact" | "default" | "comfortable"`). Values derive from the
+ * reference spacing scale so every theme shares the same profile steps.
+ */
+const uiDensityNames = ["compact", "default", "comfortable"] as const;
+
+type UiDensityName = (typeof uiDensityNames)[number];
+
+const uiDensityTokenValues = {
+  compact: {
+    "--ui-control-height-xs": "var(--ui-space-5)",
+    "--ui-control-height-sm": "var(--ui-space-7)",
+    "--ui-control-height-md": "var(--ui-space-8)",
+    "--ui-control-height-lg": "var(--ui-space-9)",
+    "--ui-control-padding-x-sm": "var(--ui-space-2)",
+    "--ui-control-padding-x-md": "var(--ui-space-3)",
+    "--ui-control-gap": "var(--ui-space-1)",
+    "--ui-table-row-height": "var(--ui-space-8)",
+    "--ui-table-cell-padding-x": "var(--ui-space-2)",
+    "--ui-surface-padding-sm": "var(--ui-space-2)",
+    "--ui-surface-padding-md": "var(--ui-space-3)",
+    "--ui-surface-gap": "var(--ui-space-2)",
+  },
+  default: {
+    "--ui-control-height-xs": "var(--ui-space-6)",
+    "--ui-control-height-sm": "var(--ui-space-8)",
+    "--ui-control-height-md": "var(--ui-space-9)",
+    "--ui-control-height-lg": "var(--ui-space-10)",
+    "--ui-control-padding-x-sm": "var(--ui-space-3)",
+    "--ui-control-padding-x-md": "var(--ui-space-4)",
+    "--ui-control-gap": "var(--ui-space-2)",
+    "--ui-table-row-height": "var(--ui-space-11)",
+    "--ui-table-cell-padding-x": "var(--ui-space-3)",
+    "--ui-surface-padding-sm": "var(--ui-space-3)",
+    "--ui-surface-padding-md": "var(--ui-space-4)",
+    "--ui-surface-gap": "var(--ui-space-4)",
+  },
+  comfortable: {
+    "--ui-control-height-xs": "var(--ui-space-7)",
+    "--ui-control-height-sm": "var(--ui-space-9)",
+    "--ui-control-height-md": "var(--ui-space-10)",
+    "--ui-control-height-lg": "var(--ui-space-12)",
+    "--ui-control-padding-x-sm": "var(--ui-space-4)",
+    "--ui-control-padding-x-md": "var(--ui-space-5)",
+    "--ui-control-gap": "var(--ui-space-3)",
+    "--ui-table-row-height": "var(--ui-space-12)",
+    "--ui-table-cell-padding-x": "var(--ui-space-4)",
+    "--ui-surface-padding-sm": "var(--ui-space-4)",
+    "--ui-surface-padding-md": "var(--ui-space-6)",
+    "--ui-surface-gap": "var(--ui-space-5)",
+  },
+} as const satisfies Record<UiDensityName, UiThemeTokens>;
+
 const bobbaLightTokens = {
+  ...uiSpaceTokens,
+  ...createTypographyTokens(bobbaTypographyLadder),
+  "--ui-text-measure": "70ch",
   "--font-sans-app":
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
   "--font-body-app": "var(--font-sans-app)",
@@ -689,20 +855,9 @@ const bobbaLightTokens = {
   "--ui-radius-surface": "calc(var(--radius) + 0.125rem)",
   "--ui-radius-overlay": "calc(var(--radius) + 0.25rem)",
   "--ui-radius-pill": "999px",
-  "--ui-control-height-xs": "1.5rem",
-  "--ui-control-height-sm": "2rem",
-  "--ui-control-height-md": "2.25rem",
-  "--ui-control-height-lg": "2.5rem",
-  "--ui-control-padding-x-sm": "0.75rem",
-  "--ui-control-padding-x-md": "1rem",
-  "--ui-control-gap": "0.5rem",
-  "--ui-table-row-height": "2.75rem",
-  "--ui-table-cell-padding-x": "0.75rem",
+  ...uiDensityTokenValues.default,
   "--ui-filter-control-height": "var(--ui-control-height-md)",
   "--ui-sidebar-compact-width": "16rem",
-  "--ui-surface-padding-sm": "0.75rem",
-  "--ui-surface-padding-md": "1rem",
-  "--ui-surface-gap": "1rem",
   "--ui-focus-ring-width": "3px",
   "--ui-motion-hover-y": "-1px",
   "--ui-motion-hover-scale": "1.012",
@@ -720,10 +875,10 @@ const bobbaLightTokens = {
   "--ui-button-height-sm": "var(--ui-control-height-sm)",
   "--ui-button-height-md": "var(--ui-control-height-md)",
   "--ui-button-height-lg": "var(--ui-control-height-lg)",
-  "--ui-button-padding-x-xs": "0.5rem",
+  "--ui-button-padding-x-xs": "var(--ui-space-2)",
   "--ui-button-padding-x-sm": "var(--ui-control-padding-x-sm)",
   "--ui-button-padding-x-md": "var(--ui-control-padding-x-md)",
-  "--ui-button-padding-x-lg": "1.5rem",
+  "--ui-button-padding-x-lg": "var(--ui-space-6)",
   "--ui-button-radius": "var(--ui-radius-control)",
   "--ui-input-height": "var(--ui-control-height-md)",
   "--ui-input-padding-x": "var(--ui-control-padding-x-sm)",
@@ -732,16 +887,16 @@ const bobbaLightTokens = {
   "--ui-card-gap": "var(--ui-surface-gap)",
   "--ui-card-radius": "var(--ui-radius-surface)",
   "--ui-overlay-padding": "var(--ui-surface-padding-md)",
-  "--ui-overlay-gap": "1rem",
+  "--ui-overlay-gap": "var(--ui-space-4)",
   "--ui-overlay-radius": "var(--ui-radius-overlay)",
-  "--ui-menu-padding": "0.25rem",
+  "--ui-menu-padding": "var(--ui-space-1)",
   "--ui-menu-item-padding-x": "0.375rem",
   "--ui-menu-item-padding-y": "0.25rem",
   "--ui-menu-item-radius": "var(--ui-radius-control)",
-  "--ui-toolbar-padding-x": "0.75rem",
-  "--ui-toolbar-padding-y": "0.5rem",
+  "--ui-toolbar-padding-x": "var(--ui-space-3)",
+  "--ui-toolbar-padding-y": "var(--ui-space-2)",
   "--ui-toolbar-gap": "var(--ui-control-gap)",
-  "--ui-toolbar-min-height": "2.75rem",
+  "--ui-toolbar-min-height": "var(--ui-space-11)",
   "--ui-tabs-list-padding": "3px",
   "--ui-tabs-trigger-padding-x": "0.375rem",
   "--ui-tabs-radius": "var(--ui-radius-control)",
@@ -2171,8 +2326,16 @@ const uiThemeTokenValues = {
   },
 } as const satisfies Record<UiThemeTokenValueName, UiThemeTokenSet>;
 
-export { uiThemeTokenValues, uiTokenCategories, uiTokenMetadata, uiTokenNames };
+export {
+  uiDensityNames,
+  uiDensityTokenValues,
+  uiThemeTokenValues,
+  uiTokenCategories,
+  uiTokenMetadata,
+  uiTokenNames,
+};
 export type {
+  UiDensityName,
   UiThemeTokenMode,
   UiThemeTokenSet,
   UiThemeTokenValueName,

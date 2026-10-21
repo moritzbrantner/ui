@@ -4,6 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  uiDensityNames,
+  uiDensityTokenValues,
   uiThemeTokenValues,
   uiTokenCategories,
   uiTokenMetadata,
@@ -148,7 +150,9 @@ function generateDefaultStyles(): string {
     "",
     generateTokenBlock(":root", uiThemeTokenValues.bobba.light),
     "",
-    generateTokenBlock(".dark", uiThemeTokenValues.bobba.dark),
+    generateDarkTokenBlock(".dark", uiThemeTokenValues.bobba.dark),
+    "",
+    generateDensityBlocks(),
   ].join("\n");
 }
 
@@ -159,7 +163,7 @@ function generateThemeStyles(themeName: (typeof builtInThemeNames)[number]): str
     "",
     generateTokenBlock(":root", uiThemeTokenValues[themeName].light),
     "",
-    generateTokenBlock(".dark", uiThemeTokenValues[themeName].dark),
+    generateDarkTokenBlock(".dark", uiThemeTokenValues[themeName].dark),
   ];
   const motionExtras = generateThemeMotionExtras(themeName, ":root");
 
@@ -167,7 +171,29 @@ function generateThemeStyles(themeName: (typeof builtInThemeNames)[number]): str
     sections.push("", motionExtras);
   }
 
+  sections.push("", generateDensityBlocks());
+
   return sections.join("\n");
+}
+
+/**
+ * Density profiles are emitted after theme token blocks so they win over `:root`, `.dark`, and
+ * `[data-ui-theme]` declarations. The doubled selector also wins when the density attribute
+ * sits on the same element as a dark theme scope.
+ */
+function generateDensityBlocks(): string {
+  return uiDensityNames
+    .map((density) => {
+      const attribute = `[data-ui-density="${density}"]`;
+      const tokens = uiDensityTokenValues[density];
+
+      return [
+        `${attribute},\n[data-ui-theme]${attribute} {`,
+        ...Object.entries(tokens).map(([name, value]) => `  ${name}: ${value};`),
+        "}",
+      ].join("\n");
+    })
+    .join("\n\n");
 }
 
 function generateThemeScopes(): string {
@@ -185,7 +211,7 @@ function generateThemeScopes(): string {
     const selector =
       `.dark [data-ui-theme="${themeName}"],\n` + `[data-ui-theme="${themeName}"].dark`;
 
-    return generateTokenBlock(selector, uiThemeTokenValues[themeName].dark);
+    return generateDarkTokenBlock(selector, uiThemeTokenValues[themeName].dark);
   });
 
   const scopedMotionExtras = [
@@ -200,6 +226,7 @@ function generateThemeScopes(): string {
     ...lightBlocks.flatMap((block) => [block, ""]),
     ...darkBlocks.flatMap((block) => [block, ""]),
     ...scopedMotionExtras.flatMap((block) => [block, ""]),
+    generateDensityBlocks(),
   ].join("\n");
 }
 
@@ -249,6 +276,18 @@ function generateTailwindThemeBlock(): string {
           token.name !== "--foreground",
       )
       .map((token) => [`--color-${token.name.slice(2)}`, `var(${token.name})`] as const),
+    ...uiTokenMetadata
+      .filter((token) => token.name.endsWith("-size") && token.name.startsWith("--ui-text-"))
+      .flatMap((token) => {
+        const role = token.name.slice("--ui-text-".length, -"-size".length);
+
+        return [
+          [`--text-ui-${role}`, `var(--ui-text-${role}-size)`],
+          [`--text-ui-${role}--line-height`, `var(--ui-text-${role}-leading)`],
+          [`--text-ui-${role}--font-weight`, `var(--ui-text-${role}-weight)`],
+          [`--text-ui-${role}--letter-spacing`, `var(--ui-text-${role}-tracking)`],
+        ] as const;
+      }),
     ["--radius-sm", "calc(var(--radius) - 4px)"],
     ["--radius-md", "calc(var(--radius) - 2px)"],
     ["--radius-lg", "var(--radius)"],
@@ -368,18 +407,48 @@ function generateShadcnCompat(): string {
   ].join("\n");
 }
 
-function generateTokenBlock(selector: string, tokens: UiThemeTokens): string {
+/**
+ * Dark blocks only restate tokens that are mode-dependent in some theme (plus every color and
+ * glass token); mode-independent tokens such as spacing and typography come from the light block
+ * that matches the same scope.
+ */
+function generateDarkTokenBlock(selector: string, tokens: UiThemeTokens): string {
+  return generateTokenBlock(selector, tokens, collectDarkTokenNames());
+}
+
+function collectDarkTokenNames(): Set<string> {
+  return new Set<string>(
+    uiTokenMetadata
+      .filter(
+        (token) =>
+          token.category === "color" ||
+          token.name.startsWith("--glass-") ||
+          Object.values(uiThemeTokenValues).some(
+            ({ light, dark }) => light[token.name] !== dark[token.name],
+          ),
+      )
+      .map((token) => token.name),
+  );
+}
+
+function generateTokenBlock(
+  selector: string,
+  tokens: UiThemeTokens,
+  include?: ReadonlySet<string>,
+): string {
   return [
     `${selector} {`,
-    ...uiTokenMetadata.map((token) => {
-      const value = tokens[token.name];
+    ...uiTokenMetadata
+      .filter((token) => !include || include.has(token.name))
+      .map((token) => {
+        const value = tokens[token.name];
 
-      if (!value) {
-        throw new Error(`${selector} is missing ${token.name}`);
-      }
+        if (!value) {
+          throw new Error(`${selector} is missing ${token.name}`);
+        }
 
-      return `  ${token.name}: ${value};`;
-    }),
+        return `  ${token.name}: ${value};`;
+      }),
     "}",
   ].join("\n");
 }
