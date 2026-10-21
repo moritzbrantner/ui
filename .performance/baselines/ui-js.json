@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "operation": "size-evidence",
   "status": "passed",
-  "durationMs": 31,
+  "durationMs": 42,
   "data": {
     "schemaVersion": "coding-tooling/size-evidence/v1",
     "metric": "raw-artifact-bytes",
@@ -10,7 +10,7 @@
       {
         "id": "ui-distributed-js",
         "kind": "web",
-        "identity": "33b212bfa27b0011618dadf2cfb605bcc67b205684ee1e3e956c0d9b403fda87",
+        "identity": "cbe929e44e718f1860b01399a65b8c929734743f07c60419e19b98f460eaa837",
         "inputs": {
           "id": "ui-distributed-js",
           "kind": "web",
@@ -37,7 +37,7 @@
             "tsconfig.json",
             "tsup.config.ts"
           ],
-          "toolVersions": ["1.4.3", "{\"tsup\":\"8.5.1\",\"esbuild\":\"0.27.7\"}"],
+          "toolVersions": ["1.3.12", "{\"tsup\":\"8.5.1\",\"esbuild\":\"0.27.7\"}"],
           "buildInputHashes": [
             {
               "path": "bun.lock",
