@@ -23,6 +23,19 @@ const MAX_RECALC_STYLE_SECONDS = 0.75;
 const MAX_LAYOUT_SECONDS = 0.75;
 const MAX_TASK_SECONDS = 8;
 
+// Effect-heavy themes get a per-effect cost breakdown: each run neutralizes one effect family
+// with an injected override, so its share of the interaction cost is measured instead of guessed.
+const effectBreakdownThemes = ["bobba", "zleek", "pulse"] as const;
+const effectOverrides = {
+  "backdrop-filter":
+    "*, *::before, *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }",
+  "gradient-shine": "*, *::before, *::after { background-image: none !important; }",
+  shadow: "*, *::before, *::after { box-shadow: none !important; }",
+  "state-animation":
+    "*, *::before, *::after { animation: none !important; transition: none !important; }",
+} as const;
+type EffectName = keyof typeof effectOverrides;
+
 test.describe("style performance", () => {
   for (const theme of themeStories) {
     test(`${theme} stays within browser style/layout smoke budgets`, async ({ page }, testInfo) => {
@@ -35,33 +48,9 @@ test.describe("style performance", () => {
 
       const session = await page.context().newCDPSession(page);
       await session.send("Performance.enable");
-      const before = await readBrowserMetrics(session);
 
-      // Exercise the most common state changes. This intentionally runs in real Chromium rather
-      // than JSDOM so CSS selector matching, style recalculation, layout, paint preparation, and
-      // theme-specific effects participate in the measurement.
       try {
-        const primaryAction = page.getByRole("button", { name: "Primary action" });
-
-        for (let index = 0; index < 12; index += 1) {
-          await primaryAction.hover();
-          // Keep the pointer on the control until its finite hover animations (Pop/Pulse) have
-          // run, so the sampled metrics include the animated frames rather than only the
-          // selector toggle.
-          await primaryAction.evaluate((element) =>
-            Promise.all(
-              element
-                .getAnimations({ subtree: true })
-                .filter((animation) =>
-                  Number.isFinite(animation.effect?.getComputedTiming().endTime ?? Infinity),
-                )
-                .map((animation) => animation.finished.catch(() => undefined)),
-            ),
-          );
-          await page.getByRole("heading", { name: "Section heading" }).hover();
-        }
-
-        const metrics = subtractBrowserMetrics(await readBrowserMetrics(session), before);
+        const metrics = await measureInteractions(page, session);
         const result = {
           theme,
           interactions: 24,
@@ -93,7 +82,99 @@ test.describe("style performance", () => {
       }
     });
   }
+
+  for (const theme of effectBreakdownThemes) {
+    test(`${theme} effect cost breakdown`, async ({ page }, testInfo) => {
+      test.setTimeout(300_000);
+      // Browser metrics are noisy; the faster of two samples per variant keeps the shares stable.
+      const measure = async (effect?: EffectName) => {
+        const first = await sample(effect);
+        const second = await sample(effect);
+        return first.taskDuration <= second.taskDuration ? first : second;
+      };
+      const sample = async (effect?: EffectName) => {
+        await page.goto(`/iframe.html?id=design-system-style-specimen--${theme}`);
+        await expect(page.getByTestId(`style-specimen-${theme}`)).toBeVisible();
+        if (effect) {
+          await page.addStyleTag({ content: effectOverrides[effect] });
+        }
+        const session = await page.context().newCDPSession(page);
+        await session.send("Performance.enable");
+        try {
+          return await measureInteractions(page, session, { openState: true });
+        } finally {
+          await session.detach();
+        }
+      };
+
+      const baseline = await measure();
+      const effects = {} as Record<EffectName, BrowserMetrics & { share: BrowserMetrics }>;
+      for (const effect of Object.keys(effectOverrides) as EffectName[]) {
+        const without = await measure(effect);
+        effects[effect] = { ...without, share: subtractBrowserMetrics(baseline, without) };
+      }
+
+      const resultJson = JSON.stringify({ theme, baseline, effects }, null, 2);
+      await mkdir("performance-results/style-performance", { recursive: true });
+      await writeFile(`performance-results/style-performance/${theme}-effects.json`, resultJson);
+      console.log(`[style-performance:effects] ${JSON.stringify({ theme, baseline, effects })}`);
+      await testInfo.attach(`${theme}-effects.json`, {
+        body: resultJson,
+        contentType: "application/json",
+      });
+    });
+  }
 });
+
+async function measureInteractions(
+  page: Page,
+  session: CDPSession,
+  { openState = false }: { openState?: boolean } = {},
+) {
+  const before = await readBrowserMetrics(session);
+
+  // Exercise the most common state changes. This intentionally runs in real Chromium rather
+  // than JSDOM so CSS selector matching, style recalculation, layout, paint preparation, and
+  // theme-specific effects participate in the measurement.
+  const primaryAction = page.getByRole("button", { name: "Primary action" });
+
+  for (let index = 0; index < 12; index += 1) {
+    await primaryAction.hover();
+    if (openState) {
+      await setCardOpenState(page, index % 2 === 0);
+    }
+    // Keep the pointer on the control until its finite hover animations (Pop/Pulse) have
+    // run, so the sampled metrics include the animated frames rather than only the
+    // selector toggle.
+    await page.evaluate(() =>
+      Promise.all(
+        document
+          .getAnimations()
+          .filter((animation) =>
+            Number.isFinite(animation.effect?.getComputedTiming().endTime ?? Infinity),
+          )
+          .map((animation) => animation.finished.catch(() => undefined)),
+      ),
+    );
+    await page.getByRole("heading", { name: "Section heading" }).hover();
+  }
+
+  return subtractBrowserMetrics(await readBrowserMetrics(session), before);
+}
+
+// The specimen has no overlay, so the open-state cost is sampled by toggling `data-state="open"`
+// on its cards, which drives the same glass/motion selectors as an opened overlay surface.
+async function setCardOpenState(page: Page, open: boolean) {
+  await page.evaluate((isOpen) => {
+    for (const card of document.querySelectorAll('[data-slot="card"]')) {
+      if (isOpen) {
+        card.setAttribute("data-state", "open");
+      } else {
+        card.removeAttribute("data-state");
+      }
+    }
+  }, open);
+}
 
 async function hasMatchingThemeTokenRule(page: Page, theme: (typeof themeStories)[number]) {
   return page.evaluate((themeName) => {
