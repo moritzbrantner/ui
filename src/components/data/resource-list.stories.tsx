@@ -116,7 +116,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   play: async ({ args, canvas, userEvent }) => {
     await expect(canvas.getByText("Package contract")).toBeVisible();
-    await userEvent.click(canvas.getByRole("button", { name: "Clear status filter" }));
+    await userEvent.click(canvas.getByRole("button", { name: /^Clear filter: Status/ }));
     await expect(args.onClearFilter).toHaveBeenCalledWith("status");
   },
 };

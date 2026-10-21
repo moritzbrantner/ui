@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Patch Changes
+
+- `FilterChip`'s accessible name is now its visible text with an action prefix, for example "Clear filter: Status Ready". Before, it was "Clear status filter", which axe-core 4.14 reports as `label-content-name-mismatch`. Locators that used the old name need updating.
+
 ### Minor Changes
 
 - Add a shadcn-compatible source registry as an opt-in distribution path alongside the package, with seven pilot items, deterministic source synchronization, upstream schema validation, and GitHub Pages publishing.

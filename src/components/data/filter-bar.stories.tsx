@@ -316,7 +316,7 @@ export const Default: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.clear(canvas.getByPlaceholderText("Search rows"));
     await userEvent.type(canvas.getByPlaceholderText("Search rows"), "tokens");
-    await userEvent.click(canvas.getByRole("button", { name: "Clear status filter" }));
+    await userEvent.click(canvas.getByRole("button", { name: /^Clear filter: Status/ }));
     await expect(canvas.getByText("Owner")).toBeVisible();
   },
 };
@@ -358,7 +358,7 @@ export const InteractiveFilters: StoryObj<typeof InteractiveFilterBar> = {
     await userEvent.click(await screen.findByRole("checkbox", { name: "Filter Status by Review" }));
     await expect(canvas.getAllByText("Ready, Review")[0]).toBeVisible();
 
-    await userEvent.click(canvas.getByRole("button", { name: "Clear status filter" }));
+    await userEvent.click(canvas.getByRole("button", { name: /^Clear filter: Status/ }));
     await expect(canvas.queryByText("Ready, Review")).not.toBeInTheDocument();
     await expect(args.onClearFilter).toHaveBeenCalledWith("status");
 
@@ -396,11 +396,11 @@ export const DenseToolbar: StoryObj<typeof DenseToolbarDemo> = {
     await userEvent.click(await screen.findByRole("checkbox", { name: "Filter Status by Ready" }));
     await expect(canvas.getAllByText("Ready")[0]).toBeVisible();
 
-    await userEvent.click(canvas.getByRole("button", { name: "Clear status filter" }));
+    await userEvent.click(canvas.getByRole("button", { name: /^Clear filter: Status/ }));
     await expect(canvas.queryByText("Ready")).not.toBeInTheDocument();
     await expect(canvas.getAllByText(">= 30")[0]).toBeVisible();
 
-    await userEvent.click(canvas.getByRole("button", { name: "Clear amount filter" }));
+    await userEvent.click(canvas.getByRole("button", { name: /^Clear filter: Amount/ }));
     await expect(canvas.queryByText(">= 30")).not.toBeInTheDocument();
   },
 };

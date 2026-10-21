@@ -55,7 +55,7 @@ describe("FilterBar", () => {
     const onClearFilter = vi.fn();
 
     render(<FilterBar filters={filters} onClearFilter={onClearFilter} />);
-    fireEvent.click(screen.getByRole("button", { name: "Clear status filter" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Clear filter: Status Ready/ }));
 
     expect(onClearFilter).toHaveBeenCalledWith("status");
   });
@@ -73,7 +73,7 @@ describe("FilterBar", () => {
     const onClearFilter = vi.fn();
 
     render(<FilterBar filters={filters} onClearFilter={onClearFilter} />);
-    fireEvent.click(screen.getByRole("button", { name: "Clear owner filter" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Clear filter: Owner Design/ }));
 
     expect(onClearFilter).not.toHaveBeenCalled();
   });

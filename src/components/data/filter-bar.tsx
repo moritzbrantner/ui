@@ -262,7 +262,6 @@ function FilterChip({ filter, onClear, className, disabled, ...props }: FilterCh
       type="button"
       data-slot="filter-chip"
       disabled={chipDisabled}
-      aria-label={`Clear ${filter.id} filter`}
       className={cn(
         "group/filter-chip inline-flex min-h-10 max-w-full items-center gap-1 rounded-md border bg-background px-2 py-1 text-xs text-foreground outline-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
         className,
@@ -270,10 +269,18 @@ function FilterChip({ filter, onClear, className, disabled, ...props }: FilterCh
       onClick={() => onClear?.(filter.id)}
       {...props}
     >
+      {/* The accessible name is the visible text with an action prefix (axe
+          label-content-name-mismatch), e.g. "Clear filter: Status Open". */}
+      {onClear ? <span className="sr-only">Clear filter: </span> : null}
       <Badge variant="secondary" className="max-w-40 truncate">
         {filter.label}
       </Badge>
-      {filter.value ? <span className="max-w-48 truncate">{filter.value}</span> : null}
+      {filter.value ? (
+        <>
+          {" "}
+          <span className="max-w-48 truncate">{filter.value}</span>
+        </>
+      ) : null}
       {filter.description ? <span className="sr-only">{filter.description}</span> : null}
       {onClear ? (
         <XIcon

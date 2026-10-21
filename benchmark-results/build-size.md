@@ -2,8 +2,8 @@
 
 - Command: `bun run verify:build-size`
 - Status: `passed`
-- Timestamp: `2026-10-21T11:30:45.047Z`
-- Total JS size: 715.3 KB / 880.0 KB
+- Timestamp: `2026-10-21T12:05:52.201Z`
+- Total JS size: 715.4 KB / 880.0 KB
 
 ## Public Entries
 
@@ -38,13 +38,13 @@
 | `dist/index.js`                     | shared | 22.3 KB | 40.0 KB | passed |
 | `dist/stable.js`                    | shared | 15.6 KB | 40.0 KB | passed |
 | `dist/chunk-XHBKOGSE.js`            | shared | 13.7 KB | 40.0 KB | passed |
+| `dist/chunk-JMTXLIIB.js`            | shared | 13.5 KB | 40.0 KB | passed |
 | `dist/chunk-AZCYGFA4.js`            | shared | 13.5 KB | 40.0 KB | passed |
-| `dist/chunk-R73UP37E.js`            | shared | 13.4 KB | 40.0 KB | passed |
 | `dist/chunk-YBKT5BRK.js`            | shared | 12.9 KB | 40.0 KB | passed |
 | `dist/chunk-ANSISVQ5.js`            | shared | 12.6 KB | 40.0 KB | passed |
 | `dist/chunk-K55ECIUT.js`            | shared | 11.9 KB | 40.0 KB | passed |
 | `dist/chunk-IE4KMJG6.js`            | shared | 10.8 KB | 40.0 KB | passed |
-| `dist/chunk-5IH6MDAW.js`            | shared | 10.7 KB | 40.0 KB | passed |
+| `dist/chunk-ITYGWYZA.js`            | shared | 10.7 KB | 40.0 KB | passed |
 | `dist/chunk-YDEL5FBV.js`            | shared | 10.5 KB | 40.0 KB | passed |
 | `dist/chunk-QDLRKMWG.js`            | shared | 10.4 KB | 40.0 KB | passed |
 | `dist/examples/editor-reference.js` | shared |  9.1 KB | 40.0 KB | passed |
@@ -63,7 +63,7 @@
 | `dist/chunk-DES2UDOF.js`            | shared |  6.6 KB | 40.0 KB | passed |
 | `dist/chunk-BV3PQEDR.js`            | shared |  6.5 KB | 40.0 KB | passed |
 | `dist/chunk-I654UX4B.js`            | shared |  6.4 KB | 40.0 KB | passed |
-| `dist/chunk-R6PHKZL5.js`            | shared |  6.2 KB | 40.0 KB | passed |
+| `dist/chunk-T54ZEON3.js`            | shared |  6.2 KB | 40.0 KB | passed |
 
 ## Failures
 
