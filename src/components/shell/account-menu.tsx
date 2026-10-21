@@ -72,7 +72,6 @@ function AccountMenu({
         <button
           type="button"
           data-slot="account-menu-trigger"
-          aria-label={label}
           title={label}
           {...buttonProps}
           {...restTriggerProps}
@@ -105,6 +104,9 @@ function AccountMenu({
               ) : null}
             </span>
           ) : null}
+          {/* The name comes from the content so it contains the visible avatar initials and
+              user text (axe label-content-name-mismatch): "AL Open account menu". */}
+          <span className="sr-only"> {label}</span>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent

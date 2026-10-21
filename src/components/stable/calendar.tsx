@@ -255,6 +255,7 @@ function CalendarDayButton({
   maxEventsPerDay = 2,
   modifiers,
   locale,
+  "aria-label": dayLabel,
   ...props
 }: React.ComponentProps<typeof DayButton> & {
   locale?: Partial<Locale>;
@@ -312,6 +313,7 @@ function CalendarDayButton({
           ) : null}
         </div>
       ) : null}
+      <CalendarDayLabel label={dayLabel} />
     </Button>
   );
 }
@@ -324,6 +326,7 @@ function CalendarCardDayButton({
   maxEventsPerDay = 4,
   modifiers,
   locale,
+  "aria-label": dayLabel,
   ...props
 }: React.ComponentProps<typeof DayButton> & {
   locale?: Partial<Locale>;
@@ -420,8 +423,18 @@ function CalendarCardDayButton({
           </span>
         ) : null}
       </div>
+      <CalendarDayLabel label={dayLabel} />
     </Button>
   );
+}
+
+/**
+ * react-day-picker's full day label ("Friday, October 30th, 2026, selected") as screen-reader
+ * text after the visible content. As an aria-label it would replace the visible day number and
+ * events, which axe reports as label-content-name-mismatch.
+ */
+function CalendarDayLabel({ label }: { label?: string }) {
+  return label ? <span className="sr-only"> {label}</span> : null;
 }
 
 export { Calendar, CalendarCardDays, CalendarDayButton, CalendarCardDayButton };

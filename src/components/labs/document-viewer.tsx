@@ -263,14 +263,9 @@ function DocumentViewerToolbar({
         >
           <ZoomOutIcon />
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          aria-label="Reset zoom"
-          onClick={() => onZoomChange?.(1)}
-        >
-          {Math.round(zoom * 100)}%
+        <Button type="button" variant="outline" size="sm" onClick={() => onZoomChange?.(1)}>
+          {/* Visible zoom first so the name contains it (axe label-content-name-mismatch). */}
+          {Math.round(zoom * 100)}%<span className="sr-only">, reset zoom</span>
         </Button>
         <Button
           type="button"

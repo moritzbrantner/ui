@@ -467,7 +467,9 @@ const GanttTaskButton = React.memo(function GanttTaskButton({
       data-slot="gantt-task"
       data-selected={selected ? "true" : undefined}
       disabled={task.disabled}
-      aria-label={ariaLabel}
+      // Without a custom renderer the name comes from the content, so it starts with the visible
+      // label and progress (axe label-content-name-mismatch): "Discovery, 40%, Apr 1 to Apr 10".
+      aria-label={taskRenderer ? ariaLabel : undefined}
       className="absolute z-10 flex min-w-9 items-center overflow-hidden rounded-md border bg-background px-2 text-left text-xs font-medium text-foreground shadow-sm outline-none transition disabled:cursor-not-allowed disabled:opacity-50 data-[selected=true]:ring-2 data-[selected=true]:ring-ring"
       style={{
         left: metrics.left,
@@ -493,10 +495,18 @@ const GanttTaskButton = React.memo(function GanttTaskButton({
             })
           : task.label}
         {showProgressLabels ? (
-          <span data-slot="gantt-task-progress-label" className="shrink-0 text-[10px] opacity-85">
-            {clampGanttPercent(task.progress ?? 0)}%
-          </span>
+          <>
+            {" "}
+            <span data-slot="gantt-task-progress-label" className="shrink-0 text-[10px] opacity-85">
+              {clampGanttPercent(task.progress ?? 0)}%
+            </span>
+          </>
         ) : null}
+        {taskRenderer ? null : (
+          <span className="sr-only">
+            , {formatDate(task.startDate, scale)} to {formatDate(task.endDate, scale)}
+          </span>
+        )}
       </span>
     </button>
   );

@@ -350,11 +350,11 @@ export const InteractiveFilters: StoryObj<typeof InteractiveFilterBar> = {
     onClearAll: fn(),
   },
   play: async ({ args, canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: "Filter Priority" }));
+    await userEvent.click(canvas.getByRole("button", { name: /^Filter Priority\b/ }));
     await userEvent.click(await screen.findByRole("checkbox", { name: "Filter Priority by High" }));
     await expect(canvas.getAllByText("High")[0]).toBeVisible();
 
-    await userEvent.click(canvas.getByRole("button", { name: "Filter Status" }));
+    await userEvent.click(canvas.getByRole("button", { name: /^Filter Status\b/ }));
     await userEvent.click(await screen.findByRole("checkbox", { name: "Filter Status by Review" }));
     await expect(canvas.getAllByText("Ready, Review")[0]).toBeVisible();
 
@@ -371,13 +371,13 @@ export const InteractiveFilters: StoryObj<typeof InteractiveFilterBar> = {
 export const TypedControls: StoryObj<typeof TypedFilterBarDemo> = {
   render: () => <TypedFilterBarDemo />,
   play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: "Filter Status" }));
+    await userEvent.click(canvas.getByRole("button", { name: /^Filter Status\b/ }));
     await userEvent.click(
       await screen.findByRole("checkbox", { name: "Filter Status by Blocked" }),
     );
     await expect(canvas.getAllByText("Ready, Blocked")[0]).toBeVisible();
 
-    await userEvent.click(canvas.getByRole("button", { name: "Filter Amount" }));
+    await userEvent.click(canvas.getByRole("button", { name: /^Filter Amount\b/ }));
     await userEvent.type(await screen.findByLabelText("Minimum Amount"), "30");
     await userEvent.type(screen.getByLabelText("Maximum Amount"), "80");
     await expect(canvas.getAllByText("30-80")[0]).toBeVisible();
@@ -392,7 +392,7 @@ export const DenseToolbar: StoryObj<typeof DenseToolbarDemo> = {
   play: async ({ canvas, userEvent }) => {
     await expect(canvas.getAllByText(">= 30")[0]).toBeVisible();
 
-    await userEvent.click(canvas.getByRole("button", { name: "Filter Status" }));
+    await userEvent.click(canvas.getByRole("button", { name: /^Filter Status\b/ }));
     await userEvent.click(await screen.findByRole("checkbox", { name: "Filter Status by Ready" }));
     await expect(canvas.getAllByText("Ready")[0]).toBeVisible();
 
@@ -408,7 +408,7 @@ export const DenseToolbar: StoryObj<typeof DenseToolbarDemo> = {
 export const TagFilter: StoryObj<typeof TagFilterDemo> = {
   render: () => <TagFilterDemo />,
   play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: "Filter Labels" }));
+    await userEvent.click(canvas.getByRole("button", { name: /^Filter Labels\b/ }));
     await userEvent.type(await screen.findByLabelText("Labels tag"), "release{enter}");
     await expect(canvas.getAllByText("design, release")[0]).toBeVisible();
     await userEvent.keyboard("{Escape}");

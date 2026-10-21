@@ -549,7 +549,7 @@ describe("@moritzbrantner/ui overlays-and-navigation", () => {
     expect(screen.getByRole("button", { name: "Language: Deutsch" })).toBeTruthy();
     expect(screen.getByRole("switch", { name: "Color mode" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Notifications, 3 unread" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Open account menu" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Open account menu$/ })).toBeTruthy();
     expect(screen.getByText("MB")).toBeTruthy();
     expect(screen.queryByText("Mira Brandt")).toBeNull();
   });

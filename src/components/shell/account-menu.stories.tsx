@@ -84,7 +84,7 @@ export const WithDisabledAndDestructiveItems: Story = {
 
 export const OpensMenu: Story = {
   play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: "Open account menu" }));
+    await userEvent.click(canvas.getByRole("button", { name: /Open account menu$/ }));
 
     const profileItem = await screen.findByRole("menuitem", { name: /Profile/ });
 
