@@ -39,7 +39,7 @@ Three density profiles override the semantic control, table, and surface rhythm 
 - `default`: general product applications and reusable patterns. Equals Bobba's own rhythm.
 - `comfortable`: reading, document, and lower-frequency interaction surfaces.
 
-Opt in with `data-ui-density="compact" | "default" | "comfortable"` on any element. Put the attribute on or inside a `data-ui-theme` scope, since a nested theme scope restates its own rhythm. Without the attribute, each theme keeps its own default rhythm: Atlas, Paper, and Scholia are compact; Studio, Pop, and Pulse are comfortable; Bobba and Zleek are default. Studio can mix compact controls with spacious canvases by putting `data-ui-density="compact"` on its tool panels.
+Opt in with `data-ui-density="compact" | "default" | "comfortable"` on any element. Put the attribute on or inside a `data-ui-theme` scope, since a nested theme scope restates its own rhythm. Without the attribute, each theme keeps its own default rhythm: Atlas is compact; Paper, Scholia, Studio, Pop, and Pulse are comfortable; Bobba and Zleek are default. Paper and Scholia deliberately use taller controls and more padding by default; dense consumers can explicitly choose `compact`. Studio can mix compact controls with spacious canvases by putting `data-ui-density="compact"` on its tool panels.
 
 ## Typography ladder
 
