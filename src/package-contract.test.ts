@@ -848,7 +848,7 @@ describe("@moritzbrantner/ui package-contract", () => {
     expect(ThemeExports.uiThemeProfiles.zleek.surface).toBe("glass");
     expect(ThemeExports.uiThemeProfiles.pop.label).toBe("Polished Studio style");
     expect(ThemeExports.uiThemeProfiles.pulse.surface).toBe("kinetic");
-    expect(ThemeExports.uiThemeProfiles.scholia.density).toBe("compact");
+    expect(ThemeExports.uiThemeProfiles.scholia.density).toBe("comfortable");
     expect(serverUiThemeProfiles.pulse.motion).toBe("energetic");
     expect(ClientButton).toBe(Button);
     expect(ClientDialog).toBe(Dialog);

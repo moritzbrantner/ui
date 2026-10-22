@@ -103,26 +103,72 @@ function Specimen({ theme }: { theme: BuiltInUiThemeName }) {
         </section>
 
         <section className="grid gap-3 rounded-[var(--ui-radius-surface)] border bg-card p-[var(--ui-surface-padding-md)] shadow-[var(--ui-shadow-surface)]">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div className="grid gap-1">
-              <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Typography ladder
-              </span>
-              <h2 className="font-heading text-2xl font-semibold tracking-tight">
-                Section heading
-              </h2>
-            </div>
-            <span className="font-mono text-xs text-muted-foreground">123,456.78 ms</span>
-          </div>
-          <p className="max-w-[70ch] text-base leading-7">
-            Body copy should remain comfortable to scan, while control text and dense numeric data
-            should remain compact enough for application interfaces.
-          </p>
-          <p className="max-w-[70ch] text-sm leading-6 text-muted-foreground">
-            This story is the baseline for future typography and density tokens. Theme changes that
-            improve one component while degrading the overall composition should be visible here.
-          </p>
+          <span className="text-ui-caption uppercase text-muted-foreground">Typography ladder</span>
+          <dl className="grid gap-3">
+            {typographyLadder.map(({ role, className, sample }) => (
+              <div
+                key={role}
+                className="grid items-baseline gap-1 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-4"
+              >
+                <dt className="font-mono text-ui-caption text-muted-foreground">{role}</dt>
+                <dd className={`max-w-(--ui-text-measure) ${className}`}>{sample}</dd>
+              </div>
+            ))}
+          </dl>
         </section>
+      </div>
+    </UiTheme>
+  );
+}
+
+const typographyLadder = [
+  { role: "display", className: "font-heading text-ui-display", sample: "Display" },
+  { role: "heading-1", className: "font-heading text-ui-heading-1", sample: "Heading one" },
+  { role: "heading-2", className: "font-heading text-ui-heading-2", sample: "Heading two" },
+  { role: "heading-3", className: "font-heading text-ui-heading-3", sample: "Heading three" },
+  { role: "title", className: "font-heading text-ui-title", sample: "Card or panel title" },
+  {
+    role: "body",
+    className: "font-body text-ui-body",
+    sample:
+      "Body copy should remain comfortable to scan, while control text and dense numeric data stay compact enough for application interfaces.",
+  },
+  {
+    role: "body-small",
+    className: "font-body text-ui-body-small text-muted-foreground",
+    sample: "Supporting copy sits one step below body and keeps the reading measure.",
+  },
+  { role: "control", className: "font-control text-ui-control", sample: "Control label" },
+  {
+    role: "caption",
+    className: "font-body text-ui-caption text-muted-foreground",
+    sample: "Caption and metadata",
+  },
+  { role: "mono", className: "font-mono text-ui-mono tabular-nums", sample: "123,456.78 ms" },
+] as const;
+
+const densityProfiles = ["compact", "default", "comfortable"] as const;
+
+function DensitySpecimen({ theme }: { theme: BuiltInUiThemeName }) {
+  return (
+    <UiTheme theme={theme} className="bg-background p-6 text-foreground">
+      <div className="grid gap-6 lg:grid-cols-3">
+        {densityProfiles.map((density) => (
+          <div key={density} data-ui-density={density} data-testid={`density-${density}`}>
+            <Card>
+              <CardHeader>
+                <CardTitle className="capitalize">{density}</CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-[var(--ui-surface-gap)]">
+                <Input aria-label={`${density} project name`} defaultValue="Atlas migration" />
+                <div className="flex flex-wrap gap-[var(--ui-control-gap)]">
+                  <Button>Save</Button>
+                  <Button variant="outline">Cancel</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        ))}
       </div>
     </UiTheme>
   );
@@ -148,3 +194,15 @@ export const Paper: Story = { render: () => <Specimen theme="paper" /> };
 export const Scholia: Story = { render: () => <Specimen theme="scholia" /> };
 export const Pop: Story = { render: () => <Specimen theme="pop" /> };
 export const Pulse: Story = { render: () => <Specimen theme="pulse" /> };
+
+export const DensityProfiles: Story = {
+  render: () => (
+    <div className="grid gap-4 bg-muted/40 p-4">
+      {builtInUiThemeNames.map((theme) => (
+        <div key={theme} className="overflow-hidden rounded-xl border bg-background">
+          <DensitySpecimen theme={theme} />
+        </div>
+      ))}
+    </div>
+  ),
+};

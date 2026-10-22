@@ -58,7 +58,7 @@ test.describe("style performance", () => {
                 .map((animation) => animation.finished.catch(() => undefined)),
             ),
           );
-          await page.getByRole("heading", { name: "Section heading" }).hover();
+          await page.getByRole("heading", { level: 1 }).hover();
         }
 
         const metrics = subtractBrowserMetrics(await readBrowserMetrics(session), before);

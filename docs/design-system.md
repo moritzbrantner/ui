@@ -56,12 +56,12 @@ Use `bobba` for default platform apps, `zleek` for polished glass shells, `atlas
 
 | Theme   | Role                        | Primary Surfaces                                                        | Density     | Motion     | Avoid Using For                                              |
 | ------- | --------------------------- | ----------------------------------------------------------------------- | ----------- | ---------- | ------------------------------------------------------------ |
-| Bobba   | Default platform style      | Shared apps, admin, core components                                     | Balanced    | Standard   | Highly branded or highly dense surfaces                      |
-| Zleek   | Glass shell style           | Command centers, launch tools, polished shells                          | Balanced    | Expressive | Dense tables or long-form reading                            |
+| Bobba   | Default platform style      | Shared apps, admin, core components                                     | Default     | Standard   | Highly branded or highly dense surfaces                      |
+| Zleek   | Glass shell style           | Command centers, launch tools, polished shells                          | Default     | Expressive | Dense tables or long-form reading                            |
 | Atlas   | Dense operational style     | Maps, analytics, tables, dashboards                                     | Compact     | Quiet      | Public marketing or celebratory flows                        |
 | Studio  | Creative production style   | Media, generation, editing tools                                        | Comfortable | Expressive | Dense back-office dashboards                                 |
-| Paper   | Document and research style | OCR, translation, text-heavy tools                                      | Compact     | Quiet      | Kinetic or showcase experiences                              |
-| Scholia | Scholarly archive style     | Source editions, citations, reference workbenches                       | Compact     | Quiet      | Generic document apps without archival needs                 |
+| Paper   | Document and research style | OCR, translation, text-heavy tools                                      | Comfortable | Quiet      | Kinetic or showcase experiences                              |
+| Scholia | Scholarly archive style     | Source editions, citations, reference workbenches                       | Comfortable | Quiet      | Generic document apps without archival needs                 |
 | Pop     | Studio public expression    | Creator onboarding, public creator surfaces, showcases                  | Comfortable | Expressive | Operational admin or dense data pages                        |
 | Pulse   | Kinetic interaction style   | Expand and collapse flows, selection-heavy controls, spatial interfaces | Comfortable | Energetic  | Long reading, quiet admin, reduced-motion-critical workflows |
 
