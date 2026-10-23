@@ -43,6 +43,7 @@ Keep product workflows, routing, auth/session state, backend contracts, settings
 - Validate and build the registry: `bun run verify:registry`
 - Build static registry JSON: `bun run build:registry`
 - Repo hygiene report: `bun run check:hygiene`
+- Design-drift report (raw colors, arbitrary values, token usage, theme coverage): `bun run report:design-drift`; its blocking rule runs in `bun run lint`
 
 Before running visual tests locally for the first time, install the Chromium browser with `bunx playwright install chromium`. CI uses `bunx playwright install --with-deps chromium`.
 

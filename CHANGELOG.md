@@ -14,6 +14,7 @@
 
 ### Minor Changes
 
+- Add typography, spacing, and density foundations. Reference spacing tokens `--ui-space-{0…16}` (`n × 0.25rem`) now drive Bobba's control, table, surface, and toolbar rhythm. A typography ladder (`--ui-text-{display,heading-1,heading-2,heading-3,title,body,body-small,control,caption,mono}-{size,leading,weight,tracking}` plus `--ui-text-measure`) is exposed as Tailwind `text-ui-<role>` utilities. `data-ui-density="compact" | "default" | "comfortable"` overrides control, table, and surface rhythm for a subtree in every theme. Other themes retain their existing appearance. `UiThemeProfile["density"]` uses `"default"` instead of `"balanced"`. Dark token blocks now restate only mode-dependent tokens. Paper and Scholia now default to comfortable density; dense consumers can opt into compact.
 - Add a shadcn-compatible source registry as an opt-in distribution path alongside the package, with seven pilot items, deterministic source synchronization, upstream schema validation, and GitHub Pages publishing.
 - Add the first theme-owned registry slice for Scholia, with a typed theme manifest, complete source-installable theme styles, source passage, critical apparatus, scholarly note components, and a source workbench block.
 - Add explicit Motion-powered Pop and Pulse profiles with reduced-motion policy, motion-enhanced Button, Tabs, and Toast patterns, Storybook demos, typed theme manifests, and source-installable registry themes.

@@ -70,7 +70,7 @@ function applyThemeAdjustments({
   primaryColor,
   radius,
 }: {
-  density: "compact" | "default" | "comfortable";
+  density: "theme" | "compact" | "default" | "comfortable";
   primaryColor: string;
   radius: "sharp" | "default" | "rounded";
 }) {
@@ -79,26 +79,13 @@ function applyThemeAdjustments({
   }
 
   const rootStyle = document.documentElement.style;
-  const densityTokens = {
-    compact: {
-      "--ui-control-height-md": "2.125rem",
-      "--ui-control-padding-x-md": "0.875rem",
-      "--ui-surface-padding-md": "0.875rem",
-      "--ui-surface-gap": "0.75rem",
-    },
-    default: {
-      "--ui-control-height-md": "",
-      "--ui-control-padding-x-md": "",
-      "--ui-surface-padding-md": "",
-      "--ui-surface-gap": "",
-    },
-    comfortable: {
-      "--ui-control-height-md": "2.625rem",
-      "--ui-control-padding-x-md": "1.125rem",
-      "--ui-surface-padding-md": "1.25rem",
-      "--ui-surface-gap": "1.125rem",
-    },
-  }[density];
+
+  if (density === "theme") {
+    delete document.documentElement.dataset.uiDensity;
+  } else {
+    document.documentElement.dataset.uiDensity = density;
+  }
+
   const radiusTokens = {
     sharp: {
       "--ui-radius-control": "0.125rem",
@@ -117,7 +104,7 @@ function applyThemeAdjustments({
     },
   }[radius];
 
-  for (const [tokenName, value] of Object.entries({ ...densityTokens, ...radiusTokens })) {
+  for (const [tokenName, value] of Object.entries(radiusTokens)) {
     rootStyle.setProperty(tokenName, value);
   }
 
@@ -139,10 +126,11 @@ const preview: Preview = {
     },
     density: {
       description: "UI density",
-      defaultValue: "default",
+      defaultValue: "theme",
       toolbar: {
         icon: "contrast",
         items: [
+          { value: "theme", title: "Theme density" },
           { value: "compact", title: "Compact" },
           { value: "default", title: "Default" },
           { value: "comfortable", title: "Comfortable" },
@@ -201,9 +189,11 @@ const preview: Preview = {
         applyDesignSystemStyle(selectedDesignSystem);
         applyThemeAdjustments({
           density:
-            context.globals.density === "compact" || context.globals.density === "comfortable"
+            context.globals.density === "compact" ||
+            context.globals.density === "default" ||
+            context.globals.density === "comfortable"
               ? context.globals.density
-              : "default",
+              : "theme",
           primaryColor:
             typeof context.globals.primaryColor === "string" ? context.globals.primaryColor : "",
           radius:

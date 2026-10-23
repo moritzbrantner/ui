@@ -5,7 +5,7 @@ type UiThemeProfile = {
   label: string;
   description: string;
   surface: "neutral" | "glass" | "dense" | "creative" | "document" | "consumer" | "kinetic";
-  density: "compact" | "balanced" | "comfortable";
+  density: "compact" | "default" | "comfortable";
   motion: "quiet" | "standard" | "expressive" | "energetic";
   bestFor: readonly string[];
 };
@@ -16,7 +16,7 @@ const uiThemeProfiles = {
     label: "Default package style",
     description: "Neutral, rounded, and product-safe for general platform applications.",
     surface: "neutral",
-    density: "balanced",
+    density: "default",
     motion: "standard",
     bestFor: ["Shared apps", "Admin flows", "Core components"],
   },
@@ -26,7 +26,7 @@ const uiThemeProfiles = {
     description:
       "Sharper translucent surfaces for command centers, launch tools, and polished shells.",
     surface: "glass",
-    density: "balanced",
+    density: "default",
     motion: "expressive",
     bestFor: ["Command centers", "Launch tools", "Polished shells"],
   },
@@ -53,7 +53,7 @@ const uiThemeProfiles = {
     label: "Document and research style",
     description: "Serif-led, document-like surfaces for reading, OCR, text, and research tools.",
     surface: "document",
-    density: "compact",
+    density: "comfortable",
     motion: "quiet",
     bestFor: ["OCR", "Translation", "Text-heavy research"],
   },
@@ -61,9 +61,9 @@ const uiThemeProfiles = {
     name: "scholia",
     label: "Scholarly archive style",
     description:
-      "Serif-led, archival, and compact for historical sources, scholarly editions, citations, and research workbenches.",
+      "Serif-led, archival, and comfortable for historical sources, scholarly editions, citations, and research workbenches.",
     surface: "document",
-    density: "compact",
+    density: "comfortable",
     motion: "quiet",
     bestFor: ["Historical sources", "Scholarly editions", "Reference workbenches"],
   },
