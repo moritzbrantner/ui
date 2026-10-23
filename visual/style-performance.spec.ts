@@ -35,6 +35,14 @@ const effectOverrides = {
     "*, *::before, *::after { animation: none !important; transition: none !important; }",
 } as const;
 type EffectName = keyof typeof effectOverrides;
+type Variant = "baseline" | EffectName;
+type BrowserMetricsSpread = Record<keyof BrowserMetrics, { min: number; max: number }>;
+const effectNames = Object.keys(effectOverrides) as EffectName[];
+const variants: Variant[] = ["baseline", ...effectNames];
+// Samples per variant (median is reported); `UI_STYLE_EFFECT_SAMPLES` can raise it, never below 5.
+const effectSamples = Math.max(5, Number(process.env.UI_STYLE_EFFECT_SAMPLES) || 5);
+// The variant order is shuffled per round; the seed is logged so a run's order can be replayed.
+const effectSeed = Number(process.env.UI_STYLE_EFFECT_SEED) || Math.floor(Math.random() * 2 ** 31);
 
 test.describe("style performance", () => {
   for (const theme of themeStories) {
@@ -85,18 +93,12 @@ test.describe("style performance", () => {
 
   for (const theme of effectBreakdownThemes) {
     test(`${theme} effect cost breakdown`, async ({ page }, testInfo) => {
-      test.setTimeout(300_000);
-      // Browser metrics are noisy; the faster of two samples per variant keeps the shares stable.
-      const measure = async (effect?: EffectName) => {
-        const first = await sample(effect);
-        const second = await sample(effect);
-        return first.taskDuration <= second.taskDuration ? first : second;
-      };
-      const sample = async (effect?: EffectName) => {
+      test.setTimeout(900_000);
+      const sample = async (variant: Variant) => {
         await page.goto(`/iframe.html?id=design-system-style-specimen--${theme}`);
         await expect(page.getByTestId(`style-specimen-${theme}`)).toBeVisible();
-        if (effect) {
-          await page.addStyleTag({ content: effectOverrides[effect] });
+        if (variant !== "baseline") {
+          await page.addStyleTag({ content: effectOverrides[variant] });
         }
         const session = await page.context().newCDPSession(page);
         await session.send("Performance.enable");
@@ -107,14 +109,63 @@ test.describe("style performance", () => {
         }
       };
 
-      const baseline = await measure();
-      const effects = {} as Record<EffectName, BrowserMetrics & { share: BrowserMetrics }>;
-      for (const effect of Object.keys(effectOverrides) as EffectName[]) {
-        const without = await measure(effect);
-        effects[effect] = { ...without, share: subtractBrowserMetrics(baseline, without) };
+      // The first sample after the dev server compiles the story is consistently slower, so a
+      // discarded warm-up sample keeps that cost out of whichever variant happens to run first.
+      await sample("baseline");
+
+      // Each round measures every variant once in a fresh shuffled order, so drift over the run
+      // (thermal, GC, background load) spreads across variants instead of biasing the late ones.
+      const random = seededRandom(effectSeed);
+      const rounds: Array<{ order: Variant[]; metrics: Record<Variant, BrowserMetrics> }> = [];
+      for (let round = 0; round < effectSamples; round += 1) {
+        const order = shuffle(variants, random);
+        const metrics = {} as Record<Variant, BrowserMetrics>;
+        for (const variant of order) {
+          metrics[variant] = await sample(variant);
+        }
+        rounds.push({ order, metrics });
       }
 
-      const resultJson = JSON.stringify({ theme, baseline, effects }, null, 2);
+      const baselineSamples = rounds.map((round) => round.metrics.baseline);
+      const baseline = {
+        ...medianBrowserMetrics(baselineSamples),
+        spread: spread(baselineSamples),
+      };
+      const effects = {} as Record<
+        EffectName,
+        BrowserMetrics & {
+          spread: BrowserMetricsSpread;
+          share: BrowserMetrics & { spread: BrowserMetricsSpread };
+        }
+      >;
+      for (const effect of effectNames) {
+        const withoutSamples = rounds.map((round) => round.metrics[effect]);
+        // A share is the paired, signed difference within one round (baseline minus the run with
+        // the effect neutralized). Negative shares are kept: they show the share is within noise.
+        const shareSamples = rounds.map((round) =>
+          differenceBrowserMetrics(round.metrics.baseline, round.metrics[effect]),
+        );
+        effects[effect] = {
+          ...medianBrowserMetrics(withoutSamples),
+          spread: spread(withoutSamples),
+          share: { ...medianBrowserMetrics(shareSamples), spread: spread(shareSamples) },
+        };
+      }
+
+      const result = {
+        theme,
+        method: {
+          warmUpSamples: 1,
+          samplesPerVariant: effectSamples,
+          statistic: "median",
+          share: "median of per-round signed differences (baseline - effect neutralized)",
+          seed: effectSeed,
+        },
+        baseline,
+        effects,
+        rounds,
+      };
+      const resultJson = JSON.stringify(result, null, 2);
       await mkdir("performance-results/style-performance", { recursive: true });
       await writeFile(`performance-results/style-performance/${theme}-effects.json`, resultJson);
       console.log(`[style-performance:effects] ${JSON.stringify({ theme, baseline, effects })}`);
@@ -229,5 +280,56 @@ function subtractBrowserMetrics(after: BrowserMetrics, before: BrowserMetrics): 
     layoutDuration: Math.max(0, after.layoutDuration - before.layoutDuration),
     recalcStyleDuration: Math.max(0, after.recalcStyleDuration - before.recalcStyleDuration),
     taskDuration: Math.max(0, after.taskDuration - before.taskDuration),
+  };
+}
+
+function differenceBrowserMetrics(left: BrowserMetrics, right: BrowserMetrics): BrowserMetrics {
+  return {
+    layoutDuration: left.layoutDuration - right.layoutDuration,
+    recalcStyleDuration: left.recalcStyleDuration - right.recalcStyleDuration,
+    taskDuration: left.taskDuration - right.taskDuration,
+  };
+}
+
+const metricNames = ["layoutDuration", "recalcStyleDuration", "taskDuration"] as const;
+
+function medianBrowserMetrics(samples: BrowserMetrics[]): BrowserMetrics {
+  const median = (values: number[]) => {
+    const sorted = [...values].sort((left, right) => left - right);
+    const middle = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 1 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+  };
+  return Object.fromEntries(
+    metricNames.map((name) => [name, median(samples.map((metrics) => metrics[name]))]),
+  ) as BrowserMetrics;
+}
+
+function spread(samples: BrowserMetrics[]): BrowserMetricsSpread {
+  return Object.fromEntries(
+    metricNames.map((name) => {
+      const values = samples.map((metrics) => metrics[name]);
+      return [name, { min: Math.min(...values), max: Math.max(...values) }];
+    }),
+  ) as BrowserMetricsSpread;
+}
+
+function shuffle<T>(items: readonly T[], random: () => number): T[] {
+  const result = [...items];
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(random() * (index + 1));
+    [result[index], result[swap]] = [result[swap], result[index]];
+  }
+  return result;
+}
+
+// mulberry32: a tiny deterministic PRNG so a logged seed reproduces the variant order.
+function seededRandom(seed: number): () => number {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let value = state;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 2 ** 32;
   };
 }
