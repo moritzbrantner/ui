@@ -19,3 +19,4 @@ unlighthouse-report/
 !.env.example
 
 benchmark-results/size-evidence.json
+benchmark-results/design-drift.*
