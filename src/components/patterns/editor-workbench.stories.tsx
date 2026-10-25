@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, screen } from "storybook/test";
+import { expect, screen, waitFor } from "storybook/test";
 
 import { EditorReference } from "../../../examples/editor-reference/EditorReference";
 import { EditorWorkbench } from "./editor-workbench";
@@ -46,7 +46,10 @@ export const Reference: Story = {
     );
     await userEvent.keyboard("{Enter}");
     await expect(canvas.getByLabelText("Preview transform")).toHaveTextContent("1.234567");
-    await userEvent.click(await canvas.findByRole("button", { name: "Clear selection" }));
+    // The modal palette keeps the editor inert (aria-hidden, no pointer events) until its exit
+    // animation finishes, which can take longer than the default 1s query timeout on a loaded CI.
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull(), { timeout: 15_000 });
+    await userEvent.click(canvas.getByRole("button", { name: "Clear selection" }));
     await expect(canvas.getByText("No object selected")).toBeVisible();
     await userEvent.click(canvas.getByRole("button", { name: "Select Square" }));
     await userEvent.click(canvas.getByRole("button", { name: "Restore panel layout" }));
