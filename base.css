@@ -421,7 +421,6 @@
     [data-slot="surface"],
     [data-slot="toast"]
   )::after {
-    content: "";
     position: absolute;
     top: 0;
     bottom: 0;
@@ -432,10 +431,29 @@
     background-repeat: no-repeat;
     pointer-events: none;
     transform: translateX(
-      calc(
-        var(--glass-shine-from) * (1 - var(--glass-shine-width)) / var(--glass-shine-width) * 100%
-      )
+      calc(var(--glass-shine-to) * (1 - var(--glass-shine-width)) / var(--glass-shine-width) * 100%)
     );
+  }
+
+  /*
+   * The layer exists only in the states that sweep, and it rests at the end of the sweep (past the
+   * inline-start edge), so outside the running animation it adds no box and no scrollable overflow.
+   */
+  :where(
+      [data-slot="button"]:not([data-variant="link"]),
+      [data-slot="card"],
+      [data-slot="page-header"],
+      [data-slot="surface"],
+      [data-slot="toast"]
+    ):where(
+      :hover,
+      :focus-visible,
+      [data-state="open"],
+      [data-open]:not([data-open="false"]),
+      [data-active]:not([data-active="false"]),
+      [data-selected="true"]
+    )::after {
+    content: "";
   }
 
   :where(
