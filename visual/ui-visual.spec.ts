@@ -362,6 +362,88 @@ test.describe("glass motion preferences", () => {
     );
 
     expect(animationName).not.toContain("ui-glass-shine");
+    expect(await pseudoAnimationName(button, "::after")).not.toContain("ui-glass-sweep");
+  });
+
+  test("sweeps the zleek button shine with a transform-only ::after layer", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await gotoStory(page, "components-actions-button--variants", {
+      designSystem: "zleek",
+      theme: "light",
+    });
+
+    const button = page.locator('[data-slot="button"]:not([data-variant="link"])').first();
+    await button.hover();
+
+    await expect.poll(() => pseudoAnimationName(button, "::after")).toContain("ui-glass-sweep");
+    await expectAnimationNameNotContains(button, "ui-glass-shine");
+
+    const sweep = await button.evaluate((element) => {
+      const animation = element
+        .getAnimations({ subtree: true })
+        .find(
+          (candidate) =>
+            candidate instanceof CSSAnimation && candidate.animationName === "ui-glass-sweep",
+        );
+      const effect = animation?.effect as KeyframeEffect | undefined;
+      const animatedProperties = new Set(
+        (effect?.getKeyframes() ?? []).flatMap((keyframe) =>
+          Object.keys(keyframe).filter(
+            (key) => !["offset", "computedOffset", "easing", "composite"].includes(key),
+          ),
+        ),
+      );
+      const hostStyle = window.getComputedStyle(element);
+
+      return {
+        pseudoElement: effect?.pseudoElement ?? null,
+        animatedProperties: [...animatedProperties],
+        hostOverflow: hostStyle.overflowX,
+        hostBackgroundImage: hostStyle.backgroundImage,
+      };
+    });
+
+    expect(sweep.pseudoElement).toBe("::after");
+    expect(sweep.animatedProperties).toEqual(["transform"]);
+    expect(sweep.hostOverflow).toBe("clip");
+    // The moving band lives only on the ::after layer; the host keeps the static gradient.
+    expect(sweep.hostBackgroundImage.match(/linear-gradient/g) ?? []).toHaveLength(1);
+  });
+
+  test("keeps the background-position shine on zleek toolbars", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await gotoStory(page, "components-actions-toolbar--default", {
+      designSystem: "zleek",
+      theme: "light",
+    });
+
+    const toolbar = page.locator('[data-slot="toolbar"]').first();
+    await toolbar.hover();
+
+    await expectAnimationNameContains(toolbar, "ui-glass-shine");
+    expect(await pseudoAnimationName(toolbar, "::after")).not.toContain("ui-glass-sweep");
+    expect(
+      await toolbar.evaluate((element) => window.getComputedStyle(element).overflowX),
+    ).not.toBe("clip");
+  });
+
+  test("keeps the glass shine layer off on pulse and pop buttons", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+
+    for (const designSystem of ["pulse", "pop"] as const) {
+      await gotoStory(page, "components-actions-button--variants", {
+        designSystem,
+        theme: "light",
+      });
+
+      const button = page.locator('[data-slot="button"]:not([data-variant="link"])').first();
+      await button.hover();
+
+      expect(
+        await button.evaluate((element) => window.getComputedStyle(element, "::after").content),
+        `${designSystem} button shine layer`,
+      ).toBe("none");
+    }
   });
 
   test(
@@ -1045,6 +1127,13 @@ async function expectAnimationNameContains(locator: Locator, expected: string) {
   await expect
     .poll(() => locator.evaluate((element) => window.getComputedStyle(element).animationName))
     .toContain(expected);
+}
+
+function pseudoAnimationName(locator: Locator, pseudoElement: "::after" | "::before") {
+  return locator.evaluate(
+    (element, pseudo) => window.getComputedStyle(element, pseudo).animationName,
+    pseudoElement,
+  );
 }
 
 async function expectAnimationNameNotContains(locator: Locator, expected: string) {

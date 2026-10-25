@@ -296,9 +296,10 @@
     --glass-saturation: 100%;
     --glass-surface-gradient: none;
     --glass-overlay-gradient: none;
-    --glass-background-size: auto;
-    --glass-background-position: 0 0;
-    --glass-background-position-hover: 0 0;
+    --glass-shine-gradient: none;
+    --glass-shine-width: 1;
+    --glass-shine-from: 0;
+    --glass-shine-to: 0;
     --glass-shine-duration: 1ms;
     --card: var(--glass-reduced-card);
     --popover: var(--glass-reduced-popover);
@@ -314,9 +315,10 @@
       --glass-saturation: 100%;
       --glass-surface-gradient: none;
       --glass-overlay-gradient: none;
-      --glass-background-size: auto;
-      --glass-background-position: 0 0;
-      --glass-background-position-hover: 0 0;
+      --glass-shine-gradient: none;
+      --glass-shine-width: 1;
+      --glass-shine-from: 0;
+      --glass-shine-to: 0;
       --glass-shine-duration: 1ms;
       --card: var(--glass-reduced-card);
       --popover: var(--glass-reduced-popover);
@@ -328,17 +330,29 @@
   :where(
     [data-slot="page-header"],
     [data-slot="card"],
-    [data-slot="alert"],
     [data-slot="surface"],
+    [data-slot="toast"]
+  ) {
+    background-image: var(--glass-surface-gradient) !important;
+    background-repeat: no-repeat;
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  }
+
+  :where(
+    [data-slot="alert"],
     [data-slot="action-bar"],
-    [data-slot="toast"],
     [data-slot="toolbar"],
     [data-slot="dropzone"],
     [data-slot="navbar"]
   ) {
-    background-image: var(--glass-surface-gradient) !important;
-    background-size: var(--glass-background-size);
-    background-position: var(--glass-background-position);
+    background-image: var(--glass-shine-gradient), var(--glass-surface-gradient) !important;
+    background-size:
+      calc(var(--glass-shine-width) * 100%) 100%,
+      100% 100%;
+    background-position:
+      calc(var(--glass-shine-from) * 100%) 0,
+      0 0;
     background-repeat: no-repeat;
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
@@ -365,9 +379,13 @@
     [data-slot="command"],
     [data-slot="navbar-submenu"]
   ) {
-    background-image: var(--glass-overlay-gradient) !important;
-    background-size: var(--glass-background-size);
-    background-position: var(--glass-background-position);
+    background-image: var(--glass-shine-gradient), var(--glass-overlay-gradient) !important;
+    background-size:
+      calc(var(--glass-shine-width) * 100%) 100%,
+      100% 100%;
+    background-position:
+      calc(var(--glass-shine-from) * 100%) 0,
+      0 0;
     background-repeat: no-repeat;
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
@@ -375,9 +393,49 @@
 
   :where([data-slot="button"]:not([data-variant="link"])) {
     background-image: var(--glass-surface-gradient);
-    background-size: var(--glass-background-size);
-    background-position: var(--glass-background-position);
     background-repeat: no-repeat;
+  }
+
+  /*
+   * The glass shine sweep on buttons and already-clipped surfaces is a transform-animated
+   * ::after layer, so hover and open states composite instead of repainting the host background.
+   * The layer is wider than its host, so the host clips it. Overlays, alerts, toolbars, navbars,
+   * action bars and dropzones keep the background-position sweep because they must not clip.
+   */
+  :where(
+    [data-slot="button"]:not([data-variant="link"]),
+    [data-slot="card"],
+    [data-slot="page-header"],
+    [data-slot="surface"],
+    [data-slot="toast"]
+  ) {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+  }
+
+  :where(
+    [data-slot="button"]:not([data-variant="link"]),
+    [data-slot="card"],
+    [data-slot="page-header"],
+    [data-slot="surface"],
+    [data-slot="toast"]
+  )::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    width: calc(var(--glass-shine-width) * 100%);
+    background-image: var(--glass-shine-gradient);
+    background-repeat: no-repeat;
+    pointer-events: none;
+    transform: translateX(
+      calc(
+        var(--glass-shine-from) * (1 - var(--glass-shine-width)) / var(--glass-shine-width) * 100%
+      )
+    );
   }
 
   :where(
@@ -561,11 +619,33 @@
 
   @keyframes ui-glass-shine {
     from {
-      background-position: var(--glass-background-position);
+      background-position:
+        calc(var(--glass-shine-from) * 100%) 0,
+        0 0;
     }
 
     to {
-      background-position: var(--glass-background-position-hover);
+      background-position:
+        calc(var(--glass-shine-to) * 100%) 0,
+        0 0;
+    }
+  }
+
+  @keyframes ui-glass-sweep {
+    from {
+      transform: translateX(
+        calc(
+          var(--glass-shine-from) * (1 - var(--glass-shine-width)) / var(--glass-shine-width) * 100%
+        )
+      );
+    }
+
+    to {
+      transform: translateX(
+        calc(
+          var(--glass-shine-to) * (1 - var(--glass-shine-width)) / var(--glass-shine-width) * 100%
+        )
+      );
     }
   }
 
@@ -582,12 +662,25 @@
 
   @media (prefers-reduced-motion: no-preference) {
     :where(
-      [data-slot="page-header"],
-      [data-slot="card"],
+        [data-slot="button"]:not([data-variant="link"]),
+        [data-slot="card"],
+        [data-slot="page-header"],
+        [data-slot="surface"],
+        [data-slot="toast"]
+      ):is(
+        :hover,
+        :focus-visible,
+        [data-state="open"],
+        [data-open]:not([data-open="false"]),
+        [data-active]:not([data-active="false"]),
+        [data-selected="true"]
+      )::after {
+      animation: ui-glass-sweep var(--glass-shine-duration) var(--ui-motion-ease-emphasized) both;
+    }
+
+    :where(
       [data-slot="alert"],
-      [data-slot="surface"],
       [data-slot="action-bar"],
-      [data-slot="toast"],
       [data-slot="toolbar"],
       [data-slot="dropzone"],
       [data-slot="navbar"],
@@ -609,8 +702,7 @@
       [data-slot="select-content"],
       [data-slot="combobox-content"],
       [data-slot="command"],
-      [data-slot="navbar-submenu"],
-      [data-slot="button"]:not([data-variant="link"])
+      [data-slot="navbar-submenu"]
     ):is(
       :hover,
       :focus-visible,
@@ -648,9 +740,10 @@
       --glass-saturation: 100%;
       --glass-surface-gradient: none;
       --glass-overlay-gradient: none;
-      --glass-background-size: auto;
-      --glass-background-position: 0 0;
-      --glass-background-position-hover: 0 0;
+      --glass-shine-gradient: none;
+      --glass-shine-width: 1;
+      --glass-shine-from: 0;
+      --glass-shine-to: 0;
       --glass-shine-duration: 1ms;
     }
   }
