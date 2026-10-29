@@ -1188,6 +1188,14 @@ function generateThemeMotionExtras(
     "    transform: translateY(0) scale(1);",
     "  }",
     "}",
+    "",
+    // The theme's own control, surface and overlay animations replace the glass shine on these
+    // slots, so the transform-animated shine layer stays off there (owner decision on ui#40).
+    "@layer base {",
+    `  ${selector} :where([data-slot="button"], [data-slot="card"][data-interactive="true"], [data-slot="toast"])::after {`,
+    "    content: none;",
+    "  }",
+    "}",
   ].join("\n");
 }
 

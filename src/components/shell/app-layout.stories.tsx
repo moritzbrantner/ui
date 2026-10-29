@@ -160,6 +160,9 @@ export const DashboardPage: Story = {
 };
 
 export const CenteredHeader: Story = {
+  // The page header is an inline-size container, so it has no intrinsic width of its own: in the
+  // default centered Storybook layout it would shrink to its padding and clip its content.
+  parameters: { layout: "fullscreen" },
   render: () => (
     <PageShell background="none" maxWidth="default">
       <PageHeader align="center">

@@ -89,27 +89,26 @@
   --glass-reduced-border: oklch(0.74 0.018 250);
   --glass-reduced-input: oklch(0.78 0.014 248);
   --glass-saturation: 135%;
-  --glass-surface-gradient:
-    linear-gradient(
-      115deg,
-      transparent 0%,
-      oklch(1 0 0 / 0.2) 38%,
-      oklch(1 0 0 / 0.34) 47%,
-      transparent 60%
-    ),
-    linear-gradient(180deg, oklch(1 0 0 / 0.16), oklch(0.86 0.018 248 / 0.08));
-  --glass-overlay-gradient:
-    linear-gradient(
-      115deg,
-      transparent 0%,
-      oklch(1 0 0 / 0.24) 36%,
-      oklch(1 0 0 / 0.42) 47%,
-      transparent 62%
-    ),
-    linear-gradient(180deg, oklch(1 0 0 / 0.22), oklch(0.84 0.018 248 / 0.1));
-  --glass-background-size: 240% 100%, 100% 100%;
-  --glass-background-position: -120% 0, 0 0;
-  --glass-background-position-hover: 120% 0, 0 0;
+  --glass-surface-gradient: linear-gradient(
+    180deg,
+    oklch(1 0 0 / 0.16),
+    oklch(0.86 0.018 248 / 0.08)
+  );
+  --glass-overlay-gradient: linear-gradient(
+    180deg,
+    oklch(1 0 0 / 0.22),
+    oklch(0.84 0.018 248 / 0.1)
+  );
+  --glass-shine-gradient: linear-gradient(
+    115deg,
+    transparent 0%,
+    oklch(1 0 0 / 0.2) 38%,
+    oklch(1 0 0 / 0.34) 47%,
+    transparent 60%
+  );
+  --glass-shine-width: 2.4;
+  --glass-shine-from: -1.2;
+  --glass-shine-to: 1.2;
   --glass-shine-duration: 1400ms;
   --background: oklch(0.985 0.006 250);
   --foreground: oklch(0.18 0.012 255);
@@ -285,27 +284,18 @@
   --glass-reduced-border: oklch(0.38 0.018 255);
   --glass-reduced-input: oklch(0.34 0.018 255);
   --glass-saturation: 135%;
-  --glass-surface-gradient:
-    linear-gradient(
-      115deg,
-      transparent 0%,
-      oklch(1 0 0 / 0.06) 38%,
-      oklch(1 0 0 / 0.12) 47%,
-      transparent 60%
-    ),
-    linear-gradient(180deg, oklch(1 0 0 / 0.055), oklch(0 0 0 / 0.12));
-  --glass-overlay-gradient:
-    linear-gradient(
-      115deg,
-      transparent 0%,
-      oklch(1 0 0 / 0.075) 36%,
-      oklch(1 0 0 / 0.16) 47%,
-      transparent 62%
-    ),
-    linear-gradient(180deg, oklch(1 0 0 / 0.075), oklch(0 0 0 / 0.16));
-  --glass-background-size: 240% 100%, 100% 100%;
-  --glass-background-position: -120% 0, 0 0;
-  --glass-background-position-hover: 120% 0, 0 0;
+  --glass-surface-gradient: linear-gradient(180deg, oklch(1 0 0 / 0.055), oklch(0 0 0 / 0.12));
+  --glass-overlay-gradient: linear-gradient(180deg, oklch(1 0 0 / 0.075), oklch(0 0 0 / 0.16));
+  --glass-shine-gradient: linear-gradient(
+    115deg,
+    transparent 0%,
+    oklch(1 0 0 / 0.06) 38%,
+    oklch(1 0 0 / 0.12) 47%,
+    transparent 60%
+  );
+  --glass-shine-width: 2.4;
+  --glass-shine-from: -1.2;
+  --glass-shine-to: 1.2;
   --glass-shine-duration: 1400ms;
   --background: oklch(0.155 0.012 255);
   --foreground: oklch(0.985 0 0);

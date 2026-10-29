@@ -87,27 +87,26 @@
   --glass-reduced-border: oklch(0.88 0.008 255);
   --glass-reduced-input: oklch(0.86 0.008 255);
   --glass-saturation: 150%;
-  --glass-surface-gradient:
-    linear-gradient(
-      110deg,
-      transparent 0%,
-      oklch(0.86 0.16 195 / 0.18) 34%,
-      oklch(0.78 0.2 325 / 0.2) 50%,
-      transparent 66%
-    ),
-    linear-gradient(180deg, oklch(1 0 0 / 0.18), oklch(0.88 0.04 210 / 0.1));
-  --glass-overlay-gradient:
-    linear-gradient(
-      110deg,
-      transparent 0%,
-      oklch(0.86 0.16 195 / 0.24) 34%,
-      oklch(0.78 0.2 325 / 0.26) 50%,
-      transparent 66%
-    ),
-    linear-gradient(180deg, oklch(1 0 0 / 0.22), oklch(0.88 0.04 210 / 0.12));
-  --glass-background-size: 340% 100%, 100% 100%;
-  --glass-background-position: -170% 0, 0 0;
-  --glass-background-position-hover: 170% 0, 0 0;
+  --glass-surface-gradient: linear-gradient(
+    180deg,
+    oklch(1 0 0 / 0.18),
+    oklch(0.88 0.04 210 / 0.1)
+  );
+  --glass-overlay-gradient: linear-gradient(
+    180deg,
+    oklch(1 0 0 / 0.22),
+    oklch(0.88 0.04 210 / 0.12)
+  );
+  --glass-shine-gradient: linear-gradient(
+    110deg,
+    transparent 0%,
+    oklch(0.86 0.16 195 / 0.18) 34%,
+    oklch(0.78 0.2 325 / 0.2) 50%,
+    transparent 66%
+  );
+  --glass-shine-width: 3.4;
+  --glass-shine-from: -1.7;
+  --glass-shine-to: 1.7;
   --glass-shine-duration: 850ms;
   --background: oklch(0.985 0.018 205);
   --foreground: oklch(0.17 0.04 255);
@@ -287,27 +286,18 @@
   --glass-reduced-border: oklch(1 0 0 / 10%);
   --glass-reduced-input: oklch(1 0 0 / 15%);
   --glass-saturation: 155%;
-  --glass-surface-gradient:
-    linear-gradient(
-      110deg,
-      transparent 0%,
-      oklch(0.78 0.16 195 / 0.12) 34%,
-      oklch(0.78 0.18 325 / 0.13) 50%,
-      transparent 66%
-    ),
-    linear-gradient(180deg, oklch(1 0 0 / 0.06), oklch(0 0 0 / 0.16));
-  --glass-overlay-gradient:
-    linear-gradient(
-      110deg,
-      transparent 0%,
-      oklch(0.78 0.16 195 / 0.16) 34%,
-      oklch(0.78 0.18 325 / 0.18) 50%,
-      transparent 66%
-    ),
-    linear-gradient(180deg, oklch(1 0 0 / 0.08), oklch(0 0 0 / 0.2));
-  --glass-background-size: 340% 100%, 100% 100%;
-  --glass-background-position: -170% 0, 0 0;
-  --glass-background-position-hover: 170% 0, 0 0;
+  --glass-surface-gradient: linear-gradient(180deg, oklch(1 0 0 / 0.06), oklch(0 0 0 / 0.16));
+  --glass-overlay-gradient: linear-gradient(180deg, oklch(1 0 0 / 0.08), oklch(0 0 0 / 0.2));
+  --glass-shine-gradient: linear-gradient(
+    110deg,
+    transparent 0%,
+    oklch(0.78 0.16 195 / 0.12) 34%,
+    oklch(0.78 0.18 325 / 0.13) 50%,
+    transparent 66%
+  );
+  --glass-shine-width: 3.4;
+  --glass-shine-from: -1.7;
+  --glass-shine-to: 1.7;
   --glass-shine-duration: 850ms;
   --background: oklch(0.15 0.04 255);
   --foreground: oklch(0.97 0.012 205);
@@ -1445,6 +1435,17 @@
       .ui-hover-growth-none *
     ):hover {
     transform: translateY(0) scale(1);
+  }
+}
+
+@layer base {
+  :root
+    :where(
+      [data-slot="button"],
+      [data-slot="card"][data-interactive="true"],
+      [data-slot="toast"]
+    )::after {
+    content: none;
   }
 }
 

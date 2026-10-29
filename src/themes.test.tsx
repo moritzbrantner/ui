@@ -448,9 +448,11 @@ describe("@moritzbrantner/ui theme-contract", () => {
     expect(uiTokenNames).toContain("--glass-saturation");
     expect(uiTokenNames).toContain("--glass-surface-gradient");
     expect(uiTokenNames).toContain("--glass-overlay-gradient");
-    expect(uiTokenNames).toContain("--glass-background-size");
-    expect(uiTokenNames).toContain("--glass-background-position");
-    expect(uiTokenNames).toContain("--glass-background-position-hover");
+    expect(uiTokenNames).toContain("--glass-shine-gradient");
+    expect(uiTokenNames).toContain("--glass-shine-width");
+    expect(uiTokenNames).toContain("--glass-shine-from");
+    expect(uiTokenNames).toContain("--glass-shine-to");
+    expect(uiTokenNames).not.toContain("--glass-background-size");
     expect(uiTokenNames).toContain("--glass-shine-duration");
     expect(uiTokenNames).toContain("--success");
     expect(uiTokenNames).toContain("--success-foreground");
