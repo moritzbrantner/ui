@@ -83,9 +83,10 @@
   --glass-saturation: 100%;
   --glass-surface-gradient: none;
   --glass-overlay-gradient: none;
-  --glass-background-size: auto;
-  --glass-background-position: 0 0;
-  --glass-background-position-hover: 0 0;
+  --glass-shine-gradient: none;
+  --glass-shine-width: 1;
+  --glass-shine-from: 0;
+  --glass-shine-to: 0;
   --glass-shine-duration: 1ms;
   --background: oklch(0.986 0.013 82);
   --foreground: oklch(0.17 0.018 65);
@@ -259,9 +260,10 @@
   --glass-saturation: 100%;
   --glass-surface-gradient: none;
   --glass-overlay-gradient: none;
-  --glass-background-size: auto;
-  --glass-background-position: 0 0;
-  --glass-background-position-hover: 0 0;
+  --glass-shine-gradient: none;
+  --glass-shine-width: 1;
+  --glass-shine-from: 0;
+  --glass-shine-to: 0;
   --glass-shine-duration: 1ms;
   --background: oklch(0.15 0.018 62);
   --foreground: oklch(0.92 0.018 82);
