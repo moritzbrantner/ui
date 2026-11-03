@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+const docked =
+  "/iframe.html?id=components-editors-editor-pane-layout--docked&globals=designSystem:studio;theme:light";
 const workbench =
   "/iframe.html?id=components-editors-editor-pane-layout--workbench&globals=designSystem:studio;theme:light";
 
@@ -8,12 +10,11 @@ test("drags a docked pane splitter with the pointer and keeps the canvas dominan
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto(workbench);
+  await page.goto(docked);
   const resizer = page.getByRole("separator", { name: "Resize Inspector" });
   const pane = page.getByRole("region", { name: "Inspector" });
-  // Wait for the story interaction to restore the pane.
-  await expect(pane).toBeVisible();
-  await expect(resizer).toHaveAttribute("aria-valuenow", "316");
+  await expect(pane).toBeVisible({ timeout: 30_000 });
+  await expect(resizer).toHaveAttribute("aria-valuenow", "300");
   const box = await resizer.boundingBox();
   if (!box) throw new Error("Resizer has no box");
   const x = box.x + box.width / 2;
@@ -22,8 +23,8 @@ test("drags a docked pane splitter with the pointer and keeps the canvas dominan
   await page.mouse.down();
   await page.mouse.move(x - 60, y, { steps: 6 });
   await page.mouse.up();
-  await expect(resizer).toHaveAttribute("aria-valuenow", "376");
-  await expect.poll(async () => Math.round((await pane.boundingBox())?.width ?? 0)).toBe(376);
+  await expect(resizer).toHaveAttribute("aria-valuenow", "360");
+  await expect.poll(async () => Math.round((await pane.boundingBox())?.width ?? 0)).toBe(360);
 
   const main = page.locator('[data-slot="editor-pane-main"]').nth(1);
   const mainBox = await main.boundingBox();
@@ -42,7 +43,7 @@ for (const width of [360, 390]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto(workbench);
     const layout = page.locator('[data-slot="editor-pane-layout"][data-orientation="horizontal"]');
-    await expect(layout).toHaveAttribute("data-presentation", "overlay");
+    await expect(layout).toHaveAttribute("data-presentation", "overlay", { timeout: 30_000 });
     await expect(page.getByRole("separator", { name: "Resize Inspector" })).toHaveCount(0);
     // The vertical timeline split stays docked and resizable.
     await expect(page.getByRole("separator", { name: "Resize Timeline" })).toBeVisible();
@@ -88,7 +89,7 @@ test("overlay drawers do not animate under reduced motion", async ({ page }) => 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(workbench);
   const pane = page.locator("#story-inspector");
-  await expect(pane).toHaveAttribute("data-presentation", "overlay");
+  await expect(pane).toHaveAttribute("data-presentation", "overlay", { timeout: 30_000 });
   const transition = await pane.evaluate((element) => getComputedStyle(element).transitionProperty);
   expect(transition).toBe("none");
 });

@@ -185,6 +185,18 @@ export const Workbench: Story = {
   },
 };
 
+/** Docked panes without an interaction script, for pointer and layout checks. */
+export const Docked: Story = {
+  args: { presentation: "docked" },
+  parameters: {
+    mobileUsability: {
+      skip: true,
+      reason:
+        "Desktop-only forced docked presentation; mobile behavior is covered by the auto Workbench and Overlay Drawers stories.",
+    },
+  },
+};
+
 function ControlledLayout() {
   const [sizes, setSizes] = React.useState({ assets: 240, inspector: 300 });
   const [collapsed, setCollapsed] = React.useState({ assets: false, inspector: false });
