@@ -20,6 +20,8 @@ type PropertyRowProps = React.ComponentProps<typeof Field> & {
 type PropertySectionProps = Omit<React.ComponentProps<"section">, "title"> & {
   title: React.ReactNode;
   description?: React.ReactNode;
+  /** Section-level commands such as reset or add, rendered beside the heading. */
+  actions?: React.ReactNode;
 } & (
     | { collapsible?: false; open?: never; defaultOpen?: never; onOpenChange?: never }
     | {
@@ -81,6 +83,7 @@ function PropertyRow({
 function PropertySection({
   title,
   description,
+  actions,
   collapsible = false,
   open,
   defaultOpen = true,
@@ -103,6 +106,11 @@ function PropertySection({
     </>
   );
   const sectionClassName = cn("min-w-0", className);
+  const sectionActions = actions ? (
+    <div data-slot="property-section-actions" className="flex shrink-0 items-center gap-1">
+      {actions}
+    </div>
+  ) : null;
   if (!collapsible) {
     return (
       <section
@@ -111,7 +119,14 @@ function PropertySection({
         aria-labelledby={headingId}
         className={sectionClassName}
       >
-        <h3 className="py-2">{heading}</h3>
+        {sectionActions ? (
+          <div className="flex min-w-0 items-center gap-2">
+            <h3 className="min-w-0 flex-1 py-2">{heading}</h3>
+            {sectionActions}
+          </div>
+        ) : (
+          <h3 className="py-2">{heading}</h3>
+        )}
         <Separator />
         <div className="py-2">{children}</div>
       </section>
@@ -133,13 +148,21 @@ function PropertySection({
         data-open={isOpen ? "true" : undefined}
         className={sectionClassName}
       >
-        <CollapsibleTrigger className="flex min-h-10 w-full items-center justify-between gap-2 px-2 py-2 text-left outline-none hover:bg-muted/40 focus-visible:ring-3 focus-visible:ring-ring/50">
-          <span>{heading}</span>
-          <ChevronDownIcon
-            aria-hidden="true"
-            className={cn("size-4 shrink-0 transition-transform", isOpen && "rotate-180")}
-          />
-        </CollapsibleTrigger>
+        <div className="flex min-w-0 items-center gap-1">
+          <h3 className="min-w-0 flex-1">
+            <CollapsibleTrigger className="flex min-h-10 w-full items-center justify-between gap-2 px-2 py-2 text-left outline-none hover:bg-muted/40 focus-visible:ring-3 focus-visible:ring-ring/50">
+              <span>{heading}</span>
+              <ChevronDownIcon
+                aria-hidden="true"
+                className={cn(
+                  "size-4 shrink-0 transition-transform motion-reduce:transition-none",
+                  isOpen && "rotate-180",
+                )}
+              />
+            </CollapsibleTrigger>
+          </h3>
+          {sectionActions}
+        </div>
         <CollapsibleContent>
           <Separator />
           <div className="py-2">{children}</div>

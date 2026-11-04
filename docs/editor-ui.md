@@ -76,6 +76,9 @@ Use the existing shared workbench primitives instead of rebuilding static editor
 
 - `WorkbenchLayout`, `WorkbenchCanvas`, `WorkbenchPanel`, and `WorkbenchToolbar` for the current state-light editor shell.
 - `ResizablePanelGroup`, `ResizablePanel`, and `ResizableHandle` for resizable regions.
+- `EditorPaneLayout` with `EditorPane`, `EditorPaneMain`, `EditorPaneHeader`, `EditorPaneContent`, and `EditorPaneToggle` for editor side/bottom panes sized in pixels, with keyboard and pointer splitters, collapse, and overlay drawers on narrow containers.
+- `EditorToolbar`, `EditorToolbarGroup`, and `EditorToolbarButton` for roving-focus editor command bars.
+- `EditorInspector`, `EditorInspectorHeader`, `EditorInspectorContent`, and `EditorInspectorFooter` for inspector chrome around `PropertySection` and `PropertyRow`.
 - The Studio theme for creative production/editing surfaces unless another established theme better matches the product.
 
 Panel layout state is presentation state. A consuming app may persist it, but it is not part of the edited document unless that product explicitly makes layout part of its domain.
@@ -85,6 +88,20 @@ Panel layout state is presentation state. A consuming app may persist it, but it
 Use `horizontalGroup` and `verticalGroup` to supply the existing resizable engine's `defaultLayout`, `onLayoutChanged`, and `groupRef`. These are native percentage layouts, not a second persistence API. Supply a stable workbench `id` when persisting layouts; panel keys are `${id}-left`, `${id}-canvas`, `${id}-right`, `${id}-main`, and `${id}-bottom` for regions that are present. The app chooses storage, restores a compatible layout, and may use the native group handle to reset sizes.
 
 Below the shared 768px breakpoint, the workbench presents one vertical stack instead of mounting hidden desktop and mobile copies. Changing layouts or docks can remount panel contents: keep edited values in app-owned controlled state so they survive these presentation changes. A control's unfinished local draft is not document state.
+
+### Editor pane chrome
+
+`EditorPaneLayout` is a flex row (`orientation="horizontal"`) or column (`"vertical"`). Its children are `EditorPaneMain` (the dominant work surface) and `EditorPane`s attached to the `start` or `end` edge; nest layouts for arrangements such as a horizontal assets/canvas/inspector row above a vertical timeline. Any other child, such as an `EditorToolbar` as the first child of a vertical layout, is laid out in order.
+
+Use it instead of `ResizablePanelGroup` when a pane should keep a pixel size while the window resizes. `ResizablePanelGroup` remains the choice for proportional splits, such as a preview and timeline sharing a column.
+
+Each pane has a required `label`, used as its region name and in its splitter, rail, and toggle names. Sizes are pixels along the layout axis: `defaultSize` (280), `minSize` (180), `maxSize` (560), or a controlled `size`/`onSizeChange`; `onResizeEnd` fires once per drag or key press and is the moment to persist. The splitter follows the WAI-ARIA window splitter pattern. Arrow keys move it by `keyboardStep` (16px), or by `largeKeyboardStep` (64px) with Shift. Home and End jump to min and max, Enter collapses or expands, and double-click restores `defaultSize`. Dragging below half the minimum collapses a `collapsible` pane. `collapsed`/`onCollapsedChange` controls docked collapse. A collapsed pane keeps its content mounted and shows a rail with a "Show …" button unless `rail={false}`.
+
+With `presentation="auto"`, a horizontal layout narrower than `narrowBreakpoint` (768px of container width, not viewport) turns its panes into overlay drawers. A drawer starts closed, takes focus when opened, and closes on Escape, a scrim click, or focus moving outside it. Focus then returns to the control that opened it. `overlayOpen`/`onOverlayOpenChange` control drawers separately from the docked `collapsed` state. `EditorPaneToggle paneId="…"` shows and hides a pane in either presentation and reaches panes in nested layouts. Layout sizes and collapse state are presentation state: persist them in the consuming app if wanted.
+
+### Editor toolbars
+
+`EditorToolbar` follows the WAI-ARIA toolbar pattern. It has one Tab stop, and arrow keys (respecting `orientation` and RTL), Home, and End move between commands. Disabled buttons are skipped, and text inputs keep their caret keys. A nested composite that manages its own focus, such as a default `ToggleGroup`, stays a single stop with its own arrow keys. Pass `rovingFocus={false}` to a `ToggleGroup` to join its items to the toolbar sequence. `EditorToolbarButton` takes a required `label` (its accessible name and tooltip), an `icon`, a display-only `shortcut`, an optional `pressed` toggle state, and `showLabel`. Its size follows the toolbar `density`.
 
 Use the existing `Toolbar`, `Command`, and `TreeView` primitives for domain-independent action, command discovery, and outliner presentation. Consumers provide commands, selection, object identities, and tree contents.
 
