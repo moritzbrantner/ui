@@ -1038,6 +1038,42 @@ const componentRegistry = [
     reason: "Reusable state-light application pattern exported from the root API.",
   },
   {
+    name: "editor-inspector",
+    fileName: "editor-inspector",
+    tier: "patterns",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/patterns/editor-inspector",
+    storyFiles: ["src/components/patterns/editor-inspector.stories.tsx"],
+    testFiles: ["src/components/patterns/editor-inspector.test.tsx"],
+    status: "pattern",
+    reason:
+      "State-light inspector chrome (fixed header, scrolling property sections, footer) over the stable property primitives.",
+  },
+  {
+    name: "editor-pane-layout",
+    fileName: "editor-pane-layout",
+    tier: "patterns",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/patterns/editor-pane-layout",
+    storyFiles: ["src/components/patterns/editor-pane-layout.stories.tsx"],
+    testFiles: ["src/components/patterns/editor-pane-layout.test.tsx"],
+    status: "pattern",
+    reason:
+      "Editor pane chrome with pixel-sized keyboard and pointer splitters, collapse rails, and container-driven overlay drawers.",
+  },
+  {
+    name: "editor-toolbar",
+    fileName: "editor-toolbar",
+    tier: "patterns",
+    rootExport: true,
+    publicSubpath: "@moritzbrantner/ui/components/patterns/editor-toolbar",
+    storyFiles: ["src/components/patterns/editor-toolbar.stories.tsx"],
+    testFiles: ["src/components/patterns/editor-toolbar.test.tsx"],
+    status: "pattern",
+    reason:
+      "Roving-focus editor command toolbar with density-aware icon commands composed over the stable Toolbar.",
+  },
+  {
     name: "editor-workbench",
     fileName: "editor-workbench",
     tier: "patterns",
