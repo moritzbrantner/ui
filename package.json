@@ -309,7 +309,7 @@
     "@storybook/react-vite": "10.6.6",
     "@tailwindcss/vite": "4.3.5",
     "@testing-library/react": "16.3.3",
-    "@testing-library/user-event": "14.6.8",
+    "@testing-library/user-event": "14.6.9",
     "@types/jsdom": "28.0.3",
     "@types/node": "25.9.9",
     "@types/react": "19.3.0",
@@ -318,8 +318,8 @@
     "@vitest/coverage-v8": "4.1.12",
     "coding-tooling": "github:moritzbrantner/coding-tooling#85d4a534e81dea765091208e6cd0fd29cb550089",
     "jsdom": "26.1.0",
-    "oxfmt": "0.77.0",
-    "oxlint": "1.92.0",
+    "oxfmt": "0.78.0",
+    "oxlint": "1.93.0",
     "oxlint-tsgolint": "7.0.2006",
     "playwright": "1.65.0",
     "react": "19.3.1",
@@ -329,7 +329,7 @@
     "tsup": "8.5.1",
     "typescript": "6.0.3",
     "unlighthouse": "0.19.1",
-    "vite": "8.3.6",
+    "vite": "8.3.7",
     "vitest": "4.1.12"
   },
   "peerDependencies": {
