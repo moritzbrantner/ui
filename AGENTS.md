@@ -25,6 +25,7 @@ Keep product workflows, routing, auth/session state, backend contracts, settings
 ## Commands
 
 - Install dependencies: `bun install --frozen-lockfile`
+  - **BUN-001 owner exception (2026-11-23):** use the latest stable Bun; `package.json` (and the example's `consumer-package.json`) declare no `packageManager`, CI passes `bun_version: latest`, and `bun.lock` stays committed and frozen. This supersedes the installed `.conventions/` BUN-001 text until the refreshed rule (moritzbrantner/coding-agent-conventions#154) is installed.
 - Start local development Storybook: `bun run dev`
 - Fast tests: `bun run test`
 - Type check: `bun run check-types`
