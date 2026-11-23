@@ -34,15 +34,18 @@
 
 ## UI-009 — Make functional screens task-first, not promotional
 
-- On representative target viewports, put the primary task, current content or state, and frequent actions before generic introductions.
-- Do not spend recurring workflow screens on hero slogans, marketing-style copy, product pitches, decorative banners, or generic explanatory prose.
+- Apply `PRINCIPLE-009`: on representative target viewports, put the primary task, current content or state, and frequent actions before product self-description.
+- Do not spend recurring workflow screens on hero slogans, marketing-style copy, product pitches, decorative banners, generic explanatory prose, architecture summaries, implementation claims, or feature badges that do not change the user's next action.
+- Do not add a visible eyebrow, title, description, section preamble, or “choose/view/start” call to action merely to narrate controls or choices that are already immediately visible. Present the useful content directly.
+- Avoid in-page navigation whose only purpose is to jump from an introductory block to the primary content directly below it.
 - Prefer compact, scannable layouts. Whitespace and framing must improve hierarchy rather than push useful controls or results below the fold.
-- Move architecture, implementation, privacy, or product explanation to documentation, help, or about surfaces unless it changes an immediate consent decision or next action.
+- If a visible page title would only repeat obvious context but a semantic page heading is still required, preserve the heading accessibly without turning it into visual chrome.
+- Move architecture, implementation, privacy, source, or product explanation to documentation, help, about, onboarding, or a contextual details surface unless it changes an immediate consent decision or next action.
 
 ## UI-010 — Make persistent UI earn its space
 
-- Every persistent navigation item, toolbar control, panel, badge, or card must support a recurring task, a real destination, or decision-relevant state.
-- Do not ship placeholder or unimplemented navigation, decorative controls, redundant chrome, or permanently visible status content that users cannot act on.
+- Every persistent navigation item, toolbar control, panel, badge, card, or link must support a recurring task, a real destination, or decision-relevant state.
+- Do not ship placeholder or unimplemented navigation, decorative controls, redundant chrome, permanently visible status content that users cannot act on, or developer/source links that are unrelated to the product's normal workflow.
 - Prefer fewer stable destinations to speculative app shells; surface secondary tasks contextually when they become relevant.
 
 ## UI-011 — Make empty states operational
@@ -50,3 +53,23 @@
 - State what is absent and expose the most likely next action.
 - Keep empty-state copy concise; do not turn empty states into marketing or generic onboarding explanations unless onboarding is itself the task.
 - Reuse the normal creation, import, or discovery action instead of inventing an empty-state-only workflow.
+
+## UI-012 — Make interactive tools direct-manipulation first
+
+- For editors and workspace-oriented tools, let users select, move, resize, connect, scrub, reorder, edit, or otherwise act on the represented object directly when the domain has a natural interaction for it.
+- Keep inspectors, forms, property panels, menus, and command palettes as precise or discoverable complements. Do not make users leave the work surface for an indirect form when the same operation can be performed clearly in context.
+- Preserve exact entry, keyboard commands, accessibility semantics, and non-pointer alternatives. Direct manipulation does not justify removing precision or keyboard completion; apply `UI-005`, `UI-007`, and `UI-008`.
+- Keep the primary work surface visually dominant. Toolbars and panels should be as small and contextual as their recurring tasks allow.
+
+## UI-013 — Give each interaction one owner and protect its geometry
+
+- Give each gesture and interaction state machine one authoritative owner. Parent and child layers must not independently implement competing selection rectangles, dragging, panning, resizing, connection gestures, timeline scrubbing, or equivalent behavior for the same physical input.
+- Repair the owning primitive or interaction seam when behavior is wrong. Do not hide an ownership defect behind duplicate overlays, descendant-specific CSS overrides, parallel local state, or wrapper-level gesture patches.
+- Treat hit targets, clipping, selection bounds, drag handles, overlay alignment, pointer capture, scroll/zoom behavior, and viewport placement as observable product behavior rather than cosmetic details.
+- When those properties depend on browser layout, pointer geometry, media, canvas, or viewport behavior, add focused browser evidence that exercises the real interaction; use cheaper tests for semantics that do not require a browser.
+
+## UI-014 — Define navigable UI behavior as a state graph
+
+- Make the important pages and interactive modes of a workflow inspectable as states with defined events, guards, transitions, and observable outcomes; nest local interaction modes under their page rather than multiplying ordinary data values into states.
+- Keep durable navigation in URL paths/query parameters, transient interaction state in its owning feature, and server-owned data in its existing authority; do not create shadow route state.
+- Use a statechart library only when transition complexity warrants it; the existing router and typed local state suffice for simpler flows.
