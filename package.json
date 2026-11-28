@@ -300,7 +300,7 @@
     "vaul": "^1.1.2"
   },
   "devDependencies": {
-    "@axe-core/playwright": "4.14.0",
+    "@axe-core/playwright": "4.14.1",
     "@playwright/test": "1.65.1",
     "@react-three/fiber": "9.8.2",
     "@storybook/addon-a11y": "10.6.8",
@@ -311,8 +311,8 @@
     "@testing-library/react": "16.3.3",
     "@testing-library/user-event": "14.6.13",
     "@types/jsdom": "28.0.3",
-    "@types/node": "25.9.9",
-    "@types/react": "19.3.0",
+    "@types/node": "25.9.10",
+    "@types/react": "19.3.1",
     "@types/react-dom": "19.3.0",
     "@vitest/browser-playwright": "4.1.12",
     "@vitest/coverage-v8": "4.1.12",
