@@ -42,7 +42,7 @@
         "@types/react-dom": "19.3.0",
         "@vitest/browser-playwright": "4.1.12",
         "@vitest/coverage-v8": "4.1.12",
-        "coding-tooling": "github:moritzbrantner/coding-tooling#1d89f753b857fd39451f2f44a76f376657b99f9d",
+        "coding-tooling": "github:moritzbrantner/coding-tooling#fe746ce29648080bb5342aa6d1093ae6010a67c6",
         "jsdom": "26.1.0",
         "oxfmt": "0.80.0",
         "oxlint": "1.95.0",
@@ -1029,7 +1029,7 @@
 
     "cmdk": ["cmdk@1.1.1", "", { "dependencies": { "@radix-ui/react-compose-refs": "^1.1.1", "@radix-ui/react-dialog": "^1.1.6", "@radix-ui/react-id": "^1.1.0", "@radix-ui/react-primitive": "^2.0.2" }, "peerDependencies": { "react": "^18 || ^19 || ^19.0.0-rc", "react-dom": "^18 || ^19 || ^19.0.0-rc" } }, "sha512-Vsv7kFaXm+ptHDMZ7izaRsP70GgrW9NBNGswt9OZaVBLlE0SNpDq8eu/VGXyF9r7M0azK3Wy7OlYXsuyYLFzHg=="],
 
-    "coding-tooling": ["coding-tooling@github:moritzbrantner/coding-tooling#1d89f75", { "dependencies": { "markdown-it": "15.0.3" }, "bin": { "coding-tooling": "./src/router.ts", "daq": "./src/daq-cli.ts" } }, "moritzbrantner-coding-tooling-1d89f75", "sha512-R6qa3zLVyPtQE0S5bMx3Wmg3EW40shvCUIWi+NJVg6yoSqD5KC/ffx8lx1mDjo4YECd27YjZQR5/wkeoXSQTJg=="],
+    "coding-tooling": ["coding-tooling@github:moritzbrantner/coding-tooling#fe746ce", { "dependencies": { "markdown-it": "15.0.3" }, "bin": { "coding-tooling": "./src/router.ts", "daq": "./src/daq-cli.ts" } }, "moritzbrantner-coding-tooling-fe746ce", "sha512-Qak4bpe/OUjKy807NkKufP9/Ltfnv1jpWiazacotTSWEnlv/VArz8EGhY6OPIMrlfHFLCxTWx8tS1r6W0ncUCA=="],
 
     "color-convert": ["color-convert@2.0.1", "", { "dependencies": { "color-name": "~1.1.4" } }, "sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ=="],
 
