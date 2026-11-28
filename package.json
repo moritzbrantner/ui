@@ -316,7 +316,7 @@
     "@types/react-dom": "19.3.0",
     "@vitest/browser-playwright": "4.1.12",
     "@vitest/coverage-v8": "4.1.12",
-    "coding-tooling": "github:moritzbrantner/coding-tooling#1d89f753b857fd39451f2f44a76f376657b99f9d",
+    "coding-tooling": "github:moritzbrantner/coding-tooling#fe746ce29648080bb5342aa6d1093ae6010a67c6",
     "jsdom": "26.1.0",
     "oxfmt": "0.80.0",
     "oxlint": "1.95.0",
